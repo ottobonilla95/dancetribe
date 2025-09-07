@@ -1,4 +1,4 @@
-import { Suspense } from 'react'
+import { Suspense } from "react";
 import Header from "@/components/Header";
 import Hero from "@/components/Hero";
 import Problem from "@/components/Problem";
@@ -15,10 +15,11 @@ export default function Home() {
         <Header />
       </Suspense>
       <main>
-        <Hero />
-        <Problem />
+        <div className="bg-black">
+          <Hero />
+        </div>
+        {/* <Problem /> */}
         <FeaturesAccordion />
-        <Pricing />
         <FAQ />
         <CTA />
       </main>

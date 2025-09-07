@@ -3,10 +3,10 @@ import { ConfigProps } from "./types/config";
 
 const config = {
   // REQUIRED
-  appName: "ShipFast",
+  appName: "DanceTribe",
   // REQUIRED: a short description of your app for SEO tags (can be overwritten)
   appDescription:
-    "The NextJS boilerplate with all you need to build your SaaS, AI tool, or any other web app.",
+    "Connect with dancers worldwide! Discover music, cities, events, and dance communities. Find festivals, socials, DJs, and explore new places through dance.",
   // REQUIRED (no https://, not trailing slash at the end, just the naked domain)
   domainName: "dancetribe.co",
   crisp: {
@@ -18,7 +18,7 @@ const config = {
   stripe: {
     // Create multiple plans in your Stripe dashboard, then add them here. You can add as many plans as you want, just make sure to add the priceId
     plans: [
-      {
+      { 
         // REQUIRED — we use this to find the plan in the webhook (for instance if you want to update the user's credits based on the plan)
         priceId:
           process.env.NODE_ENV === "development"
