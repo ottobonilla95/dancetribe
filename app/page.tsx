@@ -8,6 +8,8 @@ import CTA from "@/components/CTA";
 import Footer from "@/components/Footer";
 import connectMongo from "@/libs/mongoose";
 import City from "@/models/City";
+import Country from "@/models/Country";
+import Continent from "@/models/Continent";
 import { City as CityType } from "@/types";
 
 console.log("📦 PAGE MODULE LOADED");
@@ -19,30 +21,27 @@ async function getCities(): Promise<CityType[]> {
     await connectMongo();
     console.log("✅ Connected to MongoDB");
 
-    console.error("🔄 Connecting to MongoDB...");
-    console.log("🔄 Connecting to MongoDB...");
-    console.warn("🔄 Connecting to MongoDB...");
-    console.info("🔄 Connecting to MongoDB...");
-    await connectMongo();
-
-    console.error("🔄 Fetching cities...");
+    console.log("🔍 Fetching cities...");
     const cities = await City.find({ rank: { $gt: 0 } })
-      .populate("country", "name code")
-      .populate("continent", "name")
+      // .populate("country", "name code")
+      // .populate("continent", "name")
       .sort({ rank: 1 })
       .limit(10)
       .lean();
 
-    console.error("🔄 Cities fetched:", cities.length);
+    console.log(`📊 Found ${cities.length} cities`);
 
-    return cities.map((doc: any) => ({
+    const result = cities.map((doc: any) => ({
       ...doc,
       _id: doc._id.toString(),
-      country: { name: doc.country?.name || "", code: doc.country?.code || "" },
-      continent: { name: doc.continent?.name || "" },
+      country: { name: "Unknown", code: "" },
+      continent: { name: "Unknown" },
     }));
+
+    console.log("✅ Cities processed successfully");
+    return result;
   } catch (error) {
-    console.error("Error fetching cities:", error);
+    console.error("❌ Error fetching cities:", error);
     return [];
   }
 }

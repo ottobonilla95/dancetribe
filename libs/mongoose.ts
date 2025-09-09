@@ -1,4 +1,8 @@
 import mongoose from "mongoose";
+import User from "@/models/User";
+import Country from "@/models/Country";
+import Continent from "@/models/Continent";
+import City from "@/models/City";
 
 const connectMongo = async () => {
   if (!process.env.MONGODB_URI) {
