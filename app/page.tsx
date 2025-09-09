@@ -12,47 +12,33 @@ import Country from "@/models/Country";
 import Continent from "@/models/Continent";
 import { City as CityType } from "@/types";
 
-console.log("📦 PAGE MODULE LOADED");
-
 async function getCities(): Promise<CityType[]> {
   console.log("🚀 getCities FUNCTION CALLED");
   try {
-    console.log("🔄 About to connect to MongoDB...");
     await connectMongo();
-    console.log("✅ Connected to MongoDB");
 
-    console.log("🔍 Fetching cities...");
     const cities = await City.find({ rank: { $gt: 0 } })
-      // .populate("country", "name code")
-      // .populate("continent", "name")
+      .populate({ path: "country", model: Country, select: "name code" })
+      .populate({ path: "continent", model: Continent, select: "name" })
       .sort({ rank: 1 })
       .limit(10)
       .lean();
 
-    console.log(`📊 Found ${cities.length} cities`);
-
     const result = cities.map((doc: any) => ({
       ...doc,
       _id: doc._id.toString(),
-      country: { name: "Unknown", code: "" },
-      continent: { name: "Unknown" },
+      country: { name: doc.country?.name || "", code: doc.country?.code || "" },
+      continent: { name: doc.continent?.name || "" },
     }));
 
-    console.log("✅ Cities processed successfully");
     return result;
   } catch (error) {
-    console.error("❌ Error fetching cities:", error);
     return [];
   }
 }
 
 export default async function Home() {
   const cities: CityType[] = await getCities();
-
-  console.log("cities", cities);
-  console.log("cities", cities);
-  console.log("cities", cities);
-
   return (
     <>
       <Suspense>
