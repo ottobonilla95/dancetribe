@@ -48,6 +48,8 @@ export default async function Home() {
         <Header />
       </Suspense>
       <main>
+      UPDATEWDa
+
         <div className="bg-black">
           <Hero />
         </div>
