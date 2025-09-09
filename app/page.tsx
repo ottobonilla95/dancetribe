@@ -14,10 +14,10 @@ async function getCities(): Promise<CityType[]> {
   try {
     await connectMongo();
 
-    console.log("🔄 Connecting to MongoDB...");
+    console.error("🔄 Connecting to MongoDB...");
     await connectMongo();
 
-    console.log("🔄 Fetching cities...");
+    console.error("🔄 Fetching cities...");
     const cities = await City.find({ rank: { $gt: 0 } })
       .populate("country", "name code")
       .populate("continent", "name")
@@ -25,7 +25,7 @@ async function getCities(): Promise<CityType[]> {
       .limit(10)
       .lean();
 
-    console.log("🔄 Cities fetched:", cities.length);
+    console.error("🔄 Cities fetched:", cities.length);
 
     return cities.map((doc: any) => ({
       ...doc,
