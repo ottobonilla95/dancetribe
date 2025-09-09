@@ -10,9 +10,14 @@ import connectMongo from "@/libs/mongoose";
 import City from "@/models/City";
 import { City as CityType } from "@/types";
 
+console.log("📦 PAGE MODULE LOADED");
+
 async function getCities(): Promise<CityType[]> {
+  console.log("🚀 getCities FUNCTION CALLED");
   try {
+    console.log("🔄 About to connect to MongoDB...");
     await connectMongo();
+    console.log("✅ Connected to MongoDB");
 
     console.error("🔄 Connecting to MongoDB...");
     console.log("🔄 Connecting to MongoDB...");
@@ -45,13 +50,17 @@ async function getCities(): Promise<CityType[]> {
 export default async function Home() {
   const cities: CityType[] = await getCities();
 
+  console.log("cities", cities);
+  console.log("cities", cities);
+  console.log("cities", cities);
+
   return (
     <>
       <Suspense>
         <Header />
       </Suspense>
       <main>
-        UPDATED2
+        UPDATED3
         <div className="bg-black">
           <Hero />
         </div>
