@@ -15,6 +15,9 @@ async function getCities(): Promise<CityType[]> {
     await connectMongo();
 
     console.error("🔄 Connecting to MongoDB...");
+    console.log("🔄 Connecting to MongoDB...");
+    console.warn("🔄 Connecting to MongoDB...");
+    console.info("🔄 Connecting to MongoDB...");
     await connectMongo();
 
     console.error("🔄 Fetching cities...");
@@ -48,8 +51,7 @@ export default async function Home() {
         <Header />
       </Suspense>
       <main>
-      UPDATEWDa
-
+        UPDATED2
         <div className="bg-black">
           <Hero />
         </div>
