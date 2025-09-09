@@ -1,14 +1,41 @@
 import { Suspense } from "react";
 import Header from "@/components/Header";
 import Hero from "@/components/Hero";
-import Problem from "@/components/Problem";
+import CityList from "@/components/organisims/CityList";
 import FeaturesAccordion from "@/components/FeaturesAccordion";
-import Pricing from "@/components/Pricing";
 import FAQ from "@/components/FAQ";
 import CTA from "@/components/CTA";
 import Footer from "@/components/Footer";
+import connectMongo from "@/libs/mongoose";
+import City from "@/models/City";
+import { City as CityType } from "@/types";
 
-export default function Home() {
+async function getCities(): Promise<CityType[]> {
+  try {
+    await connectMongo();
+
+    const cities = await City.find({ rank: { $gt: 0 } })
+      .populate("country", "name code")
+      .populate("continent", "name")
+      .sort({ rank: 1 })
+      .limit(10)
+      .lean();
+
+    return cities.map((doc: any) => ({
+      ...doc,
+      _id: doc._id.toString(),
+      country: { name: doc.country?.name || "", code: doc.country?.code || "" },
+      continent: { name: doc.continent?.name || "" },
+    }));
+  } catch (error) {
+    console.error("Error fetching cities:", error);
+    return [];
+  }
+}
+
+export default async function Home() {
+  const cities: CityType[] = await getCities();
+
   return (
     <>
       <Suspense>
@@ -18,8 +45,8 @@ export default function Home() {
         <div className="bg-black">
           <Hero />
         </div>
-        {/* <Problem /> */}
-        <FeaturesAccordion />
+        <CityList cities={cities} />
+        {/* <FeaturesAccordion /> */}
         <FAQ />
         <CTA />
       </main>

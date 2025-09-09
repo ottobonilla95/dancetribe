@@ -17,8 +17,10 @@
     "@next/mdx": "^13.5.6",
     "axios": "^1.6.8",
     "crisp-sdk-web": "^1.0.22",
+    "dotenv": "^17.2.2",
     "eslint": "8.47.0",
     "eslint-config-next": "13.4.19",
+    "flag-icons": "^7.5.0",
     "form-data": "^4.0.0",
     "mongodb": "^5.9.2",
     "mongoose": "^7.6.10",
@@ -48,6 +50,7 @@
     "daisyui": "^4.10.1",
     "postcss": "^8.4.38",
     "tailwindcss": "^3.4.3",
+    "ts-node": "^10.9.2",
     "typescript": "^5.4.3"
   }
 }

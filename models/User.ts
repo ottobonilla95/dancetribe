@@ -36,6 +36,16 @@ const userSchema = new mongoose.Schema(
       type: Boolean,
       default: false,
     },
+    // User's city - links to City collection
+    city: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "City",
+    },
+    // Dance styles the user is interested in/practices
+    danceStyles: {
+      type: [String],
+      default: [],
+    },
   },
   {
     timestamps: true,

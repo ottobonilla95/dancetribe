@@ -1,0 +1,268 @@
+import dotenv from 'dotenv';
+import path from 'path';
+
+// Load environment variables
+dotenv.config({ path: path.join(process.cwd(), '.env.local') });
+
+import connectMongo from "../libs/mongoose";
+import Continent from "../models/Continent";
+import Country from "../models/Country";
+
+const continents = [
+  { name: "Asia", code: "AS", totalDancers: 0 },
+  { name: "Europe", code: "EU", totalDancers: 0 },
+  { name: "North America", code: "NA", totalDancers: 0 },
+  { name: "South America", code: "SA", totalDancers: 0 },
+  { name: "Africa", code: "AF", totalDancers: 0 },
+  { name: "Oceania", code: "OC", totalDancers: 0 },
+];
+
+const countries = [
+  // Asia
+  { name: "Japan", code: "JP", continentCode: "AS" },
+  { name: "South Korea", code: "KR", continentCode: "AS" },
+  { name: "China", code: "CN", continentCode: "AS" },
+  { name: "India", code: "IN", continentCode: "AS" },
+  { name: "Thailand", code: "TH", continentCode: "AS" },
+  { name: "Singapore", code: "SG", continentCode: "AS" },
+  { name: "Philippines", code: "PH", continentCode: "AS" },
+  { name: "Indonesia", code: "ID", continentCode: "AS" },
+  { name: "Malaysia", code: "MY", continentCode: "AS" },
+  { name: "Vietnam", code: "VN", continentCode: "AS" },
+  { name: "Taiwan", code: "TW", continentCode: "AS" },
+  { name: "Hong Kong", code: "HK", continentCode: "AS" },
+  { name: "Sri Lanka", code: "LK", continentCode: "AS" },
+  { name: "Bangladesh", code: "BD", continentCode: "AS" },
+  { name: "Nepal", code: "NP", continentCode: "AS" },
+  { name: "Pakistan", code: "PK", continentCode: "AS" },
+  { name: "Mongolia", code: "MN", continentCode: "AS" },
+  { name: "Myanmar", code: "MM", continentCode: "AS" },
+  { name: "Cambodia", code: "KH", continentCode: "AS" },
+  { name: "Laos", code: "LA", continentCode: "AS" },
+  { name: "Brunei", code: "BN", continentCode: "AS" },
+  
+  // Europe
+  { name: "Germany", code: "DE", continentCode: "EU" },
+  { name: "United Kingdom", code: "GB", continentCode: "EU" },
+  { name: "France", code: "FR", continentCode: "EU" },
+  { name: "Spain", code: "ES", continentCode: "EU" },
+  { name: "Italy", code: "IT", continentCode: "EU" },
+  { name: "Netherlands", code: "NL", continentCode: "EU" },
+  { name: "Sweden", code: "SE", continentCode: "EU" },
+  { name: "Norway", code: "NO", continentCode: "EU" },
+  { name: "Poland", code: "PL", continentCode: "EU" },
+  { name: "Russia", code: "RU", continentCode: "EU" },
+  { name: "Austria", code: "AT", continentCode: "EU" },
+  { name: "Belgium", code: "BE", continentCode: "EU" },
+  { name: "Switzerland", code: "CH", continentCode: "EU" },
+  { name: "Denmark", code: "DK", continentCode: "EU" },
+  { name: "Finland", code: "FI", continentCode: "EU" },
+  { name: "Portugal", code: "PT", continentCode: "EU" },
+  { name: "Greece", code: "GR", continentCode: "EU" },
+  { name: "Czech Republic", code: "CZ", continentCode: "EU" },
+  { name: "Hungary", code: "HU", continentCode: "EU" },
+  { name: "Romania", code: "RO", continentCode: "EU" },
+  { name: "Bulgaria", code: "BG", continentCode: "EU" },
+  { name: "Croatia", code: "HR", continentCode: "EU" },
+  { name: "Slovenia", code: "SI", continentCode: "EU" },
+  { name: "Slovakia", code: "SK", continentCode: "EU" },
+  { name: "Lithuania", code: "LT", continentCode: "EU" },
+  { name: "Latvia", code: "LV", continentCode: "EU" },
+  { name: "Estonia", code: "EE", continentCode: "EU" },
+  { name: "Ireland", code: "IE", continentCode: "EU" },
+  { name: "Iceland", code: "IS", continentCode: "EU" },
+  { name: "Luxembourg", code: "LU", continentCode: "EU" },
+  { name: "Malta", code: "MT", continentCode: "EU" },
+  { name: "Cyprus", code: "CY", continentCode: "EU" },
+  { name: "Albania", code: "AL", continentCode: "EU" },
+  { name: "Serbia", code: "RS", continentCode: "EU" },
+  { name: "Montenegro", code: "ME", continentCode: "EU" },
+  { name: "North Macedonia", code: "MK", continentCode: "EU" },
+  { name: "Bosnia and Herzegovina", code: "BA", continentCode: "EU" },
+  { name: "Ukraine", code: "UA", continentCode: "EU" },
+  { name: "Belarus", code: "BY", continentCode: "EU" },
+  { name: "Moldova", code: "MD", continentCode: "EU" },
+  { name: "Turkey", code: "TR", continentCode: "EU" },
+  
+  // North America
+  { name: "United States", code: "US", continentCode: "NA" },
+  { name: "Canada", code: "CA", continentCode: "NA" },
+  { name: "Mexico", code: "MX", continentCode: "NA" },
+  { name: "Guatemala", code: "GT", continentCode: "NA" },
+  { name: "Belize", code: "BZ", continentCode: "NA" },
+  { name: "El Salvador", code: "SV", continentCode: "NA" },
+  { name: "Honduras", code: "HN", continentCode: "NA" },
+  { name: "Nicaragua", code: "NI", continentCode: "NA" },
+  { name: "Costa Rica", code: "CR", continentCode: "NA" },
+  { name: "Panama", code: "PA", continentCode: "NA" },
+  { name: "Cuba", code: "CU", continentCode: "NA" },
+  { name: "Jamaica", code: "JM", continentCode: "NA" },
+  { name: "Haiti", code: "HT", continentCode: "NA" },
+  { name: "Dominican Republic", code: "DO", continentCode: "NA" },
+  { name: "Puerto Rico", code: "PR", continentCode: "NA" },
+  { name: "Trinidad and Tobago", code: "TT", continentCode: "NA" },
+  { name: "Barbados", code: "BB", continentCode: "NA" },
+  { name: "Saint Lucia", code: "LC", continentCode: "NA" },
+  { name: "Grenada", code: "GD", continentCode: "NA" },
+  { name: "Antigua and Barbuda", code: "AG", continentCode: "NA" },
+  { name: "Saint Kitts and Nevis", code: "KN", continentCode: "NA" },
+  { name: "Saint Vincent and the Grenadines", code: "VC", continentCode: "NA" },
+  { name: "Dominica", code: "DM", continentCode: "NA" },
+  { name: "Bahamas", code: "BS", continentCode: "NA" },
+  { name: "Cayman Islands", code: "KY", continentCode: "NA" },
+  { name: "Aruba", code: "AW", continentCode: "NA" },
+  { name: "Curaçao", code: "CW", continentCode: "NA" },
+  { name: "Bonaire", code: "BQ", continentCode: "NA" },
+  { name: "Sint Maarten", code: "SX", continentCode: "NA" },
+  { name: "Sint Eustatius", code: "BQ", continentCode: "NA" },
+  { name: "Saba", code: "BQ", continentCode: "NA" },
+  { name: "Martinique", code: "MQ", continentCode: "NA" },
+  { name: "Guadeloupe", code: "GP", continentCode: "NA" },
+  { name: "Saint Martin", code: "MF", continentCode: "NA" },
+  { name: "Saint Barthélemy", code: "BL", continentCode: "NA" },
+  
+  // South America
+  { name: "Brazil", code: "BR", continentCode: "SA" },
+  { name: "Argentina", code: "AR", continentCode: "SA" },
+  { name: "Chile", code: "CL", continentCode: "SA" },
+  { name: "Colombia", code: "CO", continentCode: "SA" },
+  { name: "Peru", code: "PE", continentCode: "SA" },
+  { name: "Venezuela", code: "VE", continentCode: "SA" },
+  { name: "Ecuador", code: "EC", continentCode: "SA" },
+  { name: "Bolivia", code: "BO", continentCode: "SA" },
+  { name: "Paraguay", code: "PY", continentCode: "SA" },
+  { name: "Uruguay", code: "UY", continentCode: "SA" },
+  { name: "Guyana", code: "GY", continentCode: "SA" },
+  { name: "Suriname", code: "SR", continentCode: "SA" },
+  { name: "French Guiana", code: "GF", continentCode: "SA" },
+  
+  // Africa
+  { name: "South Africa", code: "ZA", continentCode: "AF" },
+  { name: "Nigeria", code: "NG", continentCode: "AF" },
+  { name: "Egypt", code: "EG", continentCode: "AF" },
+  { name: "Kenya", code: "KE", continentCode: "AF" },
+  { name: "Morocco", code: "MA", continentCode: "AF" },
+  { name: "Tunisia", code: "TN", continentCode: "AF" },
+  { name: "Algeria", code: "DZ", continentCode: "AF" },
+  { name: "Ghana", code: "GH", continentCode: "AF" },
+  { name: "Senegal", code: "SN", continentCode: "AF" },
+  { name: "Ivory Coast", code: "CI", continentCode: "AF" },
+  { name: "Cameroon", code: "CM", continentCode: "AF" },
+  { name: "Angola", code: "AO", continentCode: "AF" },
+  { name: "Mozambique", code: "MZ", continentCode: "AF" },
+  { name: "Tanzania", code: "TZ", continentCode: "AF" },
+  { name: "Uganda", code: "UG", continentCode: "AF" },
+  { name: "Ethiopia", code: "ET", continentCode: "AF" },
+  { name: "Zimbabwe", code: "ZW", continentCode: "AF" },
+  { name: "Zambia", code: "ZM", continentCode: "AF" },
+  { name: "Botswana", code: "BW", continentCode: "AF" },
+  { name: "Namibia", code: "NA", continentCode: "AF" },
+  { name: "Madagascar", code: "MG", continentCode: "AF" },
+  { name: "Mauritius", code: "MU", continentCode: "AF" },
+  { name: "Reunion", code: "RE", continentCode: "AF" },
+  { name: "Seychelles", code: "SC", continentCode: "AF" },
+  { name: "Malawi", code: "MW", continentCode: "AF" },
+  { name: "Rwanda", code: "RW", continentCode: "AF" },
+  { name: "Burundi", code: "BI", continentCode: "AF" },
+  { name: "Congo", code: "CG", continentCode: "AF" },
+  { name: "Democratic Republic of the Congo", code: "CD", continentCode: "AF" },
+  { name: "Central African Republic", code: "CF", continentCode: "AF" },
+  { name: "Chad", code: "TD", continentCode: "AF" },
+  { name: "Niger", code: "NE", continentCode: "AF" },
+  { name: "Mali", code: "ML", continentCode: "AF" },
+  { name: "Burkina Faso", code: "BF", continentCode: "AF" },
+  { name: "Guinea", code: "GN", continentCode: "AF" },
+  { name: "Sierra Leone", code: "SL", continentCode: "AF" },
+  { name: "Liberia", code: "LR", continentCode: "AF" },
+  { name: "Gambia", code: "GM", continentCode: "AF" },
+  { name: "Guinea-Bissau", code: "GW", continentCode: "AF" },
+  { name: "Cape Verde", code: "CV", continentCode: "AF" },
+  { name: "São Tomé and Príncipe", code: "ST", continentCode: "AF" },
+  { name: "Equatorial Guinea", code: "GQ", continentCode: "AF" },
+  { name: "Gabon", code: "GA", continentCode: "AF" },
+  { name: "Republic of the Congo", code: "CG", continentCode: "AF" },
+  { name: "Togo", code: "TG", continentCode: "AF" },
+  { name: "Benin", code: "BJ", continentCode: "AF" },
+  { name: "Djibouti", code: "DJ", continentCode: "AF" },
+  { name: "Eritrea", code: "ER", continentCode: "AF" },
+  { name: "Somalia", code: "SO", continentCode: "AF" },
+  { name: "Sudan", code: "SD", continentCode: "AF" },
+  { name: "South Sudan", code: "SS", continentCode: "AF" },
+  { name: "Libya", code: "LY", continentCode: "AF" },
+  { name: "Lesotho", code: "LS", continentCode: "AF" },
+  { name: "Swaziland", code: "SZ", continentCode: "AF" },
+  
+  // Oceania
+  { name: "Australia", code: "AU", continentCode: "OC" },
+  { name: "New Zealand", code: "NZ", continentCode: "OC" },
+  { name: "Fiji", code: "FJ", continentCode: "OC" },
+  { name: "Papua New Guinea", code: "PG", continentCode: "OC" },
+  { name: "Samoa", code: "WS", continentCode: "OC" },
+  { name: "Tonga", code: "TO", continentCode: "OC" },
+  { name: "Vanuatu", code: "VU", continentCode: "OC" },
+  { name: "Solomon Islands", code: "SB", continentCode: "OC" },
+  { name: "French Polynesia", code: "PF", continentCode: "OC" },
+  { name: "New Caledonia", code: "NC", continentCode: "OC" },
+  { name: "Cook Islands", code: "CK", continentCode: "OC" },
+  { name: "Palau", code: "PW", continentCode: "OC" },
+  { name: "Micronesia", code: "FM", continentCode: "OC" },
+  { name: "Marshall Islands", code: "MH", continentCode: "OC" },
+  { name: "Kiribati", code: "KI", continentCode: "OC" },
+  { name: "Nauru", code: "NR", continentCode: "OC" },
+  { name: "Tuvalu", code: "TV", continentCode: "OC" },
+  
+  // Middle East
+  { name: "Israel", code: "IL", continentCode: "AS" },
+  { name: "United Arab Emirates", code: "AE", continentCode: "AS" },
+  { name: "Lebanon", code: "LB", continentCode: "AS" },
+  { name: "Jordan", code: "JO", continentCode: "AS" },
+  { name: "Saudi Arabia", code: "SA", continentCode: "AS" },
+  { name: "Kuwait", code: "KW", continentCode: "AS" },
+  { name: "Qatar", code: "QA", continentCode: "AS" },
+  { name: "Bahrain", code: "BH", continentCode: "AS" },
+  { name: "Oman", code: "OM", continentCode: "AS" },
+  { name: "Iraq", code: "IQ", continentCode: "AS" },
+  { name: "Iran", code: "IR", continentCode: "AS" },
+  { name: "Syria", code: "SY", continentCode: "AS" },
+  { name: "Yemen", code: "YE", continentCode: "AS" },
+  { name: "Afghanistan", code: "AF", continentCode: "AS" },
+];
+
+async function seedGeographicData() {
+  try {
+    await connectMongo();
+    console.log("Connected to MongoDB");
+
+    // Clear existing data
+    await Continent.deleteMany({});
+    await Country.deleteMany({});
+    console.log("Cleared existing data");
+
+    // Seed continents
+    const createdContinents = await Continent.insertMany(continents);
+    console.log(`Created ${createdContinents.length} continents`);
+
+    // Create continent lookup map
+    const continentMap = new Map();
+    createdContinents.forEach(continent => {
+      continentMap.set(continent.code, continent._id);
+    });
+
+    // Seed countries with continent references
+    const countriesWithContinent = countries.map(country => ({
+      ...country,
+      continent: continentMap.get(country.continentCode),
+    }));
+
+    const createdCountries = await Country.insertMany(countriesWithContinent);
+    console.log(`Created ${createdCountries.length} countries`);
+
+    console.log("Geographic data seeded successfully!");
+    process.exit(0);
+  } catch (error) {
+    console.error("Error seeding geographic data:", error);
+    process.exit(1);
+  }
+}
+
+seedGeographicData();

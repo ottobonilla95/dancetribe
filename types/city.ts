@@ -1,0 +1,21 @@
+export type City = {
+  _id: string;
+  name: string;
+  country: {
+    name: string;
+    code: string;
+  };
+  continent: {
+    name: string;
+  };
+  population?: number;
+  image?: string;
+  description?: string;
+  rank: number;
+  coordinates?: {
+    lat: number;
+    lng: number;
+  };
+  danceStyles: { style: string }[];
+  dancersPopulation: number;
+};

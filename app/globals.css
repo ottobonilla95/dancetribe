@@ -20,3 +20,4 @@ progress::-webkit-progress-value {
     @apply !capitalize;
   }
 }
+@import "flag-icons/css/flag-icons.min.css";

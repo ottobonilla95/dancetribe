@@ -11,5 +11,5 @@ const connectMongo = async () => {
     .connect(process.env.MONGODB_URI)
     .catch((e) => console.error("Mongoose Client Error: " + e.message));
 };
-
 export default connectMongo;
+
