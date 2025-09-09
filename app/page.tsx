@@ -2,8 +2,8 @@ import { Suspense } from "react";
 import Header from "@/components/Header";
 import Hero from "@/components/Hero";
 import CityList from "@/components/organisims/CityList";
-import FeaturesAccordion from "@/components/FeaturesAccordion";
-import FAQ from "@/components/FAQ";
+// import FeaturesAccordion from "@/components/FeaturesAccordion";
+// import FAQ from "@/components/FAQ";
 import CTA from "@/components/CTA";
 import Footer from "@/components/Footer";
 import connectMongo from "@/libs/mongoose";
@@ -45,13 +45,8 @@ export default async function Home() {
         <Header />
       </Suspense>
       <main>
-        UPDATED3
-        <div className="bg-black">
-          <Hero />
-        </div>
+        <Hero />
         <CityList cities={cities} />
-        {/* <FeaturesAccordion /> */}
-        <FAQ />
         <CTA />
       </main>
       <Footer />
