@@ -46,6 +46,52 @@ const userSchema = new mongoose.Schema(
       type: [String],
       default: [],
     },
+    // NEW ONBOARDING FIELDS
+    // Date of birth
+    dateOfBirth: {
+      type: Date,
+    },
+    // Cities visited for dance (array of city IDs)
+    citiesVisited: [{
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "City",
+    }],
+    // User's anthem - Spotify or YouTube song
+    anthem: {
+      url: String,
+      platform: {
+        type: String,
+        enum: ['spotify', 'youtube'],
+      },
+      title: String,
+      artist: String,
+    },
+    // Social media profiles
+    socialMedia: {
+      instagram: String,
+      tiktok: String,
+      youtube: String,
+    },
+    // Dance role preference
+    danceRole: {
+      type: String,
+      enum: ['follower', 'leader', 'both'],
+    },
+    // Profile completion status
+    isProfileComplete: {
+      type: Boolean,
+      default: false,
+    },
+    // Onboarding completion tracking
+    onboardingSteps: {
+      danceStyles: { type: Boolean, default: false },
+      profilePic: { type: Boolean, default: false },
+      dateOfBirth: { type: Boolean, default: false },
+      citiesVisited: { type: Boolean, default: false },
+      anthem: { type: Boolean, default: false },
+      socialMedia: { type: Boolean, default: false },
+      danceRole: { type: Boolean, default: false },
+    },
   },
   {
     timestamps: true,
