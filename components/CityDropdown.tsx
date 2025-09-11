@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { City } from "@/types";
 import apiClient from "@/libs/api";
 
@@ -24,7 +24,7 @@ export default function CityDropdown({
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const [focusedIndex, setFocusedIndex] = useState(-1);
   
-  const searchTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+  const searchTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const dropdownRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
 
@@ -170,7 +170,7 @@ export default function CityDropdown({
             ))
           ) : searchTerm.length >= 2 ? (
             <div className="p-4 text-center text-base-content/60">
-              No cities found for "{searchTerm}"
+              No cities found for &quot;{searchTerm}&quot;
             </div>
           ) : null}
         </div>

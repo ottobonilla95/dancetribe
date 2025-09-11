@@ -229,7 +229,7 @@ export default function Onboarding() {
       case "citiesVisited":
         stepData = { citiesVisited: citiesVisited.map((city) => city._id) };
         break;
-      case "anthem":
+      case "anthem": {
         if (!anthem.url) {
           alert("Please enter your anthem URL");
           return;
@@ -241,6 +241,7 @@ export default function Onboarding() {
         }
         stepData = { anthem };
         break;
+      }
       case "socialMedia":
         stepData = { socialMedia };
         break;
@@ -342,7 +343,7 @@ export default function Onboarding() {
 
   const mediaInfo = parseMediaUrl(anthem.url);
 
-  if (loading || status === "loading") {
+  if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center">
         <div className="loading loading-spinner loading-lg"></div>
