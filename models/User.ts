@@ -87,6 +87,7 @@ const userSchema = new mongoose.Schema(
       danceStyles: { type: Boolean, default: false },
       profilePic: { type: Boolean, default: false },
       dateOfBirth: { type: Boolean, default: false },
+      currentLocation: { type: Boolean, default: false },
       citiesVisited: { type: Boolean, default: false },
       anthem: { type: Boolean, default: false },
       socialMedia: { type: Boolean, default: false },

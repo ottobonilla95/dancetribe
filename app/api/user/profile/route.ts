@@ -76,6 +76,11 @@ export async function PUT(req: NextRequest) {
         user.onboardingSteps.dateOfBirth = true;
         break;
 
+      case "currentLocation":
+        user.city = data.city;
+        user.onboardingSteps.currentLocation = true;
+        break;
+
       case "citiesVisited":
         user.citiesVisited = data.citiesVisited;
         user.onboardingSteps.citiesVisited = true;

@@ -45,7 +45,7 @@ export async function POST(req: NextRequest) {
     const uploadResult = await new Promise((resolve, reject) => {
       cloudinary.uploader.upload_stream(
         {
-          folder: 'profile-pictures',
+          folder: 'dancetribe/profile-pics',
           public_id: `profile-${session.user.id}-${Date.now()}`,
           transformation: [
             { width: 400, height: 400, crop: 'fill', gravity: 'face' },

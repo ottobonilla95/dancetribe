@@ -4,6 +4,7 @@ export interface OnboardingSteps {
   danceStyles: boolean;
   profilePic: boolean;
   dateOfBirth: boolean;
+  currentLocation: boolean;
   citiesVisited: boolean;
   anthem: boolean;
   socialMedia: boolean;

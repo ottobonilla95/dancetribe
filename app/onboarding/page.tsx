@@ -5,6 +5,8 @@ import { useRouter } from "next/navigation";
 import apiClient from "@/libs/api";
 import { User, DanceStyle, City } from "@/types";
 import CitySelector from "@/components/CitySelector";
+import ImageCropPicker from "@/components/ImageCropPicker";
+import CurrentLocationPicker from "@/components/CurrentLocationPicker";
 
 interface OnboardingStep {
   id: string;
@@ -26,9 +28,9 @@ export default function Onboarding() {
   // Form states
   const [danceStyles, setDanceStyles] = useState<string[]>([]);
   const [profilePic, setProfilePic] = useState<File | null>(null);
-  const [profilePicPreview, setProfilePicPreview] = useState<string>("");
   const [uploadingProfilePic, setUploadingProfilePic] = useState(false);
   const [dateOfBirth, setDateOfBirth] = useState("");
+  const [currentLocation, setCurrentLocation] = useState<City | null>(null);
   const [citiesVisited, setCitiesVisited] = useState<City[]>([]);
   const [anthem, setAnthem] = useState({
     url: "",
@@ -63,6 +65,12 @@ export default function Onboarding() {
       title: "When's your birthday?",
       description: "Help us connect you with dancers in your age group",
       completed: user?.onboardingSteps?.dateOfBirth || false,
+    },
+    {
+      id: "currentLocation",
+      title: "Where do you live?",
+      description: "Help us connect you with dancers in your area",
+      completed: user?.onboardingSteps?.currentLocation || false,
     },
     {
       id: "citiesVisited",
@@ -110,6 +118,9 @@ export default function Onboarding() {
         setDateOfBirth(
           new Date(data.user.dateOfBirth).toISOString().split("T")[0]
         );
+      }
+      if (data.user.city && typeof data.user.city === "object" && "_id" in data.user.city) {
+        setCurrentLocation(data.user.city as City);
       }
       if (data.user.citiesVisited && Array.isArray(data.user.citiesVisited)) {
         // Handle both populated City objects and string IDs
@@ -202,6 +213,13 @@ export default function Onboarding() {
         }
         stepData = { dateOfBirth };
         break;
+      case "currentLocation":
+        if (!currentLocation) {
+          alert("Please select your current city");
+          return;
+        }
+        stepData = { city: currentLocation._id };
+        break;
       case "citiesVisited":
         stepData = { citiesVisited: citiesVisited.map((city) => city._id) };
         break;
@@ -254,32 +272,8 @@ export default function Onboarding() {
     );
   };
 
-  const handleProfilePicChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (file) {
-      // Validate file type
-      const validTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/webp'];
-      if (!validTypes.includes(file.type)) {
-        alert('Please select a valid image file (JPEG, PNG, or WebP)');
-        return;
-      }
-      
-      // Validate file size (5MB max)
-      const maxSize = 5 * 1024 * 1024; // 5MB
-      if (file.size > maxSize) {
-        alert('Image size must be less than 5MB');
-        return;
-      }
-      
-      setProfilePic(file);
-      
-      // Create preview
-      const reader = new FileReader();
-      reader.onload = (e) => {
-        setProfilePicPreview(e.target?.result as string);
-      };
-      reader.readAsDataURL(file);
-    }
+  const handleImageSelect = (file: File) => {
+    setProfilePic(file);
   };
 
   const uploadProfilePic = async (file: File): Promise<string> => {
@@ -409,66 +403,13 @@ export default function Onboarding() {
             )}
 
             {steps[currentStep].id === "profilePic" && (
-              <div className="text-center py-8">
-                <div className="flex flex-col items-center space-y-6">
-                  {/* Profile picture preview */}
-                  <div className="avatar">
-                    <div className="w-32 h-32 rounded-full">
-                      {profilePicPreview ? (
-                        <img 
-                          src={profilePicPreview} 
-                          alt="Profile preview" 
-                          className="w-full h-full object-cover rounded-full"
-                        />
-                      ) : user?.image ? (
-                        <img 
-                          src={user.image} 
-                          alt="Current profile" 
-                          className="w-full h-full object-cover rounded-full"
-                        />
-                      ) : (
-                        <div className="bg-neutral-focus text-neutral-content rounded-full w-full h-full flex items-center justify-center">
-                          <span className="text-4xl">
-                            {user?.name?.charAt(0)?.toUpperCase() || "👤"}
-                          </span>
-                        </div>
-                      )}
-                    </div>
-                  </div>
-                  
-                  <div className="space-y-2">
-                    <p className="text-base-content/70">
-                      Your profile picture helps other dancers recognize you in the community.
-                    </p>
-                    <p className="text-sm text-base-content/50">
-                      Supported formats: JPEG, PNG, WebP (max 5MB)
-                    </p>
-                  </div>
-
-                  {/* File upload button */}
-                  <div className="space-y-3">
-                    <input
-                      type="file"
-                      id="profilePicInput"
-                      accept="image/jpeg,image/jpg,image/png,image/webp"
-                      onChange={handleProfilePicChange}
-                      className="hidden"
-                    />
-                    <label
-                      htmlFor="profilePicInput"
-                      className="btn btn-primary cursor-pointer"
-                    >
-                      📷 {profilePic || user?.image ? 'Change Photo' : 'Upload Photo'}
-                    </label>
-                    
-                    {profilePic && (
-                      <p className="text-sm text-success">
-                        ✓ Photo ready to upload: {profilePic.name}
-                      </p>
-                    )}
-                  </div>
-                </div>
-              </div>
+              <ImageCropPicker
+                currentImage={user?.image}
+                userName={user?.name}
+                onImageSelect={handleImageSelect}
+                uploading={uploadingProfilePic}
+                selectedFileName={profilePic?.name}
+              />
             )}
 
             {steps[currentStep].id === "dateOfBirth" && (
@@ -484,6 +425,15 @@ export default function Onboarding() {
                   max={new Date().toISOString().split("T")[0]}
                 />
               </div>
+            )}
+
+            {steps[currentStep].id === "currentLocation" && (
+              <CurrentLocationPicker
+                selectedCity={currentLocation}
+                onCitySelect={setCurrentLocation}
+                label="Where do you currently live?"
+                placeholder="Search for your current city..."
+              />
             )}
 
             {steps[currentStep].id === "citiesVisited" && (
@@ -685,9 +635,9 @@ export default function Onboarding() {
               <button
                 className="btn btn-primary"
                 onClick={handleNext}
-                disabled={loading}
+                disabled={loading || uploadingProfilePic}
               >
-                {loading ? (
+                {loading || uploadingProfilePic ? (
                   <span className="loading loading-spinner loading-sm"></span>
                 ) : currentStep === steps.length - 1 ? (
                   "Complete Profile"
