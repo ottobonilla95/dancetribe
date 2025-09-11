@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import React, { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import apiClient from "@/libs/api";
 import { User, DanceStyle, City } from "@/types";
@@ -57,7 +57,8 @@ export default function Onboarding() {
     {
       id: "profilePic",
       title: "Add your profile picture",
-      description: "Help other dancers recognize you in the community (optional)",
+      description:
+        "Help other dancers recognize you in the community (optional)",
       completed: user?.onboardingSteps?.profilePic || false,
     },
     {
@@ -81,7 +82,8 @@ export default function Onboarding() {
     {
       id: "anthem",
       title: "What's your dance anthem?",
-      description: "Share a Spotify track or YouTube video that gets you moving",
+      description:
+        "Share a Spotify track or YouTube video that gets you moving",
       completed: user?.onboardingSteps?.anthem || false,
     },
     {
@@ -119,7 +121,11 @@ export default function Onboarding() {
           new Date(data.user.dateOfBirth).toISOString().split("T")[0]
         );
       }
-      if (data.user.city && typeof data.user.city === "object" && "_id" in data.user.city) {
+      if (
+        data.user.city &&
+        typeof data.user.city === "object" &&
+        "_id" in data.user.city
+      ) {
         setCurrentLocation(data.user.city as City);
       }
       if (data.user.citiesVisited && Array.isArray(data.user.citiesVisited)) {
@@ -278,25 +284,25 @@ export default function Onboarding() {
 
   const uploadProfilePic = async (file: File): Promise<string> => {
     const formData = new FormData();
-    formData.append('file', file);
-    
+    formData.append("file", file);
+
     try {
       setUploadingProfilePic(true);
       // For now, we'll use a placeholder upload endpoint
       // In production, you'd implement actual file upload to your storage service
-      const response = await fetch('/api/upload-profile-pic', {
-        method: 'POST',
+      const response = await fetch("/api/upload-profile-pic", {
+        method: "POST",
         body: formData,
       });
-      
+
       if (!response.ok) {
-        throw new Error('Upload failed');
+        throw new Error("Upload failed");
       }
-      
+
       const data = await response.json();
       return data.imageUrl;
     } catch (error) {
-      console.error('Error uploading image:', error);
+      console.error("Error uploading image:", error);
       throw error;
     } finally {
       setUploadingProfilePic(false);
@@ -308,22 +314,26 @@ export default function Onboarding() {
     if (!url) return null;
 
     // Spotify URL patterns
-    const spotifyMatch = url.match(/(?:spotify\.com\/track\/|spotify:track:)([a-zA-Z0-9]+)/);
+    const spotifyMatch = url.match(
+      /(?:spotify\.com\/track\/|spotify:track:)([a-zA-Z0-9]+)/
+    );
     if (spotifyMatch) {
       return {
-        platform: 'spotify' as const,
+        platform: "spotify" as const,
         id: spotifyMatch[1],
-        embedUrl: `https://open.spotify.com/embed/track/${spotifyMatch[1]}`
+        embedUrl: `https://open.spotify.com/embed/track/${spotifyMatch[1]}`,
       };
     }
 
     // YouTube URL patterns
-    const youtubeMatch = url.match(/(?:youtube\.com\/watch\?v=|youtu\.be\/)([a-zA-Z0-9_-]+)/);
+    const youtubeMatch = url.match(
+      /(?:youtube\.com\/watch\?v=|youtu\.be\/)([a-zA-Z0-9_-]+)/
+    );
     if (youtubeMatch) {
       return {
-        platform: 'youtube' as const,
+        platform: "youtube" as const,
         id: youtubeMatch[1],
-        embedUrl: `https://www.youtube.com/embed/${youtubeMatch[1]}`
+        embedUrl: `https://www.youtube.com/embed/${youtubeMatch[1]}`,
       };
     }
 
@@ -459,13 +469,13 @@ export default function Onboarding() {
                     onChange={(e) => {
                       const url = e.target.value;
                       const parsedInfo = parseMediaUrl(url);
-                      
-                      setAnthem((prev) => ({ 
-                        ...prev, 
+
+                      setAnthem((prev) => ({
+                        ...prev,
                         url,
                         platform: parsedInfo?.platform || "spotify",
                         title: prev.title,
-                        artist: prev.artist
+                        artist: prev.artist,
                       }));
                     }}
                   />

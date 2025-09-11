@@ -1,8 +1,8 @@
 "use client";
 
-import { useState, useRef } from "react";
-import ReactCrop, { Crop, PixelCrop } from 'react-image-crop';
-import 'react-image-crop/dist/ReactCrop.css';
+import React, { useState, useRef } from "react";
+import ReactCrop, { Crop, PixelCrop } from "react-image-crop";
+import "react-image-crop/dist/ReactCrop.css";
 
 interface ImageCropPickerProps {
   currentImage?: string;
@@ -12,22 +12,22 @@ interface ImageCropPickerProps {
   selectedFileName?: string;
 }
 
-export default function ImageCropPicker({ 
-  currentImage, 
-  userName, 
-  onImageSelect, 
+export default function ImageCropPicker({
+  currentImage,
+  userName,
+  onImageSelect,
   uploading = false,
-  selectedFileName 
+  selectedFileName,
 }: ImageCropPickerProps) {
   const [crop, setCrop] = useState<Crop>({
-    unit: '%',
+    unit: "%",
     width: 90,
     height: 90,
     x: 5,
-    y: 5
+    y: 5,
   });
   const [completedCrop, setCompletedCrop] = useState<PixelCrop>();
-  const [imgSrc, setImgSrc] = useState<string>('');
+  const [imgSrc, setImgSrc] = useState<string>("");
   const [showCropModal, setShowCropModal] = useState(false);
   const [profilePicPreview, setProfilePicPreview] = useState<string>("");
   const imgRef = useRef<HTMLImageElement>(null);
@@ -36,19 +36,19 @@ export default function ImageCropPicker({
     const file = e.target.files?.[0];
     if (file) {
       // Validate file type
-      const validTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/webp'];
+      const validTypes = ["image/jpeg", "image/jpg", "image/png", "image/webp"];
       if (!validTypes.includes(file.type)) {
-        alert('Please select a valid image file (JPEG, PNG, or WebP)');
+        alert("Please select a valid image file (JPEG, PNG, or WebP)");
         return;
       }
-      
+
       // Validate file size (5MB max)
       const maxSize = 5 * 1024 * 1024; // 5MB
       if (file.size > maxSize) {
-        alert('Image size must be less than 5MB');
+        alert("Image size must be less than 5MB");
         return;
       }
-      
+
       // Create preview for cropping
       const reader = new FileReader();
       reader.onload = (e) => {
@@ -59,12 +59,15 @@ export default function ImageCropPicker({
     }
   };
 
-  const getCroppedImg = (image: HTMLImageElement, crop: PixelCrop): Promise<Blob> => {
-    const canvas = document.createElement('canvas');
-    const ctx = canvas.getContext('2d');
+  const getCroppedImg = (
+    image: HTMLImageElement,
+    crop: PixelCrop
+  ): Promise<Blob> => {
+    const canvas = document.createElement("canvas");
+    const ctx = canvas.getContext("2d");
 
     if (!ctx) {
-      throw new Error('No 2d context');
+      throw new Error("No 2d context");
     }
 
     const scaleX = image.naturalWidth / image.width;
@@ -86,32 +89,43 @@ export default function ImageCropPicker({
     );
 
     return new Promise((resolve) => {
-      canvas.toBlob((blob) => {
-        if (blob) {
-          resolve(blob);
-        }
-      }, 'image/jpeg', 0.9);
+      canvas.toBlob(
+        (blob) => {
+          if (blob) {
+            resolve(blob);
+          }
+        },
+        "image/jpeg",
+        0.9
+      );
     });
   };
 
   const handleCropComplete = async () => {
     if (completedCrop && imgRef.current) {
       try {
-        const croppedImageBlob = await getCroppedImg(imgRef.current, completedCrop);
-        const croppedFile = new File([croppedImageBlob], 'cropped-profile.jpg', { type: 'image/jpeg' });
-        
+        const croppedImageBlob = await getCroppedImg(
+          imgRef.current,
+          completedCrop
+        );
+        const croppedFile = new File(
+          [croppedImageBlob],
+          "cropped-profile.jpg",
+          { type: "image/jpeg" }
+        );
+
         // Create preview
         const reader = new FileReader();
         reader.onload = (e) => {
           setProfilePicPreview(e.target?.result as string);
         };
         reader.readAsDataURL(croppedFile);
-        
+
         setShowCropModal(false);
         onImageSelect(croppedFile);
       } catch (error) {
-        console.error('Error cropping image:', error);
-        alert('Error cropping image. Please try again.');
+        console.error("Error cropping image:", error);
+        alert("Error cropping image. Please try again.");
       }
     }
   };
@@ -127,15 +141,15 @@ export default function ImageCropPicker({
                 <span className="loading loading-spinner loading-lg"></span>
               </div>
             ) : profilePicPreview ? (
-              <img 
-                src={profilePicPreview} 
-                alt="Profile preview" 
+              <img
+                src={profilePicPreview}
+                alt="Profile preview"
                 className="w-full h-full object-cover rounded-full"
               />
             ) : currentImage ? (
-              <img 
-                src={currentImage} 
-                alt="Current profile" 
+              <img
+                src={currentImage}
+                alt="Current profile"
                 className="w-full h-full object-cover rounded-full"
               />
             ) : (
@@ -147,10 +161,11 @@ export default function ImageCropPicker({
             )}
           </div>
         </div>
-        
+
         <div className="space-y-2">
           <p className="text-base-content/70">
-            Your profile picture helps other dancers recognize you in the community.
+            Your profile picture helps other dancers recognize you in the
+            community.
           </p>
           <p className="text-sm text-base-content/50">
             Supported formats: JPEG, PNG, WebP (max 5MB)
@@ -169,21 +184,22 @@ export default function ImageCropPicker({
           />
           <label
             htmlFor="profilePicInput"
-            className={`btn btn-primary cursor-pointer ${uploading ? 'btn-disabled' : ''}`}
+            className={`btn btn-primary cursor-pointer ${uploading ? "btn-disabled" : ""}`}
           >
-            📷 {profilePicPreview || currentImage ? 'Change Photo' : 'Upload Photo'}
+            📷{" "}
+            {profilePicPreview || currentImage
+              ? "Change Photo"
+              : "Upload Photo"}
           </label>
-          
+
           {selectedFileName && !uploading && (
             <p className="text-sm text-success">
               ✓ Photo ready to upload: {selectedFileName}
             </p>
           )}
-          
+
           {uploading && (
-            <p className="text-sm text-info">
-              📤 Uploading your photo...
-            </p>
+            <p className="text-sm text-info">📤 Uploading your photo...</p>
           )}
         </div>
       </div>
@@ -199,7 +215,7 @@ export default function ImageCropPicker({
                 Drag to select the area you want to use as your profile picture.
               </p>
             </div>
-            
+
             {/* Image area - scrollable if needed */}
             <div className="flex-1 p-4 overflow-auto">
               <div className="flex justify-center">
@@ -219,7 +235,7 @@ export default function ImageCropPicker({
                 </ReactCrop>
               </div>
             </div>
-            
+
             {/* Buttons - always visible */}
             <div className="p-4 border-t border-base-300 flex gap-3 justify-end">
               <button
@@ -241,4 +257,4 @@ export default function ImageCropPicker({
       )}
     </div>
   );
-} 
+}
