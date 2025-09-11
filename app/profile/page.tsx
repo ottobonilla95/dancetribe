@@ -251,17 +251,17 @@ export default async function Profile() {
                         }
                         
                         return embedUrl ? (
-                          <iframe
-                            src={embedUrl}
-                            width="100%"
-                            height="152"
-                            frameBorder="0"
-                            className="rounded-xl"
-                            style={{ overflow: 'hidden' }}
-                            scrolling="no"
-                            allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture"
-                            loading="lazy"
-                          />
+                          <div className="rounded-lg overflow-hidden" style={{ height: '152px' }}>
+                            <iframe
+                              src={embedUrl}
+                              width="100%"
+                              height="152"
+                              frameBorder="0"
+                              className="rounded-lg"
+                              allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture"
+                              loading="lazy"
+                            />
+                          </div>
                         ) : (
                           <a 
                             href={url} 

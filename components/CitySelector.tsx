@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { City } from "@/types";
 import apiClient from "@/libs/api";
 
@@ -22,7 +22,7 @@ export default function CitySelector({
   const [isLoading, setIsLoading] = useState(false);
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const [focusedIndex, setFocusedIndex] = useState(-1);
-  
+
   const searchTimeoutRef = useRef<NodeJS.Timeout | null>(null);
   const dropdownRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
@@ -52,7 +52,10 @@ export default function CitySelector({
   // Handle clicks outside dropdown
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
-      if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
+      if (
+        dropdownRef.current &&
+        !dropdownRef.current.contains(event.target as Node)
+      ) {
         setIsDropdownOpen(false);
         setFocusedIndex(-1);
       }
@@ -65,12 +68,16 @@ export default function CitySelector({
   const searchCities = async (query: string) => {
     setIsLoading(true);
     try {
-      const data = await apiClient.get(`/cities?search=${encodeURIComponent(query)}&limit=10`) as { cities: City[] };
-      
+      const data = (await apiClient.get(
+        `/cities?search=${encodeURIComponent(query)}&limit=10`
+      )) as { cities: City[] };
+
       // Filter out already selected cities
-      const selectedIds = selectedCities.map(city => city._id);
-      const filteredResults = data.cities.filter(city => !selectedIds.includes(city._id));
-      
+      const selectedIds = selectedCities.map((city) => city._id);
+      const filteredResults = data.cities.filter(
+        (city) => !selectedIds.includes(city._id)
+      );
+
       setSearchResults(filteredResults);
       setIsDropdownOpen(filteredResults.length > 0);
       setFocusedIndex(-1);
@@ -93,7 +100,7 @@ export default function CitySelector({
   };
 
   const handleCityRemove = (cityId: string) => {
-    onCitiesChange(selectedCities.filter(city => city._id !== cityId));
+    onCitiesChange(selectedCities.filter((city) => city._id !== cityId));
   };
 
   const handleKeyDown = (e: React.KeyboardEvent) => {
@@ -102,13 +109,13 @@ export default function CitySelector({
     switch (e.key) {
       case "ArrowDown":
         e.preventDefault();
-        setFocusedIndex(prev => 
+        setFocusedIndex((prev) =>
           prev < searchResults.length - 1 ? prev + 1 : 0
         );
         break;
       case "ArrowUp":
         e.preventDefault();
-        setFocusedIndex(prev => 
+        setFocusedIndex((prev) =>
           prev > 0 ? prev - 1 : searchResults.length - 1
         );
         break;
@@ -130,16 +137,15 @@ export default function CitySelector({
       <label className="label">
         <span className="label-text">{label}</span>
       </label>
-      
+
       {/* Selected cities as badges */}
       {selectedCities.length > 0 && (
         <div className="flex flex-wrap gap-2 mb-3">
           {selectedCities.map((city) => (
-            <div
-              key={city._id}
-              className="badge badge-primary gap-2 p-3"
-            >
-              <span>{city.name}, {city.country?.name}</span>
+            <div key={city._id} className="badge badge-primary gap-2 p-3">
+              <span>
+                {city.name}, {city.country?.name}
+              </span>
               <button
                 type="button"
                 className="btn btn-ghost btn-xs btn-circle"
@@ -181,10 +187,10 @@ export default function CitySelector({
         {isDropdownOpen && (
           <div className="absolute z-50 w-full mt-1 bg-base-100 border border-base-300 rounded-lg shadow-lg max-h-60 overflow-y-auto">
             {searchResults.length > 0 ? (
-                             searchResults.map((city, index) => (
-                 <button
-                   key={city._id}
-                   type="button"
+              searchResults.map((city, index) => (
+                <button
+                  key={city._id}
+                  type="button"
                   className={`w-full text-left px-4 py-3 hover:bg-base-200 transition-colors ${
                     index === focusedIndex ? "bg-base-200" : ""
                   }`}
@@ -219,4 +225,4 @@ export default function CitySelector({
       </label>
     </div>
   );
-} 
+}
