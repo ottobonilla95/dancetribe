@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useRef } from "react";
+import React, { useState, useRef } from "react";
 import html2canvas from "html2canvas";
 import ShareCard from "./ShareCard";
 
@@ -30,7 +30,7 @@ export default function ShareToStory({ userData }: ShareToStoryProps) {
     if (!shareCardRef.current) return;
 
     setIsGenerating(true);
-    
+
     try {
       // Generate the image
       const canvas = await html2canvas(shareCardRef.current, {
@@ -39,57 +39,65 @@ export default function ShareToStory({ userData }: ShareToStoryProps) {
         scale: 1,
         useCORS: true,
         allowTaint: true,
-        backgroundColor: null
+        backgroundColor: null,
       });
 
       // Convert to blob
-      canvas.toBlob(async (blob) => {
-        if (!blob) return;
+      canvas.toBlob(
+        async (blob) => {
+          if (!blob) return;
 
-        const profileUrl = `${window.location.origin}/dancer/${userData.id}`;
+          const profileUrl = `${window.location.origin}/dancer/${userData.id}`;
 
-        // Try Web Share API first (works on mobile)
-        if (navigator.share && navigator.canShare) {
-          try {
-            const file = new File([blob], 'dancetribe-profile.jpg', { type: 'image/jpeg' });
-            
-            if (navigator.canShare({ files: [file] })) {
-              await navigator.share({
-                title: `${userData.name}'s DanceTribe Profile`,
-                text: `Check out ${userData.name || 'this dancer'}'s profile on DanceTribe! 💃🕺`,
-                url: profileUrl,
-                files: [file]
+          // Try Web Share API first (works on mobile)
+          if (navigator.share && navigator.canShare) {
+            try {
+              const file = new File([blob], "dancetribe-profile.jpg", {
+                type: "image/jpeg",
               });
-              return;
+
+              if (navigator.canShare({ files: [file] })) {
+                await navigator.share({
+                  title: `${userData.name}'s DanceTribe Profile`,
+                  text: `Check out ${userData.name || "this dancer"}'s profile on DanceTribe! 💃🕺`,
+                  url: profileUrl,
+                  files: [file],
+                });
+                return;
+              }
+            } catch (err) {
+              console.log("Web Share failed, trying fallback");
             }
-          } catch (err) {
-            console.log('Web Share failed, trying fallback');
           }
-        }
 
-        // Fallback: Download image and copy link
-        const url = URL.createObjectURL(blob);
-        const a = document.createElement('a');
-        a.href = url;
-        a.download = 'dancetribe-profile-story.jpg';
-        document.body.appendChild(a);
-        a.click();
-        document.body.removeChild(a);
-        URL.revokeObjectURL(url);
+          // Fallback: Download image and copy link
+          const url = URL.createObjectURL(blob);
+          const a = document.createElement("a");
+          a.href = url;
+          a.download = "dancetribe-profile-story.jpg";
+          document.body.appendChild(a);
+          a.click();
+          document.body.removeChild(a);
+          URL.revokeObjectURL(url);
 
-        // Copy profile link to clipboard
-        if (navigator.clipboard) {
-          await navigator.clipboard.writeText(profileUrl);
-          alert('📸 Image downloaded! Profile link copied to clipboard.\n\nShare the image on Instagram Stories and paste the link when prompted! 🎉');
-        } else {
-          alert(`📸 Image downloaded!\n\nProfile link: ${profileUrl}\n\nShare the image on Instagram Stories and add this link! 🎉`);
-        }
-
-      }, 'image/jpeg', 0.9);
-
+          // Copy profile link to clipboard
+          if (navigator.clipboard) {
+            await navigator.clipboard.writeText(profileUrl);
+            alert(
+              "📸 Image downloaded! Profile link copied to clipboard.\n\nShare the image on Instagram Stories and paste the link when prompted! 🎉"
+            );
+          } else {
+            alert(
+              `📸 Image downloaded!\n\nProfile link: ${profileUrl}\n\nShare the image on Instagram Stories and add this link! 🎉`
+            );
+          }
+        },
+        "image/jpeg",
+        0.9
+      );
     } catch (error) {
-      console.error('Error generating share image:', error);
-      alert('Failed to generate share image. Please try again.');
+      console.error("Error generating share image:", error);
+      alert("Failed to generate share image. Please try again.");
     } finally {
       setIsGenerating(false);
     }
@@ -117,4 +125,4 @@ export default function ShareToStory({ userData }: ShareToStoryProps) {
       </div>
     </div>
   );
-} 
+}
