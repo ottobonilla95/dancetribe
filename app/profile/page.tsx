@@ -8,6 +8,7 @@ import DanceStyle from "@/models/DanceStyle";
 import Link from "next/link";
 import { getZodiacSign } from "@/utils/zodiac";
 import ShareToStory from "@/components/ShareToStory";
+import { FaInstagram, FaTiktok, FaYoutube } from "react-icons/fa";
 
 export default async function Profile() {
   const session = await getServerSession(authOptions);
@@ -255,7 +256,7 @@ export default async function Profile() {
                             width="100%"
                             height="152"
                             frameBorder="0"
-                            className="rounded-lg"
+                            className="rounded-xl"
                             style={{ overflow: 'hidden' }}
                             scrolling="no"
                             allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture"
@@ -286,10 +287,10 @@ export default async function Profile() {
                           href={`https://instagram.com/${userData.socialMedia.instagram.replace('@', '')}`}
                           target="_blank"
                           rel="noopener noreferrer"
-                          className="btn btn-circle btn-outline hover:btn-primary"
+                          className="btn btn-circle btn-outline hover:bg-gradient-to-r hover:from-purple-500 hover:to-pink-500 hover:text-white hover:border-purple-500"
                           title={`@${userData.socialMedia.instagram.replace('@', '')} on Instagram`}
                         >
-                          📷
+                          <FaInstagram className="text-xl" />
                         </a>
                       )}
                       {userData.socialMedia.tiktok && (
@@ -297,10 +298,10 @@ export default async function Profile() {
                           href={`https://tiktok.com/@${userData.socialMedia.tiktok.replace('@', '')}`}
                           target="_blank"
                           rel="noopener noreferrer"
-                          className="btn btn-circle btn-outline hover:btn-primary"
+                          className="btn btn-circle btn-outline hover:bg-black hover:text-white hover:border-black"
                           title={`@${userData.socialMedia.tiktok.replace('@', '')} on TikTok`}
                         >
-                          🎵
+                          <FaTiktok className="text-xl" />
                         </a>
                       )}
                       {userData.socialMedia.youtube && (
@@ -308,10 +309,10 @@ export default async function Profile() {
                           href={userData.socialMedia.youtube}
                           target="_blank"
                           rel="noopener noreferrer"
-                          className="btn btn-circle btn-outline hover:btn-primary"
+                          className="btn btn-circle btn-outline hover:bg-red-600 hover:text-white hover:border-red-600"
                           title="YouTube Channel"
                         >
-                          📺
+                          <FaYoutube className="text-xl" />
                         </a>
                       )}
                     </div>

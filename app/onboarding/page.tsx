@@ -464,9 +464,8 @@ export default function Onboarding() {
                         ...prev, 
                         url,
                         platform: parsedInfo?.platform || "spotify",
-                        // Auto-populate basic info when we have a valid URL
-                        title: parsedInfo ? "Song from " + parsedInfo.platform : prev.title,
-                        artist: parsedInfo ? "Artist" : prev.artist
+                        title: prev.title,
+                        artist: prev.artist
                       }));
                     }}
                   />
