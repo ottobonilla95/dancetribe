@@ -1,4 +1,4 @@
-import { useState } from "react";
+import React, { useState } from "react";
 import { City } from "@/types";
 import CityDropdown from "./CityDropdown";
 
@@ -13,7 +13,7 @@ export default function CurrentLocationPicker({
   selectedCity,
   onCitySelect,
   label = "Where do you live?",
-  placeholder = "Search for your current city..."
+  placeholder = "Search for your current city...",
 }: CurrentLocationPickerProps) {
   const [searchTerm, setSearchTerm] = useState("");
 
@@ -47,7 +47,7 @@ export default function CurrentLocationPicker({
         <label className="label">
           <span className="label-text font-medium">{label}</span>
         </label>
-        
+
         {!selectedCity ? (
           <CityDropdown
             searchTerm={searchTerm}
@@ -66,8 +66,8 @@ export default function CurrentLocationPicker({
                   <div className="avatar">
                     <div className="w-16 h-16 rounded-lg">
                       {selectedCity.image ? (
-                        <img 
-                          src={selectedCity.image} 
+                        <img
+                          src={selectedCity.image}
                           alt={selectedCity.name}
                           className="w-full h-full object-cover rounded-lg"
                         />
@@ -83,20 +83,20 @@ export default function CurrentLocationPicker({
                   <div className="flex-1">
                     <h3 className="font-bold text-lg">{selectedCity.name}</h3>
                     <p className="text-base-content/70 text-sm">
-                      {typeof selectedCity.country === 'string' 
-                        ? selectedCity.country 
+                      {typeof selectedCity.country === "string"
+                        ? selectedCity.country
                         : selectedCity.country?.name}
                     </p>
-                    
-                                         {/* Dancer Count */}
-                     <div className="mt-2">
-                       <div className="flex items-center gap-2">
-                         <span className="text-2xl">💃</span>
-                         <span className="text-sm font-medium text-primary">
-                           {getDancerMessage(getDancerCount(selectedCity))}
-                         </span>
-                       </div>
-                     </div>
+
+                    {/* Dancer Count */}
+                    <div className="mt-2">
+                      <div className="flex items-center gap-2">
+                        <span className="text-2xl">💃</span>
+                        <span className="text-sm font-medium text-primary">
+                          {getDancerMessage(getDancerCount(selectedCity))}
+                        </span>
+                      </div>
+                    </div>
 
                     {/* Population (optional additional info) */}
                     {selectedCity.population && (
@@ -132,4 +132,4 @@ export default function CurrentLocationPicker({
       </div>
     </div>
   );
-} 
+}
