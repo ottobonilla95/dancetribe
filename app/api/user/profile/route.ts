@@ -66,6 +66,11 @@ export async function PUT(req: NextRequest) {
         user.onboardingSteps.danceStyles = true;
         break;
 
+      case "username":
+        user.username = data.username;
+        user.onboardingSteps.username = true;
+        break;
+
       case "profilePic":
         user.image = data.image;
         user.onboardingSteps.profilePic = true;
@@ -118,6 +123,8 @@ export async function PUT(req: NextRequest) {
     const steps = user.onboardingSteps;
     const isComplete = Object.values(steps).every((step) => step === true);
     user.isProfileComplete = isComplete;
+
+    // Username is now handled in the onboarding step, no need for auto-generation
 
     await user.save();
 

@@ -1,217 +1,240 @@
 "use client";
 
-import React, { useState, useRef } from "react";
-import html2canvas from "html2canvas";
-import ShareCard from "./ShareCard";
+import React, { useRef, useState } from 'react';
+import html2canvas from 'html2canvas';
+import ShareCard from './ShareCard';
 
 interface ShareToStoryProps {
   userData: {
-    id?: string;
-    name?: string;
-    image?: string;
-    danceStyles?: string[];
-    danceRole?: string;
-    city?: {
+    id: string;
+    name: string;
+    username?: string;
+    profilePicture: string;
+    dateOfBirth: string;
+    city: {
       name: string;
-      country?: any;
+      country: { name: string };
+      image?: string;
     };
-    zodiac?: {
-      sign: string;
-      emoji: string;
-    };
+    danceStyles: Array<{
+      name: string;
+      level: string;
+    }>;
   };
 }
 
-export default function ShareToStory({ userData }: ShareToStoryProps) {
-  const [isGenerating, setIsGenerating] = useState(false);
+const ShareToStory: React.FC<ShareToStoryProps> = ({ userData }) => {
   const shareCardRef = useRef<HTMLDivElement>(null);
+  const [isGenerating, setIsGenerating] = useState(false);
 
-  // Add CSS animation for spinner
-  React.useEffect(() => {
-    const style = document.createElement('style');
-    style.textContent = `
-      @keyframes spin {
-        0% { transform: rotate(0deg); }
-        100% { transform: rotate(360deg); }
-      }
-    `;
-    document.head.appendChild(style);
-    return () => {
-      document.head.removeChild(style);
-    };
-  }, []);
-
-  const generateAndShare = async () => {
-    if (!shareCardRef.current) return;
-
-    setIsGenerating(true);
+  const generateShareImage = async () => {
+    if (!shareCardRef.current) return null;
 
     try {
-      // Create a clean iframe to render the card
+      console.log('Starting image generation...');
+      setIsGenerating(true);
+
+      // Wait for QR code to be ready
+      const waitForQR = () => {
+        return new Promise<void>((resolve) => {
+          const checkQR = () => {
+            const shareCard = shareCardRef.current;
+            if (shareCard && shareCard.getAttribute('data-qr-ready') === 'true') {
+              console.log('QR code is ready!');
+              resolve();
+            } else {
+              console.log('Waiting for QR code...');
+              setTimeout(checkQR, 100);
+            }
+          };
+          checkQR();
+        });
+      };
+
+      await waitForQR();
+
+      // Additional wait to ensure rendering is complete
+      await new Promise(resolve => setTimeout(resolve, 500));
+
+      // Create a temporary iframe for clean rendering
       const iframe = document.createElement('iframe');
-      iframe.style.position = 'fixed';
-      iframe.style.top = '-10000px';
+      iframe.style.position = 'absolute';
       iframe.style.left = '-10000px';
+      iframe.style.top = '-10000px';
       iframe.style.width = '1080px';
       iframe.style.height = '1920px';
       iframe.style.border = 'none';
+      
       document.body.appendChild(iframe);
-
-      const iframeDoc = iframe.contentDocument!;
-      iframeDoc.open();
-      iframeDoc.write(`
-        <!DOCTYPE html>
-        <html>
-        <head>
-          <style>
-            * { margin: 0; padding: 0; box-sizing: border-box; }
-            body { font-family: Arial, sans-serif; }
-          </style>
-        </head>
-        <body>
-          ${shareCardRef.current.outerHTML}
-        </body>
-        </html>
-      `);
-      iframeDoc.close();
-
+      
       // Wait for iframe to load
-      await new Promise(resolve => setTimeout(resolve, 100));
+      await new Promise((resolve) => {
+        iframe.onload = resolve;
+        // Set a basic HTML structure
+        const iframeDoc = iframe.contentDocument || iframe.contentWindow?.document;
+        if (iframeDoc) {
+          iframeDoc.open();
+          iframeDoc.write(`
+            <!DOCTYPE html>
+            <html>
+              <head>
+                <style>
+                  * { margin: 0; padding: 0; box-sizing: border-box; }
+                  body { font-family: Arial, sans-serif; }
+                </style>
+              </head>
+              <body>
+                ${shareCardRef.current!.outerHTML}
+              </body>
+            </html>
+          `);
+          iframeDoc.close();
+        }
+      });
 
-      // Generate the image from iframe content
-      console.log("Starting image generation...", iframe.contentDocument!.body.firstElementChild);
-      const canvas = await html2canvas(iframe.contentDocument!.body.firstElementChild as HTMLElement, {
+      // Wait a bit more for iframe content to render
+      await new Promise(resolve => setTimeout(resolve, 1000));
+
+      // Capture the iframe content
+      const iframeDoc = iframe.contentDocument || iframe.contentWindow?.document;
+      if (!iframeDoc) throw new Error('Could not access iframe document');
+
+      const element = iframeDoc.body.firstElementChild as HTMLElement;
+      if (!element) throw new Error('No element found to capture');
+
+      console.log('Capturing element:', element);
+
+      const canvas = await html2canvas(element, {
         width: 1080,
         height: 1920,
         scale: 1,
         useCORS: true,
         allowTaint: true,
-        backgroundColor: '#667eea',
-        logging: false,
+        backgroundColor: null,
+        logging: true,
+        foreignObjectRendering: false
       });
-      console.log("Canvas generated successfully:", canvas);
+
+      console.log('Canvas generated successfully');
 
       // Clean up iframe
       document.body.removeChild(iframe);
 
       // Convert to blob
-      canvas.toBlob(
-        async (blob) => {
-          if (!blob) return;
-
-          const profileUrl = `${window.location.origin}/dancer/${userData.id}`;
-
-          // Try Web Share API first (works on mobile)
-          if (navigator.share && navigator.canShare) {
-            try {
-              const file = new File([blob], "dancetribe-profile.jpg", {
-                type: "image/jpeg",
-              });
-
-              if (navigator.canShare({ files: [file] })) {
-                await navigator.share({
-                  title: `${userData.name}'s DanceTribe Profile`,
-                  text: `Check out ${userData.name || "this dancer"}'s profile on DanceTribe! 💃🕺`,
-                  url: profileUrl,
-                  files: [file],
-                });
-                return;
-              }
-            } catch (err) {
-              console.log("Web Share failed, trying fallback");
-            }
-          }
-
-          // Fallback: Download image and copy link
-          const url = URL.createObjectURL(blob);
-          const a = document.createElement("a");
-          a.href = url;
-          a.download = "dancetribe-profile-story.jpg";
-          document.body.appendChild(a);
-          a.click();
-          document.body.removeChild(a);
-          URL.revokeObjectURL(url);
-
-          // Copy profile link to clipboard
-          if (navigator.clipboard) {
-            await navigator.clipboard.writeText(profileUrl);
-            alert(
-              "📸 Image downloaded! Profile link copied to clipboard.\n\nShare the image on Instagram Stories and paste the link when prompted! 🎉"
-            );
+      return new Promise<Blob>((resolve, reject) => {
+        canvas.toBlob((blob) => {
+          if (blob) {
+            console.log('Image blob created:', blob.size, 'bytes');
+            resolve(blob);
           } else {
-            alert(
-              `📸 Image downloaded!\n\nProfile link: ${profileUrl}\n\nShare the image on Instagram Stories and add this link! 🎉`
-            );
+            reject(new Error('Failed to create image blob'));
           }
-        },
-        "image/jpeg",
-        0.9
-      );
-    } catch (error) {
-      console.error("Error generating share image:", error);
-      console.error("Error details:", {
-        message: error.message,
-        stack: error.stack,
-        name: error.name
+        }, 'image/png', 1.0);
       });
-      alert(`Failed to generate share image: ${error.message}\n\nPlease check the browser console for more details.`);
+
+    } catch (error) {
+      console.error('Error generating share image:', error);
+      throw error;
     } finally {
       setIsGenerating(false);
     }
   };
 
+  const handleShare = async () => {
+    try {
+      const imageBlob = await generateShareImage();
+      if (!imageBlob) {
+        throw new Error('Failed to generate image');
+      }
+
+      const file = new File([imageBlob], 'dancetribe-profile.png', { type: 'image/png' });
+
+      if (navigator.share && navigator.canShare && navigator.canShare({ files: [file] })) {
+        console.log('Using Web Share API');
+        await navigator.share({
+          title: `${userData.name}'s DanceTribe Profile`,
+          text: `Check out ${userData.name}'s dance profile on DanceTribe!`,
+          files: [file]
+        });
+      } else {
+        console.log('Web Share API not available, using fallback');
+        // Create download link as fallback
+        const url = URL.createObjectURL(imageBlob);
+        const link = document.createElement('a');
+        link.href = url;
+        link.download = 'dancetribe-profile.png';
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+        URL.revokeObjectURL(url);
+        
+        alert('Image saved! You can now share it on Instagram Stories 📱');
+      }
+    } catch (error) {
+      console.error('Share failed:', error);
+      alert('Failed to generate share image. Please try again.');
+    }
+  };
+
   return (
     <div>
+      {/* Hidden ShareCard for rendering */}
+      <div style={{ position: 'absolute', left: '-10000px', top: '-10000px' }}>
+        <ShareCard ref={shareCardRef} userData={userData} />
+      </div>
+
       {/* Share Button */}
       <button
-        onClick={generateAndShare}
+        onClick={handleShare}
         disabled={isGenerating}
         style={{
-          background: 'linear-gradient(to right, #a855f7, #ec4899)',
+          background: isGenerating 
+            ? 'linear-gradient(45deg, #ccc, #999)' 
+            : 'linear-gradient(45deg, #667eea, #764ba2)',
           color: 'white',
           border: 'none',
           borderRadius: '12px',
-          padding: '16px 32px',
-          fontSize: '18px',
+          padding: '12px 24px',
+          fontSize: '16px',
           fontWeight: '600',
           cursor: isGenerating ? 'not-allowed' : 'pointer',
-          opacity: isGenerating ? 0.7 : 1,
-          boxShadow: '0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05)'
+          display: 'flex',
+          alignItems: 'center',
+          gap: '8px',
+          transition: 'all 0.3s ease',
+          opacity: isGenerating ? 0.7 : 1
         }}
       >
         {isGenerating ? (
-          <span style={{ 
-            display: 'inline-block',
-            width: '20px', 
-            height: '20px',
-            border: '3px solid rgba(255,255,255,0.3)',
-            borderTop: '3px solid white',
-            borderRadius: '50%',
-            animation: 'spin 1s linear infinite',
-            marginRight: '8px'
-          }}></span>
+          <>
+            <div
+              style={{
+                width: '16px',
+                height: '16px',
+                border: '2px solid rgba(255,255,255,0.3)',
+                borderTop: '2px solid white',
+                borderRadius: '50%',
+                animation: 'spin 1s linear infinite'
+              }}
+            />
+            Generating...
+          </>
         ) : (
-          "📱"
+          <>
+            📱 Share to Story
+          </>
         )}
-        {isGenerating ? "Generating..." : "Share to Instagram Story"}
       </button>
 
-      {/* Hidden Share Card for Rendering */}
-      <div 
-        style={{ 
-          position: 'fixed', 
-          top: '-10000px', 
-          left: '-10000px', 
-          pointerEvents: 'none',
-          isolation: 'isolate',
-          contain: 'layout style paint',
-          zIndex: -9999
-        }}
-      >
-        <div style={{ all: 'initial', fontFamily: 'Arial, sans-serif' }}>
-          <ShareCard ref={shareCardRef} userData={userData} />
-        </div>
-      </div>
+      {/* Add CSS animation for spinner */}
+      <style jsx>{`
+        @keyframes spin {
+          0% { transform: rotate(0deg); }
+          100% { transform: rotate(360deg); }
+        }
+      `}</style>
     </div>
   );
-}
+};
+
+export default ShareToStory;

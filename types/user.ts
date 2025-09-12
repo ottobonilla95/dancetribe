@@ -1,7 +1,35 @@
 import { City } from "./city";
 
+export type User = {
+  _id: string;
+  name: string;
+  email: string;
+  image?: string;
+  username?: string;
+  dateOfBirth?: Date;
+  city?: City;
+  citiesVisited?: City[];
+  danceStyles?: string[];
+  anthem?: {
+    url: string;
+    platform: "spotify" | "youtube";
+    title?: string;
+    artist?: string;
+  };
+  socialMedia?: SocialMedia;
+  danceRole?: "follower" | "leader" | "both";
+  isProfileComplete?: boolean;
+  onboardingSteps?: OnboardingSteps;
+  customerId?: string;
+  priceId?: string;
+  hasAccess?: boolean;
+  createdAt?: Date;
+  updatedAt?: Date;
+}
+
 export interface OnboardingSteps {
   danceStyles: boolean;
+  username: boolean;
   profilePic: boolean;
   dateOfBirth: boolean;
   currentLocation: boolean;
@@ -25,26 +53,3 @@ export interface SocialMedia {
 }
 
 export type DanceRole = "follower" | "leader" | "both";
-
-export type User = {
-  id: string;
-  _id?: string;
-  name?: string;
-  email?: string;
-  image?: string;
-  customerId?: string;
-  priceId?: string;
-  hasAccess: boolean;
-  city?: City | string | null;
-  danceStyles: string[];
-  dateOfBirth?: Date | string;
-  citiesVisited: (City | string)[];
-  anthem?: Anthem;
-  socialMedia?: SocialMedia;
-  danceRole?: DanceRole;
-  isProfileComplete: boolean;
-  onboardingSteps: OnboardingSteps;
-  createdAt: Date | string;
-  updatedAt: Date | string;
-  emailVerified?: Date | string | null;
-};

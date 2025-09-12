@@ -329,11 +329,14 @@ export default async function Profile() {
             <ShareToStory userData={{
               id: userData._id,
               name: userData.name,
-              image: userData.image,
-              danceStyles: userData.danceStyles,
-              danceRole: userData.danceRole,
+              username: userData.username,
+              profilePicture: userData.image,
+              dateOfBirth: userData.dateOfBirth,
               city: userData.city,
-              zodiac: zodiac
+              danceStyles: userData.danceStyles?.map((style: any) => ({
+                name: typeof style === 'string' ? style : style.name,
+                level: typeof style === 'string' ? 'Beginner' : (style.level || 'Beginner')
+              })) || []
             }} />
           </div>
           

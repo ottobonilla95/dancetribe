@@ -8,6 +8,17 @@ const userSchema = new mongoose.Schema(
       type: String,
       trim: true,
     },
+    // Unique username for short URLs (e.g., @sarah_dancer)
+    username: {
+      type: String,
+      unique: true,
+      sparse: true, // allows null values but enforces uniqueness when present
+      lowercase: true,
+      trim: true,
+      match: [/^[a-z0-9_]+$/, 'Username can only contain lowercase letters, numbers, and underscores'],
+      minlength: 3,
+      maxlength: 20,
+    },
     email: {
       type: String,
       trim: true,
@@ -85,6 +96,7 @@ const userSchema = new mongoose.Schema(
     // Onboarding completion tracking
     onboardingSteps: {
       danceStyles: { type: Boolean, default: false },
+      username: { type: Boolean, default: false },
       profilePic: { type: Boolean, default: false },
       dateOfBirth: { type: Boolean, default: false },
       currentLocation: { type: Boolean, default: false },
