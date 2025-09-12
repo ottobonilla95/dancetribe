@@ -53,20 +53,25 @@ const ShareCard = forwardRef<HTMLDivElement, ShareCardProps>(({ userData }, ref)
   const zodiac = getZodiacSign(userData.dateOfBirth);
   const topDanceStyle = userData.danceStyles[0];
   
-  // Create profile URL and generate QR code
-  const profileUrl = `${process.env.NODE_ENV === 'production' ? 'https://dancetribe.co' : 'http://localhost:3000'}/dancer/${userData.id}`;
+  // Create short URL for both display and QR code
+  const baseUrl = process.env.NODE_ENV === 'production' ? 'https://dancetribe.co' : 'http://localhost:3000';
+  const displayUrl = process.env.NODE_ENV === 'production' ? 'DanceTribe.co' : 'localhost:3000';
   
-  // Use username if available, otherwise fallback to ID-based URL
+  // Use username-based short URL if available, otherwise fallback to long URL
   const shortUrl = userData.username 
-    ? `${process.env.NODE_ENV === 'production' ? 'DanceTribe.co' : 'localhost:3000'}/${userData.username}`
-    : `${process.env.NODE_ENV === 'production' ? 'DanceTribe.co' : 'localhost:3000'}/dancer/${userData.id}`;
+    ? `${displayUrl}/${userData.username}`
+    : `${displayUrl}/dancer/${userData.id}`;
+    
+  const fullShortUrl = userData.username 
+    ? `${baseUrl}/${userData.username}`
+    : `${baseUrl}/dancer/${userData.id}`;
   
-  // Generate QR code data URL synchronously
+  // Generate QR code data URL synchronously - using the SHORT URL for QR
   const [qrCodeUrl, setQrCodeUrl] = React.useState<string>('');
   const [isQrReady, setIsQrReady] = React.useState(false);
   
   React.useEffect(() => {
-    QRCode.toDataURL(profileUrl, {
+    QRCode.toDataURL(fullShortUrl, {
       width: 240,
       margin: 2,
       color: {
@@ -81,7 +86,7 @@ const ShareCard = forwardRef<HTMLDivElement, ShareCardProps>(({ userData }, ref)
     }).catch((error) => {
       console.error('QR Code generation failed:', error);
     });
-  }, [profileUrl]);
+  }, [fullShortUrl]);
 
   return (
     <div

@@ -16,15 +16,16 @@ export async function GET(req: NextRequest) {
     await connectMongo();
 
     const user = await User.findById(session.user.id)
+      .select("name username email image dateOfBirth city citiesVisited danceStyles anthem socialMedia danceRole onboardingSteps isProfileComplete createdAt")
       .populate({
         path: "city",
         model: City,
-        select: "name country continent rank",
+        select: "name country continent rank image",
       })
       .populate({
         path: "citiesVisited",
         model: City,
-        select: "name country continent rank",
+        select: "name country continent rank image",
       });
 
     if (!user) {
@@ -124,14 +125,13 @@ export async function PUT(req: NextRequest) {
     const isComplete = Object.values(steps).every((step) => step === true);
     user.isProfileComplete = isComplete;
 
-    // Username is now handled in the onboarding step, no need for auto-generation
-
     await user.save();
 
     return NextResponse.json({
       success: true,
       user: {
         id: user._id,
+        username: user.username,
         isProfileComplete: user.isProfileComplete,
         onboardingSteps: user.onboardingSteps,
       },

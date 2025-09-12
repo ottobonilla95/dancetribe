@@ -21,6 +21,7 @@ export default async function Profile() {
   await connectMongo();
   
   const user = await User.findById(session.user.id)
+    .select("name username email image dateOfBirth city citiesVisited danceStyles anthem socialMedia danceRole createdAt")
     .populate({
       path: "city",
       model: City,
@@ -70,6 +71,29 @@ export default async function Profile() {
       const style = danceStyles.find((s: any) => s.name === styleName);
       return style || { name: styleName, description: "" };
     });
+  };
+
+  // Helper function to construct social media URLs
+  const getSocialUrl = (platform: string, value: string) => {
+    if (!value) return '';
+    
+    // If it's already a full URL, return as-is
+    if (value.startsWith('http')) {
+      return value;
+    }
+    
+    // Otherwise, construct the URL based on platform
+    const cleanValue = value.replace('@', '');
+    switch (platform) {
+      case 'instagram':
+        return `https://instagram.com/${cleanValue}`;
+      case 'tiktok':
+        return `https://tiktok.com/@${cleanValue}`;
+      case 'youtube':
+        return value; // YouTube URLs are usually full URLs
+      default:
+        return value;
+    }
   };
 
   const getRoleDisplay = (role: string) => {
@@ -257,7 +281,7 @@ export default async function Profile() {
                               width="100%"
                               height="152"
                               frameBorder="0"
-                              className="rounded-lg"
+                              className="rounded-2xl"
                               allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture"
                               loading="lazy"
                             />
@@ -284,7 +308,7 @@ export default async function Profile() {
                     <div className="flex gap-3">
                       {userData.socialMedia.instagram && (
                         <a 
-                          href={`https://instagram.com/${userData.socialMedia.instagram.replace('@', '')}`}
+                          href={getSocialUrl('instagram', userData.socialMedia.instagram)}
                           target="_blank"
                           rel="noopener noreferrer"
                           className="btn btn-circle btn-outline hover:bg-gradient-to-r hover:from-purple-500 hover:to-pink-500 hover:text-white hover:border-purple-500"
@@ -295,7 +319,7 @@ export default async function Profile() {
                       )}
                       {userData.socialMedia.tiktok && (
                         <a 
-                          href={`https://tiktok.com/@${userData.socialMedia.tiktok.replace('@', '')}`}
+                          href={getSocialUrl('tiktok', userData.socialMedia.tiktok)}
                           target="_blank"
                           rel="noopener noreferrer"
                           className="btn btn-circle btn-outline hover:bg-black hover:text-white hover:border-black"
@@ -306,7 +330,7 @@ export default async function Profile() {
                       )}
                       {userData.socialMedia.youtube && (
                         <a 
-                          href={userData.socialMedia.youtube}
+                          href={getSocialUrl('youtube', userData.socialMedia.youtube)}
                           target="_blank"
                           rel="noopener noreferrer"
                           className="btn btn-circle btn-outline hover:bg-red-600 hover:text-white hover:border-red-600"

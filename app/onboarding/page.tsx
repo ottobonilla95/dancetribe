@@ -42,6 +42,7 @@ export default function Onboarding() {
   const usernameTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const [profilePic, setProfilePic] = useState<File | null>(null);
   const [uploadingProfilePic, setUploadingProfilePic] = useState(false);
+  const [completing, setCompleting] = useState(false);
   const [dateOfBirth, setDateOfBirth] = useState("");
   const [currentLocation, setCurrentLocation] = useState<City | null>(null);
   const [citiesVisited, setCitiesVisited] = useState<City[]>([]);
@@ -212,6 +213,8 @@ export default function Onboarding() {
       const data = (await apiClient.get("/user/profile")) as { user: User };
       const userData = data.user;
       setUser(userData);
+      
+
 
       // Pre-fill form with existing data
       if (userData.danceStyles?.length > 0) {
@@ -229,14 +232,20 @@ export default function Onboarding() {
       if (userData.dateOfBirth) {
         setDateOfBirth(new Date(userData.dateOfBirth).toISOString().split('T')[0]);
       }
-             if (userData.city && typeof userData.city === 'object') {
+       // Handle current location - ensure it's a valid city object
+       if (userData.city && typeof userData.city === 'object' && (userData.city._id || (userData.city as any).id)) {
          setCurrentLocation(userData.city as City);
        }
+       
+       // Handle cities visited - filter out null/invalid entries
        if (userData.citiesVisited?.length > 0) {
-         const cities = userData.citiesVisited.filter((city): city is City => 
-           typeof city === 'object' && city !== null
+         const validCities = userData.citiesVisited.filter((city): city is City => 
+           city !== null && 
+           typeof city === 'object' && 
+           !!(city._id || (city as any).id) && 
+           !!city.name
          );
-         setCitiesVisited(cities);
+         setCitiesVisited(validCities);
        }
              if (userData.anthem) {
          setAnthem({
@@ -332,10 +341,16 @@ export default function Onboarding() {
           alert("Please select your current city");
           return;
         }
-        stepData = { city: currentLocation._id };
+        // Handle both populated objects and ID strings
+        const cityId = typeof currentLocation === 'string' ? currentLocation : (currentLocation._id || (currentLocation as any).id);
+        stepData = { city: cityId };
         break;
       case "citiesVisited":
-        stepData = { citiesVisited: citiesVisited.map((city) => city._id) };
+        // Handle both populated objects and ID strings
+        const cityIds = citiesVisited.map((city) => 
+          typeof city === 'string' ? city : (city._id || (city as any).id)
+        );
+        stepData = { citiesVisited: cityIds };
         break;
       case "anthem": {
         if (!anthem.url) {
@@ -362,6 +377,11 @@ export default function Onboarding() {
     }
 
     try {
+      // Set completing state if this is the last step
+      if (currentStep === steps.length - 1) {
+        setCompleting(true);
+      }
+
       await apiClient.put("/user/profile", {
         step: step.id,
         data: stepData,
@@ -377,6 +397,7 @@ export default function Onboarding() {
     } catch (error) {
       console.error("Error updating profile:", error);
       alert("Error saving your information. Please try again.");
+      setCompleting(false); // Reset completing state on error
     }
   };
 
@@ -713,7 +734,7 @@ export default function Onboarding() {
                         width="100%"
                         height="152"
                         frameBorder="0"
-                        className="rounded-xl"
+                        className="rounded-2xl"
                         allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture"
                         loading="lazy"
                       ></iframe>
@@ -817,12 +838,17 @@ export default function Onboarding() {
               <button
                 className="btn btn-primary"
                 onClick={handleNext}
-                disabled={uploadingProfilePic || (steps[currentStep].id === "username" && usernameStatus.checking)}
+                disabled={uploadingProfilePic || completing || (steps[currentStep].id === "username" && usernameStatus.checking)}
               >
                 {uploadingProfilePic ? (
                   <>
                     <span className="loading loading-spinner loading-sm"></span>
                     Uploading...
+                  </>
+                ) : completing ? (
+                  <>
+                    <span className="loading loading-spinner loading-sm"></span>
+                    Completing...
                   </>
                 ) : currentStep === steps.length - 1 ? (
                   "Complete"
