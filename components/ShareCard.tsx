@@ -32,36 +32,40 @@ const ShareCard = forwardRef<HTMLDivElement, ShareCardProps>(({ userData }, ref)
   return (
     <div 
       ref={ref}
-      className="w-[1080px] h-[1920px] bg-gradient-to-br from-purple-600 via-pink-500 to-orange-400 text-white relative overflow-hidden"
       style={{ 
-        fontFamily: 'system-ui, -apple-system, sans-serif',
-        background: 'linear-gradient(135deg, #667eea 0%, #764ba2 50%, #f093fb 100%)'
+        width: '1080px',
+        height: '1920px',
+        fontFamily: 'Arial, sans-serif',
+        background: 'linear-gradient(135deg, #667eea 0%, #764ba2 50%, #f093fb 100%)',
+        color: 'white',
+        position: 'relative',
+        overflow: 'hidden'
       }}
     >
       {/* Background Pattern */}
-      <div className="absolute inset-0 opacity-10">
-        <div className="absolute top-20 left-20 text-8xl">💃</div>
-        <div className="absolute top-40 right-32 text-6xl">🕺</div>
-        <div className="absolute bottom-80 left-16 text-7xl">🎵</div>
-        <div className="absolute bottom-60 right-20 text-5xl">✨</div>
-        <div className="absolute top-[600px] left-[300px] text-9xl opacity-5">🌟</div>
+      <div style={{ position: 'absolute', top: 0, left: 0, right: 0, bottom: 0, opacity: 0.1 }}>
+        <div style={{ position: 'absolute', top: '80px', left: '80px', fontSize: '128px' }}>💃</div>
+        <div style={{ position: 'absolute', top: '160px', right: '128px', fontSize: '96px' }}>🕺</div>
+        <div style={{ position: 'absolute', bottom: '320px', left: '64px', fontSize: '112px' }}>🎵</div>
+        <div style={{ position: 'absolute', bottom: '240px', right: '80px', fontSize: '80px' }}>✨</div>
+        <div style={{ position: 'absolute', top: '600px', left: '300px', fontSize: '144px', opacity: 0.05 }}>🌟</div>
       </div>
 
       {/* Main Content */}
-      <div className="relative z-10 flex flex-col items-center justify-center h-full p-16">
+      <div style={{ position: 'relative', zIndex: 10, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', height: '100%', padding: '64px' }}>
         
         {/* Profile Picture */}
-        <div className="mb-12 relative">
-          <div className="w-72 h-72 rounded-full border-8 border-white shadow-2xl overflow-hidden bg-white">
+        <div style={{ marginBottom: '48px', position: 'relative' }}>
+          <div style={{ width: '288px', height: '288px', borderRadius: '50%', border: '8px solid white', overflow: 'hidden', backgroundColor: 'white' }}>
             {userData.image ? (
               <img 
                 src={userData.image} 
                 alt={userData.name || "Profile"} 
-                className="w-full h-full object-cover"
+                style={{ width: '100%', height: '100%', objectFit: 'cover' }}
               />
-            ) : (
-              <div className="w-full h-full bg-gradient-to-br from-purple-400 to-pink-400 flex items-center justify-center">
-                <span className="text-8xl text-white">
+                          ) : (
+              <div style={{ width: '100%', height: '100%', background: 'linear-gradient(135deg, #a855f7, #ec4899)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                <span style={{ fontSize: '128px', color: 'white' }}>
                   {userData.name?.charAt(0)?.toUpperCase() || "👤"}
                 </span>
               </div>
@@ -70,20 +74,20 @@ const ShareCard = forwardRef<HTMLDivElement, ShareCardProps>(({ userData }, ref)
           
           {/* Zodiac Badge */}
           {userData.zodiac && (
-            <div className="absolute -bottom-6 -right-6 bg-white text-purple-600 px-6 py-3 rounded-full shadow-lg font-bold text-2xl">
+            <div style={{ position: 'absolute', bottom: '-24px', right: '-24px', backgroundColor: 'white', color: '#7c3aed', padding: '12px 24px', borderRadius: '24px', fontWeight: 'bold', fontSize: '32px' }}>
               {userData.zodiac.emoji} {userData.zodiac.sign.split(' ')[0]}
             </div>
           )}
         </div>
 
         {/* Name */}
-        <h1 className="text-7xl font-bold text-center mb-8 text-white drop-shadow-lg">
+        <h1 style={{ fontSize: '112px', fontWeight: 'bold', textAlign: 'center', marginBottom: '32px', color: 'white' }}>
           {userData.name || "Dance Lover"}
         </h1>
 
         {/* Location */}
         {userData.city && (
-          <div className="text-3xl mb-8 text-center opacity-90">
+          <div style={{ fontSize: '48px', marginBottom: '32px', textAlign: 'center', opacity: 0.9 }}>
             📍 {userData.city.name}
             {userData.city.country && (
               <span>, {typeof userData.city.country === 'string' ? userData.city.country : userData.city.country.name}</span>
@@ -93,26 +97,26 @@ const ShareCard = forwardRef<HTMLDivElement, ShareCardProps>(({ userData }, ref)
 
         {/* Dance Role */}
         {userData.danceRole && (
-          <div className="text-4xl mb-12 text-center font-semibold">
+          <div style={{ fontSize: '64px', marginBottom: '48px', textAlign: 'center', fontWeight: '600' }}>
             {getRoleDisplay(userData.danceRole)}
           </div>
         )}
 
         {/* Dance Styles */}
         {userData.danceStyles && userData.danceStyles.length > 0 && (
-          <div className="mb-16 text-center">
-            <div className="text-3xl mb-6 font-semibold">Dance Styles</div>
-            <div className="flex flex-wrap justify-center gap-4 max-w-[800px]">
+          <div style={{ marginBottom: '64px', textAlign: 'center' }}>
+            <div style={{ fontSize: '48px', marginBottom: '24px', fontWeight: '600' }}>Dance Styles</div>
+            <div style={{ display: 'flex', flexWrap: 'wrap', justifyContent: 'center', gap: '16px', maxWidth: '800px' }}>
               {userData.danceStyles.slice(0, 6).map((style, index) => (
                 <span 
                   key={index}
-                  className="bg-white bg-opacity-20 backdrop-blur-sm px-6 py-3 rounded-full text-2xl font-medium border border-white border-opacity-30"
+                  style={{ backgroundColor: 'rgba(255, 255, 255, 0.2)', padding: '12px 24px', borderRadius: '24px', fontSize: '32px', fontWeight: '500', border: '1px solid rgba(255, 255, 255, 0.3)' }}
                 >
                   {style}
                 </span>
               ))}
               {userData.danceStyles.length > 6 && (
-                <span className="bg-white bg-opacity-20 backdrop-blur-sm px-6 py-3 rounded-full text-2xl font-medium border border-white border-opacity-30">
+                <span style={{ backgroundColor: 'rgba(255, 255, 255, 0.2)', padding: '12px 24px', borderRadius: '24px', fontSize: '32px', fontWeight: '500', border: '1px solid rgba(255, 255, 255, 0.3)' }}>
                   +{userData.danceStyles.length - 6} more
                 </span>
               )}
@@ -121,25 +125,25 @@ const ShareCard = forwardRef<HTMLDivElement, ShareCardProps>(({ userData }, ref)
         )}
 
         {/* Call to Action */}
-        <div className="text-center mb-12">
-          <div className="text-4xl font-bold mb-4">Join the Dance Community!</div>
-          <div className="text-2xl opacity-90">Tap the link to see my full profile</div>
+        <div style={{ textAlign: 'center', marginBottom: '48px' }}>
+          <div style={{ fontSize: '64px', fontWeight: 'bold', marginBottom: '16px' }}>Join the Dance Community!</div>
+          <div style={{ fontSize: '32px', opacity: 0.9 }}>Tap the link to see my full profile</div>
         </div>
 
         {/* DanceTribe Branding */}
-        <div className="absolute bottom-16 left-0 right-0 text-center">
-          <div className="text-6xl font-bold mb-4 tracking-wider">
+        <div style={{ position: 'absolute', bottom: '64px', left: 0, right: 0, textAlign: 'center' }}>
+          <div style={{ fontSize: '96px', fontWeight: 'bold', marginBottom: '16px', letterSpacing: '0.1em' }}>
             DANCETRIBE
           </div>
-          <div className="text-2xl opacity-80">
+          <div style={{ fontSize: '32px', opacity: 0.8 }}>
             Where dancers connect 💃🕺
           </div>
         </div>
       </div>
 
       {/* Decorative Elements */}
-      <div className="absolute top-0 left-0 w-full h-32 bg-gradient-to-b from-black from-opacity-20 to-transparent"></div>
-      <div className="absolute bottom-0 left-0 w-full h-32 bg-gradient-to-t from-black from-opacity-20 to-transparent"></div>
+      <div style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '128px', background: 'linear-gradient(to bottom, rgba(0,0,0,0.2), transparent)' }}></div>
+      <div style={{ position: 'absolute', bottom: 0, left: 0, width: '100%', height: '128px', background: 'linear-gradient(to top, rgba(0,0,0,0.2), transparent)' }}></div>
     </div>
   );
 });

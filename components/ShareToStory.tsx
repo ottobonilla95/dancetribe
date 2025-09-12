@@ -26,21 +26,73 @@ export default function ShareToStory({ userData }: ShareToStoryProps) {
   const [isGenerating, setIsGenerating] = useState(false);
   const shareCardRef = useRef<HTMLDivElement>(null);
 
+  // Add CSS animation for spinner
+  React.useEffect(() => {
+    const style = document.createElement('style');
+    style.textContent = `
+      @keyframes spin {
+        0% { transform: rotate(0deg); }
+        100% { transform: rotate(360deg); }
+      }
+    `;
+    document.head.appendChild(style);
+    return () => {
+      document.head.removeChild(style);
+    };
+  }, []);
+
   const generateAndShare = async () => {
     if (!shareCardRef.current) return;
 
     setIsGenerating(true);
 
     try {
-      // Generate the image
-      const canvas = await html2canvas(shareCardRef.current, {
+      // Create a clean iframe to render the card
+      const iframe = document.createElement('iframe');
+      iframe.style.position = 'fixed';
+      iframe.style.top = '-10000px';
+      iframe.style.left = '-10000px';
+      iframe.style.width = '1080px';
+      iframe.style.height = '1920px';
+      iframe.style.border = 'none';
+      document.body.appendChild(iframe);
+
+      const iframeDoc = iframe.contentDocument!;
+      iframeDoc.open();
+      iframeDoc.write(`
+        <!DOCTYPE html>
+        <html>
+        <head>
+          <style>
+            * { margin: 0; padding: 0; box-sizing: border-box; }
+            body { font-family: Arial, sans-serif; }
+          </style>
+        </head>
+        <body>
+          ${shareCardRef.current.outerHTML}
+        </body>
+        </html>
+      `);
+      iframeDoc.close();
+
+      // Wait for iframe to load
+      await new Promise(resolve => setTimeout(resolve, 100));
+
+      // Generate the image from iframe content
+      console.log("Starting image generation...", iframe.contentDocument!.body.firstElementChild);
+      const canvas = await html2canvas(iframe.contentDocument!.body.firstElementChild as HTMLElement, {
         width: 1080,
         height: 1920,
         scale: 1,
         useCORS: true,
         allowTaint: true,
-        backgroundColor: null,
+        backgroundColor: '#667eea',
+        logging: false,
       });
+      console.log("Canvas generated successfully:", canvas);
+
+      // Clean up iframe
+      document.body.removeChild(iframe);
 
       // Convert to blob
       canvas.toBlob(
@@ -97,7 +149,12 @@ export default function ShareToStory({ userData }: ShareToStoryProps) {
       );
     } catch (error) {
       console.error("Error generating share image:", error);
-      alert("Failed to generate share image. Please try again.");
+      console.error("Error details:", {
+        message: error.message,
+        stack: error.stack,
+        name: error.name
+      });
+      alert(`Failed to generate share image: ${error.message}\n\nPlease check the browser console for more details.`);
     } finally {
       setIsGenerating(false);
     }
@@ -109,10 +166,30 @@ export default function ShareToStory({ userData }: ShareToStoryProps) {
       <button
         onClick={generateAndShare}
         disabled={isGenerating}
-        className="btn btn-lg bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600 text-white border-none shadow-lg"
+        style={{
+          background: 'linear-gradient(to right, #a855f7, #ec4899)',
+          color: 'white',
+          border: 'none',
+          borderRadius: '12px',
+          padding: '16px 32px',
+          fontSize: '18px',
+          fontWeight: '600',
+          cursor: isGenerating ? 'not-allowed' : 'pointer',
+          opacity: isGenerating ? 0.7 : 1,
+          boxShadow: '0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05)'
+        }}
       >
         {isGenerating ? (
-          <span className="loading loading-spinner loading-sm"></span>
+          <span style={{ 
+            display: 'inline-block',
+            width: '20px', 
+            height: '20px',
+            border: '3px solid rgba(255,255,255,0.3)',
+            borderTop: '3px solid white',
+            borderRadius: '50%',
+            animation: 'spin 1s linear infinite',
+            marginRight: '8px'
+          }}></span>
         ) : (
           "📱"
         )}
@@ -120,8 +197,20 @@ export default function ShareToStory({ userData }: ShareToStoryProps) {
       </button>
 
       {/* Hidden Share Card for Rendering */}
-      <div className="fixed -top-[10000px] -left-[10000px] pointer-events-none">
-        <ShareCard ref={shareCardRef} userData={userData} />
+      <div 
+        style={{ 
+          position: 'fixed', 
+          top: '-10000px', 
+          left: '-10000px', 
+          pointerEvents: 'none',
+          isolation: 'isolate',
+          contain: 'layout style paint',
+          zIndex: -9999
+        }}
+      >
+        <div style={{ all: 'initial', fontFamily: 'Arial, sans-serif' }}>
+          <ShareCard ref={shareCardRef} userData={userData} />
+        </div>
       </div>
     </div>
   );
