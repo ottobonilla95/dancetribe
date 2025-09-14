@@ -1,4 +1,5 @@
 import { City } from "./city";
+import { UserDanceStyle } from "./dance-style";
 
 export type User = {
   _id: string;
@@ -9,7 +10,7 @@ export type User = {
   dateOfBirth?: Date;
   city?: City;
   citiesVisited?: City[];
-  danceStyles?: string[];
+  danceStyles?: UserDanceStyle[];
   anthem?: {
     url: string;
     platform: "spotify" | "youtube";
@@ -18,6 +19,8 @@ export type User = {
   };
   socialMedia?: SocialMedia;
   danceRole?: "follower" | "leader" | "both";
+  gender?: "male" | "female" | "other";
+  nationality?: string;
   isProfileComplete?: boolean;
   onboardingSteps?: OnboardingSteps;
   customerId?: string;
@@ -37,6 +40,8 @@ export interface OnboardingSteps {
   anthem: boolean;
   socialMedia: boolean;
   danceRole: boolean;
+  gender: boolean;
+  nationality: boolean;
 }
 
 export interface Anthem {

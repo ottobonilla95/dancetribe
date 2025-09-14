@@ -53,6 +53,11 @@ const ShareCard = forwardRef<HTMLDivElement, ShareCardProps>(({ userData }, ref)
   const zodiac = getZodiacSign(userData.dateOfBirth);
   const topDanceStyle = userData.danceStyles[0];
   
+  // Capitalize level for display
+  const formatLevel = (level: string) => {
+    return level.charAt(0).toUpperCase() + level.slice(1);
+  };
+  
   // Create short URL for both display and QR code
   const baseUrl = process.env.NODE_ENV === 'production' ? 'https://dancetribe.co' : 'http://localhost:3000';
   const displayUrl = process.env.NODE_ENV === 'production' ? 'DanceTribe.co' : 'localhost:3000';
@@ -147,7 +152,7 @@ const ShareCard = forwardRef<HTMLDivElement, ShareCardProps>(({ userData }, ref)
           margin: '0 0 20px 0',
           fontWeight: '500'
         }}>
-          {zodiac.emoji} {zodiac.name} • {topDanceStyle?.name} {topDanceStyle?.level}
+          {zodiac.emoji} {zodiac.name} • {topDanceStyle?.name} {formatLevel(topDanceStyle?.level || 'beginner')}
         </div>
 
         {/* Location */}

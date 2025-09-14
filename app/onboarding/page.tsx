@@ -3,7 +3,9 @@
 import React, { useState, useEffect, useRef } from "react";
 import { useRouter } from "next/navigation";
 import apiClient from "@/libs/api";
-import { User, DanceStyle, City } from "@/types";
+import { User, DanceStyle, City, UserDanceStyle } from "@/types";
+import { DANCE_LEVELS } from "@/constants/dance-levels";
+import { COUNTRIES } from "@/constants/countries";
 import CitySelector from "@/components/CitySelector";
 import ImageCropPicker from "@/components/ImageCropPicker";
 import CurrentLocationPicker from "@/components/CurrentLocationPicker";
@@ -26,7 +28,7 @@ export default function Onboarding() {
   );
 
   // Form states
-  const [danceStyles, setDanceStyles] = useState<string[]>([]);
+  const [danceStyles, setDanceStyles] = useState<UserDanceStyle[]>([]);
   const [username, setUsername] = useState("");
   const [usernameStatus, setUsernameStatus] = useState<{
     checking: boolean;
@@ -43,6 +45,7 @@ export default function Onboarding() {
   const [profilePic, setProfilePic] = useState<File | null>(null);
   const [uploadingProfilePic, setUploadingProfilePic] = useState(false);
   const [completing, setCompleting] = useState(false);
+  const [savingStep, setSavingStep] = useState(false);
   const [dateOfBirth, setDateOfBirth] = useState("");
   const [currentLocation, setCurrentLocation] = useState<City | null>(null);
   const [citiesVisited, setCitiesVisited] = useState<City[]>([]);
@@ -60,6 +63,8 @@ export default function Onboarding() {
   const [danceRole, setDanceRole] = useState<"follower" | "leader" | "both">(
     "both"
   );
+  const [gender, setGender] = useState<"male" | "female" | "other" | "">(""); 
+  const [nationality, setNationality] = useState("");
 
   const steps: OnboardingStep[] = [
     {
@@ -115,6 +120,18 @@ export default function Onboarding() {
       title: "What's your dance role?",
       description: "Do you prefer to lead, follow, or both?",
       completed: user?.onboardingSteps?.danceRole || false,
+    },
+    {
+      id: "gender",
+      title: "What's your gender?",
+      description: "Help other dancers connect with you",
+      completed: user?.onboardingSteps?.gender || false,
+    },
+    {
+      id: "nationality",
+      title: "What's your nationality?",
+      description: "Share your cultural background",
+      completed: user?.onboardingSteps?.nationality || false,
     },
   ];
 
@@ -214,11 +231,22 @@ export default function Onboarding() {
       const userData = data.user;
       setUser(userData);
       
-
+      // Redirect to dashboard if profile is already complete
+      if (userData.isProfileComplete) {
+        router.push("/dashboard");
+        return;
+      }
 
       // Pre-fill form with existing data
       if (userData.danceStyles?.length > 0) {
-        setDanceStyles(userData.danceStyles);
+        // Normalize dance styles to ensure danceStyle field contains ID, not populated object
+        const normalizedDanceStyles = userData.danceStyles.map((userStyle: any) => ({
+          danceStyle: typeof userStyle.danceStyle === 'string' 
+            ? userStyle.danceStyle 
+            : (userStyle.danceStyle?._id || userStyle.danceStyle?.id),
+          level: userStyle.level
+        }));
+        setDanceStyles(normalizedDanceStyles);
       }
       if (userData.username) {
         setUsername(userData.username);
@@ -264,6 +292,12 @@ export default function Onboarding() {
        }
       if (userData.danceRole) {
         setDanceRole(userData.danceRole);
+      }
+      if (userData.gender) {
+        setGender(userData.gender);
+      }
+      if (userData.nationality) {
+        setNationality(userData.nationality);
       }
 
       // Find the current step based on completion
@@ -371,12 +405,29 @@ export default function Onboarding() {
       case "danceRole":
         stepData = { danceRole };
         break;
+      case "gender":
+        if (!gender) {
+          alert("Please select your gender");
+          return;
+        }
+        stepData = { gender };
+        break;
+      case "nationality":
+        if (!nationality) {
+          alert("Please select your nationality");
+          return;
+        }
+        stepData = { nationality };
+        break;
       default:
         console.error("Unknown step:", step.id);
         return;
     }
 
     try {
+      // Set saving state
+      setSavingStep(true);
+      
       // Set completing state if this is the last step
       if (currentStep === steps.length - 1) {
         setCompleting(true);
@@ -398,13 +449,45 @@ export default function Onboarding() {
       console.error("Error updating profile:", error);
       alert("Error saving your information. Please try again.");
       setCompleting(false); // Reset completing state on error
+    } finally {
+      setSavingStep(false); // Always reset saving state
     }
   };
 
-  const toggleDanceStyle = (style: string) => {
-    setDanceStyles((prev) =>
-      prev.includes(style) ? prev.filter((s) => s !== style) : [...prev, style]
+  // Helper functions for dance styles with levels
+  const addDanceStyle = (styleId: string, styleName: string) => {
+    const existingStyle = danceStyles.find(ds => ds.danceStyle === styleId);
+    if (!existingStyle) {
+      setDanceStyles(prev => [...prev, { danceStyle: styleId, level: 'beginner' as UserDanceStyle['level'] }]);
+    }
+  };
+
+  const removeDanceStyle = (styleId: string) => {
+    setDanceStyles(prev => prev.filter(ds => ds.danceStyle !== styleId));
+  };
+
+  const updateDanceStyleLevel = (styleId: string, level: string) => {
+    setDanceStyles(prev => 
+      prev.map(ds => 
+        ds.danceStyle === styleId 
+          ? { ...ds, level: level as UserDanceStyle['level'] }
+          : ds
+      )
     );
+  };
+
+  const isDanceStyleSelected = (styleId: string) => {
+    return danceStyles.some(ds => ds.danceStyle === styleId);
+  };
+
+  const getDanceStyleLevel = (styleId: string) => {
+    const style = danceStyles.find(ds => ds.danceStyle === styleId);
+    return style?.level || 'beginner';
+  };
+
+  const getStyleNameById = (styleId: string) => {
+    const style = danceStylesOptions.find(s => (s._id || s.id) === styleId);
+    return style?.name || 'Unknown Style';
   };
 
   const handleImageSelect = (file: File) => {
@@ -526,36 +609,84 @@ export default function Onboarding() {
 
             {/* Dance Styles */}
             {steps[currentStep].id === "danceStyles" && (
-              <div className="form-control">
+              <div className="form-control space-y-6">
                 <label className="label">
-                  <span className="label-text">Select your dance styles</span>
+                  <span className="label-text">Select your dance styles and skill levels</span>
                 </label>
+                
+                {/* Dance Style Selection */}
                 <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
                   {danceStylesOptions.map((style) => (
-                    <label
+                    <div
                       key={style._id}
-                      className="label cursor-pointer flex-col gap-2 bg-base-100 rounded-lg p-3 border"
+                      className={`cursor-pointer flex-col gap-2 rounded-lg p-4 border transition-colors text-center ${
+                        isDanceStyleSelected(style._id || style.id) 
+                          ? 'bg-primary text-primary-content border-primary shadow-lg' 
+                          : 'bg-base-100 border-base-300 hover:bg-base-200'
+                      }`}
+                      onClick={() => {
+                        if (isDanceStyleSelected(style._id || style.id)) {
+                          removeDanceStyle(style._id || style.id);
+                        } else {
+                          addDanceStyle(style._id || style.id, style.name);
+                        }
+                      }}
                     >
-                      <span className="label-text text-center">
+                      <span className="font-medium">
                         {style.name}
                       </span>
-                      <input
-                        type="checkbox"
-                        className="checkbox checkbox-primary"
-                        checked={danceStyles.includes(style.name)}
-                        onChange={(e) => {
-                          if (e.target.checked) {
-                            setDanceStyles([...danceStyles, style.name]);
-                          } else {
-                            setDanceStyles(
-                              danceStyles.filter((s) => s !== style.name)
-                            );
-                          }
-                        }}
-                      />
-                    </label>
+                    </div>
                   ))}
                 </div>
+
+                {/* Level Selection for Selected Styles */}
+                {danceStyles.length > 0 && (
+                  <div className="space-y-4">
+                    <h3 className="font-medium text-base-content">Set your skill levels:</h3>
+                    {danceStyles.map((userStyle) => (
+                      <div key={userStyle.danceStyle} className="bg-base-200 rounded-lg p-4">
+                        <div className="flex items-center justify-between mb-3">
+                          <span className="font-medium">{getStyleNameById(userStyle.danceStyle)}</span>
+                          <button
+                            type="button"
+                            className="btn btn-ghost btn-xs text-error"
+                            onClick={() => removeDanceStyle(userStyle.danceStyle)}
+                          >
+                            Remove
+                          </button>
+                        </div>
+                        <div className="grid grid-cols-2 md:grid-cols-4 gap-2">
+                          {DANCE_LEVELS.map((level) => (
+                            <label
+                              key={level.value}
+                              className={`label cursor-pointer flex-col gap-1 rounded-lg p-2 border transition-colors ${
+                                userStyle.level === level.value
+                                  ? 'bg-primary text-primary-content border-primary'
+                                  : 'bg-base-100 border-base-300 hover:bg-base-200'
+                              }`}
+                            >
+                              <span className="text-lg">{level.emoji}</span>
+                              <span className="text-xs text-center">{level.label}</span>
+                              <input
+                                type="radio"
+                                name={`level-${userStyle.danceStyle}`}
+                                className="radio radio-primary radio-xs"
+                                checked={userStyle.level === level.value}
+                                onChange={() => updateDanceStyleLevel(userStyle.danceStyle, level.value)}
+                              />
+                            </label>
+                          ))}
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                )}
+                
+                {danceStyles.length === 0 && (
+                  <div className="text-center text-base-content/60 py-4">
+                    Select at least one dance style to continue
+                  </div>
+                )}
               </div>
             )}
 
@@ -826,6 +957,54 @@ export default function Onboarding() {
               </div>
             )}
 
+            {/* Gender */}
+            {steps[currentStep].id === "gender" && (
+              <div className="form-control">
+                <label className="label">
+                  <span className="label-text">What's your gender?</span>
+                </label>
+                <div className="flex flex-col gap-3">
+                  {[
+                    { value: "male", label: "Male" },
+                    { value: "female", label: "Female" },
+                    { value: "other", label: "Other" }
+                  ].map((option) => (
+                    <label key={option.value} className="label cursor-pointer">
+                      <span className="label-text">{option.label}</span>
+                      <input
+                        type="radio"
+                        name="gender"
+                        className="radio radio-primary"
+                        checked={gender === option.value}
+                        onChange={() => setGender(option.value as "male" | "female" | "other")}
+                      />
+                    </label>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {/* Nationality */}
+            {steps[currentStep].id === "nationality" && (
+              <div className="form-control">
+                <label className="label">
+                  <span className="label-text">What's your nationality?</span>
+                </label>
+                <select
+                  className="select select-bordered w-full"
+                  value={nationality}
+                  onChange={(e) => setNationality(e.target.value)}
+                >
+                  <option value="">Select your country...</option>
+                  {COUNTRIES.map((country) => (
+                    <option key={country} value={country}>
+                      {country}
+                    </option>
+                  ))}
+                </select>
+              </div>
+            )}
+
             {/* Navigation */}
             <div className="card-actions justify-between mt-8">
               <button
@@ -838,12 +1017,17 @@ export default function Onboarding() {
               <button
                 className="btn btn-primary"
                 onClick={handleNext}
-                disabled={uploadingProfilePic || completing || (steps[currentStep].id === "username" && usernameStatus.checking)}
+                disabled={uploadingProfilePic || completing || savingStep || (steps[currentStep].id === "username" && usernameStatus.checking)}
               >
                 {uploadingProfilePic ? (
                   <>
                     <span className="loading loading-spinner loading-sm"></span>
                     Uploading...
+                  </>
+                ) : savingStep ? (
+                  <>
+                    <span className="loading loading-spinner loading-sm"></span>
+                    Saving...
                   </>
                 ) : completing ? (
                   <>

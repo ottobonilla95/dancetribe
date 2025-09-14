@@ -4,6 +4,7 @@ import { authOptions } from "@/libs/next-auth";
 import connectMongo from "@/libs/mongoose";
 import User from "@/models/User";
 import City from "@/models/City";
+import DanceStyle from "@/models/DanceStyle";
 
 export async function GET(req: NextRequest) {
   const session = await getServerSession(authOptions);
@@ -16,7 +17,7 @@ export async function GET(req: NextRequest) {
     await connectMongo();
 
     const user = await User.findById(session.user.id)
-      .select("name username email image dateOfBirth city citiesVisited danceStyles anthem socialMedia danceRole onboardingSteps isProfileComplete createdAt")
+      .select("name username email image dateOfBirth city citiesVisited danceStyles anthem socialMedia danceRole gender nationality onboardingSteps isProfileComplete createdAt")
       .populate({
         path: "city",
         model: City,
@@ -26,6 +27,11 @@ export async function GET(req: NextRequest) {
         path: "citiesVisited",
         model: City,
         select: "name country continent rank image",
+      })
+      .populate({
+        path: "danceStyles.danceStyle",
+        model: DanceStyle,
+        select: "name description category",
       });
 
     if (!user) {
@@ -114,6 +120,16 @@ export async function PUT(req: NextRequest) {
       case "danceRole":
         user.danceRole = data.danceRole;
         user.onboardingSteps.danceRole = true;
+        break;
+
+      case "gender":
+        user.gender = data.gender;
+        user.onboardingSteps.gender = true;
+        break;
+
+      case "nationality":
+        user.nationality = data.nationality;
+        user.onboardingSteps.nationality = true;
         break;
 
       default:

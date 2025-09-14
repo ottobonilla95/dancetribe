@@ -7,6 +7,7 @@ import City from "@/models/City";
 import DanceStyle from "@/models/DanceStyle";
 import Link from "next/link";
 import { getZodiacSign } from "@/utils/zodiac";
+import { DANCE_LEVELS } from "@/constants/dance-levels";
 import ShareToStory from "@/components/ShareToStory";
 import { FaInstagram, FaTiktok, FaYoutube } from "react-icons/fa";
 
@@ -21,7 +22,7 @@ export default async function Profile() {
   await connectMongo();
   
   const user = await User.findById(session.user.id)
-    .select("name username email image dateOfBirth city citiesVisited danceStyles anthem socialMedia danceRole createdAt")
+    .select("name username email image dateOfBirth city citiesVisited danceStyles anthem socialMedia danceRole gender nationality createdAt")
     .populate({
       path: "city",
       model: City,
@@ -31,6 +32,11 @@ export default async function Profile() {
       path: "citiesVisited",
       model: City,
       select: "name country continent rank",
+    })
+    .populate({
+      path: "danceStyles.danceStyle",
+      model: DanceStyle,
+      select: "name description category",
     })
     .lean();
 
@@ -66,10 +72,33 @@ export default async function Profile() {
     });
   };
 
-  const getDanceStyleNames = (styleNames: string[]) => {
-    return styleNames.map(styleName => {
-      const style = danceStyles.find((s: any) => s.name === styleName);
-      return style || { name: styleName, description: "" };
+  const getDanceStylesWithLevels = (userDanceStyles: any[]) => {
+    return userDanceStyles.map(userStyle => {
+      const levelInfo = DANCE_LEVELS.find(l => l.value === userStyle.level);
+      
+      // Handle both populated objects and ID strings
+      let styleName: string;
+      let styleDescription: string;
+      
+      if (typeof userStyle.danceStyle === 'object' && userStyle.danceStyle?.name) {
+        // Already populated
+        styleName = userStyle.danceStyle.name;
+        styleDescription = userStyle.danceStyle.description || "";
+             } else {
+         // Just an ID, look it up in danceStyles array
+         const styleId = userStyle.danceStyle;
+         const foundStyle = danceStyles.find((style: any) => style._id === styleId || style.id === styleId);
+         styleName = foundStyle?.name || 'Unknown Style';
+         styleDescription = foundStyle?.description || "";
+       }
+      
+      return {
+        name: styleName,
+        level: userStyle.level,
+        levelLabel: levelInfo?.label || 'Beginner',
+        levelEmoji: levelInfo?.emoji || '🌱',
+        description: styleDescription
+      };
     });
   };
 
@@ -196,14 +225,36 @@ export default async function Profile() {
                   </div>
                 )}
 
+                {/* Gender */}
+                {userData.gender && (
+                  <div className="mb-4">
+                    <div className="text-sm font-medium text-base-content/60 mb-1">Gender</div>
+                    <div className="text-lg capitalize">{userData.gender}</div>
+                  </div>
+                )}
+
+                {/* Nationality */}
+                {userData.nationality && (
+                  <div className="mb-4">
+                    <div className="text-sm font-medium text-base-content/60 mb-1">Nationality</div>
+                    <div className="text-lg">{userData.nationality}</div>
+                  </div>
+                )}
+
                 {/* Dance Styles */}
                 {userData.danceStyles && userData.danceStyles.length > 0 && (
                   <div className="mb-4">
-                    <div className="text-sm font-medium text-base-content/60 mb-2">Dance Styles</div>
+                    <div className="text-sm font-medium text-base-content/60 mb-2">Dance Styles & Levels</div>
                     <div className="flex flex-wrap gap-2">
-                      {getDanceStyleNames(userData.danceStyles).map((style: any, index: number) => (
-                        <div key={index} className="badge badge-primary badge-lg" title={style.description}>
-                          {style.name}
+                      {getDanceStylesWithLevels(userData.danceStyles).map((style: any, index: number) => (
+                        <div 
+                          key={index} 
+                          className="badge badge-primary badge-lg gap-2" 
+                          title={`${style.name} - ${style.levelLabel}: ${style.description}`}
+                        >
+                          <span>{style.levelEmoji}</span>
+                          <span>{style.name}</span>
+                          <span className="text-xs opacity-80">({style.levelLabel})</span>
                         </div>
                       ))}
                     </div>
@@ -357,9 +408,9 @@ export default async function Profile() {
               profilePicture: userData.image,
               dateOfBirth: userData.dateOfBirth,
               city: userData.city,
-              danceStyles: userData.danceStyles?.map((style: any) => ({
-                name: typeof style === 'string' ? style : style.name,
-                level: typeof style === 'string' ? 'Beginner' : (style.level || 'Beginner')
+              danceStyles: userData.danceStyles?.map((userStyle: any) => ({
+                name: userStyle.danceStyle?.name || userStyle.danceStyle,
+                level: userStyle.level || 'beginner'
               })) || []
             }} />
           </div>

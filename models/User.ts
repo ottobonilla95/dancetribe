@@ -52,11 +52,19 @@ const userSchema = new mongoose.Schema(
       type: mongoose.Schema.Types.ObjectId,
       ref: "City",
     },
-    // Dance styles the user is interested in/practices
-    danceStyles: {
-      type: [String],
-      default: [],
-    },
+    // Dance styles the user is interested in/practices with their skill levels
+    danceStyles: [{
+      danceStyle: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "DanceStyle",
+        required: true
+      },
+      level: {
+        type: String,
+        enum: ['beginner', 'intermediate', 'advanced', 'expert'],
+        required: true
+      }
+    }],
     // NEW ONBOARDING FIELDS
     // Date of birth
     dateOfBirth: {
@@ -88,6 +96,16 @@ const userSchema = new mongoose.Schema(
       type: String,
       enum: ['follower', 'leader', 'both'],
     },
+    // Gender
+    gender: {
+      type: String,
+      enum: ['male', 'female', 'other'],
+    },
+    // Nationality (country name)
+    nationality: {
+      type: String,
+      trim: true,
+    },
     // Profile completion status
     isProfileComplete: {
       type: Boolean,
@@ -104,6 +122,8 @@ const userSchema = new mongoose.Schema(
       anthem: { type: Boolean, default: false },
       socialMedia: { type: Boolean, default: false },
       danceRole: { type: Boolean, default: false },
+      gender: { type: Boolean, default: false },
+      nationality: { type: Boolean, default: false },
     },
   },
   {
