@@ -39,7 +39,7 @@ export default function Onboarding() {
     checking: false,
     available: null,
     error: "",
-    suggestions: []
+    suggestions: [],
   });
   const usernameTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const [profilePic, setProfilePic] = useState<File | null>(null);
@@ -63,7 +63,7 @@ export default function Onboarding() {
   const [danceRole, setDanceRole] = useState<"follower" | "leader" | "both">(
     "both"
   );
-  const [gender, setGender] = useState<"male" | "female" | "other" | "">(""); 
+  const [gender, setGender] = useState<"male" | "female" | "other" | "">("");
   const [nationality, setNationality] = useState("");
 
   const steps: OnboardingStep[] = [
@@ -141,24 +141,29 @@ export default function Onboarding() {
     if (!value) return "Username is required";
     if (value.length < 3) return "Username must be at least 3 characters";
     if (value.length > 20) return "Username must be 20 characters or less";
-    if (!regex.test(value)) return "Username can only contain lowercase letters, numbers, and underscores";
-    if (value.startsWith('_') || value.endsWith('_')) return "Username cannot start or end with an underscore";
+    if (!regex.test(value))
+      return "Username can only contain lowercase letters, numbers, and underscores";
+    if (value.startsWith("_") || value.endsWith("_"))
+      return "Username cannot start or end with an underscore";
     return "";
   };
 
   const generateSuggestions = (name: string) => {
     if (!name) return [];
-    
-    const cleanName = name.toLowerCase().replace(/[^a-z0-9\s]/g, '').replace(/\s+/g, '_');
+
+    const cleanName = name
+      .toLowerCase()
+      .replace(/[^a-z0-9\s]/g, "")
+      .replace(/\s+/g, "_");
     const suggestions = [
       cleanName,
       `${cleanName}_dancer`,
       `${cleanName}_dance`,
       `${cleanName}123`,
       `dance_${cleanName}`,
-      `${cleanName}_2024`
-    ].filter(s => s.length >= 3 && s.length <= 20);
-    
+      `${cleanName}_2024`,
+    ].filter((s) => s.length >= 3 && s.length <= 20);
+
     return suggestions.slice(0, 3);
   };
 
@@ -169,40 +174,42 @@ export default function Onboarding() {
         checking: false,
         available: false,
         error: validationError,
-        suggestions: generateSuggestions(user?.name || "")
+        suggestions: generateSuggestions(user?.name || ""),
       });
       return;
     }
 
-    setUsernameStatus(prev => ({ ...prev, checking: true, error: "" }));
+    setUsernameStatus((prev) => ({ ...prev, checking: true, error: "" }));
 
     try {
-      const response = await fetch('/api/user/check-username', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+      const response = await fetch("/api/user/check-username", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ username: value }),
       });
-      
+
       const data = await response.json();
-      
+
       setUsernameStatus({
         checking: false,
         available: data.available,
         error: data.available ? "" : "Username is already taken",
-        suggestions: data.available ? [] : generateSuggestions(user?.name || "")
+        suggestions: data.available
+          ? []
+          : generateSuggestions(user?.name || ""),
       });
     } catch (error) {
       setUsernameStatus({
         checking: false,
         available: false,
         error: "Error checking username availability",
-        suggestions: generateSuggestions(user?.name || "")
+        suggestions: generateSuggestions(user?.name || ""),
       });
     }
   };
 
   const handleUsernameChange = (value: string) => {
-    const cleanValue = value.toLowerCase().replace(/[^a-z0-9_]/g, '');
+    const cleanValue = value.toLowerCase().replace(/[^a-z0-9_]/g, "");
     setUsername(cleanValue);
 
     // Clear previous timeout
@@ -219,7 +226,7 @@ export default function Onboarding() {
           checking: false,
           available: null,
           error: "",
-          suggestions: []
+          suggestions: [],
         });
       }
     }, 500);
@@ -230,7 +237,7 @@ export default function Onboarding() {
       const data = (await apiClient.get("/user/profile")) as { user: User };
       const userData = data.user;
       setUser(userData);
-      
+
       // Redirect to dashboard if profile is already complete
       if (userData.isProfileComplete) {
         router.push("/dashboard");
@@ -240,12 +247,15 @@ export default function Onboarding() {
       // Pre-fill form with existing data
       if (userData.danceStyles?.length > 0) {
         // Normalize dance styles to ensure danceStyle field contains ID, not populated object
-        const normalizedDanceStyles = userData.danceStyles.map((userStyle: any) => ({
-          danceStyle: typeof userStyle.danceStyle === 'string' 
-            ? userStyle.danceStyle 
-            : (userStyle.danceStyle?._id || userStyle.danceStyle?.id),
-          level: userStyle.level
-        }));
+        const normalizedDanceStyles = userData.danceStyles.map(
+          (userStyle: any) => ({
+            danceStyle:
+              typeof userStyle.danceStyle === "string"
+                ? userStyle.danceStyle
+                : userStyle.danceStyle?._id || userStyle.danceStyle?.id,
+            level: userStyle.level,
+          })
+        );
         setDanceStyles(normalizedDanceStyles);
       }
       if (userData.username) {
@@ -254,42 +264,49 @@ export default function Onboarding() {
           checking: false,
           available: true,
           error: "",
-          suggestions: []
+          suggestions: [],
         });
       }
       if (userData.dateOfBirth) {
-        setDateOfBirth(new Date(userData.dateOfBirth).toISOString().split('T')[0]);
+        setDateOfBirth(
+          new Date(userData.dateOfBirth).toISOString().split("T")[0]
+        );
       }
-       // Handle current location - ensure it's a valid city object
-       if (userData.city && typeof userData.city === 'object' && (userData.city._id || (userData.city as any).id)) {
-         setCurrentLocation(userData.city as City);
-       }
-       
-       // Handle cities visited - filter out null/invalid entries
-       if (userData.citiesVisited?.length > 0) {
-         const validCities = userData.citiesVisited.filter((city): city is City => 
-           city !== null && 
-           typeof city === 'object' && 
-           !!(city._id || (city as any).id) && 
-           !!city.name
-         );
-         setCitiesVisited(validCities);
-       }
-             if (userData.anthem) {
-         setAnthem({
-           url: userData.anthem.url,
-           platform: userData.anthem.platform,
-           title: userData.anthem.title || "",
-           artist: userData.anthem.artist || ""
-         });
-       }
-       if (userData.socialMedia) {
-         setSocialMedia({
-           instagram: userData.socialMedia.instagram || "",
-           tiktok: userData.socialMedia.tiktok || "",
-           youtube: userData.socialMedia.youtube || ""
-         });
-       }
+      // Handle current location - ensure it's a valid city object
+      if (
+        userData.city &&
+        typeof userData.city === "object" &&
+        (userData.city._id || (userData.city as any).id)
+      ) {
+        setCurrentLocation(userData.city as City);
+      }
+
+      // Handle cities visited - filter out null/invalid entries
+      if (userData.citiesVisited?.length > 0) {
+        const validCities = userData.citiesVisited.filter(
+          (city): city is City =>
+            city !== null &&
+            typeof city === "object" &&
+            !!(city._id || (city as any).id) &&
+            !!city.name
+        );
+        setCitiesVisited(validCities);
+      }
+      if (userData.anthem) {
+        setAnthem({
+          url: userData.anthem.url,
+          platform: userData.anthem.platform,
+          title: userData.anthem.title || "",
+          artist: userData.anthem.artist || "",
+        });
+      }
+      if (userData.socialMedia) {
+        setSocialMedia({
+          instagram: userData.socialMedia.instagram || "",
+          tiktok: userData.socialMedia.tiktok || "",
+          youtube: userData.socialMedia.youtube || "",
+        });
+      }
       if (userData.danceRole) {
         setDanceRole(userData.danceRole);
       }
@@ -302,9 +319,14 @@ export default function Onboarding() {
 
       // Find the current step based on completion
       const incompleteStepIndex = steps.findIndex(
-        (step) => !userData.onboardingSteps?.[step.id as keyof typeof userData.onboardingSteps]
+        (step) =>
+          !userData.onboardingSteps?.[
+            step.id as keyof typeof userData.onboardingSteps
+          ]
       );
-      setCurrentStep(incompleteStepIndex !== -1 ? incompleteStepIndex : steps.length - 1);
+      setCurrentStep(
+        incompleteStepIndex !== -1 ? incompleteStepIndex : steps.length - 1
+      );
 
       setLoading(false);
     } catch (error) {
@@ -376,13 +398,16 @@ export default function Onboarding() {
           return;
         }
         // Handle both populated objects and ID strings
-        const cityId = typeof currentLocation === 'string' ? currentLocation : (currentLocation._id || (currentLocation as any).id);
+        const cityId =
+          typeof currentLocation === "string"
+            ? currentLocation
+            : currentLocation._id || (currentLocation as any).id;
         stepData = { city: cityId };
         break;
       case "citiesVisited":
         // Handle both populated objects and ID strings
-        const cityIds = citiesVisited.map((city) => 
-          typeof city === 'string' ? city : (city._id || (city as any).id)
+        const cityIds = citiesVisited.map((city) =>
+          typeof city === "string" ? city : city._id || (city as any).id
         );
         stepData = { citiesVisited: cityIds };
         break;
@@ -427,7 +452,7 @@ export default function Onboarding() {
     try {
       // Set saving state
       setSavingStep(true);
-      
+
       // Set completing state if this is the last step
       if (currentStep === steps.length - 1) {
         setCompleting(true);
@@ -456,38 +481,41 @@ export default function Onboarding() {
 
   // Helper functions for dance styles with levels
   const addDanceStyle = (styleId: string, styleName: string) => {
-    const existingStyle = danceStyles.find(ds => ds.danceStyle === styleId);
+    const existingStyle = danceStyles.find((ds) => ds.danceStyle === styleId);
     if (!existingStyle) {
-      setDanceStyles(prev => [...prev, { danceStyle: styleId, level: 'beginner' as UserDanceStyle['level'] }]);
+      setDanceStyles((prev) => [
+        ...prev,
+        { danceStyle: styleId, level: "beginner" as UserDanceStyle["level"] },
+      ]);
     }
   };
 
   const removeDanceStyle = (styleId: string) => {
-    setDanceStyles(prev => prev.filter(ds => ds.danceStyle !== styleId));
+    setDanceStyles((prev) => prev.filter((ds) => ds.danceStyle !== styleId));
   };
 
   const updateDanceStyleLevel = (styleId: string, level: string) => {
-    setDanceStyles(prev => 
-      prev.map(ds => 
-        ds.danceStyle === styleId 
-          ? { ...ds, level: level as UserDanceStyle['level'] }
+    setDanceStyles((prev) =>
+      prev.map((ds) =>
+        ds.danceStyle === styleId
+          ? { ...ds, level: level as UserDanceStyle["level"] }
           : ds
       )
     );
   };
 
   const isDanceStyleSelected = (styleId: string) => {
-    return danceStyles.some(ds => ds.danceStyle === styleId);
+    return danceStyles.some((ds) => ds.danceStyle === styleId);
   };
 
   const getDanceStyleLevel = (styleId: string) => {
-    const style = danceStyles.find(ds => ds.danceStyle === styleId);
-    return style?.level || 'beginner';
+    const style = danceStyles.find((ds) => ds.danceStyle === styleId);
+    return style?.level || "beginner";
   };
 
   const getStyleNameById = (styleId: string) => {
-    const style = danceStylesOptions.find(s => (s._id || s.id) === styleId);
-    return style?.name || 'Unknown Style';
+    const style = danceStylesOptions.find((s) => (s._id || s.id) === styleId);
+    return style?.name || "Unknown Style";
   };
 
   const handleImageSelect = (file: File) => {
@@ -611,18 +639,20 @@ export default function Onboarding() {
             {steps[currentStep].id === "danceStyles" && (
               <div className="form-control space-y-6">
                 <label className="label">
-                  <span className="label-text">Select your dance styles and skill levels</span>
+                  <span className="label-text">
+                    Select your dance styles and skill levels
+                  </span>
                 </label>
-                
+
                 {/* Dance Style Selection */}
                 <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
                   {danceStylesOptions.map((style) => (
                     <div
                       key={style._id}
                       className={`cursor-pointer flex-col gap-2 rounded-lg p-4 border transition-colors text-center ${
-                        isDanceStyleSelected(style._id || style.id) 
-                          ? 'bg-primary text-primary-content border-primary shadow-lg' 
-                          : 'bg-base-100 border-base-300 hover:bg-base-200'
+                        isDanceStyleSelected(style._id || style.id)
+                          ? "bg-primary text-primary-content border-primary shadow-lg"
+                          : "bg-base-100 border-base-300 hover:bg-base-200"
                       }`}
                       onClick={() => {
                         if (isDanceStyleSelected(style._id || style.id)) {
@@ -632,9 +662,7 @@ export default function Onboarding() {
                         }
                       }}
                     >
-                      <span className="font-medium">
-                        {style.name}
-                      </span>
+                      <span className="font-medium">{style.name}</span>
                     </div>
                   ))}
                 </div>
@@ -642,15 +670,24 @@ export default function Onboarding() {
                 {/* Level Selection for Selected Styles */}
                 {danceStyles.length > 0 && (
                   <div className="space-y-4">
-                    <h3 className="font-medium text-base-content">Set your skill levels:</h3>
+                    <h3 className="font-medium text-base-content">
+                      Set your skill levels:
+                    </h3>
                     {danceStyles.map((userStyle) => (
-                      <div key={userStyle.danceStyle} className="bg-base-200 rounded-lg p-4">
+                      <div
+                        key={userStyle.danceStyle}
+                        className="bg-base-200 rounded-lg p-4"
+                      >
                         <div className="flex items-center justify-between mb-3">
-                          <span className="font-medium">{getStyleNameById(userStyle.danceStyle)}</span>
+                          <span className="font-medium">
+                            {getStyleNameById(userStyle.danceStyle)}
+                          </span>
                           <button
                             type="button"
                             className="btn btn-ghost btn-xs text-error"
-                            onClick={() => removeDanceStyle(userStyle.danceStyle)}
+                            onClick={() =>
+                              removeDanceStyle(userStyle.danceStyle)
+                            }
                           >
                             Remove
                           </button>
@@ -661,18 +698,25 @@ export default function Onboarding() {
                               key={level.value}
                               className={`label cursor-pointer flex-col gap-1 rounded-lg p-2 border transition-colors ${
                                 userStyle.level === level.value
-                                  ? 'bg-primary text-primary-content border-primary'
-                                  : 'bg-base-100 border-base-300 hover:bg-base-200'
+                                  ? "bg-primary text-primary-content border-primary"
+                                  : "bg-base-100 border-base-300 hover:bg-base-200"
                               }`}
                             >
                               <span className="text-lg">{level.emoji}</span>
-                              <span className="text-xs text-center">{level.label}</span>
+                              <span className="text-xs text-center">
+                                {level.label}
+                              </span>
                               <input
                                 type="radio"
                                 name={`level-${userStyle.danceStyle}`}
                                 className="radio radio-primary radio-xs"
                                 checked={userStyle.level === level.value}
-                                onChange={() => updateDanceStyleLevel(userStyle.danceStyle, level.value)}
+                                onChange={() =>
+                                  updateDanceStyleLevel(
+                                    userStyle.danceStyle,
+                                    level.value
+                                  )
+                                }
                               />
                             </label>
                           ))}
@@ -681,7 +725,7 @@ export default function Onboarding() {
                     ))}
                   </div>
                 )}
-                
+
                 {danceStyles.length === 0 && (
                   <div className="text-center text-base-content/60 py-4">
                     Select at least one dance style to continue
@@ -700,8 +744,11 @@ export default function Onboarding() {
                   <input
                     type="text"
                     className={`input input-bordered w-full ${
-                      usernameStatus.error ? 'input-error' : 
-                      usernameStatus.available === true ? 'input-success' : ''
+                      usernameStatus.error
+                        ? "input-error"
+                        : usernameStatus.available === true
+                          ? "input-success"
+                          : ""
                     }`}
                     placeholder="e.g., sarah_dancer"
                     value={username}
@@ -711,33 +758,41 @@ export default function Onboarding() {
                     {usernameStatus.checking && (
                       <span className="loading loading-spinner loading-sm"></span>
                     )}
-                    {!usernameStatus.checking && usernameStatus.available === true && (
-                      <span className="text-success">✓</span>
-                    )}
-                    {!usernameStatus.checking && usernameStatus.available === false && (
-                      <span className="text-error">✗</span>
-                    )}
+                    {!usernameStatus.checking &&
+                      usernameStatus.available === true && (
+                        <span className="text-success">✓</span>
+                      )}
+                    {!usernameStatus.checking &&
+                      usernameStatus.available === false && (
+                        <span className="text-error">✗</span>
+                      )}
                   </div>
                 </div>
-                
+
                 {/* Error message */}
                 {usernameStatus.error && (
                   <div className="label">
-                    <span className="label-text-alt text-error">{usernameStatus.error}</span>
+                    <span className="label-text-alt text-error">
+                      {usernameStatus.error}
+                    </span>
                   </div>
                 )}
-                
+
                 {/* Success message */}
                 {usernameStatus.available === true && !usernameStatus.error && (
                   <div className="label">
-                    <span className="label-text-alt text-success">Username is available!</span>
+                    <span className="label-text-alt text-success">
+                      Username is available!
+                    </span>
                   </div>
                 )}
-                
+
                 {/* Suggestions */}
                 {usernameStatus.suggestions.length > 0 && (
                   <div className="mt-3">
-                    <span className="text-sm text-base-content/70">Suggestions:</span>
+                    <span className="text-sm text-base-content/70">
+                      Suggestions:
+                    </span>
                     <div className="flex flex-wrap gap-2 mt-2">
                       {usernameStatus.suggestions.map((suggestion) => (
                         <button
@@ -754,23 +809,24 @@ export default function Onboarding() {
                     </div>
                   </div>
                 )}
-                
+
                 <div className="label">
                   <span className="label-text-alt">
-                    Your profile will be available at: DanceTribe.co/{username || 'username'}
+                    Your profile will be available at: DanceTribe.co/
+                    {username || "username"}
                   </span>
                 </div>
               </div>
             )}
 
-                         {/* Profile Picture */}
-             {steps[currentStep].id === "profilePic" && (
-               <ImageCropPicker
-                 onImageSelect={setProfilePic}
-                 currentImage={user?.image}
-                 uploading={uploadingProfilePic}
-               />
-             )}
+            {/* Profile Picture */}
+            {steps[currentStep].id === "profilePic" && (
+              <ImageCropPicker
+                onImageSelect={setProfilePic}
+                currentImage={user?.image}
+                uploading={uploadingProfilePic}
+              />
+            )}
 
             {steps[currentStep].id === "dateOfBirth" && (
               <div className="form-control">
@@ -967,7 +1023,7 @@ export default function Onboarding() {
                   {[
                     { value: "male", label: "Male" },
                     { value: "female", label: "Female" },
-                    { value: "other", label: "Other" }
+                    { value: "other", label: "Other" },
                   ].map((option) => (
                     <label key={option.value} className="label cursor-pointer">
                       <span className="label-text">{option.label}</span>
@@ -976,7 +1032,9 @@ export default function Onboarding() {
                         name="gender"
                         className="radio radio-primary"
                         checked={gender === option.value}
-                        onChange={() => setGender(option.value as "male" | "female" | "other")}
+                        onChange={() =>
+                          setGender(option.value as "male" | "female" | "other")
+                        }
                       />
                     </label>
                   ))}
@@ -1017,7 +1075,13 @@ export default function Onboarding() {
               <button
                 className="btn btn-primary"
                 onClick={handleNext}
-                disabled={uploadingProfilePic || completing || savingStep || (steps[currentStep].id === "username" && usernameStatus.checking)}
+                disabled={
+                  uploadingProfilePic ||
+                  completing ||
+                  savingStep ||
+                  (steps[currentStep].id === "username" &&
+                    usernameStatus.checking)
+                }
               >
                 {uploadingProfilePic ? (
                   <>
