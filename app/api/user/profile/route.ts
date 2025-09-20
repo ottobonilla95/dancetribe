@@ -17,7 +17,9 @@ export async function GET(req: NextRequest) {
     await connectMongo();
 
     const user = await User.findById(session.user.id)
-      .select("name username email image dateOfBirth city citiesVisited danceStyles anthem socialMedia danceRole gender nationality onboardingSteps isProfileComplete createdAt")
+      .select(
+        "name username email image dateOfBirth city citiesVisited danceStyles anthem socialMedia danceRole gender nationality onboardingSteps isProfileComplete createdAt"
+      )
       .populate({
         path: "city",
         model: City,
@@ -95,15 +97,15 @@ export async function PUT(req: NextRequest) {
 
         // If user had a previous city, decrement its totalDancers
         if (oldCityId && oldCityId.toString() !== newCityId) {
-          await City.findByIdAndUpdate(oldCityId, { 
-            $inc: { totalDancers: -1 } 
+          await City.findByIdAndUpdate(oldCityId, {
+            $inc: { totalDancers: -1 },
           });
         }
 
         // If new city is different from old city, increment its totalDancers
         if (newCityId && (!oldCityId || oldCityId.toString() !== newCityId)) {
-          await City.findByIdAndUpdate(newCityId, { 
-            $inc: { totalDancers: 1 } 
+          await City.findByIdAndUpdate(newCityId, {
+            $inc: { totalDancers: 1 },
           });
         }
 
