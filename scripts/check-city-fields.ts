@@ -12,7 +12,7 @@ async function checkCityFields() {
 
     // Check specific fields
     const citiesWithNewFields = await City.find({
-      dancersPopulation: { $exists: true },
+      totalDancers: { $exists: true },
       danceStyles: { $exists: true }
     }).countDocuments();
     

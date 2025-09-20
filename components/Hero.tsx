@@ -1,5 +1,6 @@
 import Image from "next/image";
 import TestimonialsAvatars from "./TestimonialsAvatars";
+import ButtonSignin from "./ButtonSignin";
 // import config from "@/config";
 
 const Hero = () => {
@@ -29,7 +30,7 @@ const Hero = () => {
             Discover music, cities, events, and dance communities. Find
             festivals, socials, DJs, and explore new places through dance.
           </p>
-          <button className="btn btn-primary btn-wide">Join DanceTribe</button>
+          <ButtonSignin text="🕺 Join DanceTribe 💃" extraStyle="btn-primary btn-wide" />
         </div>
 
         <TestimonialsAvatars priority={true} />

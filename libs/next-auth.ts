@@ -51,10 +51,70 @@ export const authOptions: NextAuthOptionsExtended = {
   // Learn more about the model type: https://next-auth.js.org/v3/adapters/models
   ...(connectMongo && { adapter: MongoDBAdapter(connectMongo) }),
 
+  events: {
+    createUser: async ({ user }) => {
+      // Initialize onboarding fields when a new user is created
+      try {
+        const connectMongoose = (await import('@/libs/mongoose')).default;
+        await connectMongoose();
+        
+        const User = (await import('@/models/User')).default;
+        
+        // Update the newly created user with onboarding fields
+        await User.findByIdAndUpdate(user.id, {
+          $set: {
+            isProfileComplete: false,
+            onboardingSteps: {
+              danceStyles: false,
+              username: false,
+              profilePic: false,
+              dateOfBirth: false,
+              currentLocation: false,
+              citiesVisited: false,
+              anthem: false,
+              socialMedia: false,
+              danceRole: false,
+              gender: false,
+              nationality: false,
+            }
+          }
+        });
+        
+        console.log(`✅ Initialized onboarding fields for new user: ${user.email}`);
+      } catch (error) {
+        console.error('Error initializing new user onboarding fields:', error);
+      }
+    },
+  },
   callbacks: {
+    jwt: async ({ token, user, trigger }) => {
+      // When user signs in or token is updated, fetch their profile completion status
+      if (user?.id || trigger === 'update') {
+        try {
+          // Use mongoose for database operations
+          const connectMongoose = (await import('@/libs/mongoose')).default;
+          await connectMongoose();
+          
+          const User = (await import('@/models/User')).default;
+          const userData = await User.findById(token.sub || user?.id).select('isProfileComplete onboardingSteps');
+          
+          // If user exists but doesn't have isProfileComplete field, they need onboarding
+          if (userData && userData.isProfileComplete === undefined) {
+            token.isProfileComplete = false;
+          } else {
+            token.isProfileComplete = userData?.isProfileComplete || false;
+          }
+        } catch (error) {
+          console.error('Error fetching user profile in JWT callback:', error);
+          token.isProfileComplete = false;
+        }
+      }
+      return token;
+    },
     session: async ({ session, token }) => {
       if (session?.user) {
         session.user.id = token.sub;
+        session.user.isProfileComplete = token.isProfileComplete || false;
       }
       return session;
     },

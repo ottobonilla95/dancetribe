@@ -172,6 +172,8 @@ export async function PUT(req: NextRequest) {
         isProfileComplete: user.isProfileComplete,
         onboardingSteps: user.onboardingSteps,
       },
+      // Signal to client if profile was just completed
+      profileCompleted: isComplete && !session.user.isProfileComplete,
     });
   } catch (error) {
     console.error("Error updating user profile:", error);

@@ -11,7 +11,7 @@ async function updateCitiesFields() {
       {}, // Empty filter = all documents
       {
         $set: { 
-          dancersPopulation: 0, // Add dancers population (starts at 0)
+          totalDancers: 0, // Add total dancers count (starts at 0)
           danceStyles: [] // Add empty dance styles array
         }
       }
@@ -21,7 +21,7 @@ async function updateCitiesFields() {
     console.log(`📊 Matched ${result.matchedCount} documents`);
     
     // Verify the update
-    const sampleCities = await City.find({}).limit(3).select("name dancersPopulation danceStyles population");
+    const sampleCities = await City.find({}).limit(3).select("name totalDancers danceStyles population");
     console.log("📋 Sample cities after update:", sampleCities);
 
   } catch (error) {

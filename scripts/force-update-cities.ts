@@ -12,7 +12,7 @@ async function forceUpdateCities() {
       {}, // All documents
       {
         $set: {
-          dancersPopulation: 0,
+          totalDancers: 0,
           danceStyles: []
         }
       }
