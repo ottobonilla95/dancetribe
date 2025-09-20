@@ -11,6 +11,8 @@ interface ShareToStoryProps {
     username?: string;
     profilePicture: string;
     dateOfBirth: string;
+    nationality?: string;
+    danceRole?: string;
     city: {
       name: string;
       country: { name: string };
@@ -34,24 +36,8 @@ const ShareToStory: React.FC<ShareToStoryProps> = ({ userData }) => {
       console.log('Starting image generation...');
       setIsGenerating(true);
 
-      // Wait for QR code to be ready
-      const waitForQR = () => {
-        return new Promise<void>((resolve) => {
-          const checkQR = () => {
-            const shareCard = shareCardRef.current;
-            if (shareCard && shareCard.getAttribute('data-qr-ready') === 'true') {
-              console.log('QR code is ready!');
-              resolve();
-            } else {
-              console.log('Waiting for QR code...');
-              setTimeout(checkQR, 100);
-            }
-          };
-          checkQR();
-        });
-      };
-
-      await waitForQR();
+      // Wait for components to render
+      await new Promise(resolve => setTimeout(resolve, 1000));
 
       // Additional wait to ensure rendering is complete
       await new Promise(resolve => setTimeout(resolve, 500));

@@ -363,7 +363,7 @@ export default async function Profile() {
                     <div className="text-sm font-medium text-base-content/60 mb-2">
                       Dance Anthem
                     </div>
-                    <div className="bg-base-300 rounded-lg">
+                    <div className="rounded-lg">
                       {/* Iframe for Spotify/YouTube */}
                       {(() => {
                         const url = userData.anthem.url;
@@ -487,6 +487,8 @@ export default async function Profile() {
                 username: userData.username,
                 profilePicture: userData.image,
                 dateOfBirth: userData.dateOfBirth,
+                nationality: userData.nationality,
+                danceRole: userData.danceRole,
                 city: userData.city,
                 danceStyles:
                   userData.danceStyles?.map((userStyle: any) => ({

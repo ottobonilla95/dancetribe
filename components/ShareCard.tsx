@@ -97,7 +97,7 @@ const ShareCard = forwardRef<HTMLDivElement, ShareCardProps>(
       ? `${baseUrl}/${userData.username}`
       : `${baseUrl}/dancer/${userData.id}`;
 
-    // Generate QR code data URL synchronously - using the SHORT URL for QR
+    // Generate QR code data URL
     const [qrCodeUrl, setQrCodeUrl] = React.useState<string>("");
     const [isQrReady, setIsQrReady] = React.useState(false);
 
@@ -228,7 +228,7 @@ const ShareCard = forwardRef<HTMLDivElement, ShareCardProps>(
                 📍 {userData.city.name}
               </div>
             </div>
-            <div style={{ height: "100%" }}>
+            {/* <div style={{ height: "100%" }}>
               <div
                 style={{
                   background: "white",
@@ -265,6 +265,50 @@ const ShareCard = forwardRef<HTMLDivElement, ShareCardProps>(
                   </div>
                 )}
               </div>
+            </div> */}
+
+            <div
+              style={{
+                display: "flex",
+                flexDirection: "column",
+                alignItems: "center",
+                justifyContent: "center",
+                background: "white",
+                borderRadius: "10px",
+              }}
+            >
+              {/* QR Code */}
+              {isQrReady && qrCodeUrl ? (
+                <img
+                  src={qrCodeUrl}
+                  alt="QR Code"
+                  style={{
+                    width: "180px",
+                    height: "180px",
+                    display: "block",
+                  }}
+                />
+              ) : (
+                <div
+                  style={{
+                    background: "white",
+                    borderRadius: "20px",
+                    padding: "30px",
+                    margin: "0 auto 40px",
+                    boxShadow: "0 10px 30px rgba(0,0,0,0.3)",
+                    width: "240px",
+                    height: "240px",
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "center",
+                    color: "#666",
+                  }}
+                >
+                  <div style={{ textAlign: "center" }}>
+                    <div style={{ fontSize: "16px" }}>Loading QR...</div>
+                  </div>
+                </div>
+              )}
             </div>
           </div>
 
@@ -341,170 +385,180 @@ const ShareCard = forwardRef<HTMLDivElement, ShareCardProps>(
                   gap: "24px",
                 }}
               >
-                {userData.danceStyles.slice(0, 3).map((style, index) => {
-                  // Convert level to number (1-4)
-                  const levelMap: { [key: string]: number } = {
-                    beginner: 1,
-                    intermediate: 2,
-                    advanced: 3,
-                    expert: 4,
-                  };
-                  const levelNum = levelMap[style.level] || 1;
+                {userData.danceStyles
+                  .sort((a, b) => {
+                    // Sort by skill level: expert > advanced > intermediate > beginner
+                    const levelMap: { [key: string]: number } = {
+                      beginner: 1,
+                      intermediate: 2,
+                      advanced: 3,
+                      expert: 4,
+                    };
+                    return (levelMap[b.level] || 1) - (levelMap[a.level] || 1);
+                  })
+                  .slice(0, 3)
+                  .map((style, index) => {
+                    // Convert level to number (1-4)
+                    const levelMap: { [key: string]: number } = {
+                      beginner: 1,
+                      intermediate: 2,
+                      advanced: 3,
+                      expert: 4,
+                    };
+                    const levelNum = levelMap[style.level] || 1;
 
-                  // Get emoji based on level
-                  const getEmoji = (level: string) => {
-                    switch (level) {
-                      case "beginner":
-                        return "🌱";
-                      case "intermediate":
-                        return "⭐";
-                      case "advanced":
-                        return "🔥";
-                      case "expert":
-                        return "👑";
-                      default:
-                        return "🌱";
-                    }
-                  };
+                    // Get emoji based on level
+                    const getEmoji = (level: string) => {
+                      switch (level) {
+                        case "beginner":
+                          return "🌱";
+                        case "intermediate":
+                          return "⭐";
+                        case "advanced":
+                          return "🔥";
+                        case "expert":
+                          return "👑";
+                        default:
+                          return "🌱";
+                      }
+                    };
 
-                  return (
-                    <div
-                      key={index}
-                      style={{
-                        background: "#191e25",
-                        borderRadius: "12px",
-                        padding: "24px",
-                      }}
-                    >
+                    return (
                       <div
+                        key={index}
                         style={{
-                          display: "flex",
-                          justifyContent: "space-between",
-                          alignItems: "center",
-                          marginBottom: "16px",
+                          background: "#191e25",
+                          borderRadius: "12px",
+                          padding: "24px",
                         }}
                       >
                         <div
                           style={{
                             display: "flex",
+                            justifyContent: "space-between",
                             alignItems: "center",
-                            gap: "12px",
+                            marginBottom: "16px",
                           }}
                         >
-                          <span style={{ fontSize: "32px" }}>
-                            {getEmoji(style.level)}
-                          </span>
-                          <span
+                          <div
                             style={{
-                              fontSize: "32px",
-                              fontWeight: "600",
+                              display: "flex",
+                              alignItems: "center",
+                              gap: "12px",
                             }}
                           >
-                            {style.name}
+                            <span style={{ fontSize: "32px" }}>
+                              {getEmoji(style.level)}
+                            </span>
+                            <span
+                              style={{
+                                fontSize: "32px",
+                                fontWeight: "600",
+                              }}
+                            >
+                              {style.name}
+                            </span>
+                          </div>
+                          <span
+                            style={{
+                              fontSize: "24px",
+                              opacity: "0.7",
+                              textTransform: "capitalize",
+                            }}
+                          >
+                            {style.level}
                           </span>
                         </div>
-                        <span
+                        {/* Level Progress Bar */}
+                        <div
                           style={{
-                            fontSize: "24px",
-                            opacity: "0.7",
-                            textTransform: "capitalize",
+                            display: "flex",
+                            gap: "6px",
                           }}
                         >
-                          {style.level}
-                        </span>
+                          {[1, 2, 3, 4].map((bar) => (
+                            <div
+                              key={bar}
+                              style={{
+                                height: "12px",
+                                flex: "1",
+                                borderRadius: "6px",
+                                background:
+                                  bar <= levelNum
+                                    ? "#7480ff"
+                                    : "rgba(116,128,255,0.2)",
+                              }}
+                            />
+                          ))}
+                        </div>
                       </div>
-                      {/* Level Progress Bar */}
-                      <div
-                        style={{
-                          display: "flex",
-                          gap: "6px",
-                        }}
-                      >
-                        {[1, 2, 3, 4].map((bar) => (
-                          <div
-                            key={bar}
-                            style={{
-                              height: "12px",
-                              flex: "1",
-                              borderRadius: "6px",
-                              background:
-                                bar <= levelNum
-                                  ? "#7480ff"
-                                  : "rgba(116,128,255,0.2)",
-                            }}
-                          />
-                        ))}
-                      </div>
-                    </div>
-                  );
-                })}
+                    );
+                  })}
               </div>
             </div>
           </div>
         )}
 
-        {/* Hook Title */}
+        {/* CTA Section */}
         <div
           style={{
             textAlign: "center",
-            marginTop: "40px",
-            marginBottom: "20px",
+            marginTop: "60px",
+            marginBottom: "60px",
+            maxWidth: "800px",
+            width: "100%",
           }}
         >
+          {/* Hook Title */}
           <div
             style={{
-              fontSize: "44px",
+              fontSize: "48px",
               fontWeight: "bold",
-              background: "linear-gradient(45deg, #7480ff, #ff6b6b)",
-              WebkitBackgroundClip: "text",
-              WebkitTextFillColor: "transparent",
-              backgroundClip: "text",
-              marginBottom: "12px",
+              color: "#7480ff",
+              marginBottom: "24px",
               lineHeight: "1.2",
             }}
           >
             ✨ Let's connect! ✨
           </div>
 
+          {/* Instructions */}
           <div
             style={{
-              fontSize: "34px",
-              fontWeight: "bold",
-              marginBottom: "8px",
+              fontSize: "36px",
+              fontWeight: "600",
+              marginBottom: "32px",
+              color: "#f3f4f6",
             }}
           >
-            👆 Scan to connect or visit:
+            👆 Scan QR code or visit:
           </div>
-        </div>
 
-        {/* Bottom Section - Community Info */}
-        <div
-          style={{
-            textAlign: "center",
-            marginBottom: "50px",
-          }}
-        >
           {/* Website Link */}
           <div
             style={{
-              fontSize: "28px",
-              fontWeight: "600",
+              fontSize: "32px",
+              fontWeight: "700",
               background: "#7480ff",
               color: "white",
-              padding: "12px 24px",
-              borderRadius: "25px",
+              padding: "26px",
+              paddingBottom: "40px",
+              borderRadius: "30px",
               display: "inline-block",
-              marginBottom: "70px",
+              marginBottom: "40px",
+              boxShadow: "0 8px 25px rgba(116, 128, 255, 0.3)",
             }}
           >
             🌐 DanceTribe.co
           </div>
+
+          {/* Community Message */}
           <div
             style={{
-              fontSize: "32px",
-              opacity: "0.8",
+              fontSize: "28px",
+              opacity: "0.9",
               fontWeight: "500",
-              textShadow: "none",
+              color: "#f3f4f6",
             }}
           >
             Connect with dancers worldwide! 🌍💃🕺

@@ -4,6 +4,7 @@ import User from "@/models/User";
 import City from "@/models/City";
 import Link from "next/link";
 import { getZodiacSign } from "@/utils/zodiac";
+import { isValidObjectId } from "mongoose";
 
 interface Props {
   params: {
@@ -14,20 +15,32 @@ interface Props {
 export default async function PublicProfile({ params }: Props) {
   await connectMongo();
   
-  const user = await User.findById(params.userId)
-    .populate({
-      path: "city",
-      model: City,
-      select: "name country continent",
-    })
-    .populate({
-      path: "citiesVisited",
-      model: City,
-      select: "name country",
-    })
-    .lean();
+  // Check if the userId is a valid ObjectId
+  if (!isValidObjectId(params.userId)) {
+    notFound();
+  }
 
-  if (!user) {
+  let user;
+  try {
+    user = await User.findById(params.userId)
+      .populate({
+        path: "city",
+        model: City,
+        select: "name country continent",
+      })
+      .populate({
+        path: "citiesVisited",
+        model: City,
+        select: "name country",
+      })
+      .lean();
+
+    if (!user) {
+      notFound();
+    }
+  } catch (error) {
+    // Handle any database errors
+    console.error("Error fetching user:", error);
     notFound();
   }
 
