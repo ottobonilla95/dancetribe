@@ -2,8 +2,6 @@
 
 import React, { forwardRef } from "react";
 import QRCode from "qrcode";
-import { getCountryCode } from "../utils/countries";
-
 interface ShareCardProps {
   userData: {
     id: string;
@@ -71,27 +69,12 @@ const ShareCard = forwardRef<HTMLDivElement, ShareCardProps>(
     };
 
     const zodiac = getZodiacSign(userData.dateOfBirth);
-    const topDanceStyle = userData.danceStyles[0];
-
-    // Capitalize level for display
-    const formatLevel = (level: string) => {
-      return level.charAt(0).toUpperCase() + level.slice(1);
-    };
 
     // Create short URL for both display and QR code
     const baseUrl =
       process.env.NODE_ENV === "production"
         ? "https://dancetribe.co"
         : "http://localhost:3000";
-    const displayUrl =
-      process.env.NODE_ENV === "production"
-        ? "DanceTribe.co"
-        : "localhost:3000";
-
-    // Use username-based short URL if available, otherwise fallback to long URL
-    const shortUrl = userData.username
-      ? `${displayUrl}/${userData.username}`
-      : `${displayUrl}/dancer/${userData.id}`;
 
     const fullShortUrl = userData.username
       ? `${baseUrl}/${userData.username}`
@@ -519,7 +502,7 @@ const ShareCard = forwardRef<HTMLDivElement, ShareCardProps>(
               lineHeight: "1.2",
             }}
           >
-            ✨ Let's connect! ✨
+            ✨ Let&apos;s connect! ✨
           </div>
 
           {/* Instructions */}

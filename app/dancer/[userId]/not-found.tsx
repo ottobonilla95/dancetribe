@@ -14,14 +14,14 @@ export default function NotFound() {
                   Dancer Not Found
                 </h1>
                 <p className="text-sm md:text-base text-base-content/70">
-                  This dancer doesn't exist or the profile is private.
+                  This dancer doesn&apos;t exist or the profile is private.
                 </p>
               </div>
 
               {/* Friendly Message */}
               <div className="mb-4 md:mb-6">
                 <p className="text-xs md:text-sm text-base-content/70">
-                  Don't worry! There are plenty of amazing dancers in our
+                  Don&apos;t worry! There are plenty of amazing dancers in our
                   community waiting to connect.
                 </p>
               </div>
