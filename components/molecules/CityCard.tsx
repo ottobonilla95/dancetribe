@@ -33,7 +33,7 @@ const CityCard = ({ city, index }: CityCardProps) => {
             </div>
             <div className="flex items-center gap-1">
               <span className="font-bold text-sm">Dancers:</span>
-              <span className="text-sm">{city.dancersPopulation}</span>
+              <span className="text-sm">{city.totalDancers}</span>
             </div>
             {city.danceStyles.length > 0 && (
               <div className="flex items-center gap-1">

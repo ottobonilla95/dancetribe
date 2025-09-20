@@ -6,7 +6,7 @@ import User from "@/models/User";
 import City from "@/models/City";
 import DanceStyle from "@/models/DanceStyle";
 
-export async function GET(req: NextRequest) {
+export async function GET() {
   const session = await getServerSession(authOptions);
 
   if (!session) {
@@ -90,7 +90,7 @@ export async function PUT(req: NextRequest) {
         user.onboardingSteps.dateOfBirth = true;
         break;
 
-      case "currentLocation":
+      case "currentLocation": {
         // Handle totalDancers count when changing cities
         const oldCityId = user.city;
         const newCityId = data.city;
@@ -112,6 +112,7 @@ export async function PUT(req: NextRequest) {
         user.city = newCityId;
         user.onboardingSteps.currentLocation = true;
         break;
+      }
 
       case "citiesVisited":
         user.citiesVisited = data.citiesVisited;
