@@ -125,6 +125,41 @@ const userSchema = new mongoose.Schema(
       gender: { type: Boolean, default: false },
       nationality: { type: Boolean, default: false },
     },
+    // Social features
+    // Users who liked this profile
+    likedBy: [{
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "User",
+    }],
+    // Friend connections (confirmed friendships)
+    friends: [{
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "User"
+    }],
+    // Outgoing friend requests (requests this user sent)
+    friendRequestsSent: [{
+      user: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "User",
+        required: true
+      },
+      sentAt: {
+        type: Date,
+        default: Date.now
+      }
+    }],
+    // Incoming friend requests (requests received by this user)
+    friendRequestsReceived: [{
+      user: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "User",
+        required: true
+      },
+      sentAt: {
+        type: Date,
+        default: Date.now
+      }
+    }],
   },
   {
     timestamps: true,

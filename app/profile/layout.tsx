@@ -1,8 +1,9 @@
-import { ReactNode } from "react";
+import { ReactNode, Suspense } from "react";
 import { redirect } from "next/navigation";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/libs/next-auth";
 import config from "@/config";
+import Header from "@/components/Header";
 
 // This is a server-side component to ensure the user is logged in.
 // If not, it will redirect to the login page.
@@ -20,5 +21,12 @@ export default async function LayoutPrivate({
     redirect(config.auth.loginUrl);
   }
 
-  return <>{children}</>;
+  return (
+    <>
+      <Suspense>
+        <Header />
+      </Suspense>
+      {children}
+    </>
+  );
 } 

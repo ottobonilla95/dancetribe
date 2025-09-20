@@ -2,9 +2,19 @@ import { notFound } from "next/navigation";
 import connectMongo from "@/libs/mongoose";
 import User from "@/models/User";
 import City from "@/models/City";
+import DanceStyle from "@/models/DanceStyle";
 import Link from "next/link";
 import { getZodiacSign } from "@/utils/zodiac";
+import { getCountryCode } from "@/utils/countries";
+import { DANCE_LEVELS } from "@/constants/dance-levels";
 import { isValidObjectId } from "mongoose";
+import { FaInstagram, FaTiktok, FaYoutube, FaUserPlus, FaHeart } from "react-icons/fa";
+import Flag from "@/components/Flag";
+import DanceStyleCard from "@/components/DanceStyleCard";
+import LikeButton from "@/components/LikeButton";
+import ConnectButton from "@/components/ConnectButton";
+import { getServerSession } from "next-auth";
+import { authOptions } from "@/libs/next-auth";
 
 interface Props {
   params: {
@@ -20,18 +30,31 @@ export default async function PublicProfile({ params }: Props) {
     notFound();
   }
 
+  // Get current session to check if user is logged in
+  const session = await getServerSession(authOptions);
+  const isLoggedIn = !!session;
+  const isOwnProfile = session?.user?.id === params.userId;
+
   let user;
   try {
     user = await User.findById(params.userId)
+      .select(
+        "name username email image dateOfBirth city citiesVisited danceStyles anthem socialMedia danceRole gender nationality createdAt likedBy friends friendRequestsSent friendRequestsReceived"
+      )
       .populate({
         path: "city",
         model: City,
-        select: "name country continent",
+        select: "name country continent rank image population",
       })
       .populate({
         path: "citiesVisited",
         model: City,
-        select: "name country",
+        select: "name country continent rank image",
+      })
+      .populate({
+        path: "danceStyles.danceStyle",
+        model: DanceStyle,
+        select: "name description category",
       })
       .lean();
 
@@ -44,163 +67,463 @@ export default async function PublicProfile({ params }: Props) {
     notFound();
   }
 
-  const userData = user as any;
-  const zodiac = userData.dateOfBirth ? getZodiacSign(userData.dateOfBirth) : null;
-  const age = userData.dateOfBirth ? Math.floor((Date.now() - new Date(userData.dateOfBirth).getTime()) / (365.25 * 24 * 60 * 60 * 1000)) : null;
+  const danceStyles = await DanceStyle.find({}).lean();
+
+  // Calculate age from date of birth
+  const getAge = (dateOfBirth: Date | string) => {
+    if (!dateOfBirth) return null;
+    const today = new Date();
+    const birthDate = new Date(dateOfBirth);
+    let age = today.getFullYear() - birthDate.getFullYear();
+    const monthDiff = today.getMonth() - birthDate.getMonth();
+
+    if (
+      monthDiff < 0 ||
+      (monthDiff === 0 && today.getDate() < birthDate.getDate())
+    ) {
+      age--;
+    }
+
+    return age;
+  };
+
+  const formatDate = (date: Date | string) => {
+    if (!date) return "Not set";
+    return new Date(date).toLocaleDateString("en-US", {
+      year: "numeric",
+      month: "long",
+      day: "numeric",
+    });
+  };
+
+  const getDanceStylesWithLevels = (userDanceStyles: any[]) => {
+    return userDanceStyles.map((userStyle) => {
+      const levelInfo = DANCE_LEVELS.find((l) => l.value === userStyle.level);
+
+      // Handle both populated objects and ID strings
+      let styleName: string;
+      let styleDescription: string;
+
+      if (
+        typeof userStyle.danceStyle === "object" &&
+        userStyle.danceStyle?.name
+      ) {
+        // Already populated
+        styleName = userStyle.danceStyle.name;
+        styleDescription = userStyle.danceStyle.description || "";
+      } else {
+        // Just an ID, look it up in danceStyles array
+        const styleId = userStyle.danceStyle;
+        const foundStyle = danceStyles.find(
+          (style: any) => style._id === styleId || style.id === styleId
+        );
+        styleName = foundStyle?.name || "Unknown Style";
+        styleDescription = foundStyle?.description || "";
+      }
+
+      return {
+        name: styleName,
+        level: userStyle.level,
+        levelLabel: levelInfo?.label || "Beginner",
+        levelEmoji: levelInfo?.emoji || "🌱",
+        description: styleDescription,
+      };
+    });
+  };
+
+  // Helper function to construct social media URLs
+  const getSocialUrl = (platform: string, value: string) => {
+    if (!value) return "";
+
+    // If it's already a full URL, return as-is
+    if (value.startsWith("http")) {
+      return value;
+    }
+
+    // Otherwise, construct the URL based on platform
+    const cleanValue = value.replace("@", "");
+    switch (platform) {
+      case "instagram":
+        return `https://instagram.com/${cleanValue}`;
+      case "tiktok":
+        return `https://tiktok.com/@${cleanValue}`;
+      case "youtube":
+        return value; // YouTube URLs are usually full URLs
+      default:
+        return value;
+    }
+  };
 
   const getRoleDisplay = (role: string) => {
     const roleMap = {
-      leader: "Leader 👑",
+      leader: "Leader 🕺",
       follower: "Follower 💃",
-      both: "Both (Leader & Follower) 🔄"
+      both: "Both (Leader & Follower)",
     };
     return roleMap[role as keyof typeof roleMap] || role;
   };
 
+  // Type cast to avoid Mongoose lean() typing issues
+  const userData = user as any;
+  const zodiac = userData.dateOfBirth
+    ? getZodiacSign(userData.dateOfBirth)
+    : null;
+  const age = userData.dateOfBirth ? getAge(userData.dateOfBirth) : null;
+
+  // Social status calculations
+  const likesCount = userData.likedBy?.length || 0;
+  const isLikedByCurrentUser = isLoggedIn ? userData.likedBy?.includes(session?.user?.id) : false;
+  const friendsCount = userData.friends?.length || 0;
+  
+  // Friend request status
+  const hasSentFriendRequest = isLoggedIn ? userData.friendRequestsReceived?.some((request: any) => request.user === session?.user?.id) : false;
+  const hasReceivedFriendRequest = isLoggedIn ? userData.friendRequestsSent?.some((request: any) => request.user === session?.user?.id) : false;
+  const isFriend = isLoggedIn ? userData.friends?.includes(session?.user?.id) : false;
+
   return (
-    <div className="min-h-screen bg-gradient-to-br from-purple-600 via-pink-500 to-orange-400">
-      <div className="container mx-auto px-4 py-8">
-        
+    <div className="min-h-screen p-4 bg-base-100">
+      <div className="max-w-4xl mx-auto">
         {/* Header */}
-        <div className="text-center mb-8">
-          <h1 className="text-4xl font-bold text-white mb-2">DanceTribe Profile</h1>
-          <p className="text-white opacity-80">Discover amazing dancers in our community</p>
+        <div className="mb-8 text-center">
+          <h1 className="text-4xl font-bold mb-2 bg-gradient-to-r from-purple-600 via-pink-500 to-orange-400 bg-clip-text text-transparent">
+            ✨ Meet {userData.name?.split(' ')[0] || 'This Amazing Dancer'} ✨
+          </h1>
+          <p className="text-lg text-base-content/80 font-medium">
+            {userData.city?.name ? `Dancing their way through ${userData.city.name}` : 'Spreading the love of dance worldwide'} 
+          </p>
         </div>
 
-        {/* Profile Card */}
-        <div className="max-w-2xl mx-auto">
-          <div className="card bg-white shadow-2xl">
-            <div className="card-body p-8">
-              
-              {/* Profile Header */}
-              <div className="text-center mb-8">
-                <div className="avatar mb-4">
-                  <div className="w-32 h-32 rounded-full">
-                    {userData.image ? (
-                      <img 
-                        src={userData.image} 
-                        alt={userData.name || "Profile"} 
-                        className="w-full h-full object-cover rounded-full"
-                      />
-                    ) : (
-                      <div className="bg-gradient-to-br from-purple-400 to-pink-400 text-white rounded-full w-full h-full flex items-center justify-center">
-                        <span className="text-4xl">
-                          {userData.name?.charAt(0)?.toUpperCase() || "👤"}
-                        </span>
-                      </div>
-                    )}
-                  </div>
-                </div>
-                
-                <h2 className="text-3xl font-bold text-gray-800 mb-2">
-                  {userData.name || "Dance Lover"}
-                </h2>
-                
-                {age && (
-                  <p className="text-lg text-gray-600">
-                    {age} years old
-                  </p>
-                )}
-                
-                {zodiac && (
-                  <div className="mt-3">
-                    <span className="badge badge-primary badge-lg">
-                      {zodiac.emoji} {zodiac.sign}
-                    </span>
-                  </div>
-                )}
+        {/* Encouragement Banner for logged-in users */}
+        {isLoggedIn && !isOwnProfile && (
+          <div className="alert alert-info shadow-lg mb-6">
+            <div>
+              <FaHeart className="text-lg" />
+              <div>
+                <h3 className="font-bold">Inspired by this dancer?</h3>
+                <div className="text-xs">Create your own amazing dance profile and connect with the community!</div>
               </div>
+            </div>
+            <div className="flex-none">
+              <Link href="/profile" className="btn btn-sm btn-primary">
+                My Profile
+              </Link>
+            </div>
+          </div>
+        )}
 
-              {/* Current Location */}
-              {userData.city && (
-                <div className="text-center mb-6">
-                  <div className="text-sm font-medium text-gray-500">Currently in</div>
-                  <div className="text-xl font-semibold text-gray-800">
-                    📍 {userData.city.name}
-                    {userData.city.country && (
-                      <span className="text-gray-600">
-                        , {typeof userData.city.country === 'string' ? userData.city.country : userData.city.country.name}
-                      </span>
+        {/* Profile Grid */}
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+          {/* Profile Picture & Basic Info */}
+          <div className="lg:col-span-1">
+            <div className="card bg-base-200 shadow-xl">
+              <div className="card-body">
+                <div className="flex flex-row sm:flex-col gap-4">
+                  <div className="avatar">
+                    <div className="w-28 h-28 rounded-full">
+                      {userData.image ? (
+                        <img
+                          src={userData.image}
+                          alt={userData.name || "Profile"}
+                          className="w-full h-full object-cover rounded-full"
+                        />
+                      ) : (
+                        <div className="bg-primary text-primary-content rounded-full w-full h-full flex items-center justify-center">
+                          <span className="text-4xl">
+                            {userData.name?.charAt(0)?.toUpperCase() || "👤"}
+                          </span>
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                  <div className="flex-1">
+                    <h2 className="card-title text-2xl mb-1">
+                      {`${userData.name.charAt(0).toUpperCase() + userData.name.slice(1)}${age ? `, ${age}` : ''}`}
+                    </h2>
+                    {zodiac && (
+                      <div className="mt-1 text-small">
+                        <span className="">{zodiac.sign}</span>
+                      </div>
+                    )}
+                    
+                    {/* Social Stats */}
+                    <div className="mt-2 flex gap-4 text-sm text-base-content/60">
+                      <span>❤️ {likesCount} like{likesCount !== 1 ? 's' : ''}</span>
+                      <span>👥 {friendsCount} friend{friendsCount !== 1 ? 's' : ''}</span>
+                    </div>
+                    {/* Current Location */}
+                    {userData.city && typeof userData.city === "object" && (
+                      <div className="mt-1">
+                        <div className="">
+                          📍 {userData.city.name}
+                          {userData.city.country && (
+                            <span className="text-base-content/60">
+                              {typeof userData.city.country === "string"
+                                ? userData.city.country
+                                : userData.city.country.name}
+                            </span>
+                          )}
+                        </div>
+                      </div>
+                    )}
+                    {/* Nationality */}
+                    {userData.nationality && (
+                      <div className="mt-4">
+                        <div className="text-sm font-medium text-base-content/60">
+                          Nationality
+                        </div>
+                        <div className="text-md flex items-center gap-2">
+                          <Flag
+                            countryCode={getCountryCode(userData.nationality)}
+                            size="md"
+                          />
+                          {userData.nationality}
+                        </div>
+                      </div>
+                    )}
+                    
+                    {/* Connect Button - show for all users except own profile */}
+                    {!isOwnProfile && (
+                      <div className="mt-4">
+                        <ConnectButton
+                          targetUserId={params.userId}
+                          isFriend={isFriend}
+                          hasSentRequest={hasSentFriendRequest}
+                          hasReceivedRequest={hasReceivedFriendRequest}
+                        />
+                      </div>
                     )}
                   </div>
                 </div>
-              )}
+              </div>
+            </div>
+          </div>
 
-              {/* Dance Role */}
-              {userData.danceRole && (
-                <div className="text-center mb-6">
-                  <div className="text-sm font-medium text-gray-500 mb-1">Dance Role</div>
-                  <div className="text-lg font-semibold text-gray-800">
-                    {getRoleDisplay(userData.danceRole)}
+          {/* Detailed Information */}
+          <div className="lg:col-span-2 space-y-6">
+            {/* Dance Information */}
+            <div className="card bg-base-200 shadow-xl">
+              <div className="card-body">
+                <h3 className="card-title text-xl mb-4">Dance Profile</h3>
+
+                {/* Dance Role */}
+                {userData.danceRole && (
+                  <div className="mb-4">
+                    <div className="text-sm font-medium text-base-content/60 mb-1">
+                      Dance Role
+                    </div>
+                    <div className="text-lg">
+                      {getRoleDisplay(userData.danceRole)}
+                    </div>
                   </div>
-                </div>
-              )}
+                )}
 
-              {/* Dance Styles */}
-              {userData.danceStyles && userData.danceStyles.length > 0 && (
-                <div className="mb-6">
-                  <div className="text-sm font-medium text-gray-500 mb-3 text-center">Dance Styles</div>
-                  <div className="flex flex-wrap justify-center gap-2">
-                    {userData.danceStyles.map((style: string, index: number) => (
-                      <div key={index} className="badge badge-primary badge-lg">
-                        {style}
+                {/* Dance Styles */}
+                {userData.danceStyles && userData.danceStyles.length > 0 && (
+                  <DanceStyleCard danceStyles={getDanceStylesWithLevels(userData.danceStyles)} />
+                )}
+
+                {/* Cities Visited */}
+                {userData.citiesVisited &&
+                  userData.citiesVisited.length > 0 && (
+                    <div>
+                      <div className="text-sm font-medium text-base-content/60 mb-2">
+                        Cities Danced In
                       </div>
-                    ))}
+                      <div className="flex flex-wrap gap-3">
+                        {userData.citiesVisited.map(
+                          (city: any, index: number) => (
+                            <div
+                              key={index}
+                              className="flex items-center gap-2 bg-base-300 rounded-md h-10"
+                            >
+                              {city.image ? (
+                                <img
+                                  src={city.image}
+                                  alt={city.name}
+                                  className="h-full aspect-square rounded object-cover"
+                                />
+                              ) : (
+                                <div className="h-full aspect-square rounded bg-primary/20 flex items-center justify-center">
+                                  <span className="text-xs">🌍</span>
+                                </div>
+                              )}
+                              <span className="text-sm font-medium pl-2 pr-4 py-2">
+                                {typeof city === "string" ? city : city.name}
+                              </span>
+                            </div>
+                          )
+                        )}
+                      </div>
+                    </div>
+                  )}
+              </div>
+            </div>
+
+            {/* Social & Music */}
+            <div className="card bg-base-200 shadow-xl">
+              <div className="card-body">
+                <h3 className="card-title text-xl mb-4">🎵 Music & Social</h3>
+
+                {/* Dance Anthem */}
+                {userData.anthem && userData.anthem.url && (
+                  <div className="mb-4">
+                    <div className="text-sm font-medium text-base-content/60 mb-2">
+                      Dance Anthem
+                    </div>
+                    <div className="rounded-lg">
+                      {/* Iframe for Spotify/YouTube */}
+                      {(() => {
+                        const url = userData.anthem.url;
+                        let embedUrl = "";
+
+                        if (userData.anthem.platform === "spotify") {
+                          const spotifyMatch = url.match(
+                            /(?:spotify\.com\/track\/|spotify:track:)([a-zA-Z0-9]+)/
+                          );
+                          if (spotifyMatch) {
+                            embedUrl = `https://open.spotify.com/embed/track/${spotifyMatch[1]}`;
+                          }
+                        } else if (userData.anthem.platform === "youtube") {
+                          const youtubeMatch = url.match(
+                            /(?:youtube\.com\/watch\?v=|youtu\.be\/)([a-zA-Z0-9_-]+)/
+                          );
+                          if (youtubeMatch) {
+                            embedUrl = `https://www.youtube.com/embed/${youtubeMatch[1]}`;
+                          }
+                        }
+
+                        return embedUrl ? (
+                          <div
+                            className="rounded-lg overflow-hidden"
+                            style={{ height: "152px" }}
+                          >
+                            <iframe
+                              src={embedUrl}
+                              width="100%"
+                              height="152"
+                              frameBorder="0"
+                              scrolling="no"
+                              className="rounded-2xl"
+                              style={{ overflow: "hidden" }}
+                              allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture"
+                              loading="lazy"
+                            />
+                          </div>
+                        ) : (
+                          <a
+                            href={url}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="btn btn-xs btn-primary"
+                          >
+                            🎧 Listen
+                          </a>
+                        );
+                      })()}
+                    </div>
                   </div>
-                </div>
-              )}
+                )}
 
-              {/* Cities Visited */}
-              {userData.citiesVisited && userData.citiesVisited.length > 0 && (
-                <div className="mb-8">
-                  <div className="text-sm font-medium text-gray-500 mb-3 text-center">Cities Danced In</div>
-                  <div className="flex flex-wrap justify-center gap-2">
-                    {userData.citiesVisited.slice(0, 8).map((city: any, index: number) => (
-                      <div key={index} className="badge badge-outline">
-                        🌍 {typeof city === 'string' ? city : city.name}
+                {/* Social Media */}
+                {userData.socialMedia &&
+                  (userData.socialMedia.instagram ||
+                    userData.socialMedia.tiktok ||
+                    userData.socialMedia.youtube) && (
+                    <div>
+                      <div className="text-sm font-medium text-base-content/60 mb-3">
+                        Social Media
                       </div>
-                    ))}
-                    {userData.citiesVisited.length > 8 && (
-                      <div className="badge badge-outline">
-                        +{userData.citiesVisited.length - 8} more
+                      <div className="flex gap-3">
+                        {userData.socialMedia.instagram && (
+                          <a
+                            href={getSocialUrl(
+                              "instagram",
+                              userData.socialMedia.instagram
+                            )}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="btn btn-circle btn-outline hover:bg-gradient-to-r hover:from-purple-500 hover:to-pink-500 hover:text-white hover:border-purple-500"
+                            title={`@${userData.socialMedia.instagram.replace("@", "")} on Instagram`}
+                          >
+                            <FaInstagram className="text-xl" />
+                          </a>
+                        )}
+                        {userData.socialMedia.tiktok && (
+                          <a
+                            href={getSocialUrl(
+                              "tiktok",
+                              userData.socialMedia.tiktok
+                            )}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="btn btn-circle btn-outline hover:bg-black hover:text-white hover:border-black"
+                            title={`@${userData.socialMedia.tiktok.replace("@", "")} on TikTok`}
+                          >
+                            <FaTiktok className="text-xl" />
+                          </a>
+                        )}
+                        {userData.socialMedia.youtube && (
+                          <a
+                            href={getSocialUrl(
+                              "youtube",
+                              userData.socialMedia.youtube
+                            )}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="btn btn-circle btn-outline hover:bg-red-600 hover:text-white hover:border-red-600"
+                            title="YouTube Channel"
+                          >
+                            <FaYoutube className="text-xl" />
+                          </a>
+                        )}
                       </div>
-                    )}
-                  </div>
-                </div>
-              )}
-
-              {/* Call to Action */}
-              <div className="text-center">
-                <div className="mb-4">
-                  <h3 className="text-xl font-bold text-gray-800 mb-2">
-                    Join DanceTribe Community!
-                  </h3>
-                  <p className="text-gray-600">
-                    Connect with dancers worldwide, share your passion, and discover new dance experiences.
-                  </p>
-                </div>
-                
-                <Link 
-                  href="/api/auth/signin" 
-                  className="btn btn-lg bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600 text-white border-none shadow-lg"
-                >
-                  🕺 Join DanceTribe 💃
-                </Link>
-                
-                <div className="mt-4">
-                  <Link href="/" className="link link-primary text-sm">
-                    Learn more about DanceTribe
-                  </Link>
-                </div>
+                    </div>
+                  )}
               </div>
             </div>
           </div>
         </div>
 
-        {/* Footer */}
-        <div className="text-center mt-8 text-white opacity-80">
-          <p>&copy; 2024 DanceTribe - Where dancers connect</p>
-        </div>
+        {/* Actions - only show for non-logged-in users */}
+        {!isLoggedIn && (
+          <div className="text-center mt-8 space-y-4">
+            <div className="mb-4">
+              <h3 className="text-xl font-bold text-base-content mb-2">
+                Join DanceTribe Community!
+              </h3>
+              <p className="text-base-content/70">
+                Connect with dancers worldwide, share your passion, and discover new dance experiences.
+              </p>
+            </div>
+            
+            <div>
+              <Link 
+                href="/api/auth/signin" 
+                className="btn btn-primary btn-lg"
+              >
+                🕺 Join DanceTribe 💃
+              </Link>
+            </div>
+
+            <div>
+              <Link href="/" className="link link-primary text-sm">
+                Learn more about DanceTribe
+              </Link>
+            </div>
+          </div>
+        )}
+
+        {/* Floating Like Button - for all users */}
+        {!isOwnProfile && (
+          <div className="fixed bottom-6 right-6 z-50">
+            <LikeButton
+              targetUserId={params.userId}
+              initialLikesCount={likesCount}
+              initialIsLiked={isLikedByCurrentUser}
+              className="btn btn-lg btn-circle shadow-2xl hover:shadow-3xl bg-white border-2 border-red-200 hover:border-red-300"
+            />
+          </div>
+        )}
       </div>
     </div>
   );

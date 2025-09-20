@@ -1,4 +1,7 @@
 import { Suspense } from "react";
+import { getServerSession } from "next-auth";
+import { authOptions } from "@/libs/next-auth";
+import { redirect } from "next/navigation";
 import Header from "@/components/Header";
 import Hero from "@/components/Hero";
 import CityList from "@/components/organisims/CityList";
@@ -38,6 +41,13 @@ async function getCities(): Promise<CityType[]> {
 }
 
 export default async function Home() {
+  // Check if user is logged in and redirect to dashboard
+  const session = await getServerSession(authOptions);
+  
+  if (session) {
+    redirect("/dashboard");
+  }
+
   const cities: CityType[] = await getCities();
   return (
     <>

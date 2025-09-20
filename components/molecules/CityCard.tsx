@@ -33,7 +33,13 @@ const CityCard = ({ city, index }: CityCardProps) => {
             </div>
             <div className="flex items-center gap-1">
               <span className="font-bold text-sm">Dancers:</span>
-              <span className="text-sm">{city.totalDancers}</span>
+              {city.totalDancers >= 30 ? (
+                <span className="text-sm">{city.totalDancers}</span>
+              ) : (
+                <span className="text-sm text-orange-400 animate-pulse font-medium">
+                  Growing...
+                </span>
+              )}
             </div>
             {city.danceStyles.length > 0 && (
               <div className="flex items-center gap-1">

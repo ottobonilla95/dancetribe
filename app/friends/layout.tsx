@@ -7,9 +7,7 @@ import Header from "@/components/Header";
 
 // This is a server-side component to ensure the user is logged in.
 // If not, it will redirect to the login page.
-// It's applied to all subpages of /dashboard in /app/dashboard/*** pages
-// You can also add custom static UI elements like a Navbar, Sidebar, Footer, etc..
-// See https://shipfa.st/docs/tutorials/private-page
+// It's applied to all subpages of /friends in /app/friends/*** pages
 export default async function LayoutPrivate({
   children,
 }: {
@@ -29,4 +27,4 @@ export default async function LayoutPrivate({
       {children}
     </>
   );
-}
+} 
