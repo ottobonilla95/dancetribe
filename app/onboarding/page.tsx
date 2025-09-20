@@ -68,12 +68,6 @@ export default function Onboarding() {
 
   const steps: OnboardingStep[] = [
     {
-      id: "danceStyles",
-      title: "What do you love to dance?",
-      description: "Select your favorite dance styles",
-      completed: user?.onboardingSteps?.danceStyles || false,
-    },
-    {
       id: "username",
       title: "Choose your username",
       description: "This will be your unique identifier on DanceTribe",
@@ -90,6 +84,30 @@ export default function Onboarding() {
       title: "When's your birthday?",
       description: "We'll use this to calculate your zodiac sign",
       completed: user?.onboardingSteps?.dateOfBirth || false,
+    },
+    {
+      id: "gender",
+      title: "What's your gender?",
+      description: "Help other dancers connect with you",
+      completed: user?.onboardingSteps?.gender || false,
+    },
+    {
+      id: "nationality",
+      title: "What's your nationality?",
+      description: "Share your cultural background",
+      completed: user?.onboardingSteps?.nationality || false,
+    },
+    {
+      id: "danceStyles",
+      title: "What do you love to dance?",
+      description: "Select your favorite dance styles",
+      completed: user?.onboardingSteps?.danceStyles || false,
+    },
+    {
+      id: "danceRole",
+      title: "What's your dance role?",
+      description: "Do you prefer to lead, follow, or both?",
+      completed: user?.onboardingSteps?.danceRole || false,
     },
     {
       id: "currentLocation",
@@ -114,24 +132,6 @@ export default function Onboarding() {
       title: "Connect your socials",
       description: "Let other dancers find you online",
       completed: user?.onboardingSteps?.socialMedia || false,
-    },
-    {
-      id: "danceRole",
-      title: "What's your dance role?",
-      description: "Do you prefer to lead, follow, or both?",
-      completed: user?.onboardingSteps?.danceRole || false,
-    },
-    {
-      id: "gender",
-      title: "What's your gender?",
-      description: "Help other dancers connect with you",
-      completed: user?.onboardingSteps?.gender || false,
-    },
-    {
-      id: "nationality",
-      title: "What's your nationality?",
-      description: "Share your cultural background",
-      completed: user?.onboardingSteps?.nationality || false,
     },
   ];
 

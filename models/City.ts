@@ -23,6 +23,10 @@ const citySchema = new mongoose.Schema(
       type: Number,
       required: true,
     },
+    totalDancers: {
+      type: Number,
+      default: 0,
+    },
     image: {
       type: String,
     },

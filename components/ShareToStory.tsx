@@ -184,55 +184,26 @@ const ShareToStory: React.FC<ShareToStoryProps> = ({ userData }) => {
       </div>
 
       {/* Share Button */}
-      <button
-        onClick={handleShare}
-        disabled={isGenerating}
-        style={{
-          background: isGenerating 
-            ? 'linear-gradient(45deg, #ccc, #999)' 
-            : 'linear-gradient(45deg, #667eea, #764ba2)',
-          color: 'white',
-          border: 'none',
-          borderRadius: '12px',
-          padding: '12px 24px',
-          fontSize: '16px',
-          fontWeight: '600',
-          cursor: isGenerating ? 'not-allowed' : 'pointer',
-          display: 'flex',
-          alignItems: 'center',
-          gap: '8px',
-          transition: 'all 0.3s ease',
-          opacity: isGenerating ? 0.7 : 1
-        }}
-      >
-        {isGenerating ? (
-          <>
-            <div
-              style={{
-                width: '16px',
-                height: '16px',
-                border: '2px solid rgba(255,255,255,0.3)',
-                borderTop: '2px solid white',
-                borderRadius: '50%',
-                animation: 'spin 1s linear infinite'
-              }}
-            />
-            Generating...
-          </>
-        ) : (
-          <>
-            📱 Share to Story
-          </>
-        )}
-      </button>
+      <div className="flex justify-center">
+        <button
+          onClick={handleShare}
+          disabled={isGenerating}
+          className={`btn ${isGenerating ? 'btn-disabled' : 'btn-primary'} gap-2`}
+        >
+          {isGenerating ? (
+            <>
+              <span className="loading loading-spinner loading-sm"></span>
+              Generating...
+            </>
+          ) : (
+            <>
+              📱 Share my profile
+            </>
+          )}
+        </button>
+      </div>
 
-      {/* Add CSS animation for spinner */}
-      <style jsx>{`
-        @keyframes spin {
-          0% { transform: rotate(0deg); }
-          100% { transform: rotate(360deg); }
-        }
-      `}</style>
+
     </div>
   );
 };

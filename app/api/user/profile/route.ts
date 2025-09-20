@@ -89,7 +89,25 @@ export async function PUT(req: NextRequest) {
         break;
 
       case "currentLocation":
-        user.city = data.city;
+        // Handle totalDancers count when changing cities
+        const oldCityId = user.city;
+        const newCityId = data.city;
+
+        // If user had a previous city, decrement its totalDancers
+        if (oldCityId && oldCityId.toString() !== newCityId) {
+          await City.findByIdAndUpdate(oldCityId, { 
+            $inc: { totalDancers: -1 } 
+          });
+        }
+
+        // If new city is different from old city, increment its totalDancers
+        if (newCityId && (!oldCityId || oldCityId.toString() !== newCityId)) {
+          await City.findByIdAndUpdate(newCityId, { 
+            $inc: { totalDancers: 1 } 
+          });
+        }
+
+        user.city = newCityId;
         user.onboardingSteps.currentLocation = true;
         break;
 

@@ -1,6 +1,4 @@
 Next:
-- Organise steps
-- Current city, add a new user to the current city, and if someone go, add less user to the current city. show the amount of dancers in thirt city, picture, etrc.
 
 - Fix profile page 
 - Fix sharable image 
@@ -63,3 +61,7 @@ Blogs.
 Etc.
 
 Create blogs and forums.. and share them on insta.. or run ads.
+
+
+Later
+- If user update their city the update the citires totalDancers accordingly.

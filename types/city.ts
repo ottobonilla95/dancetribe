@@ -9,6 +9,7 @@ export type City = {
     name: string;
   };
   population?: number;
+  totalDancers: number;
   image?: string;
   description?: string;
   rank: number;
@@ -17,5 +18,4 @@ export type City = {
     lng: number;
   };
   danceStyles: { style: string }[];
-  dancersPopulation: number;
 };
