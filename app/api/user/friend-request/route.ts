@@ -7,7 +7,7 @@ import User from "@/models/User";
 export async function POST(req: NextRequest) {
   try {
     const session = await getServerSession(authOptions);
-    
+
     if (!session?.user?.id) {
       return NextResponse.json(
         { error: "Authentication required" },
@@ -39,16 +39,13 @@ export async function POST(req: NextRequest) {
     // Check if target user exists
     const targetUser = await User.findById(targetUserId);
     if (!targetUser) {
-      return NextResponse.json(
-        { error: "User not found" },
-        { status: 404 }
-      );
+      return NextResponse.json({ error: "User not found" }, { status: 404 });
     }
 
     const currentUser = await User.findById(currentUserId);
 
     switch (action) {
-      case "send":
+      case "send": {
         // Check if already friends
         if (currentUser.friends.includes(targetUserId)) {
           return NextResponse.json(
@@ -74,37 +71,40 @@ export async function POST(req: NextRequest) {
         );
         if (incomingRequest) {
           return NextResponse.json(
-            { error: "This user already sent you a friend request. Accept it instead!" },
+            {
+              error:
+                "This user already sent you a friend request. Accept it instead!",
+            },
             { status: 400 }
           );
         }
 
         // Send friend request
         await User.findByIdAndUpdate(currentUserId, {
-          $push: { 
-            friendRequestsSent: { 
+          $push: {
+            friendRequestsSent: {
               user: targetUserId,
-              sentAt: new Date()
-            }
-          }
+              sentAt: new Date(),
+            },
+          },
         });
 
         await User.findByIdAndUpdate(targetUserId, {
-          $push: { 
-            friendRequestsReceived: { 
+          $push: {
+            friendRequestsReceived: {
               user: currentUserId,
-              sentAt: new Date()
-            }
-          }
+              sentAt: new Date(),
+            },
+          },
         });
 
         return NextResponse.json({
           success: true,
           action: "request_sent",
-          message: "Friend request sent successfully"
+          message: "Friend request sent successfully",
         });
-
-      case "accept":
+      }
+      case "accept": {
         // Check if there's a pending request
         const pendingRequest = currentUser.friendRequestsReceived.find(
           (request: any) => request.user.toString() === targetUserId
@@ -119,50 +119,50 @@ export async function POST(req: NextRequest) {
         // Add to friends list for both users
         await User.findByIdAndUpdate(currentUserId, {
           $push: { friends: targetUserId },
-          $pull: { friendRequestsReceived: { user: targetUserId } }
+          $pull: { friendRequestsReceived: { user: targetUserId } },
         });
 
         await User.findByIdAndUpdate(targetUserId, {
           $push: { friends: currentUserId },
-          $pull: { friendRequestsSent: { user: currentUserId } }
+          $pull: { friendRequestsSent: { user: currentUserId } },
         });
 
         return NextResponse.json({
           success: true,
           action: "request_accepted",
-          message: "Friend request accepted"
+          message: "Friend request accepted",
         });
-
-      case "reject":
+      }
+      case "reject": {
         // Remove the friend request
         await User.findByIdAndUpdate(currentUserId, {
-          $pull: { friendRequestsReceived: { user: targetUserId } }
+          $pull: { friendRequestsReceived: { user: targetUserId } },
         });
 
         await User.findByIdAndUpdate(targetUserId, {
-          $pull: { friendRequestsSent: { user: currentUserId } }
+          $pull: { friendRequestsSent: { user: currentUserId } },
         });
 
         return NextResponse.json({
           success: true,
           action: "request_rejected",
-          message: "Friend request rejected"
+          message: "Friend request rejected",
         });
-
+      }
       case "cancel":
         // Cancel sent request
         await User.findByIdAndUpdate(currentUserId, {
-          $pull: { friendRequestsSent: { user: targetUserId } }
+          $pull: { friendRequestsSent: { user: targetUserId } },
         });
 
         await User.findByIdAndUpdate(targetUserId, {
-          $pull: { friendRequestsReceived: { user: currentUserId } }
+          $pull: { friendRequestsReceived: { user: currentUserId } },
         });
 
         return NextResponse.json({
           success: true,
           action: "request_cancelled",
-          message: "Friend request cancelled"
+          message: "Friend request cancelled",
         });
 
       default:
@@ -171,7 +171,6 @@ export async function POST(req: NextRequest) {
           { status: 400 }
         );
     }
-
   } catch (error) {
     console.error("Friend request API error:", error);
     return NextResponse.json(
@@ -179,4 +178,4 @@ export async function POST(req: NextRequest) {
       { status: 500 }
     );
   }
-} 
+}
