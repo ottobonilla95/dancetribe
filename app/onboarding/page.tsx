@@ -392,7 +392,7 @@ export default function Onboarding() {
         }
         stepData = { dateOfBirth };
         break;
-      case "currentLocation":
+      case "currentLocation": {
         if (!currentLocation) {
           alert("Please select your current city");
           return;
@@ -404,13 +404,15 @@ export default function Onboarding() {
             : currentLocation._id || (currentLocation as any).id;
         stepData = { city: cityId };
         break;
-      case "citiesVisited":
+      }
+      case "citiesVisited": {
         // Handle both populated objects and ID strings
         const cityIds = citiesVisited.map((city) =>
           typeof city === "string" ? city : city._id || (city as any).id
         );
         stepData = { citiesVisited: cityIds };
         break;
+      }
       case "anthem": {
         if (!anthem.url) {
           alert("Please enter your anthem URL");
@@ -480,7 +482,7 @@ export default function Onboarding() {
   };
 
   // Helper functions for dance styles with levels
-  const addDanceStyle = (styleId: string, styleName: string) => {
+  const addDanceStyle = (styleId: string) => {
     const existingStyle = danceStyles.find((ds) => ds.danceStyle === styleId);
     if (!existingStyle) {
       setDanceStyles((prev) => [
@@ -508,18 +510,9 @@ export default function Onboarding() {
     return danceStyles.some((ds) => ds.danceStyle === styleId);
   };
 
-  const getDanceStyleLevel = (styleId: string) => {
-    const style = danceStyles.find((ds) => ds.danceStyle === styleId);
-    return style?.level || "beginner";
-  };
-
   const getStyleNameById = (styleId: string) => {
     const style = danceStylesOptions.find((s) => (s._id || s.id) === styleId);
     return style?.name || "Unknown Style";
-  };
-
-  const handleImageSelect = (file: File) => {
-    setProfilePic(file);
   };
 
   const uploadProfilePic = async (file: File): Promise<string> => {
@@ -605,8 +598,6 @@ export default function Onboarding() {
     );
   }
 
-  const progress = ((currentStep + 1) / steps.length) * 100;
-
   return (
     <div className="min-h-screen bg-base-100 py-8">
       <div className="max-w-2xl mx-auto px-4">
@@ -658,7 +649,7 @@ export default function Onboarding() {
                         if (isDanceStyleSelected(style._id || style.id)) {
                           removeDanceStyle(style._id || style.id);
                         } else {
-                          addDanceStyle(style._id || style.id, style.name);
+                          addDanceStyle(style._id || style.id);
                         }
                       }}
                     >
@@ -992,7 +983,9 @@ export default function Onboarding() {
             {steps[currentStep].id === "danceRole" && (
               <div className="form-control">
                 <label className="label">
-                  <span className="label-text">What's your dance role?</span>
+                  <span className="label-text">
+                    What&apos;s your dance role?
+                  </span>
                 </label>
                 <div className="flex flex-col gap-3">
                   {["leader", "follower", "both"].map((role) => (
@@ -1017,7 +1010,7 @@ export default function Onboarding() {
             {steps[currentStep].id === "gender" && (
               <div className="form-control">
                 <label className="label">
-                  <span className="label-text">What's your gender?</span>
+                  <span className="label-text">What&apos;s your gender?</span>
                 </label>
                 <div className="flex flex-col gap-3">
                   {[
@@ -1046,7 +1039,9 @@ export default function Onboarding() {
             {steps[currentStep].id === "nationality" && (
               <div className="form-control">
                 <label className="label">
-                  <span className="label-text">What's your nationality?</span>
+                  <span className="label-text">
+                    What&apos;s your nationality?
+                  </span>
                 </label>
                 <select
                   className="select select-bordered w-full"
