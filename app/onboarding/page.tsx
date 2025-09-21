@@ -1,11 +1,12 @@
 "use client";
 
 import React, { useState, useEffect, useRef } from "react";
-import { useRouter } from "next/navigation";
+import { useSession } from "next-auth/react";
 import apiClient from "@/libs/api";
 import { User, DanceStyle, City, UserDanceStyle } from "@/types";
 import { DANCE_LEVELS } from "@/constants/dance-levels";
 import { COUNTRIES } from "@/constants/countries";
+import { validateUsername, generateSuggestions } from "@/utils/username";
 import CitySelector from "@/components/CitySelector";
 import ImageCropPicker from "@/components/ImageCropPicker";
 import CurrentLocationPicker from "@/components/CurrentLocationPicker";
@@ -18,8 +19,11 @@ interface OnboardingStep {
 }
 
 export default function Onboarding() {
-  const router = useRouter();
-  //   const { data: status } = useSession();
+  const { update } = useSession();
+
+  // Check if we're in edit mode
+  const urlParams = new URLSearchParams(window.location.search);
+  const isEditMode = urlParams.get("mode") === "edit";
   const [loading, setLoading] = useState(true);
   const [currentStep, setCurrentStep] = useState(0);
   const [user, setUser] = useState<User>(null);
@@ -136,36 +140,6 @@ export default function Onboarding() {
   ];
 
   // Username validation and checking
-  const validateUsername = (value: string) => {
-    const regex = /^[a-z0-9_]+$/;
-    if (!value) return "Username is required";
-    if (value.length < 3) return "Username must be at least 3 characters";
-    if (value.length > 20) return "Username must be 20 characters or less";
-    if (!regex.test(value))
-      return "Username can only contain lowercase letters, numbers, and underscores";
-    if (value.startsWith("_") || value.endsWith("_"))
-      return "Username cannot start or end with an underscore";
-    return "";
-  };
-
-  const generateSuggestions = (name: string) => {
-    if (!name) return [];
-
-    const cleanName = name
-      .toLowerCase()
-      .replace(/[^a-z0-9\s]/g, "")
-      .replace(/\s+/g, "_");
-    const suggestions = [
-      cleanName,
-      `${cleanName}_dancer`,
-      `${cleanName}_dance`,
-      `${cleanName}123`,
-      `dance_${cleanName}`,
-      `${cleanName}_2024`,
-    ].filter((s) => s.length >= 3 && s.length <= 20);
-
-    return suggestions.slice(0, 3);
-  };
 
   const checkUsernameAvailability = async (value: string) => {
     const validationError = validateUsername(value);
@@ -238,9 +212,9 @@ export default function Onboarding() {
       const userData = data.user;
       setUser(userData);
 
-      // Redirect to dashboard if profile is already complete
-      if (userData.isProfileComplete) {
-        router.push("/dashboard");
+      // Redirect completed users to dashboard (unless in edit mode)
+      if (userData.isProfileComplete && !isEditMode) {
+        window.location.href = "/dashboard";
         return;
       }
 
@@ -318,15 +292,21 @@ export default function Onboarding() {
       }
 
       // Find the current step based on completion
-      const incompleteStepIndex = steps.findIndex(
-        (step) =>
-          !userData.onboardingSteps?.[
-            step.id as keyof typeof userData.onboardingSteps
-          ]
-      );
-      setCurrentStep(
-        incompleteStepIndex !== -1 ? incompleteStepIndex : steps.length - 1
-      );
+      try {
+        const incompleteStepIndex = steps.findIndex(
+          (step) =>
+            !userData.onboardingSteps?.[
+              step.id as keyof typeof userData.onboardingSteps
+            ]
+        );
+        setCurrentStep(
+          incompleteStepIndex !== -1 ? incompleteStepIndex : steps.length - 1
+        );
+      } catch (stepError) {
+        console.error("Error finding current step:", stepError);
+        // Default to first step if there's an error
+        setCurrentStep(0);
+      }
 
       setLoading(false);
     } catch (error) {
@@ -460,24 +440,52 @@ export default function Onboarding() {
         setCompleting(true);
       }
 
-      await apiClient.put("/user/profile", {
+      const response = await apiClient.put("/user/profile", {
         step: step.id,
         data: stepData,
       });
 
+      console.log("🔍 API Response:", response);
+
+      // Check if profile was just completed
+      if (response.data?.profileCompleted) {
+        console.log(
+          "🎉 Profile completed! Updating session and redirecting..."
+        );
+
+        try {
+          // Update the session to reflect profile completion
+          await update();
+          console.log("✅ Session updated successfully");
+        } catch (sessionError) {
+          console.error("❌ Failed to update session:", sessionError);
+        }
+
+        // Redirect to dashboard
+        window.location.href = "/dashboard";
+        return;
+      }
+
       // Move to next step or complete onboarding
       if (currentStep < steps.length - 1) {
+        console.log("📍 Moving to next step:", currentStep + 1);
         setCurrentStep(currentStep + 1);
       } else {
-        // Onboarding complete
-        router.push("/dashboard");
+        if (isEditMode) {
+          console.log("🎉 Profile updated! Redirecting to profile...");
+          window.location.href = "/profile";
+        } else {
+          console.log("🎉 Onboarding complete! Redirecting to dashboard...");
+          window.location.href = "/dashboard";
+        }
       }
     } catch (error) {
       console.error("Error updating profile:", error);
       alert("Error saving your information. Please try again.");
-      setCompleting(false); // Reset completing state on error
     } finally {
-      setSavingStep(false); // Always reset saving state
+      // Always reset states in finally block
+      setSavingStep(false);
+      setCompleting(false);
     }
   };
 
@@ -604,7 +612,9 @@ export default function Onboarding() {
         {/* Progress */}
         <div className="mb-8">
           <div className="flex justify-between items-center mb-4">
-            <h1 className="text-2xl font-bold">Complete Your Profile</h1>
+            <h1 className="text-2xl font-bold">
+              {isEditMode ? "Edit Your Profile" : "Complete Your Profile"}
+            </h1>
             <span className="text-sm text-base-content/70">
               {currentStep + 1} of {steps.length}
             </span>
@@ -1094,7 +1104,11 @@ export default function Onboarding() {
                     Completing...
                   </>
                 ) : currentStep === steps.length - 1 ? (
-                  "Complete"
+                  isEditMode ? (
+                    "Save Changes"
+                  ) : (
+                    "Complete"
+                  )
                 ) : (
                   "Next"
                 )}

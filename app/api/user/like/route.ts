@@ -50,25 +50,29 @@ export async function POST(req: NextRequest) {
 
     if (isAlreadyLiked) {
       // Unlike - remove from likedBy array
-      await User.findByIdAndUpdate(targetUserId, {
-        $pull: { likedBy: currentUserId }
-      });
+      const updatedUser = await User.findByIdAndUpdate(
+        targetUserId, 
+        { $pull: { likedBy: currentUserId } },
+        { new: true }
+      );
 
       return NextResponse.json({
         success: true,
         action: "unliked",
-        likesCount: targetUser.likedBy.length - 1
+        likesCount: updatedUser.likedBy.length
       });
     } else {
       // Like - add to likedBy array
-      await User.findByIdAndUpdate(targetUserId, {
-        $addToSet: { likedBy: currentUserId }
-      });
+      const updatedUser = await User.findByIdAndUpdate(
+        targetUserId,
+        { $addToSet: { likedBy: currentUserId } },
+        { new: true }
+      );
 
       return NextResponse.json({
         success: true,
         action: "liked",
-        likesCount: targetUser.likedBy.length + 1
+        likesCount: updatedUser.likedBy.length
       });
     }
 

@@ -69,13 +69,23 @@ export async function middleware(request: NextRequest) {
     return NextResponse.next()
   }
 
-  // For authenticated users, check if they need onboarding
-  // Check the JWT token for profile completion status
-  // If isProfileComplete is undefined/null (new user), also redirect to onboarding
-  if (token.isProfileComplete !== true) {
-    const url = request.nextUrl.clone()
-    url.pathname = '/onboarding'
-    return NextResponse.redirect(url)
+  // Check if user has completed onboarding
+  console.log('🔍 Middleware - Checking onboarding status:', {
+    pathname,
+    userId: token.sub,
+    isProfileComplete: token.isProfileComplete
+  })
+
+  // If user hasn't completed profile, redirect to onboarding
+  if (token.isProfileComplete === false) {
+    console.log('🔄 Middleware - Redirecting to onboarding (profile incomplete)')
+    return NextResponse.redirect(new URL('/onboarding', request.url))
+  }
+
+  // If user has completed profile but tries to access onboarding, redirect to dashboard
+  if (pathname === '/onboarding' && token.isProfileComplete === true) {
+    console.log('🔄 Middleware - Redirecting to dashboard (profile complete)')
+    return NextResponse.redirect(new URL('/dashboard', request.url))
   }
 
   return NextResponse.next()

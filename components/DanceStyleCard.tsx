@@ -1,4 +1,5 @@
 interface DanceStyle {
+  id?: string;
   name: string;
   level: string;
   levelLabel: string;
@@ -9,6 +10,8 @@ interface DanceStyle {
 interface DanceStyleCardProps {
   danceStyles: DanceStyle[];
 }
+
+import Link from "next/link";
 
 export default function DanceStyleCard({ danceStyles }: DanceStyleCardProps) {
   return (
@@ -27,12 +30,12 @@ export default function DanceStyleCard({ danceStyles }: DanceStyleCardProps) {
           };
           const levelNum = levelMap[style.level] || 1;
           
-          return (
-            <div key={index} className="bg-base-300 rounded-lg p-3">
+          const content = (
+            <div className="bg-base-300 rounded-lg p-3 hover:bg-base-200 transition-colors cursor-pointer">
               <div className="flex items-center justify-between mb-2">
                 <div className="flex items-center gap-2">
                   <span>{style.levelEmoji}</span>
-                  <span className="font-medium">{style.name}</span>
+                  <span className="font-medium hover:text-primary transition-colors">{style.name}</span>
                 </div>
                 <span className="text-xs text-base-content/70 capitalize">
                   {style.levelLabel}
@@ -51,6 +54,16 @@ export default function DanceStyleCard({ danceStyles }: DanceStyleCardProps) {
                   />
                 ))}
               </div>
+            </div>
+          );
+
+          return style.id ? (
+            <Link key={index} href={`/dance-style/${style.id}`}>
+              {content}
+            </Link>
+          ) : (
+            <div key={index}>
+              {content}
             </div>
           );
         })}

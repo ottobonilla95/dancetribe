@@ -160,7 +160,16 @@ export async function PUT(req: NextRequest) {
     // Check if profile is complete
     const steps = user.onboardingSteps;
     const isComplete = Object.values(steps).every((step) => step === true);
+    const wasCompleteBeforeSave = user.isProfileComplete;
     user.isProfileComplete = isComplete;
+
+    console.log("🔍 Profile completion check:", {
+      step: step,
+      allSteps: steps,
+      isComplete,
+      wasCompleteBeforeSave,
+      willSignalCompletion: isComplete && !wasCompleteBeforeSave
+    });
 
     await user.save();
 
@@ -173,7 +182,7 @@ export async function PUT(req: NextRequest) {
         onboardingSteps: user.onboardingSteps,
       },
       // Signal to client if profile was just completed
-      profileCompleted: isComplete && !session.user.isProfileComplete,
+      profileCompleted: isComplete && !wasCompleteBeforeSave,
     });
   } catch (error) {
     console.error("Error updating user profile:", error);

@@ -1,40 +1,14 @@
 "use client";
 
-import { useEffect, useState } from "react";
-import { useSession } from "next-auth/react";
 import Link from "next/link";
 import { FaUserFriends, FaBell } from "react-icons/fa";
 
-export default function FriendRequestNotification() {
-  const { data: session } = useSession();
-  const [pendingRequests, setPendingRequests] = useState(0);
-  const [isVisible, setIsVisible] = useState(false);
+interface FriendRequestNotificationProps {
+  pendingRequests: number;
+}
 
-  useEffect(() => {
-    if (!session?.user?.id) return;
-
-    const fetchPendingRequests = async () => {
-      try {
-        const response = await fetch('/api/user/friend-requests-count');
-        if (response.ok) {
-          const data = await response.json();
-          setPendingRequests(data.count || 0);
-          setIsVisible(data.count > 0);
-        }
-      } catch (error) {
-        console.error('Error fetching friend requests:', error);
-      }
-    };
-
-    fetchPendingRequests();
-    
-    // Check for updates every 30 seconds
-    const interval = setInterval(fetchPendingRequests, 30000);
-    
-    return () => clearInterval(interval);
-  }, [session]);
-
-  if (!session || !isVisible || pendingRequests === 0) {
+export default function FriendRequestNotification({ pendingRequests }: FriendRequestNotificationProps) {
+  if (pendingRequests === 0) {
     return null;
   }
 

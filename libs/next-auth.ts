@@ -98,12 +98,22 @@ export const authOptions: NextAuthOptionsExtended = {
           const User = (await import('@/models/User')).default;
           const userData = await User.findById(token.sub || user?.id).select('isProfileComplete onboardingSteps');
           
+          console.log('🔍 JWT Callback - User data:', {
+            userId: token.sub || user?.id,
+            isProfileComplete: userData?.isProfileComplete,
+            trigger
+          });
+          
           // If user exists but doesn't have isProfileComplete field, they need onboarding
           if (userData && userData.isProfileComplete === undefined) {
             token.isProfileComplete = false;
           } else {
             token.isProfileComplete = userData?.isProfileComplete || false;
           }
+          
+          console.log('🔍 JWT Callback - Token updated:', {
+            isProfileComplete: token.isProfileComplete
+          });
         } catch (error) {
           console.error('Error fetching user profile in JWT callback:', error);
           token.isProfileComplete = false;

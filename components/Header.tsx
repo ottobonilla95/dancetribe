@@ -7,8 +7,10 @@ import { useSession } from "next-auth/react";
 import Link from "next/link";
 import Image from "next/image";
 import ButtonSignin from "./ButtonSignin";
+import SearchBar from "./SearchBar";
 import logo from "@/app/icon.png";
 import config from "@/config";
+import { useFriendRequestCount } from "@/libs/hooks";
 import { FaUser, FaUserFriends, FaCog, FaSignOutAlt, FaHome } from "react-icons/fa";
 import { signOut } from "next-auth/react";
 
@@ -30,33 +32,14 @@ const Header = () => {
   const searchParams = useSearchParams();
   const { data: session } = useSession();
   const [isOpen, setIsOpen] = useState<boolean>(false);
-  const [pendingRequests, setPendingRequests] = useState(0);
+  const pendingRequests = useFriendRequestCount();
 
   // setIsOpen(false) when the route changes (i.e: when the user clicks on a link on mobile)
   useEffect(() => {
     setIsOpen(false);
   }, [searchParams]);
 
-  // Fetch friend request count for logged-in users
-  useEffect(() => {
-    if (!session?.user?.id) return;
 
-    const fetchPendingRequests = async () => {
-      try {
-        const response = await fetch('/api/user/friend-requests-count');
-        if (response.ok) {
-          const data = await response.json();
-          setPendingRequests(data.count || 0);
-        }
-      } catch (error) {
-        console.error('Error fetching friend requests:', error);
-      }
-    };
-
-    fetchPendingRequests();
-    const interval = setInterval(fetchPendingRequests, 30000);
-    return () => clearInterval(interval);
-  }, [session]);
 
   const loggedInNavItems = [
     { href: "/dashboard", label: "Dashboard", icon: FaHome },
@@ -103,7 +86,7 @@ const Header = () => {
         <div className="flex lg:hidden">
           <button
             type="button"
-            className="-m-2.5 inline-flex items-center justify-center rounded-md p-2.5"
+            className="-m-2.5 inline-flex items-center justify-center rounded-md p-2.5 relative"
             onClick={() => setIsOpen(true)}
           >
             <span className="sr-only">Open main menu</span>
@@ -121,6 +104,12 @@ const Header = () => {
                 d="M3.75 6.75h16.5M3.75 12h16.5m-16.5 5.25h16.5"
               />
             </svg>
+            {/* Friend request notification badge */}
+            {session && pendingRequests > 0 && (
+              <span className="absolute -top-1 -right-1 bg-error text-error-content text-xs rounded-full h-5 w-5 flex items-center justify-center font-medium animate-pulse">
+                {pendingRequests > 9 ? '9+' : pendingRequests}
+              </span>
+            )}
           </button>
         </div>
 
@@ -137,6 +126,13 @@ const Header = () => {
             </Link>
           ))}
         </div>
+
+        {/* Search Bar */}
+        {session && (
+          <div className="hidden lg:flex lg:justify-center lg:flex-1 lg:max-w-lg lg:mx-6">
+            <SearchBar placeholder="Find dancers..." compact className="w-full" />
+          </div>
+        )}
 
         {/* CTA on large screens */}
         <div className="hidden lg:flex lg:justify-end lg:flex-1">
@@ -267,6 +263,11 @@ const Header = () => {
                     <h3 className="font-semibold truncate">{session.user?.name || "User"}</h3>
                     <p className="text-sm text-base-content/60 truncate">{session.user?.email}</p>
                   </div>
+                </div>
+
+                {/* Search Bar */}
+                <div className="py-4 border-b border-base-300">
+                  <SearchBar placeholder="Find dancers..." />
                 </div>
 
                 {/* Navigation Items */}

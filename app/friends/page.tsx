@@ -18,9 +18,30 @@ export default async function FriendsPage() {
   let user;
   try {
     user = await User.findById(session.user.id)
-      .populate("friends", "name image username city")
-      .populate("friendRequestsReceived.user", "name image username city")
-      .populate("friendRequestsSent.user", "name image username city")
+      .populate({
+        path: "friends",
+        select: "name image username city",
+        populate: {
+          path: "city",
+          select: "name"
+        }
+      })
+      .populate({
+        path: "friendRequestsReceived.user",
+        select: "name image username city",
+        populate: {
+          path: "city",
+          select: "name"
+        }
+      })
+      .populate({
+        path: "friendRequestsSent.user", 
+        select: "name image username city",
+        populate: {
+          path: "city",
+          select: "name"
+        }
+      })
       .populate("likedBy", "name image username")
       .lean();
   } catch (error) {

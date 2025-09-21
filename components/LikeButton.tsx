@@ -4,21 +4,25 @@ import { useState } from "react";
 import { FaHeart } from "react-icons/fa";
 import { useSession } from "next-auth/react";
 import Link from "next/link";
+import { useLikes } from "@/contexts/LikesContext";
 
 interface LikeButtonProps {
   targetUserId: string;
   initialLikesCount: number;
   initialIsLiked: boolean;
   className?: string;
+  onLikeUpdate?: (newLikesCount: number, newIsLiked: boolean) => void;
 }
 
 export default function LikeButton({ 
   targetUserId, 
   initialLikesCount, 
   initialIsLiked,
-  className = ""
+  className = "",
+  onLikeUpdate
 }: LikeButtonProps) {
   const { data: session } = useSession();
+  const { updateLikesCount } = useLikes();
   const [likesCount, setLikesCount] = useState(initialLikesCount);
   const [isLiked, setIsLiked] = useState(initialIsLiked);
   const [isLoading, setIsLoading] = useState(false);
@@ -43,8 +47,19 @@ export default function LikeButton({
       const data = await response.json();
 
       if (data.success) {
-        setIsLiked(data.action === 'liked');
-        setLikesCount(data.likesCount);
+        const newIsLiked = data.action === 'liked';
+        const newLikesCount = data.likesCount;
+        
+        setIsLiked(newIsLiked);
+        setLikesCount(newLikesCount);
+        
+        // Update context so other components know
+        updateLikesCount(targetUserId, newLikesCount);
+        
+        // Notify parent component of the update
+        if (onLikeUpdate) {
+          onLikeUpdate(newLikesCount, newIsLiked);
+        }
       }
     } catch (error) {
       console.error('Error liking profile:', error);

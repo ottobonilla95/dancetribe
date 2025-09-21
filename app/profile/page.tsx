@@ -455,7 +455,10 @@ export default async function Profile() {
             />
           </div>
 
-          <div>
+          <div className="flex gap-4 justify-center">
+            <Link href="/onboarding?mode=edit" className="btn btn-secondary btn-lg">
+              ✏️ Edit Profile
+            </Link>
             <Link href="/dashboard" className="btn btn-primary btn-lg">
               Back to Dashboard
             </Link>
