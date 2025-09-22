@@ -109,6 +109,9 @@ export default async function Profile() {
         levelLabel: levelInfo?.label || "Beginner",
         levelEmoji: levelInfo?.emoji || "🌱",
         description: styleDescription,
+        id: typeof userStyle.danceStyle === "object" 
+          ? userStyle.danceStyle._id || userStyle.danceStyle.id
+          : userStyle.danceStyle,
       };
     });
   };
@@ -197,7 +200,10 @@ export default async function Profile() {
                     {/* Current Location */}
                     {userData.city && typeof userData.city === "object" && (
                       <div className="mt-1">
-                        <div className="">
+                        <Link 
+                          href={`/city/${userData.city._id || userData.city.id}`}
+                          className="hover:text-primary transition-colors"
+                        >
                           📍 {userData.city.name}
                           {userData.city.country && (
                             <span className="text-base-content/60">
@@ -206,7 +212,7 @@ export default async function Profile() {
                                 : userData.city.country.name}
                             </span>
                           )}
-                        </div>
+                        </Link>
                       </div>
                     )}
                     {/* Nationality */}
@@ -292,25 +298,28 @@ export default async function Profile() {
                       <div className="flex flex-wrap gap-3">
                         {userData.citiesVisited.map(
                           (city: any, index: number) => (
-                            <div
+                            <Link
                               key={index}
-                              className="flex items-center gap-2 bg-base-300 rounded-md h-10"
+                              href={`/city/${city._id || city.id || city}`}
+                              className="group"
                             >
-                              {city.image ? (
-                                <img
-                                  src={city.image}
-                                  alt={city.name}
-                                  className="h-full aspect-square rounded object-cover"
-                                />
-                              ) : (
-                                <div className="h-full aspect-square rounded bg-primary/20 flex items-center justify-center">
-                                  <span className="text-xs">🌍</span>
-                                </div>
-                              )}
-                              <span className="text-sm font-medium pl-2 pr-4 py-2">
-                                {typeof city === "string" ? city : city.name}
-                              </span>
-                            </div>
+                              <div className="flex items-center gap-2 bg-base-300 rounded-md h-10 hover:bg-base-200 transition-colors cursor-pointer">
+                                {city.image ? (
+                                  <img
+                                    src={city.image}
+                                    alt={city.name}
+                                    className="h-full aspect-square rounded object-cover"
+                                  />
+                                ) : (
+                                  <div className="h-full aspect-square rounded bg-primary/20 flex items-center justify-center">
+                                    <span className="text-xs">🌍</span>
+                                  </div>
+                                )}
+                                <span className="text-sm font-medium pl-2 pr-4 py-2 group-hover:text-primary">
+                                  {typeof city === "string" ? city : city.name}
+                                </span>
+                              </div>
+                            </Link>
                           )
                         )}
                       </div>
