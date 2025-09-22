@@ -151,7 +151,14 @@ const Header = () => {
                 <div tabIndex={0} role="button" className="btn btn-ghost btn-circle avatar">
                   <div className="w-8 rounded-full">
                     {session.user?.image ? (
-                      <img src={session.user.image} alt={session.user?.name || "Profile"} />
+                      <Image
+                        src={session.user.image}
+                        alt={session.user?.name || "Profile"}
+                        width={32}
+                        height={32}
+                        className="rounded-full object-cover"
+                        unoptimized
+                      />
                     ) : (
                       <div className="bg-primary text-primary-content rounded-full w-full h-full flex items-center justify-center">
                         <span className="text-sm font-bold">
@@ -245,10 +252,13 @@ const Header = () => {
                   <div className="avatar">
                     <div className="w-12 h-12 rounded-full">
                       {session.user?.image ? (
-                        <img
+                        <Image
                           src={session.user.image}
                           alt={session.user?.name || "Profile"}
+                          width={48}
+                          height={48}
                           className="w-full h-full object-cover rounded-full"
+                          unoptimized
                         />
                       ) : (
                         <div className="bg-primary text-primary-content rounded-full w-full h-full flex items-center justify-center">

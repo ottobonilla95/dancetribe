@@ -26,7 +26,9 @@ export default async function LayoutPrivate({
       <Suspense>
         <Header />
       </Suspense>
-      {children}
+      <Suspense fallback={<div className="flex justify-center items-center min-h-screen"><span className="loading loading-spinner loading-lg"></span></div>}>
+        {children}
+      </Suspense>
     </>
   );
 }

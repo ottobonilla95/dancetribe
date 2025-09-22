@@ -170,11 +170,11 @@ const ShareToStory: React.FC<ShareToStoryProps> = ({ userData }) => {
       </div>
 
       {/* Share Button */}
-      <div className="flex justify-center">
+      <div className="w-full">
         <button
           onClick={handleShare}
           disabled={isGenerating}
-          className={`btn ${isGenerating ? 'btn-disabled' : 'btn-primary'} gap-2`}
+          className={`btn ${isGenerating ? 'btn-disabled' : 'btn-primary'} gap-2 w-full`}
         >
           {isGenerating ? (
             <>

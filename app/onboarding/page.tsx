@@ -2,6 +2,7 @@
 
 import React, { useState, useEffect, useRef } from "react";
 import { useSession } from "next-auth/react";
+import { useSearchParams } from "next/navigation";
 import apiClient from "@/libs/api";
 import { User, DanceStyle, City, UserDanceStyle } from "@/types";
 import { DANCE_LEVELS } from "@/constants/dance-levels";
@@ -20,10 +21,10 @@ interface OnboardingStep {
 
 export default function Onboarding() {
   const { update } = useSession();
+  const searchParams = useSearchParams();
 
   // Check if we're in edit mode
-  const urlParams = new URLSearchParams(window.location.search);
-  const isEditMode = urlParams.get("mode") === "edit";
+  const isEditMode = searchParams.get("mode") === "edit";
   const [loading, setLoading] = useState(true);
   const [currentStep, setCurrentStep] = useState(0);
   const [user, setUser] = useState<User>(null);
@@ -214,6 +215,7 @@ export default function Onboarding() {
 
       // Redirect completed users to dashboard (unless in edit mode)
       if (userData.isProfileComplete && !isEditMode) {
+        console.log("🚀 Redirecting to dashboard...");
         window.location.href = "/dashboard";
         return;
       }
@@ -292,20 +294,26 @@ export default function Onboarding() {
       }
 
       // Find the current step based on completion
-      try {
-        const incompleteStepIndex = steps.findIndex(
-          (step) =>
-            !userData.onboardingSteps?.[
-              step.id as keyof typeof userData.onboardingSteps
-            ]
-        );
-        setCurrentStep(
-          incompleteStepIndex !== -1 ? incompleteStepIndex : steps.length - 1
-        );
-      } catch (stepError) {
-        console.error("Error finding current step:", stepError);
-        // Default to first step if there's an error
+      if (isEditMode) {
+        // In edit mode, always start from the first step
         setCurrentStep(0);
+      } else {
+        // In onboarding mode, find the first incomplete step
+        try {
+          const incompleteStepIndex = steps.findIndex(
+            (step) =>
+              !userData.onboardingSteps?.[
+                step.id as keyof typeof userData.onboardingSteps
+              ]
+          );
+          setCurrentStep(
+            incompleteStepIndex !== -1 ? incompleteStepIndex : steps.length - 1
+          );
+        } catch (stepError) {
+          console.error("Error finding current step:", stepError);
+          // Default to first step if there's an error
+          setCurrentStep(0);
+        }
       }
 
       setLoading(false);
@@ -589,6 +597,12 @@ export default function Onboarding() {
     fetchUserProfile();
     fetchDanceStyles();
   }, []);
+
+  // Add a refresh function for testing
+  const refreshUserData = async () => {
+    setLoading(true);
+    await fetchUserProfile();
+  };
 
   useEffect(() => {
     return () => {

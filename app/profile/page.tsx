@@ -226,6 +226,32 @@ export default async function Profile() {
                     )}
                   </div>
                 </div>
+                
+                {/* Profile Actions */}
+                <div className="mt-6 space-y-3">
+                  <Link href="/onboarding?mode=edit" className="btn btn-secondary btn-sm w-full">
+                    ✏️ Edit Profile
+                  </Link>
+                  <div className="w-full">
+                    <ShareToStory
+                      userData={{
+                        id: userData._id,
+                        name: userData.name,
+                        username: userData.username,
+                        profilePicture: userData.image,
+                        dateOfBirth: userData.dateOfBirth,
+                        nationality: userData.nationality,
+                        danceRole: userData.danceRole,
+                        city: userData.city,
+                        danceStyles:
+                          userData.danceStyles?.map((userStyle: any) => ({
+                            name: userStyle.danceStyle?.name || userStyle.danceStyle,
+                            level: userStyle.level || "beginner",
+                          })) || [],
+                      }}
+                    />
+                  </div>
+                </div>
               </div>
             </div>
           </div>
@@ -434,35 +460,10 @@ export default async function Profile() {
         </div>
 
         {/* Actions */}
-        <div className="text-center mt-8 space-y-4">
-          <div>
-            <ShareToStory
-              userData={{
-                id: userData._id,
-                name: userData.name,
-                username: userData.username,
-                profilePicture: userData.image,
-                dateOfBirth: userData.dateOfBirth,
-                nationality: userData.nationality,
-                danceRole: userData.danceRole,
-                city: userData.city,
-                danceStyles:
-                  userData.danceStyles?.map((userStyle: any) => ({
-                    name: userStyle.danceStyle?.name || userStyle.danceStyle,
-                    level: userStyle.level || "beginner",
-                  })) || [],
-              }}
-            />
-          </div>
-
-          <div className="flex gap-4 justify-center">
-            <Link href="/onboarding?mode=edit" className="btn btn-secondary btn-lg">
-              ✏️ Edit Profile
-            </Link>
-            <Link href="/dashboard" className="btn btn-primary btn-lg">
-              Back to Dashboard
-            </Link>
-          </div>
+        <div className="text-center mt-8">
+          <Link href="/dashboard" className="btn btn-primary btn-lg">
+            Back to Dashboard
+          </Link>
         </div>
       </div>
     </div>

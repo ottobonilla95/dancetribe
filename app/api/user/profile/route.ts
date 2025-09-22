@@ -24,11 +24,31 @@ export async function GET() {
         path: "city",
         model: City,
         select: "name country continent rank image",
+        populate: [
+          {
+            path: "country",
+            select: "name",
+          },
+          {
+            path: "continent",
+            select: "name",
+          },
+        ],
       })
       .populate({
         path: "citiesVisited",
         model: City,
         select: "name country continent rank image",
+        populate: [
+          {
+            path: "country",
+            select: "name",
+          },
+          {
+            path: "continent",
+            select: "name",
+          },
+        ],
       })
       .populate({
         path: "danceStyles.danceStyle",

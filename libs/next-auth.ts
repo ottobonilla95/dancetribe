@@ -88,7 +88,7 @@ export const authOptions: NextAuthOptionsExtended = {
   },
   callbacks: {
     jwt: async ({ token, user, trigger }) => {
-      // When user signs in or token is updated, fetch their profile completion status
+      // When user signs in or token is updated, fetch their profile completion status and image
       if (user?.id || trigger === 'update') {
         try {
           // Use mongoose for database operations
@@ -96,11 +96,12 @@ export const authOptions: NextAuthOptionsExtended = {
           await connectMongoose();
           
           const User = (await import('@/models/User')).default;
-          const userData = await User.findById(token.sub || user?.id).select('isProfileComplete onboardingSteps');
+          const userData = await User.findById(token.sub || user?.id).select('isProfileComplete onboardingSteps image name');
           
           console.log('🔍 JWT Callback - User data:', {
             userId: token.sub || user?.id,
             isProfileComplete: userData?.isProfileComplete,
+            hasCustomImage: !!userData?.image,
             trigger
           });
           
@@ -111,8 +112,17 @@ export const authOptions: NextAuthOptionsExtended = {
             token.isProfileComplete = userData?.isProfileComplete || false;
           }
           
+          // Update token with current user image and name
+          if (userData?.image) {
+            token.picture = userData.image;
+          }
+          if (userData?.name) {
+            token.name = userData.name;
+          }
+          
           console.log('🔍 JWT Callback - Token updated:', {
-            isProfileComplete: token.isProfileComplete
+            isProfileComplete: token.isProfileComplete,
+            picture: token.picture
           });
         } catch (error) {
           console.error('Error fetching user profile in JWT callback:', error);
@@ -125,6 +135,13 @@ export const authOptions: NextAuthOptionsExtended = {
       if (session?.user) {
         session.user.id = token.sub;
         session.user.isProfileComplete = token.isProfileComplete || false;
+        // Update session with current user image and name from token
+        if (token.picture) {
+          session.user.image = token.picture;
+        }
+        if (token.name) {
+          session.user.name = token.name;
+        }
       }
       return session;
     },
