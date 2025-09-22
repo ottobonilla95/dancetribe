@@ -19,7 +19,7 @@ export default function DanceStyleCard({ danceStyles }: DanceStyleCardProps) {
       <div className="text-sm font-medium text-base-content/60 mb-3">
         Dance Styles & Levels
       </div>
-      <div className="space-y-3">
+      <div className="space-y-4">
         {danceStyles.map((style: DanceStyle, index: number) => {
           // Convert level to number (1-4)
           const levelMap: { [key: string]: number } = {
@@ -58,7 +58,7 @@ export default function DanceStyleCard({ danceStyles }: DanceStyleCardProps) {
           );
 
           return style.id ? (
-            <Link key={index} href={`/dance-style/${style.id}`}>
+            <Link key={index} href={`/dance-style/${style.id}`} className="block">
               {content}
             </Link>
           ) : (
