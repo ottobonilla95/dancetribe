@@ -70,8 +70,16 @@ export default function Onboarding() {
   );
   const [gender, setGender] = useState<"male" | "female" | "other" | "">("");
   const [nationality, setNationality] = useState("");
+  const [firstName, setFirstName] = useState("");
+  const [lastName, setLastName] = useState("");
 
   const steps: OnboardingStep[] = [
+    {
+      id: "nameDetails",
+      title: "What's your name?",
+      description: "Tell us your first and last name",
+      completed: user?.onboardingSteps?.nameDetails || false,
+    },
     {
       id: "username",
       title: "Choose your username",
@@ -292,6 +300,12 @@ export default function Onboarding() {
       if (userData.nationality) {
         setNationality(userData.nationality);
       }
+      if (userData.firstName) {
+        setFirstName(userData.firstName);
+      }
+      if (userData.lastName) {
+        setLastName(userData.lastName);
+      }
 
       // Find the current step based on completion
       if (isEditMode) {
@@ -339,6 +353,17 @@ export default function Onboarding() {
     let stepData: any = {};
 
     switch (step.id) {
+      case "nameDetails":
+        if (!firstName.trim()) {
+          alert("Please enter your first name");
+          return;
+        }
+        if (!lastName.trim()) {
+          alert("Please enter your last name");
+          return;
+        }
+        stepData = { firstName: firstName.trim(), lastName: lastName.trim() };
+        break;
       case "danceStyles":
         if (danceStyles.length === 0) {
           alert("Please select at least one dance style");
@@ -649,6 +674,36 @@ export default function Onboarding() {
             <p className="text-base-content/70 mb-6">
               {steps[currentStep].description}
             </p>
+
+            {/* Name Details */}
+            {steps[currentStep].id === "nameDetails" && (
+              <div className="form-control space-y-4">
+                <div className="form-control">
+                  <label className="label">
+                    <span className="label-text">First Name</span>
+                  </label>
+                  <input
+                    type="text"
+                    className="input input-bordered w-full"
+                    placeholder="e.g., Sarah"
+                    value={firstName}
+                    onChange={(e) => setFirstName(e.target.value)}
+                  />
+                </div>
+                <div className="form-control">
+                  <label className="label">
+                    <span className="label-text">Last Name</span>
+                  </label>
+                  <input
+                    type="text"
+                    className="input input-bordered w-full"
+                    placeholder="e.g., Johnson"
+                    value={lastName}
+                    onChange={(e) => setLastName(e.target.value)}
+                  />
+                </div>
+              </div>
+            )}
 
             {/* Dance Styles */}
             {steps[currentStep].id === "danceStyles" && (

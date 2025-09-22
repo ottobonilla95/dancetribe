@@ -4,6 +4,8 @@ import { UserDanceStyle } from "./dance-style";
 export type User = {
   _id: string;
   name: string;
+  firstName?: string;
+  lastName?: string;
   email: string;
   image?: string;
   username?: string;
@@ -31,6 +33,7 @@ export type User = {
 }
 
 export interface OnboardingSteps {
+  nameDetails: boolean;
   danceStyles: boolean;
   username: boolean;
   profilePic: boolean;

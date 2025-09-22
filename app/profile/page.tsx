@@ -26,7 +26,7 @@ export default async function Profile() {
 
   const user = await User.findById(session.user.id)
     .select(
-      "name username email image dateOfBirth city citiesVisited danceStyles anthem socialMedia danceRole gender nationality createdAt"
+      "name firstName lastName username email image dateOfBirth city citiesVisited danceStyles anthem socialMedia danceRole gender nationality createdAt"
     )
     .populate({
       path: "city",
@@ -190,7 +190,10 @@ export default async function Profile() {
                   </div>
                   <div>
                     <h2 className="card-title text-2xl mb-1">
-                      {`${userData.name.charAt(0).toUpperCase() + userData.name.slice(1)}, ${age}`}
+                      {userData.firstName && userData.lastName 
+                        ? `${userData.firstName} ${userData.lastName}, ${age}`
+                        : `${userData.name?.charAt(0)?.toUpperCase() + userData.name?.slice(1)}, ${age}`
+                      }
                     </h2>
                     {zodiac && (
                       <div className="mt-1 text-small">

@@ -8,6 +8,14 @@ const userSchema = new mongoose.Schema(
       type: String,
       trim: true,
     },
+    firstName: {
+      type: String,
+      trim: true,
+    },
+    lastName: {
+      type: String,
+      trim: true,
+    },
     // Unique username for short URLs (e.g., @sarah_dancer)
     username: {
       type: String,
@@ -113,6 +121,7 @@ const userSchema = new mongoose.Schema(
     },
     // Onboarding completion tracking
     onboardingSteps: {
+      nameDetails: { type: Boolean, default: false },
       danceStyles: { type: Boolean, default: false },
       username: { type: Boolean, default: false },
       profilePic: { type: Boolean, default: false },

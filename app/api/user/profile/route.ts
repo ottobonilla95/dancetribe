@@ -5,6 +5,8 @@ import connectMongo from "@/libs/mongoose";
 import User from "@/models/User";
 import City from "@/models/City";
 import DanceStyle from "@/models/DanceStyle";
+import Country from "@/models/Country";
+import Continent from "@/models/Continent";
 
 export async function GET() {
   const session = await getServerSession(authOptions);
@@ -18,37 +20,41 @@ export async function GET() {
 
     const user = await User.findById(session.user.id)
       .select(
-        "name username email image dateOfBirth city citiesVisited danceStyles anthem socialMedia danceRole gender nationality onboardingSteps isProfileComplete createdAt"
+        "name firstName lastName username email image dateOfBirth city citiesVisited danceStyles anthem socialMedia danceRole gender nationality onboardingSteps isProfileComplete createdAt"
       )
       .populate({
         path: "city",
         model: City,
-        select: "name country continent rank image",
+        select: "name country continent rank image population totalDancers",
         populate: [
           {
             path: "country",
-            select: "name",
+            model: Country,
+            select: "name code"
           },
           {
-            path: "continent",
-            select: "name",
-          },
-        ],
+            path: "continent", 
+            model: Continent,
+            select: "name code"
+          }
+        ]
       })
       .populate({
         path: "citiesVisited",
         model: City,
-        select: "name country continent rank image",
+        select: "name country continent rank image population totalDancers",
         populate: [
           {
             path: "country",
-            select: "name",
+            model: Country,
+            select: "name code"
           },
           {
             path: "continent",
-            select: "name",
-          },
-        ],
+            model: Continent,
+            select: "name code"
+          }
+        ]
       })
       .populate({
         path: "danceStyles.danceStyle",
@@ -88,8 +94,20 @@ export async function PUT(req: NextRequest) {
       return NextResponse.json({ error: "User not found" }, { status: 404 });
     }
 
+    // Initialize missing onboarding steps for existing users
+    if (!user.onboardingSteps.hasOwnProperty('nameDetails')) {
+      user.onboardingSteps.nameDetails = false;
+    }
+
     // Update specific onboarding step
     switch (step) {
+      case "nameDetails":
+        user.firstName = data.firstName;
+        user.lastName = data.lastName;
+        user.name = `${data.firstName} ${data.lastName}`.trim();
+        user.onboardingSteps.nameDetails = true;
+        break;
+
       case "danceStyles":
         user.danceStyles = data.danceStyles;
         user.onboardingSteps.danceStyles = true;
@@ -182,14 +200,6 @@ export async function PUT(req: NextRequest) {
     const isComplete = Object.values(steps).every((step) => step === true);
     const wasCompleteBeforeSave = user.isProfileComplete;
     user.isProfileComplete = isComplete;
-
-    console.log("🔍 Profile completion check:", {
-      step: step,
-      allSteps: steps,
-      isComplete,
-      wasCompleteBeforeSave,
-      willSignalCompletion: isComplete && !wasCompleteBeforeSave
-    });
 
     await user.save();
 

@@ -65,6 +65,7 @@ export const authOptions: NextAuthOptionsExtended = {
           $set: {
             isProfileComplete: false,
             onboardingSteps: {
+              nameDetails: false,
               danceStyles: false,
               username: false,
               profilePic: false,
