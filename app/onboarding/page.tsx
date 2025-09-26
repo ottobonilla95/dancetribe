@@ -481,15 +481,18 @@ export default function Onboarding() {
       console.log("🔍 API Response:", response);
 
       // Check if profile was just completed
-      if (response.data?.profileCompleted) {
+      if (response.data?.isProfileComplete) {
         console.log(
           "🎉 Profile completed! Updating session and redirecting..."
         );
 
         try {
           // Update the session to reflect profile completion
-          await update();
-          console.log("✅ Session updated successfully");
+          const updatedSession = await update();
+          console.log("✅ Session updated successfully:", updatedSession);
+          
+          // Wait a moment to ensure session is propagated
+          await new Promise(resolve => setTimeout(resolve, 1000));
         } catch (sessionError) {
           console.error("❌ Failed to update session:", sessionError);
         }
@@ -622,12 +625,6 @@ export default function Onboarding() {
     fetchUserProfile();
     fetchDanceStyles();
   }, []);
-
-  // Add a refresh function for testing
-  const refreshUserData = async () => {
-    setLoading(true);
-    await fetchUserProfile();
-  };
 
   useEffect(() => {
     return () => {
