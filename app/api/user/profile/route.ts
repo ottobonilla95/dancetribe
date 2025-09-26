@@ -94,11 +94,6 @@ export async function PUT(req: NextRequest) {
       return NextResponse.json({ error: "User not found" }, { status: 404 });
     }
 
-    // Initialize missing onboarding steps for existing users
-    if (!user.onboardingSteps.hasOwnProperty('nameDetails')) {
-      user.onboardingSteps.nameDetails = false;
-    }
-
     // Update specific onboarding step
     switch (step) {
       case "nameDetails":
