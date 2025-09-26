@@ -41,7 +41,7 @@ export default async function CityPage({ params, searchParams }: Props) {
   const isLoggedIn = !!session;
 
   // Pagination setup
-  const currentPage = parseInt(searchParams.page || '1');
+  const currentPage = parseInt(searchParams.page || "1");
   const dancersPerPage = 12;
   const skip = (currentPage - 1) * dancersPerPage;
 
@@ -190,7 +190,7 @@ export default async function CityPage({ params, searchParams }: Props) {
             <div className="stat-value text-secondary">
               {totalDancersWhoVisited}
             </div>
-            <div className="stat-desc">Dancers who've visited for dance</div>
+            <div className="stat-desc">Dancers who&apos;ve visited for dance</div>
           </div>
 
           <div className="stat bg-base-200 rounded-lg">
@@ -251,7 +251,8 @@ export default async function CityPage({ params, searchParams }: Props) {
                 <div className="flex justify-between items-center mb-4">
                   <h2 className="card-title">Dancers in {city.name}</h2>
                   <span className="text-sm text-base-content/60">
-                    Page {currentPage} of {totalPages} ({formatNumber(totalDancers)} total)
+                    Page {currentPage} of {totalPages} (
+                    {formatNumber(totalDancers)} total)
                   </span>
                 </div>
 

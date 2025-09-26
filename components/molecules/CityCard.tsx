@@ -10,13 +10,19 @@ interface CityCardProps {
 const CityCard = ({ city, index }: CityCardProps) => {
   return (
     <Link href={`/city/${city._id}`}>
-      <div className="relative group cursor-pointer bg-base-100 rounded-lg shadow-lg overflow-hidden hover:shadow-xl transition-shadow duration-300">
-        {city.image && (
+      <div className="relative group cursor-pointer bg-base-100 rounded-lg shadow-lg overflow-hidden hover:shadow-xl transition-shadow duration-300 h-48">
+        {city.image ? (
           <img
             src={city.image}
             alt={`${city.name}, ${city.country}`}
             className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-110"
           />
+        ) : (
+          <div className="w-full h-full bg-gradient-to-br from-primary/20 to-primary/40 flex items-center justify-center">
+            <h2 className="text-3xl font-bold text-center px-4 text-primary">
+              {city.name}
+            </h2>
+          </div>
         )}
         <div className="absolute bottom-0 left-0 w-full h-[40%] bg-gradient-to-b from-black/10 to-black/100" />
         <div className="absolute top-0 left-0 w-full h-full">

@@ -234,7 +234,7 @@ export default function SearchBar({
 
           {!isLoading && !error && query.length >= 2 && results.length === 0 && (
             <div className="p-4 text-center text-base-content/60">
-              No dancers found for "{query}"
+              No dancers found for &quot;{query}&quot;
             </div>
           )}
         </div>
