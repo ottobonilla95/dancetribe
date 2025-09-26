@@ -478,10 +478,8 @@ export default function Onboarding() {
         data: stepData,
       });
 
-      console.log("🔍 API Response:", response);
-
       // Check if profile was just completed
-      if (response.data?.isProfileComplete) {
+      if (response.data?.profileCompleted) {
         console.log(
           "🎉 Profile completed! Updating session and redirecting..."
         );
@@ -490,9 +488,9 @@ export default function Onboarding() {
           // Update the session to reflect profile completion
           const updatedSession = await update();
           console.log("✅ Session updated successfully:", updatedSession);
-          
+
           // Wait a moment to ensure session is propagated
-          await new Promise(resolve => setTimeout(resolve, 1000));
+          await new Promise((resolve) => setTimeout(resolve, 1000));
         } catch (sessionError) {
           console.error("❌ Failed to update session:", sessionError);
         }
