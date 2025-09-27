@@ -5,8 +5,6 @@ import { redirect } from "next/navigation";
 import Header from "@/components/Header";
 import Hero from "@/components/Hero";
 import CityList from "@/components/organisims/CityList";
-// import FeaturesAccordion from "@/components/FeaturesAccordion";
-// import FAQ from "@/components/FAQ";
 import CTA from "@/components/CTA";
 import Footer from "@/components/Footer";
 import connectMongo from "@/libs/mongoose";
@@ -56,7 +54,7 @@ export default async function Home() {
       </Suspense>
       <main>
         <Hero />
-        <CityList cities={cities} />
+        <CityList initialCities={cities} />
         <CTA />
       </main>
       <Footer />
