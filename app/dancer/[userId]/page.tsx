@@ -12,7 +12,6 @@ import {
   FaInstagram,
   FaTiktok,
   FaYoutube,
-  FaUserPlus,
   FaHeart,
 } from "react-icons/fa";
 import Flag from "@/components/Flag";
@@ -93,15 +92,6 @@ export default async function PublicProfile({ params }: Props) {
     }
 
     return age;
-  };
-
-  const formatDate = (date: Date | string) => {
-    if (!date) return "Not set";
-    return new Date(date).toLocaleDateString("en-US", {
-      year: "numeric",
-      month: "long",
-      day: "numeric",
-    });
   };
 
   const getDanceStylesWithLevels = (userDanceStyles: any[]) => {

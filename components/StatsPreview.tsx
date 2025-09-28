@@ -111,7 +111,7 @@ export default function StatsPreview({
             <>
               <div className="stat-value text-info text-sm">No Data</div>
               <div className="stat-desc text-xs">
-                Users haven't set roles yet
+                Users haven&apos;t set roles yet
               </div>
             </>
           )}
