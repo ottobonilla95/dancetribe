@@ -22,7 +22,7 @@ async function getInitialDancers(currentUserId: string) {
 
     // Get current user's city
     const currentUser = await User.findById(currentUserId).select("city");
-    
+
     // Simple: just get local dancers (since "Near Me" is default)
     const users = await User.find({
       _id: { $ne: currentUserId },
@@ -36,7 +36,7 @@ async function getInitialDancers(currentUserId: string) {
           path: "country",
           model: Country,
           select: "name code",
-        }, 
+        },
       })
       .select("-email -friendRequestsSent -friendRequestsReceived -friends")
       .sort({ updatedAt: -1, createdAt: -1 })
@@ -104,7 +104,9 @@ async function getDanceStyles(): Promise<DanceStyleType[]> {
   }
 }
 
-async function getHotDanceStyles(): Promise<(DanceStyleType & { userCount: number })[]> {
+async function getHotDanceStyles(): Promise<
+  (DanceStyleType & { userCount: number })[]
+> {
   try {
     await connectMongo();
 
@@ -118,8 +120,8 @@ async function getHotDanceStyles(): Promise<(DanceStyleType & { userCount: numbe
       {
         $group: {
           _id: "$danceStyles.danceStyle",
-          userCount: { $sum: 1 }
-        }
+          userCount: { $sum: 1 },
+        },
       },
       // Sort by user count (most popular first)
       { $sort: { userCount: -1 } },
@@ -131,8 +133,8 @@ async function getHotDanceStyles(): Promise<(DanceStyleType & { userCount: numbe
           from: "dancestyles",
           localField: "_id",
           foreignField: "_id",
-          as: "styleDetails"
-        }
+          as: "styleDetails",
+        },
       },
       // Unwind style details
       { $unwind: "$styleDetails" },
@@ -145,9 +147,9 @@ async function getHotDanceStyles(): Promise<(DanceStyleType & { userCount: numbe
           name: "$styleDetails.name",
           category: "$styleDetails.category",
           isActive: "$styleDetails.isActive",
-          userCount: 1
-        }
-      }
+          userCount: 1,
+        },
+      },
     ]);
 
     return hotStyles.map((style: any) => ({
@@ -176,8 +178,8 @@ async function getCommunityStats() {
           from: "cities",
           localField: "city",
           foreignField: "_id",
-          as: "cityData"
-        }
+          as: "cityData",
+        },
       },
       { $unwind: "$cityData" },
       {
@@ -185,19 +187,19 @@ async function getCommunityStats() {
           from: "countries",
           localField: "cityData.country",
           foreignField: "_id",
-          as: "countryData"
-        }
+          as: "countryData",
+        },
       },
       { $unwind: "$countryData" },
       { $group: { _id: "$countryData._id" } },
-      { $count: "totalCountries" }
+      { $count: "totalCountries" },
     ]);
 
     // Get unique cities count
     const cities = await User.aggregate([
       { $match: { isProfileComplete: true, city: { $exists: true } } },
       { $group: { _id: "$city" } },
-      { $count: "totalCities" }
+      { $count: "totalCities" },
     ]);
 
     // Get top dance style
@@ -212,43 +214,53 @@ async function getCommunityStats() {
           from: "dancestyles",
           localField: "_id",
           foreignField: "_id",
-          as: "styleDetails"
-        }
+          as: "styleDetails",
+        },
       },
-      { $unwind: "$styleDetails" }
+      { $unwind: "$styleDetails" },
     ]);
 
     // Get leader/follower ratio - simplified query
     const roleStats = await User.aggregate([
       { $match: { isProfileComplete: true } },
-      { $group: { _id: "$danceRole", count: { $sum: 1 } } }
+      { $group: { _id: "$danceRole", count: { $sum: 1 } } },
     ]);
 
     // Process role stats with correct mapping
     const roleData = { leaders: 0, followers: 0, both: 0 };
     roleStats.forEach((role: any) => {
       console.log("Processing role:", role); // Debug each role
-      if (role._id === 'leader') {
+      if (role._id === "leader") {
         roleData.leaders = role.count;
-      } else if (role._id === 'follower') {
+      } else if (role._id === "follower") {
         roleData.followers = role.count;
-      } else if (role._id === 'both') {
+      } else if (role._id === "both") {
         roleData.both = role.count;
       }
     });
 
     // Debug log
-    console.log("Role stats debug:", { roleStats, roleData, totalUsers: totalDancers });
+    console.log("Role stats debug:", {
+      roleStats,
+      roleData,
+      totalUsers: totalDancers,
+    });
 
     // Get category emoji for top style
     const getCategoryEmoji = (category: string) => {
       switch (category) {
-        case 'latin': return '🌶️';
-        case 'ballroom': return '👑';
-        case 'street': return '🏙️';
-        case 'contemporary': return '🎨';
-        case 'traditional': return '🏛️';
-        default: return '💃';
+        case "latin":
+          return "🌶️";
+        case "ballroom":
+          return "👑";
+        case "street":
+          return "🏙️";
+        case "contemporary":
+          return "🎨";
+        case "traditional":
+          return "🏛️";
+        default:
+          return "💃";
       }
     };
 
@@ -258,19 +270,19 @@ async function getCommunityStats() {
       {
         $lookup: {
           from: "cities",
-          localField: "city", 
+          localField: "city",
           foreignField: "_id",
-          as: "cityData"
-        }
+          as: "cityData",
+        },
       },
       { $unwind: "$cityData" },
       {
         $lookup: {
           from: "countries",
           localField: "cityData.country",
-          foreignField: "_id", 
-          as: "countryData"
-        }
+          foreignField: "_id",
+          as: "countryData",
+        },
       },
       { $unwind: "$countryData" },
       {
@@ -278,10 +290,10 @@ async function getCommunityStats() {
           _id: "$countryData._id",
           name: { $first: "$countryData.name" },
           code: { $first: "$countryData.code" },
-          dancerCount: { $sum: 1 }
-        }
+          dancerCount: { $sum: 1 },
+        },
       },
-      { $sort: { dancerCount: -1 } }
+      { $sort: { dancerCount: -1 } },
     ]);
 
     return {
@@ -291,21 +303,21 @@ async function getCommunityStats() {
       topDanceStyle: {
         name: topStyle[0]?.styleDetails?.name || "Bachata",
         count: topStyle[0]?.count || 0,
-        emoji: getCategoryEmoji(topStyle[0]?.styleDetails?.category || 'latin')
+        emoji: getCategoryEmoji(topStyle[0]?.styleDetails?.category || "latin"),
       },
       leaderFollowerRatio: roleData,
-      countryData: countryBreakdown
+      countryData: countryBreakdown,
     };
   } catch (error) {
     console.error("Error fetching community stats:", error);
-          return {
-        totalDancers: 0,
-        totalCountries: 0,
-        totalCities: 0,
-        topDanceStyle: { name: "Bachata", count: 0, emoji: "🌶️" },
-        leaderFollowerRatio: { leaders: 0, followers: 0, both: 0 },
-        countryData: []
-      };
+    return {
+      totalDancers: 0,
+      totalCountries: 0,
+      totalCities: 0,
+      topDanceStyle: { name: "Bachata", count: 0, emoji: "🌶️" },
+      leaderFollowerRatio: { leaders: 0, followers: 0, both: 0 },
+      countryData: [],
+    };
   }
 }
 
@@ -354,13 +366,14 @@ export default async function Dashboard() {
   }
 
   // Fetch data in parallel
-  const [initialDancers, danceStyles, cities, hotDanceStyles, communityStats] = await Promise.all([
-    getInitialDancers(session.user.id),
-    getDanceStyles(),
-    getCities(),
-    getHotDanceStyles(),
-    getCommunityStats(),
-  ]);
+  const [initialDancers, danceStyles, cities, hotDanceStyles, communityStats] =
+    await Promise.all([
+      getInitialDancers(session.user.id),
+      getDanceStyles(),
+      getCities(),
+      getHotDanceStyles(),
+      getCommunityStats(),
+    ]);
 
   return (
     <main className="min-h-screen pb-24 py-8">
@@ -370,22 +383,25 @@ export default async function Dashboard() {
           Hottest Dance Cities 🔥
         </h2>
         <CityList initialCities={cities} />
-        
-        {/* Community Stats Section */}
-        <div className="mt-12">
-          <StatsPreview stats={communityStats} countryData={communityStats.countryData} />
-        </div>
-        
+
         {/* Hot Dance Styles Section */}
         <div className="mt-12">
           <HotDanceStyles danceStyles={hotDanceStyles} />
         </div>
-        
+
         {/* Discovery Feed */}
         <div className="mt-12">
           <DiscoveryFeed
             initialDancers={initialDancers}
             danceStyles={danceStyles}
+          />
+        </div>
+
+        {/* Community Stats Section */}
+        <div className="mt-12">
+          <StatsPreview
+            stats={communityStats}
+            countryData={communityStats.countryData}
           />
         </div>
       </div>
