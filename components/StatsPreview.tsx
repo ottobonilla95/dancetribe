@@ -10,7 +10,12 @@ interface StatsPreviewProps {
     topDanceStyle: { name: string; count: number; emoji: string };
     leaderFollowerRatio: { leaders: number; followers: number; both: number };
   };
-  countryData?: Array<{ _id: string; name: string; code: string; dancerCount: number }>;
+  countryData?: Array<{
+    _id: string;
+    name: string;
+    code: string;
+    dancerCount: number;
+  }>;
 }
 
 export default function StatsPreview({
@@ -140,10 +145,9 @@ export default function StatsPreview({
       {countryData.length > 0 && (
         <div className="mt-8">
           <div className="mb-4">
-            <h3 className="text-lg font-semibold mb-2">Global Dance Community</h3>
-            <p className="text-sm text-base-content/70">
-              Explore where our dancers are located around the world
-            </p>
+            <h3 className="text-lg font-semibold mb-2">
+              Dancers around the world
+            </h3>
           </div>
           <WorldMap countryData={countryData} />
         </div>
