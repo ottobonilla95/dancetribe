@@ -20,7 +20,7 @@ export async function GET() {
 
     const user = await User.findById(session.user.id)
       .select(
-        "name firstName lastName username email image dateOfBirth city citiesVisited danceStyles anthem socialMedia danceRole gender nationality onboardingSteps isProfileComplete createdAt"
+        "name firstName lastName username email image dateOfBirth city citiesVisited danceStyles anthem socialMedia danceRole gender nationality onboardingSteps isProfileComplete isTeacher teacherProfile createdAt"
       )
       .populate({
         path: "city",
@@ -184,6 +184,23 @@ export async function PUT(req: NextRequest) {
       case "nationality":
         user.nationality = data.nationality;
         user.onboardingSteps.nationality = true;
+        break;
+
+      case "teacherInfo":
+        user.isTeacher = data.isTeacher;
+        if (data.isTeacher && data.teacherProfile) {
+          user.teacherProfile = {
+            bio: data.teacherProfile.bio,
+            yearsOfExperience: data.teacherProfile.yearsOfExperience,
+            contact: {
+              whatsapp: data.teacherProfile.contact?.whatsapp || "",
+              email: data.teacherProfile.contact?.email || "",
+            },
+          };
+        } else {
+          user.teacherProfile = undefined;
+        }
+        user.onboardingSteps.teacherInfo = true;
         break;
 
       default:

@@ -72,6 +72,13 @@ export default function Onboarding() {
   const [nationality, setNationality] = useState("");
   const [firstName, setFirstName] = useState("");
   const [lastName, setLastName] = useState("");
+  const [isTeacher, setIsTeacher] = useState(false);
+  const [teacherBio, setTeacherBio] = useState("");
+  const [yearsOfExperience, setYearsOfExperience] = useState("");
+  const [teacherContact, setTeacherContact] = useState({
+    whatsapp: "",
+    email: "",
+  });
 
   const steps: OnboardingStep[] = [
     {
@@ -145,6 +152,12 @@ export default function Onboarding() {
       title: "Connect your socials",
       description: "Let other dancers find you online",
       completed: user?.onboardingSteps?.socialMedia || false,
+    },
+    {
+      id: "teacherInfo",
+      title: "Are you a dance teacher?",
+      description: "Share your teaching experience and let students find you",
+      completed: user?.onboardingSteps?.teacherInfo || false,
     },
   ];
 
@@ -306,6 +319,19 @@ export default function Onboarding() {
       if (userData.lastName) {
         setLastName(userData.lastName);
       }
+      if (userData.isTeacher) {
+        setIsTeacher(userData.isTeacher);
+        if (userData.teacherProfile) {
+          setTeacherBio(userData.teacherProfile.bio || "");
+          setYearsOfExperience(
+            userData.teacherProfile.yearsOfExperience?.toString() || ""
+          );
+          setTeacherContact({
+            whatsapp: userData.teacherProfile.contact?.whatsapp || "",
+            email: userData.teacherProfile.contact?.email || "",
+          });
+        }
+      }
 
       // Find the current step based on completion
       if (isEditMode) {
@@ -458,6 +484,28 @@ export default function Onboarding() {
           return;
         }
         stepData = { nationality };
+        break;
+      case "teacherInfo":
+        // Validate at least one contact method if teacher
+        if (isTeacher && !teacherContact.whatsapp && !teacherContact.email) {
+          alert("Please provide at least one contact method (WhatsApp or Email)");
+          return;
+        }
+        stepData = {
+          isTeacher,
+          teacherProfile: isTeacher
+            ? {
+                bio: teacherBio,
+                yearsOfExperience: yearsOfExperience
+                  ? parseInt(yearsOfExperience)
+                  : undefined,
+                contact: {
+                  whatsapp: teacherContact.whatsapp || undefined,
+                  email: teacherContact.email || undefined,
+                },
+              }
+            : undefined,
+        };
         break;
       default:
         console.error("Unknown step:", step.id);
@@ -703,33 +751,64 @@ export default function Onboarding() {
             {/* Dance Styles */}
             {steps[currentStep].id === "danceStyles" && (
               <div className="form-control space-y-6">
-                <label className="label">
-                  <span className="label-text">
-                    Select your dance styles and skill levels
-                  </span>
-                </label>
+                {/* Partner Dance Styles */}
+                <div>
+                  <h3 className="font-semibold text-base-content mb-3">
+                    Partner Dances
+                  </h3>
+                  <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
+                    {danceStylesOptions
+                      .filter((style) => style.isPartnerDance)
+                      .map((style) => (
+                        <div
+                          key={style._id}
+                          className={`cursor-pointer flex-col gap-2 rounded-lg p-4 border transition-colors text-center ${
+                            isDanceStyleSelected(style._id || style.id)
+                              ? "bg-primary text-primary-content border-primary shadow-lg"
+                              : "bg-base-100 border-base-300 hover:bg-base-200"
+                          }`}
+                          onClick={() => {
+                            if (isDanceStyleSelected(style._id || style.id)) {
+                              removeDanceStyle(style._id || style.id);
+                            } else {
+                              addDanceStyle(style._id || style.id);
+                            }
+                          }}
+                        >
+                          <span className="font-medium">{style.name}</span>
+                        </div>
+                      ))}
+                  </div>
+                </div>
 
-                {/* Dance Style Selection */}
-                <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
-                  {danceStylesOptions.map((style) => (
-                    <div
-                      key={style._id}
-                      className={`cursor-pointer flex-col gap-2 rounded-lg p-4 border transition-colors text-center ${
-                        isDanceStyleSelected(style._id || style.id)
-                          ? "bg-primary text-primary-content border-primary shadow-lg"
-                          : "bg-base-100 border-base-300 hover:bg-base-200"
-                      }`}
-                      onClick={() => {
-                        if (isDanceStyleSelected(style._id || style.id)) {
-                          removeDanceStyle(style._id || style.id);
-                        } else {
-                          addDanceStyle(style._id || style.id);
-                        }
-                      }}
-                    >
-                      <span className="font-medium">{style.name}</span>
-                    </div>
-                  ))}
+                {/* Solo/Non-Partner Dance Styles */}
+                <div>
+                  <h3 className="font-semibold text-base-content mb-3">
+                    Solo Dances
+                  </h3>
+                  <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
+                    {danceStylesOptions
+                      .filter((style) => !style.isPartnerDance)
+                      .map((style) => (
+                        <div
+                          key={style._id}
+                          className={`cursor-pointer flex-col gap-2 rounded-lg p-4 border transition-colors text-center ${
+                            isDanceStyleSelected(style._id || style.id)
+                              ? "bg-primary text-primary-content border-primary shadow-lg"
+                              : "bg-base-100 border-base-300 hover:bg-base-200"
+                          }`}
+                          onClick={() => {
+                            if (isDanceStyleSelected(style._id || style.id)) {
+                              removeDanceStyle(style._id || style.id);
+                            } else {
+                              addDanceStyle(style._id || style.id);
+                            }
+                          }}
+                        >
+                          <span className="font-medium">{style.name}</span>
+                        </div>
+                      ))}
+                  </div>
                 </div>
 
                 {/* Level Selection for Selected Styles */}
@@ -1129,6 +1208,125 @@ export default function Onboarding() {
                     </option>
                   ))}
                 </select>
+              </div>
+            )}
+
+            {/* Teacher Info */}
+            {steps[currentStep].id === "teacherInfo" && (
+              <div className="space-y-4">
+                <div className="form-control">
+                  <label className="label cursor-pointer justify-start gap-4">
+                    <input
+                      type="checkbox"
+                      className="toggle toggle-primary"
+                      checked={isTeacher}
+                      onChange={(e) => setIsTeacher(e.target.checked)}
+                    />
+                    <div>
+                      <span className="label-text font-semibold">
+                        I am a dance teacher
+                      </span>
+                      <p className="text-sm text-base-content/60">
+                        Let students find and contact you
+                      </p>
+                    </div>
+                  </label>
+                </div>
+
+                {isTeacher && (
+                  <div className="space-y-4 border-t pt-4">
+                    <div className="form-control">
+                      <label className="label">
+                        <span className="label-text">Teaching Bio</span>
+                      </label>
+                      <textarea
+                        className="textarea textarea-bordered h-24"
+                        placeholder="Tell students about your teaching style, experience, and what makes your classes special..."
+                        value={teacherBio}
+                        onChange={(e) => setTeacherBio(e.target.value)}
+                      />
+                    </div>
+
+                    <div className="form-control">
+                      <label className="label">
+                        <span className="label-text">
+                          Years of Teaching Experience
+                        </span>
+                      </label>
+                      <input
+                        type="number"
+                        className="input input-bordered"
+                        placeholder="e.g., 5"
+                        min="0"
+                        max="50"
+                        value={yearsOfExperience}
+                        onChange={(e) => setYearsOfExperience(e.target.value)}
+                      />
+                    </div>
+
+                    <div className="divider">
+                      Contact Information (at least one required)
+                    </div>
+
+                    <div className="form-control">
+                      <label className="label">
+                        <span className="label-text">
+                          WhatsApp Number (optional)
+                        </span>
+                      </label>
+                      <input
+                        type="tel"
+                        className="input input-bordered"
+                        placeholder="+1234567890"
+                        value={teacherContact.whatsapp}
+                        onChange={(e) =>
+                          setTeacherContact((prev) => ({
+                            ...prev,
+                            whatsapp: e.target.value,
+                          }))
+                        }
+                      />
+                    </div>
+
+                    <div className="form-control">
+                      <label className="label">
+                        <span className="label-text">Email (optional)</span>
+                      </label>
+                      <input
+                        type="email"
+                        className="input input-bordered"
+                        placeholder="teacher@example.com"
+                        value={teacherContact.email}
+                        onChange={(e) =>
+                          setTeacherContact((prev) => ({
+                            ...prev,
+                            email: e.target.value,
+                          }))
+                        }
+                      />
+                    </div>
+
+                    <div className="alert alert-info">
+                      <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        fill="none"
+                        viewBox="0 0 24 24"
+                        className="stroke-current shrink-0 w-6 h-6"
+                      >
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          strokeWidth="2"
+                          d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+                        ></path>
+                      </svg>
+                      <span className="text-sm">
+                        Provide at least one contact method so dancers can reach
+                        you for lessons
+                      </span>
+                    </div>
+                  </div>
+                )}
               </div>
             )}
 

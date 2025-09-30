@@ -9,26 +9,55 @@ export async function GET(req: NextRequest) {
     await connectMongo();
 
     const { searchParams } = new URL(req.url);
-    const sortBy = searchParams.get("sortBy") || "rank";
-    const limit = parseInt(searchParams.get("limit") || "10");
+    const sortBy = searchParams.get("sortBy") || "totalDancers";
+    const page = parseInt(searchParams.get("page") || "1");
+    const limit = parseInt(searchParams.get("limit") || "12");
+    const search = searchParams.get("search") || "";
+    
+    const skip = (page - 1) * limit;
 
     // Build sort criteria
     let sortCriteria: any;
     switch (sortBy) {
       case "totalDancers":
-        sortCriteria = { totalDancers: -1 }; // Descending - most dancers first
+        sortCriteria = { totalDancers: -1, name: 1 }; // Most dancers first, then by name
         break;
       case "rank":
-      default:
-        sortCriteria = { rank: 1 }; // Ascending - lower rank = higher position
+        sortCriteria = { rank: 1, totalDancers: -1 }; // Lower rank first, then by dancers
         break;
+      case "name":
+        sortCriteria = { name: 1 }; // Alphabetical
+        break;
+      case "population":
+        sortCriteria = { population: -1, totalDancers: -1 }; // Largest cities first
+        break;
+      default:
+        sortCriteria = { totalDancers: -1, name: 1 };
     }
 
-    // Fetch cities with sorting
-    const cities = await City.find({ rank: { $gt: 0 } })
+    // Build search criteria
+    let searchCriteria: any = { 
+      isActive: true,
+      totalDancers: { $gt: 0 } // Only show cities with dancers
+    };
+
+    if (search) {
+      searchCriteria.$or = [
+        { name: { $regex: search, $options: "i" } },
+        { "country.name": { $regex: search, $options: "i" } },
+        { "continent.name": { $regex: search, $options: "i" } }
+      ];
+    }
+
+    // Get total count for pagination
+    const totalCount = await City.countDocuments(searchCriteria);
+
+    // Fetch cities with sorting, pagination, and search
+    const cities = await City.find(searchCriteria)
       .populate({ path: "country", model: Country, select: "name code" })
       .populate({ path: "continent", model: Continent, select: "name" })
       .sort(sortCriteria)
+      .skip(skip)
       .limit(limit)
       .lean();
 
@@ -45,11 +74,17 @@ export async function GET(req: NextRequest) {
       },
     }));
 
+    const hasMore = skip + limit < totalCount;
+
     return NextResponse.json({
       success: true,
       cities: transformedCities,
-      total: transformedCities.length,
-      sortBy
+      totalCount,
+      hasMore,
+      page,
+      limit,
+      sortBy,
+      search
     });
 
   } catch (error) {

@@ -13,6 +13,7 @@ import DiscoveryFeed from "@/components/DiscoveryFeed";
 import CityList from "@/components/organisims/CityList";
 import HotDanceStyles from "@/components/HotDanceStyles";
 import StatsPreview from "@/components/StatsPreview";
+import Link from "next/link";
 
 export const dynamic = "force-dynamic";
 
@@ -383,18 +384,18 @@ export default async function Dashboard() {
           Hottest Dance Cities 🔥
         </h2>
         <CityList initialCities={cities} />
+        <div className="flex justify-center mt-6">
+          <Link
+            href="/cities"
+            className="btn btn-outline btn-sm md:btn-md"
+          >
+            View All Cities
+          </Link>
+        </div>
 
         {/* Hot Dance Styles Section */}
         <div className="mt-12">
           <HotDanceStyles danceStyles={hotDanceStyles} />
-        </div>
-
-        {/* Discovery Feed */}
-        <div className="mt-12">
-          <DiscoveryFeed
-            initialDancers={initialDancers}
-            danceStyles={danceStyles}
-          />
         </div>
 
         {/* Community Stats Section */}
@@ -402,6 +403,14 @@ export default async function Dashboard() {
           <StatsPreview
             stats={communityStats}
             countryData={communityStats.countryData}
+          />
+        </div>
+
+        {/* Discovery Feed */}
+        <div className="mt-12">
+          <DiscoveryFeed
+            initialDancers={initialDancers}
+            danceStyles={danceStyles}
           />
         </div>
       </div>

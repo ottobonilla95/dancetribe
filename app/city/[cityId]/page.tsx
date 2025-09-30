@@ -116,6 +116,21 @@ export default async function CityPage({ params, searchParams }: Props) {
     isProfileComplete: true,
   });
 
+  // Get teachers in this city
+  const teachers = await User.find({
+    city: cityObjectId,
+    isProfileComplete: true,
+    isTeacher: true,
+  })
+    .select("name username image danceStyles teacherProfile")
+    .populate({
+      path: "danceStyles.danceStyle",
+      model: DanceStyle,
+      select: "name",
+    })
+    .limit(10)
+    .lean();
+
   // Pagination calculations
   const totalPages = Math.ceil(totalDancers / dancersPerPage);
 
@@ -242,6 +257,56 @@ export default async function CityPage({ params, searchParams }: Props) {
                 )}
               </div>
             </div>
+
+            {/* Teachers in this City */}
+            {teachers.length > 0 && (
+              <div className="card bg-base-200 shadow-xl mt-6">
+                <div className="card-body">
+                  <h2 className="card-title mb-4 flex items-center gap-2">
+                    🎓 Dance Teachers
+                  </h2>
+                  <div className="space-y-3">
+                    {teachers.map((teacher: any) => (
+                      <Link
+                        key={teacher._id}
+                        href={`/dancer/${teacher._id}`}
+                        className="flex items-center gap-3 hover:bg-base-300 rounded p-2 transition-colors"
+                      >
+                        <div className="avatar">
+                          <div className="w-10 h-10 rounded-full">
+                            {teacher.image ? (
+                              <img
+                                src={teacher.image}
+                                alt={teacher.name}
+                                className="w-full h-full object-cover rounded-full"
+                              />
+                            ) : (
+                              <div className="bg-primary text-primary-content rounded-full w-full h-full flex items-center justify-center">
+                                <span className="text-sm">
+                                  {teacher.name?.charAt(0)?.toUpperCase() || "?"}
+                                </span>
+                              </div>
+                            )}
+                          </div>
+                        </div>
+                        <div className="flex-1 min-w-0">
+                          <h3 className="font-medium text-sm truncate">
+                            {teacher.name}
+                          </h3>
+                          {teacher.teacherProfile?.yearsOfExperience && (
+                            <p className="text-xs text-base-content/60">
+                              {teacher.teacherProfile.yearsOfExperience} year
+                              {teacher.teacherProfile.yearsOfExperience !== 1 ? "s" : ""} exp.
+                            </p>
+                          )}
+                        </div>
+                        <div className="badge badge-primary badge-sm">View</div>
+                      </Link>
+                    ))}
+                  </div>
+                </div>
+              </div>
+            )}
           </div>
 
           {/* Dancers in this City */}

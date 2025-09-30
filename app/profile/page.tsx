@@ -10,9 +10,10 @@ import { getZodiacSign } from "@/utils/zodiac";
 import { getCountryCode } from "@/utils/countries";
 import { DANCE_LEVELS } from "@/constants/dance-levels";
 import ShareToStory from "@/components/ShareToStory";
-import { FaInstagram, FaTiktok, FaYoutube } from "react-icons/fa";
+import { FaInstagram, FaTiktok, FaYoutube, FaWhatsapp, FaEnvelope } from "react-icons/fa";
 import Flag from "@/components/Flag";
 import DanceStyleCard from "@/components/DanceStyleCard";
+import CopyProfileLink from "@/components/CopyProfileLink";
 
 export default async function Profile() {
   const session = await getServerSession(authOptions);
@@ -26,7 +27,7 @@ export default async function Profile() {
 
   const user = await User.findById(session.user.id)
     .select(
-      "name firstName lastName username email image dateOfBirth city citiesVisited danceStyles anthem socialMedia danceRole gender nationality createdAt"
+      "name firstName lastName username email image dateOfBirth city citiesVisited danceStyles anthem socialMedia danceRole gender nationality isTeacher teacherProfile createdAt"
     )
     .populate({
       path: "city",
@@ -189,12 +190,19 @@ export default async function Profile() {
                     </div>
                   </div>
                   <div>
-                    <h2 className="card-title text-2xl mb-1">
-                      {userData.firstName && userData.lastName 
-                        ? `${userData.firstName} ${userData.lastName}, ${age}`
-                        : `${userData.name?.charAt(0)?.toUpperCase() + userData.name?.slice(1)}, ${age}`
-                      }
-                    </h2>
+                    <div className="flex items-center gap-2 flex-wrap">
+                      <h2 className="card-title text-2xl mb-1">
+                        {userData.firstName && userData.lastName 
+                          ? `${userData.firstName} ${userData.lastName}, ${age}`
+                          : `${userData.name?.charAt(0)?.toUpperCase() + userData.name?.slice(1)}, ${age}`
+                        }
+                      </h2>
+                      {userData.isTeacher && (
+                        <div className="badge badge-primary badge-lg gap-1">
+                          🎓 Teacher
+                        </div>
+                      )}
+                    </div>
                     {zodiac && (
                       <div className="mt-1 text-small">
                         <span className="">{zodiac.sign}</span>
@@ -235,12 +243,64 @@ export default async function Profile() {
                     )}
                   </div>
                 </div>
+
+                {/* Teacher Info - Prominent */}
+                {userData.isTeacher && userData.teacherProfile && (
+                  <div className="mt-6 -mx-8 sm:mx-0 px-8 py-4 sm:px-4 bg-gradient-to-br from-primary/20 to-secondary/20 sm:rounded-lg border-y-2 sm:border-2 border-primary/40">
+                    <div className="flex items-center gap-2 mb-3">
+                      <span className="text-2xl">🎓</span>
+                      <h3 className="font-bold text-lg">Dance Teacher</h3>
+                    </div>
+
+                    {userData.teacherProfile.yearsOfExperience !== undefined && (
+                      <div className="mb-3">
+                        <div className="text-sm text-base-content/70">
+                          <span className="font-semibold text-primary">
+                            {userData.teacherProfile.yearsOfExperience}
+                          </span>{" "}
+                          year{userData.teacherProfile.yearsOfExperience !== 1 ? "s" : ""} of teaching experience
+                        </div>
+                      </div>
+                    )}
+
+                    {userData.teacherProfile.bio && (
+                      <div className="mb-3">
+                        <p className="text-sm text-base-content/80 italic">
+                          "{userData.teacherProfile.bio}"
+                        </p>
+                      </div>
+                    )}
+
+                    {userData.teacherProfile.contact &&
+                      (userData.teacherProfile.contact.whatsapp ||
+                        userData.teacherProfile.contact.email) && (
+                        <div className="space-y-2">
+                          <div className="text-xs text-base-content/60 mb-1">
+                            Contact Information:
+                          </div>
+                          {userData.teacherProfile.contact.whatsapp && (
+                            <div className="flex items-center gap-2 text-sm">
+                              <FaWhatsapp className="text-success" />
+                              <span className="font-mono">{userData.teacherProfile.contact.whatsapp}</span>
+                            </div>
+                          )}
+                          {userData.teacherProfile.contact.email && (
+                            <div className="flex items-center gap-2 text-sm">
+                              <FaEnvelope className="text-info" />
+                              <span className="font-mono">{userData.teacherProfile.contact.email}</span>
+                            </div>
+                          )}
+                        </div>
+                      )}
+                  </div>
+                )}
                 
                 {/* Profile Actions */}
                 <div className="mt-6 space-y-3">
                   <Link href="/onboarding?mode=edit" className="btn btn-secondary btn-sm w-full">
                     ✏️ Edit Profile
                   </Link>
+                  <CopyProfileLink userId={userData._id} />
                   <div className="w-full">
                     <ShareToStory
                       userData={{

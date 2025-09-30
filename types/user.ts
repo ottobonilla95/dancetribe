@@ -28,6 +28,8 @@ export type User = {
   customerId?: string;
   priceId?: string;
   hasAccess?: boolean;
+  isTeacher?: boolean;
+  teacherProfile?: TeacherProfile;
   createdAt?: Date;
   updatedAt?: Date;
 }
@@ -45,6 +47,7 @@ export interface OnboardingSteps {
   danceRole: boolean;
   gender: boolean;
   nationality: boolean;
+  teacherInfo: boolean;
 }
 
 export interface Anthem {
@@ -58,6 +61,16 @@ export interface SocialMedia {
   instagram?: string;
   tiktok?: string;
   youtube?: string;
+}
+
+export interface TeacherProfile {
+  bio?: string;
+  yearsOfExperience?: number;
+  danceStylesTaught?: string[]; // Array of DanceStyle IDs
+  contact?: {
+    whatsapp?: string;
+    email?: string;
+  };
 }
 
 export type DanceRole = "follower" | "leader" | "both";

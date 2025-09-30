@@ -133,6 +133,24 @@ const userSchema = new mongoose.Schema(
       danceRole: { type: Boolean, default: false },
       gender: { type: Boolean, default: false },
       nationality: { type: Boolean, default: false },
+      teacherInfo: { type: Boolean, default: false },
+    },
+    // Teacher profile
+    isTeacher: {
+      type: Boolean,
+      default: false,
+    },
+    teacherProfile: {
+      bio: String,
+      yearsOfExperience: Number,
+      danceStylesTaught: [{
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "DanceStyle",
+      }],
+      contact: {
+        whatsapp: String,
+        email: String,
+      },
     },
     // Social features
     // Users who liked this profile

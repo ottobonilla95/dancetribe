@@ -13,6 +13,8 @@ import {
   FaTiktok,
   FaYoutube,
   FaHeart,
+  FaWhatsapp,
+  FaEnvelope,
 } from "react-icons/fa";
 import Flag from "@/components/Flag";
 import DanceStyleCard from "@/components/DanceStyleCard";
@@ -46,7 +48,7 @@ export default async function PublicProfile({ params }: Props) {
   try {
     user = await User.findById(params.userId)
       .select(
-        "name username email image dateOfBirth city citiesVisited danceStyles anthem socialMedia danceRole gender nationality createdAt likedBy friends friendRequestsSent friendRequestsReceived"
+        "name username email image dateOfBirth city citiesVisited danceStyles anthem socialMedia danceRole gender nationality createdAt likedBy friends friendRequestsSent friendRequestsReceived isTeacher teacherProfile"
       )
       .populate({
         path: "city",
@@ -260,9 +262,16 @@ export default async function PublicProfile({ params }: Props) {
                       </div>
                     </div>
                     <div className="flex-1">
-                      <h2 className="card-title text-2xl mb-1">
-                        {`${userData.name.charAt(0).toUpperCase() + userData.name.slice(1)}${age ? `, ${age}` : ""}`}
-                      </h2>
+                      <div className="flex items-center gap-2 flex-wrap">
+                        <h2 className="card-title text-2xl mb-1">
+                          {`${userData.name.charAt(0).toUpperCase() + userData.name.slice(1)}${age ? `, ${age}` : ""}`}
+                        </h2>
+                        {userData.isTeacher && (
+                          <div className="badge badge-primary badge-lg gap-1">
+                            🎓 Teacher
+                          </div>
+                        )}
+                      </div>
                       {zodiac && (
                         <div className="mt-1 text-small">
                           <span className="">{zodiac.sign}</span>
@@ -330,6 +339,62 @@ export default async function PublicProfile({ params }: Props) {
                       )}
                     </div>
                   </div>
+
+                  {/* Teacher Info - Prominent (Full Width on Mobile) */}
+                  {userData.isTeacher && userData.teacherProfile && (
+                    <div className="mt-4 -mx-[2rem] px-8 py-3 sm:rounded-lg sm:mx-6 sm:px-3 bg-gradient-to-br from-primary/20 to-secondary/20 border-y-2 sm:border-2 border-primary/40">
+                      <div className="flex items-center gap-2 mb-2">
+                        <span className="text-xl">🎓</span>
+                        <h3 className="font-bold">Dance Teacher</h3>
+                      </div>
+
+                      {userData.teacherProfile.yearsOfExperience !== undefined && (
+                        <div className="mb-2">
+                          <div className="text-sm text-base-content/70">
+                            <span className="font-semibold text-primary">
+                              {userData.teacherProfile.yearsOfExperience}
+                            </span>{" "}
+                            year{userData.teacherProfile.yearsOfExperience !== 1 ? "s" : ""} of teaching
+                          </div>
+                        </div>
+                      )}
+
+                      {userData.teacherProfile.bio && (
+                        <div className="mb-2">
+                          <p className="text-sm text-base-content/80 italic line-clamp-3">
+                            "{userData.teacherProfile.bio}"
+                          </p>
+                        </div>
+                      )}
+
+                      {userData.teacherProfile.contact &&
+                        (userData.teacherProfile.contact.whatsapp ||
+                          userData.teacherProfile.contact.email) && (
+                          <div className="flex flex-wrap gap-2">
+                            {userData.teacherProfile.contact.whatsapp && (
+                              <a
+                                href={`https://wa.me/${userData.teacherProfile.contact.whatsapp.replace(/\D/g, "")}`}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="btn btn-success btn-xs gap-1 flex-1"
+                              >
+                                <FaWhatsapp />
+                                WhatsApp
+                              </a>
+                            )}
+                            {userData.teacherProfile.contact.email && (
+                              <a
+                                href={`mailto:${userData.teacherProfile.contact.email}`}
+                                className="btn btn-info btn-xs gap-1 flex-1"
+                              >
+                                <FaEnvelope />
+                                Email
+                              </a>
+                            )}
+                          </div>
+                        )}
+                    </div>
+                  )}
                 </div>
               </div>
             </div>
