@@ -266,7 +266,7 @@ export default async function Profile() {
                     {userData.teacherProfile.bio && (
                       <div className="mb-3">
                         <p className="text-sm text-base-content/80 italic">
-                          "{userData.teacherProfile.bio}"
+                          &quot;{userData.teacherProfile.bio}&quot;
                         </p>
                       </div>
                     )}

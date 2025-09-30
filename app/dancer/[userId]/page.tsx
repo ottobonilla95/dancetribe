@@ -362,7 +362,7 @@ export default async function PublicProfile({ params }: Props) {
                       {userData.teacherProfile.bio && (
                         <div className="mb-2">
                           <p className="text-sm text-base-content/80 italic line-clamp-3">
-                            "{userData.teacherProfile.bio}"
+                            &quot;{userData.teacherProfile.bio}&quot;
                           </p>
                         </div>
                       )}

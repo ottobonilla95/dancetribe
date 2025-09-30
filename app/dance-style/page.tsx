@@ -262,7 +262,7 @@ export default async function DanceStylesPage() {
             <div className="text-6xl mb-4">��</div>
             <h3 className="text-2xl font-bold mb-2">No Dance Styles Available</h3>
             <p className="text-base-content/70">
-              We're working on adding more dance styles to our platform.
+              We&apos;re working on adding more dance styles to our platform.
             </p>
           </div>
         )}
@@ -270,11 +270,11 @@ export default async function DanceStylesPage() {
         {/* Call to Action */}
         <div className="mt-16 text-center bg-gradient-to-r from-purple-500 to-pink-500 rounded-2xl p-8 text-white">
           <h3 className="text-2xl md:text-3xl font-bold mb-4">
-            Don't See Your Dance Style?
+            Don&apos;t See Your Dance Style?
           </h3>
           <p className="text-lg mb-6 opacity-90">
-            We're constantly adding new dance styles to our platform. 
-            Let us know what you'd like to see!
+            We&apos;re constantly adding new dance styles to our platform. 
+            Let us know what you&apos;d like to see!
           </p>
           <button className="btn btn-white btn-lg">
             Request a Dance Style

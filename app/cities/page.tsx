@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useCallback, useRef } from "react";
+import React, { useState, useEffect, useCallback, useRef } from "react";
 import { City } from "@/types";
 import CityCard from "@/components/molecules/CityCard";
 import { FaSort, FaSpinner, FaSearch, FaFilter } from "react-icons/fa";
