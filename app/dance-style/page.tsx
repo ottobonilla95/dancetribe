@@ -71,7 +71,7 @@ async function getAllDanceStyles(): Promise<(DanceStyleType & { userCount: numbe
           _id: style._id.toString(),
           id: style._id.toString(),
           userCount
-        };
+        } as DanceStyleType & { userCount: number };
       })
     );
 
