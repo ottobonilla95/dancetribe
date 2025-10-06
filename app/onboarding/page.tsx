@@ -52,6 +52,7 @@ export default function Onboarding() {
   const [completing, setCompleting] = useState(false);
   const [savingStep, setSavingStep] = useState(false);
   const [dateOfBirth, setDateOfBirth] = useState("");
+  const [dancingStartYear, setDancingStartYear] = useState("");
   const [currentLocation, setCurrentLocation] = useState<City | null>(null);
   const [citiesVisited, setCitiesVisited] = useState<City[]>([]);
   const [anthem, setAnthem] = useState({
@@ -104,6 +105,12 @@ export default function Onboarding() {
       title: "When's your birthday?",
       description: "We'll use this to calculate your zodiac sign",
       completed: user?.onboardingSteps?.dateOfBirth || false,
+    },
+    {
+      id: "dancingStartYear",
+      title: "When did you start dancing?",
+      description: "What year did you begin your dance journey?",
+      completed: user?.onboardingSteps?.dancingStartYear || false,
     },
     {
       id: "gender",
@@ -269,6 +276,9 @@ export default function Onboarding() {
           new Date(userData.dateOfBirth).toISOString().split("T")[0]
         );
       }
+      if (userData.dancingStartYear) {
+        setDancingStartYear(userData.dancingStartYear.toString());
+      }
       // Handle current location - ensure it's a valid city object
       if (
         userData.city &&
@@ -430,6 +440,19 @@ export default function Onboarding() {
           return;
         }
         stepData = { dateOfBirth };
+        break;
+      case "dancingStartYear":
+        if (!dancingStartYear) {
+          alert("Please enter the year you started dancing");
+          return;
+        }
+        const yearNum = parseInt(dancingStartYear);
+        const currentYear = new Date().getFullYear();
+        if (yearNum < 1900 || yearNum > currentYear) {
+          alert(`Please enter a valid year between 1900 and ${currentYear}`);
+          return;
+        }
+        stepData = { dancingStartYear: yearNum };
         break;
       case "currentLocation": {
         if (!currentLocation) {
@@ -984,6 +1007,30 @@ export default function Onboarding() {
                   onChange={(e) => setDateOfBirth(e.target.value)}
                   max={new Date().toISOString().split("T")[0]}
                 />
+              </div>
+            )}
+
+            {steps[currentStep].id === "dancingStartYear" && (
+              <div className="form-control">
+                <label className="label">
+                  <span className="label-text">What year did you start dancing?</span>
+                </label>
+                <input
+                  type="number"
+                  className="input input-bordered"
+                  placeholder={`e.g., ${new Date().getFullYear() - 5}`}
+                  value={dancingStartYear}
+                  onChange={(e) => setDancingStartYear(e.target.value)}
+                  min="1900"
+                  max={new Date().getFullYear()}
+                />
+                {dancingStartYear && (
+                  <label className="label">
+                    <span className="label-text-alt text-base-content/60">
+                      That's {new Date().getFullYear() - parseInt(dancingStartYear)} years of dancing! 🎉
+                    </span>
+                  </label>
+                )}
               </div>
             )}
 

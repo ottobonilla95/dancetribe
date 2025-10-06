@@ -24,6 +24,8 @@ import ConnectButton from "@/components/ConnectButton";
 import { LikesProvider } from "@/contexts/LikesContext";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/libs/next-auth";
+import AchievementBadges from "@/components/AchievementBadges";
+import { calculateUserBadges } from "@/utils/badges";
 
 interface Props {
   params: {
@@ -48,7 +50,7 @@ export default async function PublicProfile({ params }: Props) {
   try {
     user = await User.findById(params.userId)
       .select(
-        "name username email image dateOfBirth city citiesVisited danceStyles anthem socialMedia danceRole gender nationality createdAt likedBy friends friendRequestsSent friendRequestsReceived isTeacher teacherProfile"
+        "name username email image dateOfBirth dancingStartYear city citiesVisited danceStyles anthem socialMedia danceRole gender nationality createdAt likedBy friends friendRequestsSent friendRequestsReceived isTeacher teacherProfile"
       )
       .populate({
         path: "city",
@@ -418,6 +420,18 @@ export default async function PublicProfile({ params }: Props) {
                     </div>
                   )}
 
+                  {/* Dancing Experience */}
+                  {userData.dancingStartYear && (
+                    <div className="mb-4">
+                      <div className="text-sm font-medium text-base-content/60 mb-1">
+                        Dancing Experience
+                      </div>
+                      <div className="text-lg">
+                        {new Date().getFullYear() - userData.dancingStartYear} years (since {userData.dancingStartYear})
+                      </div>
+                    </div>
+                  )}
+
                   {/* Dance Styles */}
                   {userData.danceStyles && userData.danceStyles.length > 0 && (
                     <DanceStyleCard
@@ -464,6 +478,14 @@ export default async function PublicProfile({ params }: Props) {
                         </div>
                       </div>
                     )}
+                </div>
+              </div>
+
+              {/* Achievement Badges */}
+              <div className="card bg-base-200 shadow-xl">
+                <div className="card-body">
+                  <h3 className="card-title text-xl mb-4">🏆 Achievement Badges</h3>
+                  <AchievementBadges badges={calculateUserBadges(userData)} maxDisplay={6} />
                 </div>
               </div>
 

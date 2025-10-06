@@ -78,6 +78,12 @@ const userSchema = new mongoose.Schema(
     dateOfBirth: {
       type: Date,
     },
+    // Year when user started dancing
+    dancingStartYear: {
+      type: Number,
+      min: 1900,
+      max: new Date().getFullYear(),
+    },
     // Cities visited for dance (array of city IDs)
     citiesVisited: [{
       type: mongoose.Schema.Types.ObjectId,
@@ -126,6 +132,7 @@ const userSchema = new mongoose.Schema(
       username: { type: Boolean, default: false },
       profilePic: { type: Boolean, default: false },
       dateOfBirth: { type: Boolean, default: false },
+      dancingStartYear: { type: Boolean, default: false },
       currentLocation: { type: Boolean, default: false },
       citiesVisited: { type: Boolean, default: false },
       anthem: { type: Boolean, default: false },

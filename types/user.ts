@@ -10,6 +10,7 @@ export type User = {
   image?: string;
   username?: string;
   dateOfBirth?: Date;
+  dancingStartYear?: number;
   city?: City;
   citiesVisited?: City[];
   danceStyles?: UserDanceStyle[];
@@ -40,6 +41,7 @@ export interface OnboardingSteps {
   username: boolean;
   profilePic: boolean;
   dateOfBirth: boolean;
+  dancingStartYear: boolean;
   currentLocation: boolean;
   citiesVisited: boolean;
   anthem: boolean;

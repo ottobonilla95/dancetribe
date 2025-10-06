@@ -20,7 +20,7 @@ export async function GET() {
 
     const user = await User.findById(session.user.id)
       .select(
-        "name firstName lastName username email image dateOfBirth city citiesVisited danceStyles anthem socialMedia danceRole gender nationality onboardingSteps isProfileComplete isTeacher teacherProfile createdAt"
+        "name firstName lastName username email image dateOfBirth dancingStartYear city citiesVisited danceStyles anthem socialMedia danceRole gender nationality onboardingSteps isProfileComplete isTeacher teacherProfile createdAt"
       )
       .populate({
         path: "city",
@@ -121,6 +121,11 @@ export async function PUT(req: NextRequest) {
       case "dateOfBirth":
         user.dateOfBirth = new Date(data.dateOfBirth);
         user.onboardingSteps.dateOfBirth = true;
+        break;
+
+      case "dancingStartYear":
+        user.dancingStartYear = data.dancingStartYear;
+        user.onboardingSteps.dancingStartYear = true;
         break;
 
       case "currentLocation": {

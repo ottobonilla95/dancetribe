@@ -14,6 +14,8 @@ import { FaInstagram, FaTiktok, FaYoutube, FaWhatsapp, FaEnvelope } from "react-
 import Flag from "@/components/Flag";
 import DanceStyleCard from "@/components/DanceStyleCard";
 import CopyProfileLink from "@/components/CopyProfileLink";
+import AchievementBadges from "@/components/AchievementBadges";
+import { calculateUserBadges } from "@/utils/badges";
 
 export default async function Profile() {
   const session = await getServerSession(authOptions);
@@ -27,7 +29,7 @@ export default async function Profile() {
 
   const user = await User.findById(session.user.id)
     .select(
-      "name firstName lastName username email image dateOfBirth city citiesVisited danceStyles anthem socialMedia danceRole gender nationality isTeacher teacherProfile createdAt"
+      "name firstName lastName username email image dateOfBirth dancingStartYear city citiesVisited danceStyles anthem socialMedia danceRole gender nationality isTeacher teacherProfile friends likedBy createdAt"
     )
     .populate({
       path: "city",
@@ -344,7 +346,17 @@ export default async function Profile() {
                   </div>
                 )}
 
-           
+                {/* Dancing Experience */}
+                {userData.dancingStartYear && (
+                  <div className="mb-4">
+                    <div className="text-sm font-medium text-base-content/60 mb-1">
+                      Dancing Experience
+                    </div>
+                    <div className="text-lg">
+                      {new Date().getFullYear() - userData.dancingStartYear} years (since {userData.dancingStartYear})
+                    </div>
+                  </div>
+                )}
 
                 {/* Dance Styles */}
                 {userData.danceStyles && userData.danceStyles.length > 0 && (
@@ -388,6 +400,14 @@ export default async function Profile() {
                       </div>
                     </div>
                   )}
+              </div>
+            </div>
+
+            {/* Achievement Badges */}
+            <div className="card bg-base-200 shadow-xl">
+              <div className="card-body">
+                <h3 className="card-title text-xl mb-4">🏆 Achievement Badges</h3>
+                <AchievementBadges badges={calculateUserBadges(userData)} maxDisplay={6} />
               </div>
             </div>
 

@@ -1,0 +1,331 @@
+export interface Badge {
+  id: string;
+  name: string;
+  description: string;
+  icon: string;
+  category: "experience" | "travel" | "continents" | "styles" | "social" | "teacher";
+  tier: "bronze" | "silver" | "gold" | "platinum" | "diamond";
+  requirement: {
+    type: string;
+    value: number;
+  };
+}
+
+export const BADGES: Badge[] = [
+  // Experience Badges
+  {
+    id: "new_dancer",
+    name: "New Dancer",
+    description: "Just started your dance journey",
+    icon: "🌱",
+    category: "experience",
+    tier: "bronze",
+    requirement: { type: "yearsOfDancing", value: 0 },
+  },
+  {
+    id: "growing_dancer",
+    name: "Growing",
+    description: "1 year of dancing experience",
+    icon: "🌿",
+    category: "experience",
+    tier: "bronze",
+    requirement: { type: "yearsOfDancing", value: 1 },
+  },
+  {
+    id: "dedicated_dancer",
+    name: "Dedicated",
+    description: "3 years of dancing experience",
+    icon: "🌳",
+    category: "experience",
+    tier: "silver",
+    requirement: { type: "yearsOfDancing", value: 3 },
+  },
+  {
+    id: "veteran_dancer",
+    name: "Veteran",
+    description: "5 years of dancing experience",
+    icon: "⭐",
+    category: "experience",
+    tier: "gold",
+    requirement: { type: "yearsOfDancing", value: 5 },
+  },
+  {
+    id: "legend_dancer",
+    name: "Legend",
+    description: "10+ years of dancing experience",
+    icon: "👑",
+    category: "experience",
+    tier: "platinum",
+    requirement: { type: "yearsOfDancing", value: 10 },
+  },
+  {
+    id: "master_dancer",
+    name: "Master",
+    description: "20+ years of dancing experience",
+    icon: "💎",
+    category: "experience",
+    tier: "diamond",
+    requirement: { type: "yearsOfDancing", value: 20 },
+  },
+
+  // City Travel Badges
+  {
+    id: "first_city",
+    name: "First Steps Abroad",
+    description: "Visited your first city",
+    icon: "✈️",
+    category: "travel",
+    tier: "bronze",
+    requirement: { type: "citiesVisited", value: 1 },
+  },
+  {
+    id: "city_explorer",
+    name: "City Explorer",
+    description: "Visited 3 cities",
+    icon: "🗺️",
+    category: "travel",
+    tier: "silver",
+    requirement: { type: "citiesVisited", value: 3 },
+  },
+  {
+    id: "globe_trotter",
+    name: "Globe Trotter",
+    description: "Visited 5 cities",
+    icon: "🌍",
+    category: "travel",
+    tier: "gold",
+    requirement: { type: "citiesVisited", value: 5 },
+  },
+  {
+    id: "world_dancer",
+    name: "World Dancer",
+    description: "Visited 10 cities",
+    icon: "🌏",
+    category: "travel",
+    tier: "platinum",
+    requirement: { type: "citiesVisited", value: 10 },
+  },
+  {
+    id: "nomad",
+    name: "Dance Nomad",
+    description: "Visited 20+ cities",
+    icon: "🌐",
+    category: "travel",
+    tier: "diamond",
+    requirement: { type: "citiesVisited", value: 20 },
+  },
+
+  // Continent Travel Badges
+  {
+    id: "continental_starter",
+    name: "Continental Starter",
+    description: "Danced in 1 continent",
+    icon: "🗾",
+    category: "continents",
+    tier: "bronze",
+    requirement: { type: "continentsVisited", value: 1 },
+  },
+  {
+    id: "continental_explorer",
+    name: "Continental Explorer",
+    description: "Danced in 2 continents",
+    icon: "🌎",
+    category: "continents",
+    tier: "silver",
+    requirement: { type: "continentsVisited", value: 2 },
+  },
+  {
+    id: "continental_master",
+    name: "Continental Master",
+    description: "Danced in 3 continents",
+    icon: "🌍",
+    category: "continents",
+    tier: "gold",
+    requirement: { type: "continentsVisited", value: 3 },
+  },
+  {
+    id: "continental_legend",
+    name: "World Citizen",
+    description: "Danced in 4+ continents",
+    icon: "🗺️",
+    category: "continents",
+    tier: "platinum",
+    requirement: { type: "continentsVisited", value: 4 },
+  },
+  {
+    id: "continental_ultimate",
+    name: "Global Ambassador",
+    description: "Danced in 5+ continents",
+    icon: "🌐",
+    category: "continents",
+    tier: "diamond",
+    requirement: { type: "continentsVisited", value: 5 },
+  },
+
+  // Dance Style Badges
+  {
+    id: "style_specialist",
+    name: "Specialist",
+    description: "Practicing 1 dance style",
+    icon: "💃",
+    category: "styles",
+    tier: "bronze",
+    requirement: { type: "danceStyles", value: 1 },
+  },
+  {
+    id: "style_versatile",
+    name: "Versatile",
+    description: "Practicing 2 dance styles",
+    icon: "🕺",
+    category: "styles",
+    tier: "silver",
+    requirement: { type: "danceStyles", value: 2 },
+  },
+  {
+    id: "style_multitalented",
+    name: "Multi-talented",
+    description: "Practicing 3 dance styles",
+    icon: "🎭",
+    category: "styles",
+    tier: "gold",
+    requirement: { type: "danceStyles", value: 3 },
+  },
+  {
+    id: "style_polyglot",
+    name: "Dance Polyglot",
+    description: "Practicing 5+ dance styles",
+    icon: "🎪",
+    category: "styles",
+    tier: "platinum",
+    requirement: { type: "danceStyles", value: 5 },
+  },
+  {
+    id: "style_master",
+    name: "Style Master",
+    description: "Expert in 2+ dance styles",
+    icon: "⭐",
+    category: "styles",
+    tier: "gold",
+    requirement: { type: "expertStyles", value: 2 },
+  },
+  {
+    id: "style_grandmaster",
+    name: "Grand Master",
+    description: "Expert in 3+ dance styles",
+    icon: "🏆",
+    category: "styles",
+    tier: "diamond",
+    requirement: { type: "expertStyles", value: 3 },
+  },
+
+  // Social Badges
+  {
+    id: "social_newbie",
+    name: "Making Friends",
+    description: "Made 5 dance friends",
+    icon: "👥",
+    category: "social",
+    tier: "bronze",
+    requirement: { type: "friends", value: 5 },
+  },
+  {
+    id: "social_connector",
+    name: "Connector",
+    description: "Made 10 dance friends",
+    icon: "🤝",
+    category: "social",
+    tier: "silver",
+    requirement: { type: "friends", value: 10 },
+  },
+  {
+    id: "social_builder",
+    name: "Community Builder",
+    description: "Made 25 dance friends",
+    icon: "💫",
+    category: "social",
+    tier: "gold",
+    requirement: { type: "friends", value: 25 },
+  },
+  {
+    id: "social_hub",
+    name: "Social Hub",
+    description: "Made 50+ dance friends",
+    icon: "🌟",
+    category: "social",
+    tier: "platinum",
+    requirement: { type: "friends", value: 50 },
+  },
+  {
+    id: "popular_profile",
+    name: "Popular",
+    description: "Received 50 profile likes",
+    icon: "❤️",
+    category: "social",
+    tier: "silver",
+    requirement: { type: "likes", value: 50 },
+  },
+  {
+    id: "viral_profile",
+    name: "Viral",
+    description: "Received 100+ profile likes",
+    icon: "🔥",
+    category: "social",
+    tier: "gold",
+    requirement: { type: "likes", value: 100 },
+  },
+  {
+    id: "celebrity_profile",
+    name: "Celebrity",
+    description: "Received 500+ profile likes",
+    icon: "✨",
+    category: "social",
+    tier: "diamond",
+    requirement: { type: "likes", value: 500 },
+  },
+
+  // Teacher Badges
+  {
+    id: "teacher_new",
+    name: "New Teacher",
+    description: "Started teaching dance",
+    icon: "📚",
+    category: "teacher",
+    tier: "bronze",
+    requirement: { type: "isTeacher", value: 1 },
+  },
+  {
+    id: "teacher_experienced",
+    name: "Experienced Instructor",
+    description: "5 years of teaching experience",
+    icon: "🎓",
+    category: "teacher",
+    tier: "gold",
+    requirement: { type: "teachingYears", value: 5 },
+  },
+  {
+    id: "teacher_master",
+    name: "Master Teacher",
+    description: "10+ years of teaching experience",
+    icon: "🏆",
+    category: "teacher",
+    tier: "diamond",
+    requirement: { type: "teachingYears", value: 10 },
+  },
+];
+
+export const TIER_COLORS = {
+  bronze: "badge-warning",
+  silver: "badge-neutral",
+  gold: "badge-warning",
+  platinum: "badge-info",
+  diamond: "badge-secondary",
+};
+
+export const TIER_LABELS = {
+  bronze: "Bronze",
+  silver: "Silver",
+  gold: "Gold",
+  platinum: "Platinum",
+  diamond: "Diamond",
+};
+
