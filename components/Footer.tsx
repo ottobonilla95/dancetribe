@@ -43,7 +43,7 @@ const Footer = () => {
               target="_blank"
               className="mt-4 inline-block cursor-pointer rounded bg-neutral px-2 py-1 text-sm text-neutral-content ring-1 ring-base-content/10 duration-200 hover:ring-neutral"
             >
-              <div className="flex items-center gap-1">
+              {/* <div className="flex items-center gap-1">
                 <span className="opacity-90">Built with</span>
                 <span className="flex items-center gap-0.5 font-semibold tracking-tight">
                   <svg
@@ -61,7 +61,7 @@ const Footer = () => {
                   </svg>
                   ShipFast
                 </span>
-              </div>
+              </div> */}
             </a>
           </div>
           <div className="flex-grow flex flex-wrap justify-center -mb-10 md:mt-0 mt-10 text-center">

@@ -12,10 +12,21 @@ interface DancerCardProps {
     danceStylesPopulated?: Array<{ name: string; _id: string }>;
   };
   showLikeButton?: boolean;
+  showFlag?: boolean;
 }
 
-export default function DancerCard({ dancer, showLikeButton = true }: DancerCardProps) {
+export default function DancerCard({ dancer, showLikeButton = true, showFlag = false }: DancerCardProps) {
   const zodiacInfo = dancer.dateOfBirth ? getZodiacSign(new Date(dancer.dateOfBirth)) : null;
+  
+  // Generate flag emoji from country code
+  const getFlagEmoji = (countryCode: string) => {
+    if (!countryCode || countryCode.length !== 2) return null;
+    const codePoints = countryCode
+      .toUpperCase()
+      .split('')
+      .map(char => 127397 + char.charCodeAt(0));
+    return String.fromCodePoint(...codePoints);
+  };
 
   return (
     <div className="card bg-base-100 shadow-lg hover:shadow-xl transition-all duration-300 border border-base-200">
@@ -45,7 +56,12 @@ export default function DancerCard({ dancer, showLikeButton = true }: DancerCard
             </div>
             
             <div className="flex-1 min-w-0">
-              <h3 className="font-bold text-lg truncate">{dancer.name}</h3>
+              <div className="flex items-center gap-2">
+                <h3 className="font-bold text-lg truncate">{dancer.name}</h3>
+                {showFlag && dancer.city?.country?.code && (
+                  <span className="text-xl">{getFlagEmoji(dancer.city.country.code)}</span>
+                )}
+              </div>
               <p className="text-sm text-base-content/60">@{dancer.username}</p>
               
               {/* Location */}
@@ -85,12 +101,12 @@ export default function DancerCard({ dancer, showLikeButton = true }: DancerCard
             <div className="mb-3">
               <div className="flex flex-wrap gap-1">
                 {dancer.danceStylesPopulated.slice(0, 3).map((style, index) => (
-                  <span key={index} className="badge badge-outline badge-xs">
+                  <span key={index} className="badge badge-outline badge-sm">
                     {style.name}
                   </span>
                 ))}
                 {dancer.danceStylesPopulated.length > 3 && (
-                  <span className="badge badge-outline badge-xs">
+                  <span className="badge badge-outline badge-sm">
                     +{dancer.danceStylesPopulated.length - 3}
                   </span>
                 )}

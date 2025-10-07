@@ -1,6 +1,4 @@
 import { ReactNode, Suspense } from "react";
-import { getServerSession } from "next-auth";
-import { authOptions } from "@/libs/next-auth";
 import Header from "@/components/Header";
 
 // Layout for dance style pages
@@ -10,18 +8,13 @@ export default async function DanceStyleLayout({
 }: {
   children: ReactNode;
 }) {
-  const session = await getServerSession(authOptions);
-  const isLoggedIn = !!session;
-
   return (
     <>
-      {/* Show Header only for authenticated users */}
-      {isLoggedIn && (
-        <Suspense>
-          <Header />
-        </Suspense>
-      )}
+      <Suspense>
+        <Header />
+      </Suspense>
+
       {children}
     </>
   );
-} 
+}

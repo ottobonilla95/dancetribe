@@ -62,14 +62,14 @@ export default async function PublicProfile({ params }: Props) {
           {
             path: "country",
             model: Country,
-            select: "name code"
+            select: "name code",
           },
           {
             path: "continent",
             model: Continent,
-            select: "name code"
-          }
-        ]
+            select: "name code",
+          },
+        ],
       })
       .populate({
         path: "citiesVisited",
@@ -79,14 +79,14 @@ export default async function PublicProfile({ params }: Props) {
           {
             path: "country",
             model: Country,
-            select: "name code"
+            select: "name code",
           },
           {
             path: "continent",
             model: Continent,
-            select: "name code"
-          }
-        ]
+            select: "name code",
+          },
+        ],
       })
       .populate({
         path: "danceStyles.danceStyle",
@@ -150,9 +150,10 @@ export default async function PublicProfile({ params }: Props) {
       }
 
       return {
-        id: typeof userStyle.danceStyle === "object" 
-          ? userStyle.danceStyle._id 
-          : userStyle.danceStyle,
+        id:
+          typeof userStyle.danceStyle === "object"
+            ? userStyle.danceStyle._id
+            : userStyle.danceStyle,
         name: styleName,
         level: userStyle.level,
         levelLabel: levelInfo?.label || "Beginner",
@@ -244,22 +245,20 @@ export default async function PublicProfile({ params }: Props) {
           {/* CTA Banner for non-authenticated users */}
           {!isLoggedIn && (
             <div className="alert alert-info shadow-lg mb-6">
-              <div>
+              <div className="flex gap-2 items-center">
                 <FaHeart className="text-lg" />
-                <div>
-                  <h3 className="font-bold">Inspired by this dancer?</h3>
-                  <div className="text-xs">
-                    Join DanceTribe to connect with amazing dancers like this
-                    around the world!
-                  </div>
-                </div>
+
+                <h3 className="font-bold">
+                  Want to connect with {userData.name?.split(" ")[0]}?
+                </h3>
               </div>
+              {/* </div> */}
               <div className="flex-none">
                 <Link
                   href="/api/auth/signin"
                   className="btn btn-sm btn-primary"
                 >
-                  Join DanceTribe
+                  Create Profile
                 </Link>
               </div>
             </div>
@@ -321,7 +320,7 @@ export default async function PublicProfile({ params }: Props) {
                       {userData.city && typeof userData.city === "object" && (
                         <div className="mt-1">
                           <span>📍 </span>
-                          <Link 
+                          <Link
                             href={`/city/${userData.city._id}`}
                             className="link link-primary hover:link-accent"
                           >
@@ -367,13 +366,18 @@ export default async function PublicProfile({ params }: Props) {
                         <h3 className="font-bold">Dance Teacher</h3>
                       </div>
 
-                      {userData.teacherProfile.yearsOfExperience !== undefined && (
+                      {userData.teacherProfile.yearsOfExperience !==
+                        undefined && (
                         <div className="mb-2">
                           <div className="text-sm text-base-content/70">
                             <span className="font-semibold text-primary">
                               {userData.teacherProfile.yearsOfExperience}
                             </span>{" "}
-                            year{userData.teacherProfile.yearsOfExperience !== 1 ? "s" : ""} of teaching
+                            year
+                            {userData.teacherProfile.yearsOfExperience !== 1
+                              ? "s"
+                              : ""}{" "}
+                            of teaching
                           </div>
                         </div>
                       )}
@@ -444,7 +448,8 @@ export default async function PublicProfile({ params }: Props) {
                         Dancing Experience
                       </div>
                       <div className="text-lg">
-                        {new Date().getFullYear() - userData.dancingStartYear} years (since {userData.dancingStartYear})
+                        {new Date().getFullYear() - userData.dancingStartYear}{" "}
+                        years (since {userData.dancingStartYear})
                       </div>
                     </div>
                   )}
@@ -466,32 +471,34 @@ export default async function PublicProfile({ params }: Props) {
                           Cities Danced In
                         </div>
                         <div className="flex flex-wrap gap-3">
-                                                  {userData.citiesVisited.map(
-                          (city: any, index: number) => (
-                            <Link
-                              key={index}
-                              href={`/city/${city._id || city}`}
-                              className="group"
-                            >
-                              <div className="flex items-center gap-2 bg-base-300 rounded-md h-10 hover:bg-base-200 transition-colors cursor-pointer">
-                                {city.image ? (
-                                  <img
-                                    src={city.image}
-                                    alt={city.name}
-                                    className="h-full aspect-square rounded object-cover"
-                                  />
-                                ) : (
-                                  <div className="h-full aspect-square rounded bg-primary/20 flex items-center justify-center">
-                                    <span className="text-xs">🌍</span>
-                                  </div>
-                                )}
-                                <span className="text-sm font-medium pl-2 pr-4 py-2 group-hover:text-primary">
-                                  {typeof city === "string" ? city : city.name}
-                                </span>
-                              </div>
-                            </Link>
-                          )
-                        )}
+                          {userData.citiesVisited.map(
+                            (city: any, index: number) => (
+                              <Link
+                                key={index}
+                                href={`/city/${city._id || city}`}
+                                className="group"
+                              >
+                                <div className="flex items-center gap-2 bg-base-300 rounded-md h-10 hover:bg-base-200 transition-colors cursor-pointer">
+                                  {city.image ? (
+                                    <img
+                                      src={city.image}
+                                      alt={city.name}
+                                      className="h-full aspect-square rounded object-cover"
+                                    />
+                                  ) : (
+                                    <div className="h-full aspect-square rounded bg-primary/20 flex items-center justify-center">
+                                      <span className="text-xs">🌍</span>
+                                    </div>
+                                  )}
+                                  <span className="text-sm font-medium pl-2 pr-4 py-2 group-hover:text-primary">
+                                    {typeof city === "string"
+                                      ? city
+                                      : city.name}
+                                  </span>
+                                </div>
+                              </Link>
+                            )
+                          )}
                         </div>
                       </div>
                     )}
@@ -501,8 +508,13 @@ export default async function PublicProfile({ params }: Props) {
               {/* Achievement Badges */}
               <div className="card bg-base-200 shadow-xl">
                 <div className="card-body">
-                  <h3 className="card-title text-xl mb-4">🏆 Achievement Badges</h3>
-                  <AchievementBadges badges={calculateUserBadges(userData)} maxDisplay={6} />
+                  <h3 className="card-title text-xl mb-4">
+                    🏆 Achievement Badges
+                  </h3>
+                  <AchievementBadges
+                    badges={calculateUserBadges(userData)}
+                    maxDisplay={6}
+                  />
                 </div>
               </div>
 
@@ -513,7 +525,9 @@ export default async function PublicProfile({ params }: Props) {
                   userData.socialMedia.youtube) && (
                   <div className="card bg-base-200 shadow-xl">
                     <div className="card-body">
-                      <h3 className="card-title text-xl mb-4">🌐 Social Media</h3>
+                      <h3 className="card-title text-xl mb-4">
+                        🌐 Social Media
+                      </h3>
                       <div className="flex gap-3">
                         {userData.socialMedia.instagram && (
                           <a
@@ -626,34 +640,23 @@ export default async function PublicProfile({ params }: Props) {
 
           {/* Actions - only show for non-logged-in users */}
           {!isLoggedIn && (
-            <div className="text-center mt-8 space-y-4">
-              <div className="mb-4">
-                <h3 className="text-xl font-bold text-base-content mb-2">
-                  Join DanceTribe Community!
+            <div className="alert alert-info shadow-lg mt-4">
+              <div className="flex-1 text-center">
+                <h3 className="font-bold text-lg mb-3">
+                  ⭐️ Create your dance profile now
                 </h3>
-                <p className="text-base-content/70">
-                  Connect with dancers worldwide, share your passion, and
-                  discover new dance experiences.
-                </p>
-              </div>
-
-              <div>
                 <Link
                   href="/api/auth/signin"
-                  className="btn btn-primary btn-lg"
+                  className="btn btn-primary btn-sm gap-2"
                 >
-                  🕺 Join DanceTribe 💃
-                </Link>
-              </div>
-
-              <div>
-                <Link href="/" className="link link-primary text-sm">
-                  Learn more about DanceTribe
+                  <FaHeart className="text-sm" />
+                  Get Started Free
                 </Link>
               </div>
             </div>
           )}
 
+          <div className="h-10" />
           {/* Floating Like Button - for all users */}
           {!isOwnProfile && (
             <div className="fixed bottom-6 right-6 z-50">

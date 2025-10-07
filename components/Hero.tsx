@@ -24,14 +24,14 @@ const Hero = () => {
         </a> */}
 
         <div className="flex flex-col gap-4 lg:gap-12 items-center lg:items-start">
-          <h1 className="font-extrabold text-4xl lg:text-6xl tracking-tight md:-mb-4">
+          <h1 className="font-extrabold text-3xl lg:text-6xl tracking-tight md:-mb-4">
             Connect with dancers worldwide
           </h1>
-          <p className="text-lg opacity-80 leading-relaxed">
+          {/* <p className="text-lg opacity-80 leading-relaxed">
             Discover music, cities, events, and dance communities. Find
             festivals, socials, DJs, and explore new places through dance.
-          </p>
-          <div className="flex flex-col sm:flex-row gap-3 w-full sm:w-auto">
+          </p> */}
+          <div className="flex flex-col items-center sm:flex-row gap-3 w-full sm:w-auto">
             <ButtonSignin text="🕺 Join DanceTribe 💃" extraStyle="btn-primary btn-wide" />
             <a
               href={`mailto:${CONTACT.COLLABORATION_EMAIL}`}
@@ -47,7 +47,7 @@ const Hero = () => {
           </div>
         </div>
 
-        <TestimonialsAvatars priority={true} />
+        {/* <TestimonialsAvatars priority={true} /> */}
       </div>
       <div className="lg:w-full">
         <Image

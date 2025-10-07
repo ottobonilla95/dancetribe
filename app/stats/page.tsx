@@ -4,13 +4,13 @@ import { authOptions } from "@/libs/next-auth";
 import connectMongo from "@/libs/mongoose";
 import User from "@/models/User";
 import Link from "next/link";
+import BackButton from "@/components/BackButton";
 import { 
   FaUsers, 
   FaGlobeAmericas, 
   FaMusic, 
   FaTrophy,
-  FaMapMarkerAlt,
-  FaArrowLeft
+  FaMapMarkerAlt
 } from "react-icons/fa";
 import WorldMap from "@/components/WorldMap";
 
@@ -245,17 +245,11 @@ export default async function StatsPage() {
         <div className="mb-8">
           {/* Back link - above title on mobile, inline on desktop */}
           <div className="mb-4 md:mb-0">
-            <Link href="/dashboard" className="btn btn-ghost btn-sm gap-2 md:hidden">
-              <FaArrowLeft />
-              Back to Dashboard
-            </Link>
+            <BackButton label="Back" className="md:hidden" />
           </div>
           
           <div className="flex items-center gap-4">
-            <Link href="/dashboard" className="btn btn-ghost btn-sm gap-2 hidden md:flex">
-              <FaArrowLeft />
-              Back to Dashboard
-            </Link>
+            <BackButton label="Back" className="hidden md:flex" />
             <div>
               <h1 className="text-3xl md:text-4xl font-extrabold tracking-tight">
                 Community Analytics

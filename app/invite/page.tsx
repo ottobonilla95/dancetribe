@@ -1,8 +1,8 @@
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/libs/next-auth";
 import { redirect } from "next/navigation";
-import Link from "next/link";
 import InviteFriends from "@/components/InviteFriends";
+import BackButton from "@/components/BackButton";
 import connectMongo from "@/libs/mongoose";
 import User from "@/models/User";
 
@@ -31,12 +31,7 @@ export default async function InvitePage() {
       <div className="max-w-3xl mx-auto">
         {/* Back Button */}
         <div className="mb-6">
-          <Link href="/dashboard" className="btn btn-ghost btn-sm gap-2">
-            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-5 h-5">
-              <path strokeLinecap="round" strokeLinejoin="round" d="M10.5 19.5L3 12m0 0l7.5-7.5M3 12h18" />
-            </svg>
-            Back to Dashboard
-          </Link>
+          <BackButton label="Back" />
         </div>
 
         {/* Main Content */}
