@@ -13,11 +13,23 @@ export const viewport: Viewport = {
 	themeColor: config.colors.main,
 	width: "device-width",
 	initialScale: 1,
+	// PWA settings
+	maximumScale: 1,
+	userScalable: false,
+	viewportFit: "cover",
 };
 
 // This adds default SEO tags to all pages in our app.
 // You can override them in each page passing params to getSOTags() function.
-export const metadata = getSEOTags();
+export const metadata = {
+	...getSEOTags(),
+	manifest: "/manifest.json",
+	appleWebApp: {
+		capable: true,
+		statusBarStyle: "default",
+		title: "DanceTribe",
+	},
+};
 
 export default function RootLayout({ children }: { children: ReactNode }) {
 	return (
@@ -26,6 +38,13 @@ export default function RootLayout({ children }: { children: ReactNode }) {
 			data-theme={config.colors.theme}
 			className={font.className}
 		>
+			<head>
+				{/* iOS-specific PWA meta tags */}
+				<meta name="apple-mobile-web-app-capable" content="yes" />
+				<meta name="apple-mobile-web-app-status-bar-style" content="default" />
+				<meta name="apple-mobile-web-app-title" content="DanceTribe" />
+				<link rel="apple-touch-icon" href="/apple-icon.png" />
+			</head>
 			<body>
 				{/* ClientLayout contains all the client wrappers (Crisp chat support, toast messages, tooltips, etc.) */}
 				<ClientLayout>{children}</ClientLayout>

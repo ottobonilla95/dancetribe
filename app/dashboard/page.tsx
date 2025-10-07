@@ -13,6 +13,7 @@ import DiscoveryFeed from "@/components/DiscoveryFeed";
 import CityList from "@/components/organisims/CityList";
 import HotDanceStyles from "@/components/HotDanceStyles";
 import StatsPreview from "@/components/StatsPreview";
+import TrendyMusicPreview from "@/components/TrendyMusicPreview";
 import Link from "next/link";
 
 export const dynamic = "force-dynamic";
@@ -322,6 +323,76 @@ async function getCommunityStats() {
   }
 }
 
+// Extract Spotify track ID from URL
+function extractSpotifyTrackId(url: string): string | null {
+  const match = url.match(/track\/([a-zA-Z0-9]+)/);
+  return match ? match[1] : null;
+}
+
+// Extract YouTube video ID from URL
+function extractYouTubeVideoId(url: string): string | null {
+  const patterns = [
+    /(?:youtube\.com\/watch\?v=|youtu\.be\/)([a-zA-Z0-9_-]+)/,
+    /youtube\.com\/embed\/([a-zA-Z0-9_-]+)/,
+  ];
+  
+  for (const pattern of patterns) {
+    const match = url.match(pattern);
+    if (match) return match[1];
+  }
+  
+  return null;
+}
+
+// Determine platform from URL
+function detectPlatform(url: string): 'spotify' | 'youtube' | null {
+  if (url.includes('spotify.com')) return 'spotify';
+  if (url.includes('youtube.com') || url.includes('youtu.be')) return 'youtube';
+  return null;
+}
+
+async function getTrendingSongs() {
+  try {
+    await connectMongo();
+
+    // Get all users with anthem URLs
+    const users = await User.find({ 
+      "anthem.url": { $exists: true, $ne: "" } 
+    })
+      .select("anthem")
+      .lean();
+
+    // Count occurrences of each song
+    const songCounts: { [key: string]: number } = {};
+    users.forEach((user: any) => {
+      if (user.anthem?.url) {
+        songCounts[user.anthem.url] = (songCounts[user.anthem.url] || 0) + 1;
+      }
+    });
+
+    // Convert to array and sort by count
+    const trendingSongs = Object.entries(songCounts)
+      .map(([url, count]) => {
+        const platform = detectPlatform(url);
+        return {
+          url,
+          count,
+          platform,
+          spotifyTrackId: platform === 'spotify' ? extractSpotifyTrackId(url) : null,
+          youtubeVideoId: platform === 'youtube' ? extractYouTubeVideoId(url) : null,
+        };
+      })
+      .filter((song) => song.spotifyTrackId || song.youtubeVideoId) // Only valid URLs
+      .sort((a, b) => b.count - a.count)
+      .slice(0, 10); // Top 10
+
+    return trendingSongs;
+  } catch (error) {
+    console.error("Error fetching trending songs:", error);
+    return [];
+  }
+}
+
 async function getCities(): Promise<CityType[]> {
   console.log("🚀 getCities FUNCTION CALLED");
   try {
@@ -367,13 +438,14 @@ export default async function Dashboard() {
   }
 
   // Fetch data in parallel
-  const [initialDancers, danceStyles, cities, hotDanceStyles, communityStats] =
+  const [initialDancers, danceStyles, cities, hotDanceStyles, communityStats, trendingSongs] =
     await Promise.all([
       getInitialDancers(session.user.id),
       getDanceStyles(),
       getCities(),
       getHotDanceStyles(),
       getCommunityStats(),
+      getTrendingSongs(),
     ]);
 
   return (
@@ -397,6 +469,9 @@ export default async function Dashboard() {
         <div className="mt-12">
           <HotDanceStyles danceStyles={hotDanceStyles} />
         </div>
+
+        {/* Trendy Music Section */}
+        <TrendyMusicPreview songs={trendingSongs} />
 
         {/* Community Stats Section */}
         <div className="mt-12">

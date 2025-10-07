@@ -52,7 +52,7 @@ export default async function PublicProfile({ params }: Props) {
   try {
     user = await User.findById(params.userId)
       .select(
-        "name username email image dateOfBirth dancingStartYear city citiesVisited danceStyles anthem socialMedia danceRole gender nationality createdAt likedBy friends friendRequestsSent friendRequestsReceived isTeacher teacherProfile"
+        "name username email image dateOfBirth dancingStartYear city citiesVisited trips danceStyles anthem socialMedia danceRole gender nationality createdAt likedBy friends friendRequestsSent friendRequestsReceived isTeacher teacherProfile"
       )
       .populate({
         path: "city",
@@ -87,6 +87,16 @@ export default async function PublicProfile({ params }: Props) {
             select: "name code",
           },
         ],
+      })
+      .populate({
+        path: "trips.city",
+        model: City,
+        select: "name country image",
+        populate: {
+          path: "country",
+          model: Country,
+          select: "name code",
+        },
       })
       .populate({
         path: "danceStyles.danceStyle",
@@ -575,6 +585,69 @@ export default async function PublicProfile({ params }: Props) {
                     </div>
                   </div>
                 )}
+
+              {/* Upcoming Trips */}
+              {(() => {
+                const now = new Date();
+                const upcomingTrips = userData.trips?.filter(
+                  (trip: any) => new Date(trip.endDate) >= now
+                ) || [];
+                
+                if (upcomingTrips.length === 0) return null;
+
+                return (
+                  <div className="card bg-base-200 shadow-xl">
+                    <div className="card-body">
+                      <h3 className="card-title text-xl mb-4">✈️ Upcoming Trips</h3>
+                      <div className="space-y-3">
+                        {upcomingTrips.map((trip: any) => (
+                          <div
+                            key={trip._id}
+                            className="card bg-base-300 overflow-hidden"
+                          >
+                            <div className="flex items-stretch">
+                              {/* City Image or Flag - Full bleed on left */}
+                              <div className="w-24 h-24 flex-shrink-0 relative">
+                                {trip.city.image ? (
+                                  <img
+                                    src={trip.city.image}
+                                    alt={trip.city.name}
+                                    className="w-full h-full object-cover"
+                                  />
+                                ) : (
+                                  <div className="w-full h-full flex items-center justify-center bg-base-200">
+                                    <div className="text-5xl">
+                                      <Flag countryCode={trip.city.country.code} size="lg" />
+                                    </div>
+                                  </div>
+                                )}
+                              </div>
+
+                              {/* Text Content with Padding */}
+                              <div className="flex-1 p-4">
+                                <h4 className="font-semibold">
+                                  {trip.city.name}, {trip.city.country.name}
+                                </h4>
+                                <p className="text-sm text-base-content/70 mt-1">
+                                  {new Date(trip.startDate).toLocaleDateString("en-US", {
+                                    month: "short",
+                                    day: "numeric",
+                                    year: "numeric",
+                                  })} - {new Date(trip.endDate).toLocaleDateString("en-US", {
+                                    month: "short",
+                                    day: "numeric",
+                                    year: "numeric",
+                                  })}
+                                </p>
+                              </div>
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  </div>
+                );
+              })()}
 
               {/* Dance Anthem */}
               {userData.anthem && userData.anthem.url && (

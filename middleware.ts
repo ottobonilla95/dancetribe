@@ -16,7 +16,11 @@ const publicRoutes = [
   '/api/auth/callback',
   '/api/auth/session',
   '/api/auth/providers',
-  '/api/auth/csrf'
+  '/api/auth/csrf',
+  '/dancer',
+  '/dance-style',
+  '/city',
+  '/cities'
 ]
 
 // Routes that require authentication but allow incomplete profiles
@@ -50,6 +54,14 @@ export async function middleware(request: NextRequest) {
 
   // Allow public routes
   if (publicRoutes.some(route => pathname === route || pathname.startsWith(route + '/'))) {
+    return NextResponse.next()
+  }
+
+  // Allow username routes (/{username} pattern - single segment, no slashes)
+  // This allows users to share their profile via dancetribe.com/username
+  const pathSegments = pathname.split('/').filter(Boolean)
+  if (pathSegments.length === 1) {
+    // Single segment path - likely a username
     return NextResponse.next()
   }
 

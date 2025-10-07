@@ -11,9 +11,10 @@ import SearchBar from "./SearchBar";
 import logo from "@/app/icon.png";
 import config from "@/config";
 import { useFriendRequestCount } from "@/libs/hooks";
-import { FaUser, FaUserFriends, FaCog, FaSignOutAlt, FaHome, FaUserPlus } from "react-icons/fa";
+import { FaUser, FaUserFriends, FaCog, FaSignOutAlt, FaHome, FaUserPlus, FaMusic } from "react-icons/fa";
 import { signOut } from "next-auth/react";
 import { CONTACT } from "@/constants/contact";
+import InstallAppButton from "./InstallAppButton";
 
 const links: {
   href: string;
@@ -51,6 +52,7 @@ const Header = () => {
       icon: FaUserFriends, 
       badge: pendingRequests > 0 ? pendingRequests : undefined 
     },
+    { href: "/music", label: "Trendy Music", icon: FaMusic },
     { href: "/invite", label: "Invite Friends", icon: FaUserPlus, highlight: true },
     { href: "/onboarding?mode=edit", label: "Edit Profile", icon: FaCog },
   ];
@@ -322,6 +324,11 @@ const Header = () => {
                 </div>
 
                 <div className="divider"></div>
+
+                {/* Install App Button */}
+                <div className="py-2">
+                  <InstallAppButton />
+                </div>
 
                 {/* Collaborate Button */}
                 <div className="py-2">

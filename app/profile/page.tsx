@@ -19,6 +19,7 @@ import CopyProfileLink from "@/components/CopyProfileLink";
 import AchievementBadges from "@/components/AchievementBadges";
 import { calculateUserBadges } from "@/utils/badges";
 import WelcomeModal from "@/components/WelcomeModal";
+import UpcomingTrips from "@/components/UpcomingTrips";
 
 interface ProfileProps {
   searchParams: { welcome?: string };
@@ -532,6 +533,13 @@ export default async function Profile({ searchParams }: ProfileProps) {
                   </div>
                 </div>
               )}
+
+            {/* Upcoming Trips */}
+            <div className="card bg-base-200 shadow-xl">
+              <div className="card-body">
+                <UpcomingTrips editable={true} />
+              </div>
+            </div>
 
             {/* Dance Anthem */}
             {userData.anthem && userData.anthem.url && (

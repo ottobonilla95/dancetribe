@@ -17,7 +17,9 @@ import {
   FaGlobeAmericas,
   FaHeart,
   FaMusic,
+  FaWhatsapp,
 } from "react-icons/fa";
+import { SiLine, SiTelegram } from "react-icons/si";
 
 interface Props {
   params: {
@@ -303,6 +305,54 @@ export default async function CityPage({ params, searchParams }: Props) {
                         <div className="badge badge-primary badge-sm">View</div>
                       </Link>
                     ))}
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {/* City Dance Groups */}
+            {(city.socialGroups?.whatsapp || city.socialGroups?.line || city.socialGroups?.telegram) && (
+              <div className="card bg-base-200 shadow-xl mt-6">
+                <div className="card-body">
+                  <h2 className="card-title mb-4">💬 Community Groups</h2>
+                  <p className="text-sm text-base-content/70 mb-4">
+                    Join the dance community
+                  </p>
+                  <div className="space-y-2">
+                    {city.socialGroups.whatsapp && (
+                      <a
+                        href={city.socialGroups.whatsapp}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="btn btn-success btn-sm gap-2 w-full"
+                      >
+                        <FaWhatsapp className="text-lg" />
+                        WhatsApp
+                      </a>
+                    )}
+                    {city.socialGroups.line && (
+                      <a
+                        href={city.socialGroups.line}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="btn btn-sm gap-2 w-full"
+                        style={{ backgroundColor: '#00B900', color: 'white' }}
+                      >
+                        <SiLine className="text-lg" />
+                        LINE
+                      </a>
+                    )}
+                    {city.socialGroups.telegram && (
+                      <a
+                        href={city.socialGroups.telegram}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="btn btn-info btn-sm gap-2 w-full"
+                      >
+                        <SiTelegram className="text-lg" />
+                        Telegram
+                      </a>
+                    )}
                   </div>
                 </div>
               </div>

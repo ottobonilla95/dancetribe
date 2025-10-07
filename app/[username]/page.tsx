@@ -18,45 +18,20 @@ export default async function UsernamePage({ params }: PageProps) {
     const user = await User.findOne({
       username: username.toLowerCase(),
     }).select("_id");
-
-    console.log("-------------------");
-    console.log("-------------------");
-    console.log("-------------------");
-    console.log("-------------------");
-    console.log("-------------------");
-    console.log("user", user);
-    console.log("-------------------");
-    console.log("-------------------");
-    console.log("-------------------");
-    console.log("-------------------");
-    console.log("-------------------");
-    console.log("-------------------");
-    console.log("-------------------");
-    console.log("-------------------");
-    console.log("-------------------");
-    console.log("-------------------");
-    console.log("-------------------");
-    console.log("-------------------");
-    console.log("-------------------");
-    console.log("-------------------");
-    console.log("-------------------");
-    console.log("-------------------");
-    console.log("-------------------");
-    console.log("-------------------");
-    console.log("-------------------");
-    console.log("-------------------");
-    console.log("-------------------");
-    console.log("-------------------");
-    console.log("-------------------");
+    
     if (user) {
       // Redirect to the full dancer profile
-      console.log("redirecting to", `/dancer/${user._id}`);
       redirect(`/dancer/${user._id}`);
     } else {
       // Username not found, redirect to home with a message
       redirect("/?error=user-not-found");
     }
-  } catch (error) {
+  } catch (error: any) {
+    // Check if it's a Next.js redirect (which is expected behavior)
+    if (error?.digest?.startsWith('NEXT_REDIRECT')) {
+      throw error; // Re-throw to allow Next.js to handle the redirect
+    }
+    
     console.error("Error finding user:", error);
     redirect("/?error=server-error");
   }

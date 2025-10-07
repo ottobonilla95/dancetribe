@@ -89,6 +89,26 @@ const userSchema = new mongoose.Schema(
       type: mongoose.Schema.Types.ObjectId,
       ref: "City",
     }],
+    // Upcoming trips - cities user is planning to visit
+    trips: [{
+      city: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "City",
+        required: true
+      },
+      startDate: {
+        type: Date,
+        required: true
+      },
+      endDate: {
+        type: Date,
+        required: true
+      },
+      createdAt: {
+        type: Date,
+        default: Date.now
+      }
+    }],
     // User's anthem - Spotify or YouTube song
     anthem: {
       url: String,
