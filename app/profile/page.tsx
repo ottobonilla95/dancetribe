@@ -18,8 +18,13 @@ import DanceStyleCard from "@/components/DanceStyleCard";
 import CopyProfileLink from "@/components/CopyProfileLink";
 import AchievementBadges from "@/components/AchievementBadges";
 import { calculateUserBadges } from "@/utils/badges";
+import WelcomeModal from "@/components/WelcomeModal";
 
-export default async function Profile() {
+interface ProfileProps {
+  searchParams: { welcome?: string };
+}
+
+export default async function Profile({ searchParams }: ProfileProps) {
   const session = await getServerSession(authOptions);
 
   if (!session) {
@@ -186,6 +191,32 @@ export default async function Profile() {
 
   return (
     <div className="min-h-screen p-4 bg-base-100">
+      {/* Welcome Modal */}
+      <WelcomeModal 
+        userName={userData.name || userData.username}
+        userUsername={userData.username}
+        userImage={userData.image}
+        userData={{
+          id: userData._id,
+          name: userData.name,
+          username: userData.username,
+          profilePicture: userData.image || "/default-avatar.png",
+          dateOfBirth: userData.dateOfBirth,
+          nationality: userData.nationality,
+          danceRole: userData.danceRole,
+          city: userData.city ? {
+            name: userData.city.name,
+            country: { name: userData.city.country?.name || "" },
+            image: userData.city.image
+          } : { name: "", country: { name: "" } },
+          danceStyles: getDanceStylesWithLevels(userData.danceStyles || []).map(s => ({
+            name: s.name,
+            level: s.levelLabel || s.level
+          }))
+        }}
+        showWelcome={searchParams?.welcome === "true"}
+      />
+
       <div className="max-w-4xl mx-auto">
         {/* Header */}
         <div className="mb-8 text-center">

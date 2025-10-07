@@ -1,6 +1,6 @@
-import { redirect } from 'next/navigation';
-import connectDB from '@/libs/mongoose';
-import User from '@/models/User';
+import { redirect } from "next/navigation";
+import connectDB from "@/libs/mongoose";
+import User from "@/models/User";
 
 interface PageProps {
   params: {
@@ -10,24 +10,54 @@ interface PageProps {
 
 export default async function UsernamePage({ params }: PageProps) {
   const { username } = params;
-  
+
   try {
     await connectDB();
-    
+
     // Find user by username (exact match)
     const user = await User.findOne({
-      username: username.toLowerCase()
-    }).select('_id');
-    
+      username: username.toLowerCase(),
+    }).select("_id");
+
+    console.log("-------------------");
+    console.log("-------------------");
+    console.log("-------------------");
+    console.log("-------------------");
+    console.log("-------------------");
+    console.log("user", user);
+    console.log("-------------------");
+    console.log("-------------------");
+    console.log("-------------------");
+    console.log("-------------------");
+    console.log("-------------------");
+    console.log("-------------------");
+    console.log("-------------------");
+    console.log("-------------------");
+    console.log("-------------------");
+    console.log("-------------------");
+    console.log("-------------------");
+    console.log("-------------------");
+    console.log("-------------------");
+    console.log("-------------------");
+    console.log("-------------------");
+    console.log("-------------------");
+    console.log("-------------------");
+    console.log("-------------------");
+    console.log("-------------------");
+    console.log("-------------------");
+    console.log("-------------------");
+    console.log("-------------------");
+    console.log("-------------------");
     if (user) {
       // Redirect to the full dancer profile
+      console.log("redirecting to", `/dancer/${user._id}`);
       redirect(`/dancer/${user._id}`);
     } else {
       // Username not found, redirect to home with a message
-      redirect('/?error=user-not-found');
+      redirect("/?error=user-not-found");
     }
   } catch (error) {
-    console.error('Error finding user:', error);
-    redirect('/?error=server-error');
+    console.error("Error finding user:", error);
+    redirect("/?error=server-error");
   }
-} 
+}

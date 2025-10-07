@@ -567,8 +567,8 @@ export default function Onboarding() {
           console.error("❌ Failed to update session:", sessionError);
         }
 
-        // Redirect to dashboard
-        window.location.href = "/dashboard";
+        // Redirect to profile with welcome modal
+        window.location.href = "/profile?welcome=true";
         return;
       }
 
@@ -581,8 +581,8 @@ export default function Onboarding() {
           console.log("🎉 Profile updated! Redirecting to profile...");
           window.location.href = "/profile";
         } else {
-          console.log("🎉 Onboarding complete! Redirecting to dashboard...");
-          window.location.href = "/dashboard";
+          console.log("🎉 Onboarding complete! Showing welcome modal...");
+          window.location.href = "/profile?welcome=true";
         }
       }
     } catch (error) {
