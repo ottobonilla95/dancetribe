@@ -3,6 +3,8 @@ import connectMongo from "@/libs/mongoose";
 import User from "@/models/User";
 import City from "@/models/City";
 import DanceStyle from "@/models/DanceStyle";
+import Country from "@/models/Country";
+import Continent from "@/models/Continent";
 import Link from "next/link";
 import { getZodiacSign } from "@/utils/zodiac";
 import { getCountryCode } from "@/utils/countries";
@@ -56,11 +58,35 @@ export default async function PublicProfile({ params }: Props) {
         path: "city",
         model: City,
         select: "name country continent rank image population",
+        populate: [
+          {
+            path: "country",
+            model: Country,
+            select: "name code"
+          },
+          {
+            path: "continent",
+            model: Continent,
+            select: "name code"
+          }
+        ]
       })
       .populate({
         path: "citiesVisited",
         model: City,
         select: "name country continent rank image",
+        populate: [
+          {
+            path: "country",
+            model: Country,
+            select: "name code"
+          },
+          {
+            path: "continent",
+            model: Continent,
+            select: "name code"
+          }
+        ]
       })
       .populate({
         path: "danceStyles.danceStyle",
@@ -291,27 +317,18 @@ export default async function PublicProfile({ params }: Props) {
                           {friendsCount !== 1 ? "s" : ""}
                         </span>
                       </div>
-                                          {/* Current Location */}
-                    {userData.city && typeof userData.city === "object" && (
-                      <div className="mt-1">
-                        <div className="">
-                          📍{" "}
+                      {/* Current Location */}
+                      {userData.city && typeof userData.city === "object" && (
+                        <div className="mt-1">
+                          <span>📍 </span>
                           <Link 
                             href={`/city/${userData.city._id}`}
                             className="link link-primary hover:link-accent"
                           >
                             {userData.city.name}
                           </Link>
-                          {userData.city.country && (
-                            <span className="text-base-content/60">
-                              {typeof userData.city.country === "string"
-                                ? userData.city.country
-                                : userData.city.country.name}
-                            </span>
-                          )}
                         </div>
-                      </div>
-                    )}
+                      )}
                       {/* Nationality */}
                       {userData.nationality && (
                         <div className="mt-4">
@@ -489,128 +506,121 @@ export default async function PublicProfile({ params }: Props) {
                 </div>
               </div>
 
-              {/* Social & Music */}
-              <div className="card bg-base-200 shadow-xl">
-                <div className="card-body">
-                  <h3 className="card-title text-xl mb-4">🎵 Music & Social</h3>
-
-                  {/* Dance Anthem */}
-                  {userData.anthem && userData.anthem.url && (
-                    <div className="mb-4">
-                      <div className="text-sm font-medium text-base-content/60 mb-2">
-                        Dance Anthem
-                      </div>
-                      <div className="rounded-lg">
-                        {/* Iframe for Spotify/YouTube */}
-                        {(() => {
-                          const url = userData.anthem.url;
-                          let embedUrl = "";
-
-                          if (userData.anthem.platform === "spotify") {
-                            const spotifyMatch = url.match(
-                              /(?:spotify\.com\/track\/|spotify:track:)([a-zA-Z0-9]+)/
-                            );
-                            if (spotifyMatch) {
-                              embedUrl = `https://open.spotify.com/embed/track/${spotifyMatch[1]}`;
-                            }
-                          } else if (userData.anthem.platform === "youtube") {
-                            const youtubeMatch = url.match(
-                              /(?:youtube\.com\/watch\?v=|youtu\.be\/)([a-zA-Z0-9_-]+)/
-                            );
-                            if (youtubeMatch) {
-                              embedUrl = `https://www.youtube.com/embed/${youtubeMatch[1]}`;
-                            }
-                          }
-
-                          return embedUrl ? (
-                            <div
-                              className="rounded-lg overflow-hidden"
-                              style={{ height: "152px" }}
-                            >
-                              <iframe
-                                src={embedUrl}
-                                width="100%"
-                                height="152"
-                                frameBorder="0"
-                                scrolling="no"
-                                className="rounded-2xl"
-                                style={{ overflow: "hidden" }}
-                                allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture"
-                                loading="lazy"
-                              />
-                            </div>
-                          ) : (
-                            <a
-                              href={url}
-                              target="_blank"
-                              rel="noopener noreferrer"
-                              className="btn btn-xs btn-primary"
-                            >
-                              🎧 Listen
-                            </a>
-                          );
-                        })()}
+              {/* Social Media */}
+              {userData.socialMedia &&
+                (userData.socialMedia.instagram ||
+                  userData.socialMedia.tiktok ||
+                  userData.socialMedia.youtube) && (
+                  <div className="card bg-base-200 shadow-xl">
+                    <div className="card-body">
+                      <h3 className="card-title text-xl mb-4">🌐 Social Media</h3>
+                      <div className="flex gap-3">
+                        {userData.socialMedia.instagram && (
+                          <a
+                            href={getSocialUrl(
+                              "instagram",
+                              userData.socialMedia.instagram
+                            )}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="btn btn-circle btn-outline hover:bg-gradient-to-r hover:from-purple-500 hover:to-pink-500 hover:text-white hover:border-purple-500"
+                            title={`@${userData.socialMedia.instagram.replace("@", "")} on Instagram`}
+                          >
+                            <FaInstagram className="text-xl" />
+                          </a>
+                        )}
+                        {userData.socialMedia.tiktok && (
+                          <a
+                            href={getSocialUrl(
+                              "tiktok",
+                              userData.socialMedia.tiktok
+                            )}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="btn btn-circle btn-outline hover:bg-black hover:text-white hover:border-black"
+                            title={`@${userData.socialMedia.tiktok.replace("@", "")} on TikTok`}
+                          >
+                            <FaTiktok className="text-xl" />
+                          </a>
+                        )}
+                        {userData.socialMedia.youtube && (
+                          <a
+                            href={getSocialUrl(
+                              "youtube",
+                              userData.socialMedia.youtube
+                            )}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="btn btn-circle btn-outline hover:bg-red-600 hover:text-white hover:border-red-600"
+                            title="YouTube Channel"
+                          >
+                            <FaYoutube className="text-xl" />
+                          </a>
+                        )}
                       </div>
                     </div>
-                  )}
+                  </div>
+                )}
 
-                  {/* Social Media */}
-                  {userData.socialMedia &&
-                    (userData.socialMedia.instagram ||
-                      userData.socialMedia.tiktok ||
-                      userData.socialMedia.youtube) && (
-                      <div>
-                        <div className="text-sm font-medium text-base-content/60 mb-3">
-                          Social Media
-                        </div>
-                        <div className="flex gap-3">
-                          {userData.socialMedia.instagram && (
-                            <a
-                              href={getSocialUrl(
-                                "instagram",
-                                userData.socialMedia.instagram
-                              )}
-                              target="_blank"
-                              rel="noopener noreferrer"
-                              className="btn btn-circle btn-outline hover:bg-gradient-to-r hover:from-purple-500 hover:to-pink-500 hover:text-white hover:border-purple-500"
-                              title={`@${userData.socialMedia.instagram.replace("@", "")} on Instagram`}
-                            >
-                              <FaInstagram className="text-xl" />
-                            </a>
-                          )}
-                          {userData.socialMedia.tiktok && (
-                            <a
-                              href={getSocialUrl(
-                                "tiktok",
-                                userData.socialMedia.tiktok
-                              )}
-                              target="_blank"
-                              rel="noopener noreferrer"
-                              className="btn btn-circle btn-outline hover:bg-black hover:text-white hover:border-black"
-                              title={`@${userData.socialMedia.tiktok.replace("@", "")} on TikTok`}
-                            >
-                              <FaTiktok className="text-xl" />
-                            </a>
-                          )}
-                          {userData.socialMedia.youtube && (
-                            <a
-                              href={getSocialUrl(
-                                "youtube",
-                                userData.socialMedia.youtube
-                              )}
-                              target="_blank"
-                              rel="noopener noreferrer"
-                              className="btn btn-circle btn-outline hover:bg-red-600 hover:text-white hover:border-red-600"
-                              title="YouTube Channel"
-                            >
-                              <FaYoutube className="text-xl" />
-                            </a>
-                          )}
-                        </div>
-                      </div>
-                    )}
+              {/* Dance Anthem */}
+              {userData.anthem && userData.anthem.url && (
+                <div className="card bg-base-200 shadow-xl">
+                  <div className="card-body">
+                    <h3 className="card-title text-xl mb-4">🎵 Dance Anthem</h3>
+                    <div className="rounded-lg">
+                      {/* Iframe for Spotify/YouTube */}
+                      {(() => {
+                        const url = userData.anthem.url;
+                        let embedUrl = "";
+
+                        if (userData.anthem.platform === "spotify") {
+                          const spotifyMatch = url.match(
+                            /(?:spotify\.com\/track\/|spotify:track:)([a-zA-Z0-9]+)/
+                          );
+                          if (spotifyMatch) {
+                            embedUrl = `https://open.spotify.com/embed/track/${spotifyMatch[1]}`;
+                          }
+                        } else if (userData.anthem.platform === "youtube") {
+                          const youtubeMatch = url.match(
+                            /(?:youtube\.com\/watch\?v=|youtu\.be\/)([a-zA-Z0-9_-]+)/
+                          );
+                          if (youtubeMatch) {
+                            embedUrl = `https://www.youtube.com/embed/${youtubeMatch[1]}`;
+                          }
+                        }
+
+                        return embedUrl ? (
+                          <div
+                            className="rounded-lg overflow-hidden"
+                            style={{ height: "152px" }}
+                          >
+                            <iframe
+                              src={embedUrl}
+                              width="100%"
+                              height="152"
+                              frameBorder="0"
+                              scrolling="no"
+                              className="rounded-2xl"
+                              style={{ overflow: "hidden" }}
+                              allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture"
+                              loading="lazy"
+                            />
+                          </div>
+                        ) : (
+                          <a
+                            href={url}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="btn btn-xs btn-primary"
+                          >
+                            🎧 Listen
+                          </a>
+                        );
+                      })()}
+                    </div>
+                  </div>
                 </div>
-              </div>
+              )}
             </div>
           </div>
 

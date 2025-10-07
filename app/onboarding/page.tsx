@@ -441,7 +441,7 @@ export default function Onboarding() {
         }
         stepData = { dateOfBirth };
         break;
-      case "dancingStartYear":
+      case "dancingStartYear": {
         if (!dancingStartYear) {
           alert("Please enter the year you started dancing");
           return;
@@ -454,6 +454,7 @@ export default function Onboarding() {
         }
         stepData = { dancingStartYear: yearNum };
         break;
+      }
       case "currentLocation": {
         if (!currentLocation) {
           alert("Please select your current city");
@@ -1027,7 +1028,7 @@ export default function Onboarding() {
                 {dancingStartYear && (
                   <label className="label">
                     <span className="label-text-alt text-base-content/60">
-                      That's {new Date().getFullYear() - parseInt(dancingStartYear)} years of dancing! 🎉
+                      That&apos;s {new Date().getFullYear() - parseInt(dancingStartYear)} years of dancing! 🎉
                     </span>
                   </label>
                 )}

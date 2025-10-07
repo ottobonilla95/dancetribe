@@ -5,6 +5,7 @@ import connectMongo from "@/libs/mongoose";
 import User from "@/models/User";
 import City from "@/models/City";
 import DanceStyle from "@/models/DanceStyle";
+import { createAccentInsensitivePattern } from "@/utils/search";
 
 export async function GET(req: NextRequest) {
   const session = await getServerSession(authOptions);
@@ -29,6 +30,9 @@ export async function GET(req: NextRequest) {
       });
     }
 
+    // Create accent-insensitive search pattern
+    const accentInsensitivePattern = createAccentInsensitivePattern(query);
+    
     // Create search conditions
     const searchConditions = {
       $and: [
@@ -36,11 +40,11 @@ export async function GET(req: NextRequest) {
         { _id: { $ne: session.user.id } },
         // Only search users with complete profiles
         { isProfileComplete: true },
-        // Search criteria
+        // Search criteria with accent-insensitive matching
         {
           $or: [
-            { username: { $regex: query, $options: "i" } },
-            { name: { $regex: query, $options: "i" } },
+            { username: { $regex: accentInsensitivePattern, $options: "i" } },
+            { name: { $regex: accentInsensitivePattern, $options: "i" } },
           ]
         }
       ]

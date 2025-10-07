@@ -11,7 +11,7 @@ import SearchBar from "./SearchBar";
 import logo from "@/app/icon.png";
 import config from "@/config";
 import { useFriendRequestCount } from "@/libs/hooks";
-import { FaUser, FaUserFriends, FaCog, FaSignOutAlt, FaHome } from "react-icons/fa";
+import { FaUser, FaUserFriends, FaCog, FaSignOutAlt, FaHome, FaUserPlus } from "react-icons/fa";
 import { signOut } from "next-auth/react";
 import { CONTACT } from "@/constants/contact";
 
@@ -51,7 +51,8 @@ const Header = () => {
       icon: FaUserFriends, 
       badge: pendingRequests > 0 ? pendingRequests : undefined 
     },
-    { href: "/onboarding", label: "Settings", icon: FaCog },
+    { href: "/invite", label: "Invite Friends", icon: FaUserPlus, highlight: true },
+    { href: "/onboarding?mode=edit", label: "Edit Profile", icon: FaCog },
   ];
 
   const handleSignOut = () => {
@@ -301,7 +302,11 @@ const Header = () => {
                       <Link
                         href={item.href}
                         key={item.href}
-                        className="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-base-300 transition-colors"
+                        className={`flex items-center gap-3 px-3 py-2 rounded-lg transition-colors ${
+                          (item as any).highlight 
+                            ? "bg-gradient-to-r from-primary/20 to-secondary/20 hover:from-primary/30 hover:to-secondary/30 border border-primary/30" 
+                            : "hover:bg-base-300"
+                        }`}
                         title={item.label}
                       >
                         <item.icon className="text-lg" />

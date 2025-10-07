@@ -6,6 +6,7 @@ import User from "@/models/User";
 import DanceStyle from "@/models/DanceStyle";
 import City from "@/models/City";
 import Country from "@/models/Country";
+import { createAccentInsensitivePattern } from "@/utils/search";
 
 export async function GET(req: NextRequest) {
   try {
@@ -56,13 +57,13 @@ export async function GET(req: NextRequest) {
       query.danceRole = danceRole;
     }
 
-    // Filter by city (case-insensitive search)
+    // Filter by city (accent-insensitive search)
     if (city && city.trim()) {
-      const cityRegex = new RegExp(city.trim(), "i");
+      const accentInsensitivePattern = createAccentInsensitivePattern(city.trim());
       
-      // Find cities that match the search
+      // Find cities that match the search (with accent-insensitive matching)
       const matchingCities = await City.find({
-        name: cityRegex
+        name: { $regex: accentInsensitivePattern, $options: "i" }
       }).select("_id");
       
       if (matchingCities.length > 0) {

@@ -68,7 +68,7 @@ export default function CityDropdown({
   const searchCities = async (term: string) => {
     try {
       setIsLoading(true);
-      const data = (await apiClient.get(`/cities?search=${encodeURIComponent(term)}&limit=10`)) as {
+      const data = (await apiClient.get(`/cities?search=${encodeURIComponent(term)}&limit=10&includeEmpty=true`)) as {
         cities: City[];
       };
       

@@ -3,6 +3,7 @@ import connectMongo from "@/libs/mongoose";
 import City from "@/models/City";
 import Country from "@/models/Country";
 import Continent from "@/models/Continent";
+import { createAccentInsensitivePattern } from "@/utils/search";
 
 export async function GET(req: NextRequest) {
   try {
@@ -13,6 +14,7 @@ export async function GET(req: NextRequest) {
     const page = parseInt(searchParams.get("page") || "1");
     const limit = parseInt(searchParams.get("limit") || "12");
     const search = searchParams.get("search") || "";
+    const includeEmpty = searchParams.get("includeEmpty") === "true"; // Allow cities with 0 dancers
     
     const skip = (page - 1) * limit;
 
@@ -37,15 +39,22 @@ export async function GET(req: NextRequest) {
 
     // Build search criteria
     let searchCriteria: any = { 
-      isActive: true,
-      totalDancers: { $gt: 0 } // Only show cities with dancers
+      isActive: true
     };
 
+    // Only filter by dancers if not including empty cities
+    if (!includeEmpty) {
+      searchCriteria.totalDancers = { $gt: 0 };
+    }
+
     if (search) {
+      // Use accent-insensitive search pattern
+      const accentInsensitivePattern = createAccentInsensitivePattern(search);
+      
       searchCriteria.$or = [
-        { name: { $regex: search, $options: "i" } },
-        { "country.name": { $regex: search, $options: "i" } },
-        { "continent.name": { $regex: search, $options: "i" } }
+        { name: { $regex: accentInsensitivePattern, $options: "i" } },
+        { "country.name": { $regex: accentInsensitivePattern, $options: "i" } },
+        { "continent.name": { $regex: accentInsensitivePattern, $options: "i" } }
       ];
     }
 

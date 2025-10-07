@@ -104,15 +104,26 @@ export function calculateUserBadges(userData: UserBadgeData): Badge[] {
     }
   }
 
-  // Sort badges by tier (diamond first) and then by category
+  // Filter to show only the highest tier badge per category
   const tierOrder = { diamond: 0, platinum: 1, gold: 2, silver: 3, bronze: 4 };
-  earnedBadges.sort((a, b) => {
+  const badgesByCategory = new Map<string, Badge>();
+
+  for (const badge of earnedBadges) {
+    const existing = badgesByCategory.get(badge.category);
+    if (!existing || tierOrder[badge.tier] < tierOrder[existing.tier]) {
+      badgesByCategory.set(badge.category, badge);
+    }
+  }
+
+  // Convert back to array and sort by tier
+  const filteredBadges = Array.from(badgesByCategory.values());
+  filteredBadges.sort((a, b) => {
     const tierDiff = tierOrder[a.tier] - tierOrder[b.tier];
     if (tierDiff !== 0) return tierDiff;
     return a.category.localeCompare(b.category);
   });
 
-  return earnedBadges;
+  return filteredBadges;
 }
 
 export function getNextBadges(userData: UserBadgeData, limit: number = 3): Array<Badge & { progress: number }> {

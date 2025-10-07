@@ -11,6 +11,16 @@ export interface Badge {
   };
 }
 
+// Category images - one per category
+export const CATEGORY_IMAGES: Record<string, string> = {
+  experience: "/img/badges/experience.png", // placeholder - add later
+  travel: "/img/badges/travel.png", // placeholder - add later
+  continents: "/img/badges/globe.png",
+  styles: "/img/badges/styles.png", // placeholder - add later
+  social: "/img/badges/friends.png", // placeholder - add later
+  teacher: "/img/badges/teacher.png", // placeholder - add later
+};
+
 export const BADGES: Badge[] = [
   // Experience Badges
   {

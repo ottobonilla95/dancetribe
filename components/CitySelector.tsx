@@ -69,7 +69,7 @@ export default function CitySelector({
     setIsLoading(true);
     try {
       const data = (await apiClient.get(
-        `/cities?search=${encodeURIComponent(query)}&limit=10`
+        `/cities?search=${encodeURIComponent(query)}&limit=10&includeEmpty=true`
       )) as { cities: City[] };
 
       // Filter out already selected cities
