@@ -43,7 +43,9 @@ export default function RootLayout({ children }: { children: ReactNode }) {
 				<meta name="apple-mobile-web-app-capable" content="yes" />
 				<meta name="apple-mobile-web-app-status-bar-style" content="default" />
 				<meta name="apple-mobile-web-app-title" content="DanceTribe" />
-				<link rel="apple-touch-icon" href="/apple-icon.png" />
+				<link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+				<link rel="icon" type="image/png" sizes="192x192" href="/icon-192.png" />
+				<link rel="icon" type="image/png" sizes="512x512" href="/icon-512.png" />
 			</head>
 			<body>
 				{/* ClientLayout contains all the client wrappers (Crisp chat support, toast messages, tooltips, etc.) */}
