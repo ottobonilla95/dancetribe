@@ -50,10 +50,6 @@ export default function InstallPrompt({ show, onClose }: InstallPromptProps) {
   // Don't show if already installed, seen, or not on mobile
   const shouldShow = show && !isInstalled && !hasSeenPrompt && (isIOS || isAndroid);
 
-  if (!shouldShow) {
-    return null;
-  }
-
   return (
     <>
       {/* Instructions Modal */}
@@ -65,14 +61,16 @@ export default function InstallPrompt({ show, onClose }: InstallPromptProps) {
         }}
       />
 
-      {/* Backdrop */}
-      <div
-        className="fixed inset-0 bg-black/50 z-50 animate-fade-in"
-        onClick={handleClose}
-      />
+      {shouldShow && (
+        <>
+          {/* Backdrop */}
+          <div
+            className="fixed inset-0 bg-black/50 z-50 animate-fade-in"
+            onClick={handleClose}
+          />
 
-      {/* Prompt Card */}
-      <div className="fixed bottom-0 left-0 right-0 z-50 p-4 animate-slide-up">
+          {/* Prompt Card */}
+          <div className="fixed bottom-0 left-0 right-0 z-50 p-4 animate-slide-up">
         <div className="bg-gradient-to-br from-primary to-secondary text-primary-content rounded-2xl shadow-2xl max-w-md mx-auto p-6 relative">
           {/* Close Button */}
           <button
@@ -110,28 +108,30 @@ export default function InstallPrompt({ show, onClose }: InstallPromptProps) {
         </div>
       </div>
 
-      <style jsx>{`
-        @keyframes fade-in {
-          from { opacity: 0; }
-          to { opacity: 1; }
-        }
-        @keyframes slide-up {
-          from {
-            transform: translateY(100%);
-            opacity: 0;
-          }
-          to {
-            transform: translateY(0);
-            opacity: 1;
-          }
-        }
-        .animate-fade-in {
-          animation: fade-in 0.3s ease-out;
-        }
-        .animate-slide-up {
-          animation: slide-up 0.4s ease-out;
-        }
-      `}</style>
+          <style jsx>{`
+            @keyframes fade-in {
+              from { opacity: 0; }
+              to { opacity: 1; }
+            }
+            @keyframes slide-up {
+              from {
+                transform: translateY(100%);
+                opacity: 0;
+              }
+              to {
+                transform: translateY(0);
+                opacity: 1;
+              }
+            }
+            .animate-fade-in {
+              animation: fade-in 0.3s ease-out;
+            }
+            .animate-slide-up {
+              animation: slide-up 0.4s ease-out;
+            }
+          `}</style>
+        </>
+      )}
     </>
   );
 }

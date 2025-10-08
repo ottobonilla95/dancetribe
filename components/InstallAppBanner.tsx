@@ -51,22 +51,24 @@ export default function InstallAppBanner() {
   };
 
   const handleInstallClick = () => {
-    handleDismiss(); // Dismiss banner permanently when user clicks Install
     setShowInstructionsModal(true);
   };
 
-  if (!show || isInstalled || isDismissed) {
-    return null;
-  }
+  // Render modal even if banner is hidden (so it can still show when triggered)
+  const shouldShowBanner = show && !isInstalled && !isDismissed;
 
   return (
     <>
       {/* Instructions Modal */}
       <InstallInstructionsModal
         isOpen={showInstructionsModal}
-        onClose={() => setShowInstructionsModal(false)}
+        onClose={() => {
+          setShowInstructionsModal(false);
+          handleDismiss(); // Dismiss banner permanently when modal closes
+        }}
       />
 
+      {shouldShowBanner && (
       <div className="fixed bottom-20 left-4 right-4 z-40 lg:hidden animate-slide-up">
       <div className="bg-gradient-to-r from-primary to-secondary text-primary-content rounded-xl shadow-lg p-4 flex items-center justify-between gap-3 max-w-md mx-auto">
         <div className="flex items-center gap-3 flex-1">
@@ -108,6 +110,7 @@ export default function InstallAppBanner() {
         }
       `}</style>
     </div>
+      )}
     </>
   );
 }
