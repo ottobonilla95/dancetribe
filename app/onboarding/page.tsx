@@ -157,7 +157,7 @@ export default function Onboarding() {
     },
     {
       id: "anthem",
-      title: "What's your dance anthem?",
+      title: "What's your dance anthem? (optional)",
       description: "Share a song that gets you moving",
       completed: user?.onboardingSteps?.anthem || false,
     },
@@ -1073,9 +1073,6 @@ export default function Onboarding() {
 
             {steps[currentStep].id === "anthem" && (
               <div className="space-y-4">
-                <div className="alert alert-info">
-                  <span className="text-sm">This step is optional - you can skip it if you&apos;d like!</span>
-                </div>
                 <div className="form-control">
                   <label className="label">
                     <span className="label-text">Song URL (optional)</span>
