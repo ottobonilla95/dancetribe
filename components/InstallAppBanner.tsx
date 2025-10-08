@@ -51,6 +51,7 @@ export default function InstallAppBanner() {
   };
 
   const handleInstallClick = () => {
+    handleDismiss(); // Dismiss banner permanently when user clicks Install
     setShowInstructionsModal(true);
   };
 
