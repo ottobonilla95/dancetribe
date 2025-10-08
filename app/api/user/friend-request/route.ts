@@ -3,6 +3,8 @@ import { getServerSession } from "next-auth";
 import { authOptions } from "@/libs/next-auth";
 import connectMongo from "@/libs/mongoose";
 import User from "@/models/User";
+import { sendEmail } from "@/libs/resend";
+import { friendRequestReceivedEmail, friendRequestAcceptedEmail } from "@/libs/email-templates";
 
 export async function POST(req: NextRequest) {
   try {
@@ -98,6 +100,18 @@ export async function POST(req: NextRequest) {
           },
         });
 
+        // Send email notification (non-blocking)
+        if (targetUser.email) {
+          const emailTemplate = friendRequestReceivedEmail(
+            { name: currentUser.name, username: currentUser.username, image: currentUser.image },
+            { name: targetUser.name, email: targetUser.email }
+          );
+          sendEmail({
+            to: targetUser.email,
+            ...emailTemplate,
+          }).catch(err => console.error('Failed to send friend request email:', err));
+        }
+
         return NextResponse.json({
           success: true,
           action: "request_sent",
@@ -126,6 +140,18 @@ export async function POST(req: NextRequest) {
           $push: { friends: currentUserId },
           $pull: { friendRequestsSent: { user: currentUserId } },
         });
+
+        // Send email notification to the person who sent the request (non-blocking)
+        if (targetUser.email) {
+          const emailTemplate = friendRequestAcceptedEmail(
+            { name: currentUser.name, username: currentUser.username, image: currentUser.image, _id: currentUserId },
+            { name: targetUser.name, email: targetUser.email }
+          );
+          sendEmail({
+            to: targetUser.email,
+            ...emailTemplate,
+          }).catch(err => console.error('Failed to send friend request accepted email:', err));
+        }
 
         return NextResponse.json({
           success: true,

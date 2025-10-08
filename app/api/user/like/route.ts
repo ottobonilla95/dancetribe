@@ -3,6 +3,8 @@ import { getServerSession } from "next-auth";
 import { authOptions } from "@/libs/next-auth";
 import connectMongo from "@/libs/mongoose";
 import User from "@/models/User";
+import { sendEmail } from "@/libs/resend";
+import { profileLikedEmail } from "@/libs/email-templates";
 
 export async function POST(req: NextRequest) {
   try {
@@ -36,6 +38,9 @@ export async function POST(req: NextRequest) {
 
     const currentUserId = session.user.id;
 
+    // Get current user data for email
+    const currentUser = await User.findById(currentUserId);
+
     // Check if target user exists
     const targetUser = await User.findById(targetUserId);
     if (!targetUser) {
@@ -68,6 +73,18 @@ export async function POST(req: NextRequest) {
         { $addToSet: { likedBy: currentUserId } },
         { new: true }
       );
+
+      // Send email notification (non-blocking)
+      if (targetUser.email) {
+        const emailTemplate = profileLikedEmail(
+          { name: currentUser.name, username: currentUser.username, image: currentUser.image, _id: currentUserId },
+          { name: targetUser.name, email: targetUser.email }
+        );
+        sendEmail({
+          to: targetUser.email,
+          ...emailTemplate,
+        }).catch(err => console.error('Failed to send profile like email:', err));
+      }
 
       return NextResponse.json({
         success: true,
