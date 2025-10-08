@@ -1074,7 +1074,7 @@ export default function Onboarding() {
             {steps[currentStep].id === "anthem" && (
               <div className="space-y-4">
                 <div className="alert alert-info">
-                  <span className="text-sm">This step is optional - you can skip it if you'd like!</span>
+                  <span className="text-sm">This step is optional - you can skip it if you&apos;d like!</span>
                 </div>
                 <div className="form-control">
                   <label className="label">
