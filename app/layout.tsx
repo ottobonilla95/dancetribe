@@ -43,7 +43,14 @@ export default function RootLayout({ children }: { children: ReactNode }) {
 				<meta name="apple-mobile-web-app-capable" content="yes" />
 				<meta name="apple-mobile-web-app-status-bar-style" content="default" />
 				<meta name="apple-mobile-web-app-title" content="DanceTribe" />
-				<link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+				
+				{/* Apple Touch Icons for different devices */}
+				<link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png" />
+				<link rel="apple-touch-icon" sizes="167x167" href="/apple-touch-icon-167.png" />
+				<link rel="apple-touch-icon" sizes="152x152" href="/apple-touch-icon-152.png" />
+				<link rel="apple-touch-icon" sizes="120x120" href="/apple-touch-icon-120.png" />
+				
+				{/* Standard favicons */}
 				<link rel="icon" type="image/png" sizes="192x192" href="/icon-192.png" />
 				<link rel="icon" type="image/png" sizes="512x512" href="/icon-512.png" />
 			</head>

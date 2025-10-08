@@ -4,14 +4,14 @@ import { useState } from "react";
 import { FaLink, FaCheck } from "react-icons/fa";
 
 interface CopyProfileLinkProps {
-  userId: string;
+  username: string;
 }
 
-export default function CopyProfileLink({ userId }: CopyProfileLinkProps) {
+export default function CopyProfileLink({ username }: CopyProfileLinkProps) {
   const [copied, setCopied] = useState(false);
 
   const copyToClipboard = async () => {
-    const profileUrl = `${window.location.origin}/dancer/${userId}`;
+    const profileUrl = `${window.location.origin}/${username}`;
     
     try {
       await navigator.clipboard.writeText(profileUrl);

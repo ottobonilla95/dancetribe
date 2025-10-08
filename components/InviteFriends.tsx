@@ -247,17 +247,6 @@ export default function InviteFriends({ userName = "A friend" }: InviteFriendsPr
         </div>
       </div>
 
-      {/* Why This Matters */}
-      <div className="card bg-gradient-to-br from-purple-500/10 to-pink-500/10 border-2 border-purple-500/20">
-        <div className="card-body">
-          <h3 className="font-bold text-lg mb-2">🌍 Why this matters</h3>
-          <p className="text-sm text-base-content/80">
-            DanceTribe only gets better when more dancers join! The more people from your dance scene 
-            who join, the more valuable it becomes for everyone. You&apos;re not just inviting friends - 
-            you&apos;re helping build something amazing for the entire dance community. 💃🕺
-          </p>
-        </div>
-      </div>
     </div>
   );
 }

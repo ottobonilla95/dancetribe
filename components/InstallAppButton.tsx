@@ -30,6 +30,7 @@ export default function InstallAppButton() {
       <button
         onClick={() => setShowModal(true)}
         className="btn btn-primary btn-block gap-2 lg:hidden"
+        data-install-button
       >
         <FaDownload className="text-lg" />
         Install App

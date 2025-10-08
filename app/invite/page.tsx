@@ -8,13 +8,14 @@ import User from "@/models/User";
 
 export const metadata = {
   title: "Invite Friends | DanceTribe",
-  description: "Invite your dance friends to join DanceTribe and grow the global dance community",
+  description:
+    "Invite your dance friends to join DanceTribe and grow the global dance community",
 };
 
 export default async function InvitePage() {
   // Session is already validated in layout
   const session = await getServerSession(authOptions);
-  
+
   // Fetch user data
   await connectMongo();
   const user = await User.findById(session!.user.id).select("name").lean();
@@ -31,7 +32,7 @@ export default async function InvitePage() {
       <div className="max-w-3xl mx-auto">
         {/* Back Button */}
         <div className="mb-6">
-          <BackButton label="Back" />
+          <BackButton label="Back" href="/dashboard" />
         </div>
 
         {/* Main Content */}
@@ -46,9 +47,10 @@ export default async function InvitePage() {
                 🌍 Building Something Special
               </h3>
               <p className="text-base-content/80 mb-4">
-                Imagine a world where any dancer can land in ANY city and instantly connect with the local 
-                dance scene. Where language and borders don&apos;t matter because dance is our universal language. 
-                That&apos;s what we&apos;re building together! 🔥
+                Imagine a world where any dancer can land in ANY city and
+                instantly connect with the local dance scene. Where language and
+                borders don&apos;t matter because dance is our universal
+                language. That&apos;s what we&apos;re building together! 🔥
               </p>
               <div className="flex flex-wrap gap-2 justify-center text-sm">
                 <div className="badge badge-lg badge-primary gap-2">
@@ -99,4 +101,3 @@ export default async function InvitePage() {
     </div>
   );
 }
-

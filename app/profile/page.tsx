@@ -354,7 +354,7 @@ export default async function Profile({ searchParams }: ProfileProps) {
                   <Link href="/onboarding?mode=edit" className="btn btn-secondary btn-sm w-full">
                     ✏️ Edit Profile
                   </Link>
-                  <CopyProfileLink userId={userData._id} />
+                  <CopyProfileLink username={userData.username} />
                   <div className="w-full">
                     <ShareToStory
                       userData={{

@@ -1,7 +1,8 @@
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/libs/next-auth";
 import { redirect } from "next/navigation";
-import { ReactNode } from "react";
+import { ReactNode, Suspense } from "react";
+import Header from "@/components/Header";
 
 export default async function InviteLayout({
   children,
@@ -14,6 +15,13 @@ export default async function InviteLayout({
     redirect("/api/auth/signin");
   }
 
-  return children;
+  return (
+    <>
+      <Suspense>
+        <Header />
+      </Suspense>
+      {children}
+    </>
+  );
 }
 
