@@ -1,7 +1,8 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { FaDownload, FaTimes, FaApple, FaAndroid } from "react-icons/fa";
+import { FaDownload, FaTimes } from "react-icons/fa";
+import InstallInstructionsModal from "./InstallInstructionsModal";
 
 interface InstallPromptProps {
   show: boolean;
@@ -13,10 +14,9 @@ export default function InstallPrompt({ show, onClose }: InstallPromptProps) {
   const [isAndroid, setIsAndroid] = useState(false);
   const [isInstalled, setIsInstalled] = useState(false);
   const [hasSeenPrompt, setHasSeenPrompt] = useState(false);
+  const [showInstructionsModal, setShowInstructionsModal] = useState(false);
 
   useEffect(() => {
-    console.log("📱 InstallPrompt: Component mounted, show prop =", show);
-    
     // Detect platform
     const userAgent = window.navigator.userAgent.toLowerCase();
     const detectedIOS = /iphone|ipad|ipod/.test(userAgent);
@@ -25,76 +25,46 @@ export default function InstallPrompt({ show, onClose }: InstallPromptProps) {
     setIsIOS(detectedIOS);
     setIsAndroid(detectedAndroid);
 
-    console.log("📱 InstallPrompt: Platform detection", { 
-      userAgent, 
-      isIOS: detectedIOS, 
-      isAndroid: detectedAndroid 
-    });
-
     // Check if already installed
     const isStandalone = window.matchMedia('(display-mode: standalone)').matches;
     if (isStandalone) {
       setIsInstalled(true);
-      console.log("📱 InstallPrompt: Already installed (standalone mode)");
     }
 
     // Check if user has already seen this prompt
     const seen = localStorage.getItem("hasSeenInstallPrompt");
     if (seen) {
       setHasSeenPrompt(true);
-      console.log("📱 InstallPrompt: User has already seen prompt");
     }
   }, []);
 
-  useEffect(() => {
-    console.log("📱 InstallPrompt: show prop changed to", show);
-  }, [show]);
-
   const handleClose = () => {
-    // Mark as seen
     localStorage.setItem("hasSeenInstallPrompt", "true");
     onClose();
   };
 
   const handleInstallClick = () => {
-    // Mark as seen since they're taking action
-    localStorage.setItem("hasSeenInstallPrompt", "true");
-    // Close the prompt
-    onClose();
-    // Try to click the install button to show full instructions
-    setTimeout(() => {
-      const installButton = document.querySelector('[data-install-button]') as HTMLButtonElement;
-      if (installButton) {
-        installButton.click();
-      }
-    }, 300);
+    setShowInstructionsModal(true);
   };
 
-  // Don't show if:
-  // - Already installed
-  // - User has already seen it
-  // - Not on mobile (iOS or Android)
-  // - Parent says don't show
+  // Don't show if already installed, seen, or not on mobile
   const shouldShow = show && !isInstalled && !hasSeenPrompt && (isIOS || isAndroid);
-  
-  console.log("📱 InstallPrompt: Render decision", {
-    show,
-    isInstalled,
-    hasSeenPrompt,
-    isIOS,
-    isAndroid,
-    shouldShow
-  });
 
   if (!shouldShow) {
-    console.log("📱 InstallPrompt: Not showing prompt");
     return null;
   }
-  
-  console.log("📱 InstallPrompt: Showing prompt! 🎉");
 
   return (
     <>
+      {/* Instructions Modal */}
+      <InstallInstructionsModal
+        isOpen={showInstructionsModal}
+        onClose={() => {
+          setShowInstructionsModal(false);
+          handleClose(); // Also close the prompt
+        }}
+      />
+
       {/* Backdrop */}
       <div
         className="fixed inset-0 bg-black/50 z-50 animate-fade-in"
@@ -121,40 +91,6 @@ export default function InstallPrompt({ show, onClose }: InstallPromptProps) {
             </p>
           </div>
 
-          {/* Platform-specific icon */}
-          <div className="flex justify-center mb-4">
-            {isIOS && (
-              <div className="flex items-center gap-2 bg-white/20 rounded-lg px-4 py-2">
-                <FaApple className="text-2xl" />
-                <span className="font-semibold">iOS</span>
-              </div>
-            )}
-            {isAndroid && (
-              <div className="flex items-center gap-2 bg-white/20 rounded-lg px-4 py-2">
-                <FaAndroid className="text-2xl" />
-                <span className="font-semibold">Android</span>
-              </div>
-            )}
-          </div>
-
-          {/* Quick Instructions */}
-          <div className="bg-white/10 rounded-lg p-4 mb-4 text-sm">
-            {isIOS && (
-              <ol className="space-y-2 list-decimal list-inside">
-                <li>Tap the <strong>Share</strong> button below</li>
-                <li>Scroll and tap <strong>&quot;Add to Home Screen&quot;</strong></li>
-                <li>Tap <strong>&quot;Add&quot;</strong></li>
-              </ol>
-            )}
-            {isAndroid && (
-              <ol className="space-y-2 list-decimal list-inside">
-                <li>Tap the <strong>Menu</strong> (⋮) button</li>
-                <li>Tap <strong>&quot;Install app&quot;</strong></li>
-                <li>Tap <strong>&quot;Install&quot;</strong></li>
-              </ol>
-            )}
-          </div>
-
           {/* Actions */}
           <div className="space-y-2">
             <button
@@ -162,7 +98,7 @@ export default function InstallPrompt({ show, onClose }: InstallPromptProps) {
               className="btn btn-white w-full gap-2 text-primary font-bold"
             >
               <FaDownload />
-              Show Me How
+              Install App
             </button>
             <button
               onClick={handleClose}

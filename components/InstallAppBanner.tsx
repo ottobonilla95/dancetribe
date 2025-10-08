@@ -2,11 +2,13 @@
 
 import { useState, useEffect } from "react";
 import { FaDownload, FaTimes } from "react-icons/fa";
+import InstallInstructionsModal from "./InstallInstructionsModal";
 
 export default function InstallAppBanner() {
   const [show, setShow] = useState(false);
   const [isInstalled, setIsInstalled] = useState(false);
   const [isDismissed, setIsDismissed] = useState(false);
+  const [showInstructionsModal, setShowInstructionsModal] = useState(false);
 
   useEffect(() => {
     // Check if already installed
@@ -49,18 +51,7 @@ export default function InstallAppBanner() {
   };
 
   const handleInstallClick = () => {
-    // Hide the banner temporarily
-    setShow(false);
-    // Click the install button to show full instructions
-    const installButton = document.querySelector('[data-install-button]') as HTMLButtonElement;
-    if (installButton) {
-      // First scroll to it (in case it's in a collapsed menu)
-      installButton.scrollIntoView({ behavior: 'smooth', block: 'center' });
-      // Then click it after a short delay
-      setTimeout(() => {
-        installButton.click();
-      }, 300);
-    }
+    setShowInstructionsModal(true);
   };
 
   if (!show || isInstalled || isDismissed) {
@@ -68,7 +59,14 @@ export default function InstallAppBanner() {
   }
 
   return (
-    <div className="fixed bottom-20 left-4 right-4 z-40 lg:hidden animate-slide-up">
+    <>
+      {/* Instructions Modal */}
+      <InstallInstructionsModal
+        isOpen={showInstructionsModal}
+        onClose={() => setShowInstructionsModal(false)}
+      />
+
+      <div className="fixed bottom-20 left-4 right-4 z-40 lg:hidden animate-slide-up">
       <div className="bg-gradient-to-r from-primary to-secondary text-primary-content rounded-xl shadow-lg p-4 flex items-center justify-between gap-3 max-w-md mx-auto">
         <div className="flex items-center gap-3 flex-1">
           <FaDownload className="text-2xl flex-shrink-0" />
@@ -109,6 +107,7 @@ export default function InstallAppBanner() {
         }
       `}</style>
     </div>
+    </>
   );
 }
 
