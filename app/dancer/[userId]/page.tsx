@@ -52,7 +52,7 @@ export default async function PublicProfile({ params }: Props) {
   try {
     user = await User.findById(params.userId)
       .select(
-        "name username email image dateOfBirth dancingStartYear city citiesVisited trips danceStyles anthem socialMedia danceRole gender nationality createdAt likedBy friends friendRequestsSent friendRequestsReceived isTeacher teacherProfile"
+        "name username email image dateOfBirth dancingStartYear city citiesVisited trips danceStyles anthem socialMedia danceRole gender nationality relationshipStatus createdAt likedBy friends friendRequestsSent friendRequestsReceived isTeacher teacherProfile"
       )
       .populate({
         path: "city",
@@ -203,6 +203,17 @@ export default async function PublicProfile({ params }: Props) {
       both: "Both (Leader & Follower)",
     };
     return roleMap[role as keyof typeof roleMap] || role;
+  };
+
+  const getRelationshipStatusDisplay = (status: string) => {
+    const statusMap = {
+      single: "Single 💙",
+      in_a_relationship: "In a relationship 💕",
+      married: "Married 💍",
+      its_complicated: "It's complicated 🤷",
+      prefer_not_to_say: "Prefer not to say",
+    };
+    return statusMap[status as keyof typeof statusMap] || status;
   };
 
   // Type cast to avoid Mongoose lean() typing issues
@@ -447,6 +458,18 @@ export default async function PublicProfile({ params }: Props) {
                       </div>
                       <div className="text-lg">
                         {getRoleDisplay(userData.danceRole)}
+                      </div>
+                    </div>
+                  )}
+
+                  {/* Relationship Status */}
+                  {userData.relationshipStatus && (
+                    <div className="mb-4">
+                      <div className="text-sm font-medium text-base-content/60 mb-1">
+                        Relationship Status
+                      </div>
+                      <div className="text-lg">
+                        {getRelationshipStatusDisplay(userData.relationshipStatus)}
                       </div>
                     </div>
                   )}

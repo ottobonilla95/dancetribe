@@ -71,6 +71,7 @@ export default function Onboarding() {
   );
   const [gender, setGender] = useState<"male" | "female" | "other" | "">("");
   const [nationality, setNationality] = useState("");
+  const [relationshipStatus, setRelationshipStatus] = useState<"single" | "in_a_relationship" | "married" | "its_complicated" | "prefer_not_to_say" | "">("");
   const [firstName, setFirstName] = useState("");
   const [lastName, setLastName] = useState("");
   const [isTeacher, setIsTeacher] = useState(false);
@@ -123,6 +124,12 @@ export default function Onboarding() {
       title: "What's your nationality?",
       description: "Share your cultural background",
       completed: user?.onboardingSteps?.nationality || false,
+    },
+    {
+      id: "relationshipStatus",
+      title: "What's your relationship status?",
+      description: "Optional - share if you're comfortable",
+      completed: user?.onboardingSteps?.relationshipStatus || false,
     },
     {
       id: "danceStyles",
@@ -323,6 +330,9 @@ export default function Onboarding() {
       if (userData.nationality) {
         setNationality(userData.nationality);
       }
+      if (userData.relationshipStatus) {
+        setRelationshipStatus(userData.relationshipStatus);
+      }
       if (userData.firstName) {
         setFirstName(userData.firstName);
       }
@@ -477,16 +487,17 @@ export default function Onboarding() {
         break;
       }
       case "anthem": {
-        if (!anthem.url) {
-          alert("Please enter your anthem URL");
-          return;
+        // Anthem is now optional - only validate if URL is provided
+        if (anthem.url) {
+          const parsedMedia = parseMediaUrl(anthem.url);
+          if (!parsedMedia) {
+            alert("Please enter a valid Spotify or YouTube URL");
+            return;
+          }
+          stepData = { anthem };
+        } else {
+          stepData = { anthem: null };
         }
-        const parsedMedia = parseMediaUrl(anthem.url);
-        if (!parsedMedia) {
-          alert("Please enter a valid Spotify or YouTube URL");
-          return;
-        }
-        stepData = { anthem };
         break;
       }
       case "socialMedia":
@@ -508,6 +519,10 @@ export default function Onboarding() {
           return;
         }
         stepData = { nationality };
+        break;
+      case "relationshipStatus":
+        // Relationship status is optional
+        stepData = { relationshipStatus: relationshipStatus || undefined };
         break;
       case "teacherInfo":
         // Validate at least one contact method if teacher
@@ -1058,9 +1073,12 @@ export default function Onboarding() {
 
             {steps[currentStep].id === "anthem" && (
               <div className="space-y-4">
+                <div className="alert alert-info">
+                  <span className="text-sm">This step is optional - you can skip it if you'd like!</span>
+                </div>
                 <div className="form-control">
                   <label className="label">
-                    <span className="label-text">Song URL</span>
+                    <span className="label-text">Song URL (optional)</span>
                   </label>
                   <input
                     type="url"
@@ -1256,6 +1274,42 @@ export default function Onboarding() {
                     </option>
                   ))}
                 </select>
+              </div>
+            )}
+
+            {/* Relationship Status */}
+            {steps[currentStep].id === "relationshipStatus" && (
+              <div className="form-control">
+                <div className="alert alert-info mb-4">
+                  <span className="text-sm">This step is optional - you can skip it if you prefer!</span>
+                </div>
+                <label className="label">
+                  <span className="label-text">
+                    What&apos;s your relationship status?
+                  </span>
+                </label>
+                <div className="flex flex-col gap-3">
+                  {[
+                    { value: "", label: "Prefer not to say" },
+                    { value: "single", label: "Single 💙" },
+                    { value: "in_a_relationship", label: "In a relationship 💕" },
+                    { value: "married", label: "Married 💍" },
+                    { value: "its_complicated", label: "It's complicated 🤷" },
+                  ].map((option) => (
+                    <label key={option.value} className="label cursor-pointer">
+                      <span className="label-text">{option.label}</span>
+                      <input
+                        type="radio"
+                        name="relationshipStatus"
+                        className="radio radio-primary"
+                        checked={relationshipStatus === option.value}
+                        onChange={() =>
+                          setRelationshipStatus(option.value as typeof relationshipStatus)
+                        }
+                      />
+                    </label>
+                  ))}
+                </div>
               </div>
             )}
 

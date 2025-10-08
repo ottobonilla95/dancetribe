@@ -20,7 +20,7 @@ export async function GET() {
 
     const user = await User.findById(session.user.id)
       .select(
-        "name firstName lastName username email image dateOfBirth dancingStartYear city citiesVisited danceStyles anthem socialMedia danceRole gender nationality onboardingSteps isProfileComplete isTeacher teacherProfile createdAt"
+        "name firstName lastName username email image dateOfBirth dancingStartYear city citiesVisited danceStyles anthem socialMedia danceRole gender nationality relationshipStatus onboardingSteps isProfileComplete isTeacher teacherProfile createdAt"
       )
       .populate({
         path: "city",
@@ -158,12 +158,17 @@ export async function PUT(req: NextRequest) {
         break;
 
       case "anthem":
-        user.anthem = {
-          url: data.anthem.url,
-          platform: data.anthem.platform,
-          title: data.anthem.title,
-          artist: data.anthem.artist,
-        };
+        // Anthem is now optional
+        if (data.anthem && data.anthem.url) {
+          user.anthem = {
+            url: data.anthem.url,
+            platform: data.anthem.platform,
+            title: data.anthem.title,
+            artist: data.anthem.artist,
+          };
+        } else {
+          user.anthem = undefined;
+        }
         user.onboardingSteps.anthem = true;
         break;
 
@@ -189,6 +194,11 @@ export async function PUT(req: NextRequest) {
       case "nationality":
         user.nationality = data.nationality;
         user.onboardingSteps.nationality = true;
+        break;
+
+      case "relationshipStatus":
+        user.relationshipStatus = data.relationshipStatus;
+        user.onboardingSteps.relationshipStatus = true;
         break;
 
       case "teacherInfo":

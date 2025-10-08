@@ -140,6 +140,11 @@ const userSchema = new mongoose.Schema(
       type: String,
       trim: true,
     },
+    // Relationship status
+    relationshipStatus: {
+      type: String,
+      enum: ['single', 'in_a_relationship', 'married', 'its_complicated', 'prefer_not_to_say'],
+    },
     // Profile completion status
     isProfileComplete: {
       type: Boolean,
@@ -160,6 +165,7 @@ const userSchema = new mongoose.Schema(
       danceRole: { type: Boolean, default: false },
       gender: { type: Boolean, default: false },
       nationality: { type: Boolean, default: false },
+      relationshipStatus: { type: Boolean, default: false },
       teacherInfo: { type: Boolean, default: false },
     },
     // Teacher profile

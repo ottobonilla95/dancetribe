@@ -24,6 +24,7 @@ export type User = {
   danceRole?: "follower" | "leader" | "both";
   gender?: "male" | "female" | "other";
   nationality?: string;
+  relationshipStatus?: "single" | "in_a_relationship" | "married" | "its_complicated" | "prefer_not_to_say";
   isProfileComplete?: boolean;
   onboardingSteps?: OnboardingSteps;
   customerId?: string;
@@ -49,6 +50,7 @@ export interface OnboardingSteps {
   danceRole: boolean;
   gender: boolean;
   nationality: boolean;
+  relationshipStatus: boolean;
   teacherInfo: boolean;
 }
 
