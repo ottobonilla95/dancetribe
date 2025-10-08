@@ -142,15 +142,15 @@ export default function InstallPrompt({ show, onClose }: InstallPromptProps) {
             {isIOS && (
               <ol className="space-y-2 list-decimal list-inside">
                 <li>Tap the <strong>Share</strong> button below</li>
-                <li>Scroll and tap <strong>"Add to Home Screen"</strong></li>
-                <li>Tap <strong>"Add"</strong></li>
+                <li>Scroll and tap <strong>&quot;Add to Home Screen&quot;</strong></li>
+                <li>Tap <strong>&quot;Add&quot;</strong></li>
               </ol>
             )}
             {isAndroid && (
               <ol className="space-y-2 list-decimal list-inside">
                 <li>Tap the <strong>Menu</strong> (⋮) button</li>
-                <li>Tap <strong>"Install app"</strong></li>
-                <li>Tap <strong>"Install"</strong></li>
+                <li>Tap <strong>&quot;Install app&quot;</strong></li>
+                <li>Tap <strong>&quot;Install&quot;</strong></li>
               </ol>
             )}
           </div>
