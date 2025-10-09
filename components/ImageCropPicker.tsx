@@ -57,10 +57,10 @@ export default function ImageCropPicker({
         return;
       }
 
-      // Validate file size (5MB max)
-      const maxSize = 5 * 1024 * 1024; // 5MB
+      // Validate file size (10MB max)
+      const maxSize = 10 * 1024 * 1024; // 10MB
       if (file.size > maxSize) {
-        alert("Image size must be less than 5MB");
+        alert("Image size must be less than 10MB");
         return;
       }
 
@@ -185,7 +185,7 @@ export default function ImageCropPicker({
             community.
           </p>
           <p className="text-sm text-base-content/50">
-            Supported formats: JPEG, PNG, WebP (max 5MB)
+            Supported formats: JPEG, PNG, WebP (max 10MB)
           </p>
         </div>
 
