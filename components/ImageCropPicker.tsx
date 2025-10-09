@@ -32,6 +32,21 @@ export default function ImageCropPicker({
   const [profilePicPreview, setProfilePicPreview] = useState<string>("");
   const imgRef = useRef<HTMLImageElement>(null);
 
+  const onImageLoad = (e: React.SyntheticEvent<HTMLImageElement>) => {
+    const { width, height } = e.currentTarget;
+    
+    // Calculate the initial crop in pixels based on the default percentage crop
+    const pixelCrop: PixelCrop = {
+      unit: 'px',
+      x: (width * crop.x) / 100,
+      y: (height * crop.y) / 100,
+      width: (width * crop.width) / 100,
+      height: (height * crop.height) / 100,
+    };
+    
+    setCompletedCrop(pixelCrop);
+  };
+
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file) {
@@ -54,6 +69,8 @@ export default function ImageCropPicker({
       reader.onload = (e) => {
         setImgSrc(e.target?.result as string);
         setShowCropModal(true);
+        // Reset completedCrop when new image is loaded
+        setCompletedCrop(undefined);
       };
       reader.readAsDataURL(file);
     }
@@ -231,6 +248,7 @@ export default function ImageCropPicker({
                     src={imgSrc}
                     alt="Crop preview"
                     className="max-w-full max-h-[40vh] w-auto h-auto object-contain"
+                    onLoad={onImageLoad}
                   />
                 </ReactCrop>
               </div>
