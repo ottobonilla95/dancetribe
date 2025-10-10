@@ -18,7 +18,7 @@ export default function HotDanceStyles({ danceStyles }: HotDanceStylesProps) {
         </Link>
       </div>
 
-      <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-3 md:gap-4">
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-3 md:gap-4">
         {danceStyles.map((style, index) => (
           <HotDanceStyleCard 
             key={style._id} 

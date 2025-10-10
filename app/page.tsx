@@ -41,8 +41,8 @@ async function getHotDanceStyles(): Promise<
       },
       // Sort by user count (most popular first)
       { $sort: { userCount: -1 } },
-      // Limit to top 6
-      { $limit: 6 },
+      // Limit to top 4
+      { $limit: 4 },
       // Lookup dance style details
       {
         $lookup: {
@@ -83,10 +83,10 @@ async function getCities(): Promise<CityType[]> {
   try {
     await connectMongo();
 
-    const cities = await City.find({ rank: { $gt: 0 } })
+    const cities = await City.find({ totalDancers: { $gt: 0 } })
       .populate({ path: "country", model: Country, select: "name code" })
       .populate({ path: "continent", model: Continent, select: "name" })
-      .sort({ rank: 1 })
+      .sort({ totalDancers: -1 })
       .limit(10)
       .lean();
 

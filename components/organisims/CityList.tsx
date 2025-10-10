@@ -11,13 +11,13 @@ interface CityListProps {
 
 const CityList = ({ initialCities }: CityListProps) => {
   const [cities, setCities] = useState(initialCities);
-  const [sortBy, setSortBy] = useState<"rank" | "totalDancers">("rank");
+  const [sortBy, setSortBy] = useState<"rank" | "totalDancers">("totalDancers");
   const [loading, setLoading] = useState(false);
   
   const fetchSortedCities = async (sortOption: "rank" | "totalDancers") => {
     setLoading(true);
     try {
-      const response = await fetch(`/api/cities?sortBy=${sortOption}&limit=6`);
+      const response = await fetch(`/api/cities?sortBy=${sortOption}&limit=10`);
       if (response.ok) {
         const data = await response.json();
         setCities(data.cities || []);
