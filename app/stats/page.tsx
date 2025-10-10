@@ -13,6 +13,7 @@ import {
   FaMapMarkerAlt
 } from "react-icons/fa";
 import WorldMap from "@/components/WorldMap";
+import { getCountryCode } from "@/utils/countries";
 
 export const dynamic = "force-dynamic";
 
@@ -143,37 +144,23 @@ async function getDetailedStats() {
       { $sort: { count: -1 } },
     ]);
 
-    // Nationality distribution (top 15)
+    // Nationality distribution (top 15) - using actual nationality field
     const nationalityStats = await User.aggregate([
-      { $match: { isProfileComplete: true, city: { $exists: true } } },
-      {
-        $lookup: {
-          from: "cities",
-          localField: "city",
-          foreignField: "_id",
-          as: "cityData",
-        },
-      },
-      { $unwind: "$cityData" },
-      {
-        $lookup: {
-          from: "countries",
-          localField: "cityData.country",
-          foreignField: "_id",
-          as: "countryData",
-        },
-      },
-      { $unwind: "$countryData" },
+      { $match: { isProfileComplete: true, nationality: { $exists: true, $ne: "" } } },
       {
         $group: {
-          _id: "$countryData._id",
-          name: { $first: "$countryData.name" },
-          code: { $first: "$countryData.code" },
+          _id: "$nationality",
           count: { $sum: 1 },
         },
       },
       { $sort: { count: -1 } },
       { $limit: 15 },
+      {
+        $project: {
+          name: "$_id",
+          count: 1,
+        },
+      },
     ]);
 
 
@@ -423,7 +410,8 @@ export default async function StatsPage() {
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
             {stats.nationalityStats.map((country: any, index: number) => {
               // Convert country code to flag emoji
-              const getCountryFlag = (countryCode: string) => {
+              const getCountryFlag = (countryName: string) => {
+                const countryCode = getCountryCode(countryName);
                 if (!countryCode || countryCode.length !== 2) return "🌍";
                 const codePoints = countryCode
                   .toUpperCase()
@@ -435,7 +423,7 @@ export default async function StatsPage() {
               return (
                 <div key={country._id} className="flex items-center justify-between p-3 bg-base-100 rounded-lg">
                   <div className="flex items-center gap-3">
-                    <span className="text-lg">{getCountryFlag(country.code)}</span>
+                    <span className="text-lg">{getCountryFlag(country.name)}</span>
                     <div>
                       <div className="font-medium text-sm">{country.name}</div>
                       <div className="text-xs text-base-content/60">#{index + 1}</div>

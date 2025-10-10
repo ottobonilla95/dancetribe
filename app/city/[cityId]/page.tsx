@@ -118,6 +118,22 @@ export default async function CityPage({ params, searchParams }: Props) {
     isProfileComplete: true,
   });
 
+  // Get role distribution
+  const roleDistribution = await User.aggregate([
+    { $match: { city: cityObjectId, isProfileComplete: true } },
+    { $group: { _id: "$danceRole", count: { $sum: 1 } } },
+    { $sort: { count: -1 } },
+  ]);
+
+  // Find most common role
+  const mostCommonRole = roleDistribution.length > 0 ? roleDistribution[0] : null;
+  const rolePercentage = mostCommonRole && totalDancers > 0 
+    ? Math.round((mostCommonRole.count / totalDancers) * 100) 
+    : 0;
+  const roleLabel = mostCommonRole?._id 
+    ? mostCommonRole._id.charAt(0).toUpperCase() + mostCommonRole._id.slice(1)
+    : "N/A";
+
   // Get teachers in this city
   const teachers = await User.find({
     city: cityObjectId,
@@ -214,13 +230,11 @@ export default async function CityPage({ params, searchParams }: Props) {
             <div className="stat-figure text-accent">
               <FaHeart className="text-3xl" />
             </div>
-            <div className="stat-title">Dance Density</div>
+            <div className="stat-title">Most Common Role</div>
             <div className="stat-value text-accent">
-              {totalDancers > 0
-                ? Math.round((totalDancers / city.population) * 100000)
-                : 0}
+              {roleLabel}
             </div>
-            <div className="stat-desc">Dancers per 100K people</div>
+            <div className="stat-desc">{rolePercentage}% of dancers</div>
           </div>
         </div>
 
