@@ -104,7 +104,7 @@ export default function Onboarding() {
     {
       id: "dateOfBirth",
       title: "When's your birthday?",
-      description: "We'll use this to calculate your zodiac sign",
+      description: "Help us personalize your profile",
       completed: user?.onboardingSteps?.dateOfBirth || false,
     },
     {
@@ -157,7 +157,7 @@ export default function Onboarding() {
     },
     {
       id: "anthem",
-      title: "What's your dance anthem? (optional)",
+      title: "What's your favorite song? (optional)",
       description: "Share a song that gets you moving",
       completed: user?.onboardingSteps?.anthem || false,
     },
@@ -491,7 +491,7 @@ export default function Onboarding() {
         if (anthem.url) {
           const parsedMedia = parseMediaUrl(anthem.url);
           if (!parsedMedia) {
-            alert("Please enter a valid Spotify or YouTube URL");
+            alert("Please enter a valid Spotify URL");
             return;
           }
           stepData = { anthem };
@@ -680,18 +680,6 @@ export default function Onboarding() {
         platform: "spotify" as const,
         id: spotifyMatch[1],
         embedUrl: `https://open.spotify.com/embed/track/${spotifyMatch[1]}`,
-      };
-    }
-
-    // YouTube URL patterns
-    const youtubeMatch = url.match(
-      /(?:youtube\.com\/watch\?v=|youtu\.be\/)([a-zA-Z0-9_-]+)/
-    );
-    if (youtubeMatch) {
-      return {
-        platform: "youtube" as const,
-        id: youtubeMatch[1],
-        embedUrl: `https://www.youtube.com/embed/${youtubeMatch[1]}`,
       };
     }
 
@@ -1075,12 +1063,12 @@ export default function Onboarding() {
               <div className="space-y-4">
                 <div className="form-control">
                   <label className="label">
-                    <span className="label-text">Song URL (optional)</span>
+                    <span className="label-text">Spotify Song URL (optional)</span>
                   </label>
                   <input
                     type="url"
                     className="input input-bordered"
-                    placeholder="Paste your Spotify or YouTube link here..."
+                    placeholder="Paste your Spotify link here..."
                     value={anthem.url}
                     onChange={(e) => {
                       const url = e.target.value;
@@ -1089,7 +1077,7 @@ export default function Onboarding() {
                       setAnthem((prev) => ({
                         ...prev,
                         url,
-                        platform: parsedInfo?.platform || "spotify",
+                        platform: "spotify",
                         title: prev.title,
                         artist: prev.artist,
                       }));
@@ -1097,29 +1085,25 @@ export default function Onboarding() {
                   />
                   <label className="label">
                     <span className="label-text-alt text-base-content/60">
-                      Examples:
-                      <br />
-                      🎵 Spotify: https://open.spotify.com/track/...
-                      <br />
-                      📺 YouTube: https://www.youtube.com/watch?v=...
+                      Example: https://open.spotify.com/track/...
                     </span>
                   </label>
                 </div>
 
                 {!mediaInfo && anthem.url && (
                   <div className="alert alert-warning">
-                    <span>Please enter a valid Spotify or YouTube URL</span>
+                    <span>Please enter a valid Spotify URL</span>
                   </div>
                 )}
 
                 {mediaInfo && (
                   <div className="space-y-2">
                     <div className="flex items-center gap-2">
-                      <span className="badge badge-primary capitalize">
-                        {mediaInfo.platform}
+                      <span className="badge badge-primary">
+                        Spotify
                       </span>
                       <span className="text-sm text-base-content/70">
-                        Preview your anthem below
+                        Preview your song below
                       </span>
                     </div>
                     <div className="flex justify-center mt-4">
