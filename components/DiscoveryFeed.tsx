@@ -14,6 +14,9 @@ interface DiscoveryFeedProps {
 export default function DiscoveryFeed({ initialDancers = [], danceStyles = [] }: DiscoveryFeedProps) {
   const [dancers, setDancers] = useState(initialDancers);
   const [loading, setLoading] = useState(false);
+  const [loadingMore, setLoadingMore] = useState(false);
+  const [hasMore, setHasMore] = useState(true);
+  const [total, setTotal] = useState(0);
   const [filters, setFilters] = useState({
     danceStyle: "",
     danceRole: "",
@@ -23,8 +26,13 @@ export default function DiscoveryFeed({ initialDancers = [], danceStyles = [] }:
   });
   const [showFilters, setShowFilters] = useState(false);
 
-  const fetchDancers = async () => {
-    setLoading(true);
+  const fetchDancers = async (skip = 0, append = false) => {
+    if (append) {
+      setLoadingMore(true);
+    } else {
+      setLoading(true);
+    }
+    
     try {
       const params = new URLSearchParams();
       if (filters.danceStyle) params.append("danceStyle", filters.danceStyle);
@@ -32,22 +40,34 @@ export default function DiscoveryFeed({ initialDancers = [], danceStyles = [] }:
       if (filters.city) params.append("city", filters.city);
       if (filters.nearMe) params.append("nearMe", "true");
       if (filters.inMyCountry) params.append("inMyCountry", "true");
+      params.append("skip", skip.toString());
 
       const response = await fetch(`/api/dancers/discover?${params.toString()}`);
       if (response.ok) {
         const data = await response.json();
-        setDancers(data.dancers || []);
+        if (append) {
+          setDancers((prev) => [...prev, ...(data.dancers || [])]);
+        } else {
+          setDancers(data.dancers || []);
+        }
+        setHasMore(data.hasMore || false);
+        setTotal(data.total || 0);
       }
     } catch (error) {
       console.error("Error fetching dancers:", error);
     } finally {
       setLoading(false);
+      setLoadingMore(false);
     }
+  };
+
+  const loadMore = () => {
+    fetchDancers(dancers.length, true);
   };
 
   useEffect(() => {
     // Always fetch fresh data when any filter changes
-    fetchDancers();
+    fetchDancers(0, false);
   }, [filters]);
 
   const clearFilters = () => {
@@ -221,7 +241,7 @@ export default function DiscoveryFeed({ initialDancers = [], danceStyles = [] }:
             <>
               <div className="flex items-center justify-between">
                 <p className="text-sm text-base-content/60">
-                  {dancers.length} dancer{dancers.length !== 1 ? 's' : ''} found
+                  Showing {dancers.length} of {total} dancer{total !== 1 ? 's' : ''}
                 </p>
               </div>
               
@@ -230,6 +250,26 @@ export default function DiscoveryFeed({ initialDancers = [], danceStyles = [] }:
                   <DancerCard key={dancer._id} dancer={dancer} />
                 ))}
               </div>
+
+              {/* Load More Button */}
+              {hasMore && (
+                <div className="flex justify-center mt-8">
+                  <button
+                    onClick={loadMore}
+                    disabled={loadingMore}
+                    className="btn btn-outline btn-wide"
+                  >
+                    {loadingMore ? (
+                      <>
+                        <FaSpinner className="animate-spin" />
+                        Loading...
+                      </>
+                    ) : (
+                      "Load More Dancers"
+                    )}
+                  </button>
+                </div>
+              )}
             </>
           )}
         </>

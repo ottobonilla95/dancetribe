@@ -191,7 +191,7 @@ async function getRecentDancers() {
       })
       .select("name username image danceStyles city likedBy")
       .sort({ createdAt: -1 })
-      .limit(12)
+      .limit(16)
       .lean();
 
     // Get all dance styles for mapping
@@ -290,7 +290,7 @@ export default async function Home() {
                 </div>
               </div>
 
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
                 {recentDancers.map((dancer) => (
                   <DancerCard key={dancer._id} dancer={dancer} showLikeButton={false} showFlag={true} />
                 ))}
