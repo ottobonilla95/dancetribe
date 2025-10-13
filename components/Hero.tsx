@@ -10,12 +10,16 @@ const Hero = () => {
           <h1 className="font-extrabold text-3xl lg:text-6xl tracking-tight">
             Connect with dancers worldwide
           </h1>
-          <p className="text-lg opacity-80 leading-relaxed hidden lg:block">
-            Discover and connect with friends. Find teachers, dance partners, music, cities, and more.
+          <p className="text-lg opacity-80 leading-relaxed">
+            Meet dancers worldwide 🌎 Find partners, teachers, and new cities to
+            dance and grow with DanceTribe.
           </p>
         </div>
         <div className="flex flex-col items-center sm:flex-row gap-3 w-full sm:w-auto">
-          <ButtonSignin text="🕺 Join DanceTribe 💃" extraStyle="btn-primary btn-wide" />
+          <ButtonSignin
+            text="🕺 Join DanceTribe 💃"
+            extraStyle="btn-primary btn-wide"
+          />
           {/* <a
             href={`mailto:${CONTACT.COLLABORATION_EMAIL}`}
             className="btn btn-outline btn-wide gap-2"
@@ -27,6 +31,24 @@ const Hero = () => {
             </svg>
             Collab
           </a> */}
+        </div>
+
+        {/* Scroll indicator */}
+        <div className="flex flex-col items-center gap-2 mt-8 animate-bounce">
+          <span className="text-sm text-base-content/60">Explore more</span>
+          <svg 
+            className="w-6 h-6 text-base-content/40" 
+            fill="none" 
+            stroke="currentColor" 
+            viewBox="0 0 24 24"
+          >
+            <path 
+              strokeLinecap="round" 
+              strokeLinejoin="round" 
+              strokeWidth={2} 
+              d="M19 14l-7 7m0 0l-7-7m7 7V3" 
+            />
+          </svg>
         </div>
       </div>
       <div className="lg:w-full">
