@@ -1,6 +1,9 @@
+"use client";
+
 import Image from "next/image";
 import ButtonSignin from "./ButtonSignin";
 import { CONTACT } from "@/constants/contact";
+import { useEffect, useRef } from "react";
 
 interface HeroProps {
   featuredUsers?: Array<{
@@ -11,12 +14,33 @@ interface HeroProps {
 }
 
 const Hero = ({ featuredUsers = [] }: HeroProps) => {
+  const videoRef = useRef<HTMLVideoElement>(null);
+
+  useEffect(() => {
+    const video = videoRef.current;
+    if (video) {
+      // Force play the video
+      video.play().catch((error) => {
+        console.log("Video autoplay failed:", error);
+        // If autoplay fails, try playing on user interaction
+        const playOnInteraction = () => {
+          video.play();
+          document.removeEventListener('touchstart', playOnInteraction);
+          document.removeEventListener('click', playOnInteraction);
+        };
+        document.addEventListener('touchstart', playOnInteraction);
+        document.addEventListener('click', playOnInteraction);
+      });
+    }
+  }, []);
+
   return (
     <section className="relative h-screen flex items-center justify-center overflow-hidden text-white">
       {/* Background Video */}
       <div className="absolute inset-0 z-0">
-        <div className="absolute inset-0 bg-gradient-to-b from-black/70 via-black/60 to-black/80 z-10"></div>
+        <div className="absolute inset-0 bg-gradient-to-b from-black/80 via-black/75 to-black/85 z-10"></div>
         <video
+          ref={videoRef}
           autoPlay
           loop
           muted
@@ -24,9 +48,11 @@ const Hero = ({ featuredUsers = [] }: HeroProps) => {
           preload="auto"
           className="absolute inset-0 w-full h-full object-cover"
           style={{ pointerEvents: 'none' }}
+          webkit-playsinline="true"
+          x-webkit-airplay="allow"
         >
           <source 
-            src="https://res.cloudinary.com/daenzc7ix/video/upload/v1760362543/Ya_esta%CC%81_aqui%CC%81_nuestro_nuevo_tema_Bachata_Bolero_Es_un_honor_tener_a_los_increi%CC%81bles_ata_t1kkhl.mp4" 
+            src="https://res.cloudinary.com/daenzc7ix/video/upload/q_auto,f_auto/v1760362543/Ya_esta%CC%81_aqui%CC%81_nuestro_nuevo_tema_Bachata_Bolero_Es_un_honor_tener_a_los_increi%CC%81bles_ata_t1kkhl.mp4" 
             type="video/mp4" 
           />
         </video>
@@ -35,11 +61,11 @@ const Hero = ({ featuredUsers = [] }: HeroProps) => {
       {/* Content */}
       <div className="relative z-20 max-w-4xl mx-auto px-4 sm:px-6 py-6 sm:py-8 text-center">
         {/* Main Heading */}
-        <h1 className="text-3xl sm:text-4xl md:text-6xl font-extrabold tracking-tight mb-4 sm:mb-6 mt-4">
+        <h1 className="text-4xl sm:text-5xl md:text-6xl font-extrabold tracking-tight mb-4 sm:mb-6 mt-4">
           💃 Connect with dancers worldwide 
         </h1>
         
-        <p className="text-base sm:text-xl md:text-2xl mb-6 sm:mb-8 text-white/90 max-w-3xl mx-auto">
+        <p className="text-lg sm:text-xl md:text-2xl mb-6 sm:mb-8 text-white/95 max-w-3xl mx-auto leading-relaxed">
           Join a global community of dancers connecting, learning, and traveling around the world
         </p>
 
@@ -72,16 +98,16 @@ const Hero = ({ featuredUsers = [] }: HeroProps) => {
 
         {/* 3 Key Features */}
         <div className="space-y-3 sm:space-y-4 mb-8 sm:mb-10 text-left md:text-center max-w-2xl mx-auto">
-          <div className="flex items-start md:items-center gap-2 sm:gap-3 text-sm sm:text-base md:text-lg">
-            <span className="text-xl sm:text-2xl flex-shrink-0">🌍</span>
+          <div className="flex items-start md:items-center gap-2 sm:gap-3 text-base sm:text-lg md:text-xl">
+            <span className="text-2xl sm:text-3xl flex-shrink-0">🌍</span>
             <span><strong>Find dancers in 100+ cities</strong> worldwide</span>
           </div>
-          <div className="flex items-start md:items-center gap-2 sm:gap-3 text-sm sm:text-base md:text-lg">
-            <span className="text-xl sm:text-2xl flex-shrink-0">💃</span>
+          <div className="flex items-start md:items-center gap-2 sm:gap-3 text-base sm:text-lg md:text-xl">
+            <span className="text-2xl sm:text-3xl flex-shrink-0">💃</span>
             <span><strong>Connect with teachers & dance partners</strong> for dating and friendship</span>
           </div>
-          <div className="flex items-start md:items-center gap-2 sm:gap-3 text-sm sm:text-base md:text-lg">
-            <span className="text-xl sm:text-2xl flex-shrink-0">🏆</span>
+          <div className="flex items-start md:items-center gap-2 sm:gap-3 text-base sm:text-lg md:text-xl">
+            <span className="text-2xl sm:text-3xl flex-shrink-0">🏆</span>
             <span><strong>Track your journey</strong> and earn achievement badges</span>
           </div>
         </div>
@@ -92,7 +118,7 @@ const Hero = ({ featuredUsers = [] }: HeroProps) => {
             text="Join DanceTribe →"
             extraStyle="btn-primary btn-md sm:btn-lg text-base sm:text-lg px-8 sm:px-12"
           />
-          <p className="text-xs sm:text-sm text-white/70">
+          <p className="text-sm sm:text-base text-white/80">
             If you already have an account, we&apos;ll log you in
           </p>
         </div>
