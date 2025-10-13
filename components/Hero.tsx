@@ -21,7 +21,9 @@ const Hero = ({ featuredUsers = [] }: HeroProps) => {
           loop
           muted
           playsInline
+          preload="auto"
           className="absolute inset-0 w-full h-full object-cover"
+          style={{ pointerEvents: 'none' }}
         >
           <source 
             src="https://res.cloudinary.com/daenzc7ix/video/upload/v1760362543/Ya_esta%CC%81_aqui%CC%81_nuestro_nuevo_tema_Bachata_Bolero_Es_un_honor_tener_a_los_increi%CC%81bles_ata_t1kkhl.mp4" 
@@ -31,23 +33,23 @@ const Hero = ({ featuredUsers = [] }: HeroProps) => {
       </div>
 
       {/* Content */}
-      <div className="relative z-20 max-w-4xl mx-auto px-6 py-8 text-center">
+      <div className="relative z-20 max-w-4xl mx-auto px-4 sm:px-6 py-6 sm:py-8 text-center">
         {/* Main Heading */}
-        <h1 className="text-4xl md:text-6xl font-extrabold tracking-tight mb-6">
+        <h1 className="text-3xl sm:text-4xl md:text-6xl font-extrabold tracking-tight mb-4 sm:mb-6 mt-4">
           💃 Connect with dancers worldwide 
         </h1>
         
-        <p className="text-xl md:text-2xl mb-8 text-white/90 max-w-3xl mx-auto">
+        <p className="text-base sm:text-xl md:text-2xl mb-6 sm:mb-8 text-white/90 max-w-3xl mx-auto">
           Join a global community of dancers connecting, learning, and traveling around the world
         </p>
 
         {/* User Avatars */}
         {featuredUsers.length > 0 && (
-          <div className="flex justify-center mb-8 -space-x-3">
+          <div className="flex justify-center mb-6 sm:mb-8 -space-x-2 sm:-space-x-3">
             {featuredUsers.slice(0, 8).map((user) => (
               <div
                 key={user._id}
-                className="w-12 h-12 rounded-full border-2 border-white overflow-hidden bg-base-200"
+                className="w-10 h-10 sm:w-12 sm:h-12 rounded-full border-2 border-white overflow-hidden bg-base-200"
                 title={user.name}
               >
                 {user.image ? (
@@ -59,7 +61,7 @@ const Hero = ({ featuredUsers = [] }: HeroProps) => {
                     className="w-full h-full object-cover"
                   />
                 ) : (
-                  <div className="w-full h-full bg-gradient-to-br from-primary/30 to-primary/50 flex items-center justify-center text-white font-bold">
+                  <div className="w-full h-full bg-gradient-to-br from-primary/30 to-primary/50 flex items-center justify-center text-white font-bold text-sm">
                     {user.name?.charAt(0) || 'D'}
                   </div>
                 )}
@@ -69,37 +71,37 @@ const Hero = ({ featuredUsers = [] }: HeroProps) => {
         )}
 
         {/* 3 Key Features */}
-        <div className="space-y-4 mb-10 text-left md:text-center max-w-2xl mx-auto">
-          <div className="flex items-start md:items-center gap-3 text-lg">
-            <span className="text-2xl">🌍</span>
+        <div className="space-y-3 sm:space-y-4 mb-8 sm:mb-10 text-left md:text-center max-w-2xl mx-auto">
+          <div className="flex items-start md:items-center gap-2 sm:gap-3 text-sm sm:text-base md:text-lg">
+            <span className="text-xl sm:text-2xl flex-shrink-0">🌍</span>
             <span><strong>Find dancers in 100+ cities</strong> worldwide</span>
           </div>
-          <div className="flex items-start md:items-center gap-3 text-lg">
-            <span className="text-2xl">💃</span>
+          <div className="flex items-start md:items-center gap-2 sm:gap-3 text-sm sm:text-base md:text-lg">
+            <span className="text-xl sm:text-2xl flex-shrink-0">💃</span>
             <span><strong>Connect with teachers & dance partners</strong> for dating and friendship</span>
           </div>
-          <div className="flex items-start md:items-center gap-3 text-lg">
-            <span className="text-2xl">🏆</span>
+          <div className="flex items-start md:items-center gap-2 sm:gap-3 text-sm sm:text-base md:text-lg">
+            <span className="text-xl sm:text-2xl flex-shrink-0">🏆</span>
             <span><strong>Track your journey</strong> and earn achievement badges</span>
           </div>
         </div>
 
         {/* CTA */}
-        <div className="flex flex-col items-center gap-4">
+        <div className="flex flex-col items-center gap-3 sm:gap-4">
           <ButtonSignin
             text="Join DanceTribe →"
-            extraStyle="btn-primary btn-lg text-lg px-12"
+            extraStyle="btn-primary btn-md sm:btn-lg text-base sm:text-lg px-8 sm:px-12"
           />
-          <p className="text-sm text-white/70">
+          <p className="text-xs sm:text-sm text-white/70">
             If you already have an account, we&apos;ll log you in
           </p>
         </div>
 
         {/* Scroll indicator */}
-        <div className="flex flex-col items-center gap-2 mt-12 animate-bounce">
-          <span className="text-sm text-white/60">Explore more</span>
+        <div className="flex flex-col items-center gap-1 sm:gap-2 mt-8 sm:mt-12 animate-bounce">
+          <span className="text-xs sm:text-sm text-white/70">Explore more</span>
           <svg 
-            className="w-6 h-6 text-white/40" 
+            className="w-5 h-5 sm:w-6 sm:h-6 text-white/60" 
             fill="none" 
             stroke="currentColor" 
             viewBox="0 0 24 24"
