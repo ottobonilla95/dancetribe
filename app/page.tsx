@@ -1,8 +1,6 @@
-import { Suspense } from "react";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/libs/next-auth";
 import { redirect } from "next/navigation";
-import Header from "@/components/Header";
 import Hero from "@/components/Hero";
 import CityList from "@/components/organisims/CityList";
 import Footer from "@/components/Footer";
@@ -173,6 +171,35 @@ async function getTrendingSongs() {
   }
 }
 
+async function getFeaturedUsers() {
+  try {
+    await connectMongo();
+
+    const users = await User.find({
+      isProfileComplete: true,
+      image: { 
+        $exists: true, 
+        $ne: null,
+        // Exclude Google's default avatar images (with initials)
+        $not: { $regex: /googleusercontent\.com.*[?&]d=/ }
+      },
+    })
+      .select("name image")
+      .sort({ createdAt: -1 })
+      .limit(8)
+      .lean();
+
+    return users.map((user: any) => ({
+      _id: user._id.toString(),
+      name: user.name,
+      image: user.image,
+    }));
+  } catch (error) {
+    console.error("Error fetching featured users:", error);
+    return [];
+  }
+}
+
 async function getRecentDancers() {
   try {
     await connectMongo();
@@ -244,21 +271,19 @@ export default async function Home() {
   }
 
   // Fetch data in parallel
-  const [cities, hotDanceStyles, recentDancers, trendingSongs] = await Promise.all([
+  const [cities, hotDanceStyles, recentDancers, trendingSongs, featuredUsers] = await Promise.all([
     getCities(),
     getHotDanceStyles(),
     getRecentDancers(),
     getTrendingSongs(),
+    getFeaturedUsers(),
   ]);
 
   return (
     <>
-      <Suspense>
-        <Header />
-      </Suspense>
       <main>
-        <Hero />
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <Hero featuredUsers={featuredUsers} />
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mt-12 md:mt-16">
           <h2 className="max-w-3xl font-extrabold text-xl md:text-2xl tracking-tight mb-2 md:mb-8">
             Hottest Dance Cities 🔥
           </h2>
