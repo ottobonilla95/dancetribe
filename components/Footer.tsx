@@ -37,13 +37,13 @@ const Footer = () => {
               Copyright © {new Date().getFullYear()} - All rights reserved
             </p>
 
-            <a
+            {/* <a
               href="https://shipfa.st/?ref=shipfast_badge"
               title="Go to ShipFast"
               target="_blank"
               className="mt-4 inline-block cursor-pointer rounded bg-neutral px-2 py-1 text-sm text-neutral-content ring-1 ring-base-content/10 duration-200 hover:ring-neutral"
-            >
-              {/* <div className="flex items-center gap-1">
+            > */}
+            {/* <div className="flex items-center gap-1">
                 <span className="opacity-90">Built with</span>
                 <span className="flex items-center gap-0.5 font-semibold tracking-tight">
                   <svg
@@ -62,7 +62,7 @@ const Footer = () => {
                   ShipFast
                 </span>
               </div> */}
-            </a>
+            {/* </a> */}
           </div>
           <div className="flex-grow flex flex-wrap justify-center -mb-10 md:mt-0 mt-10 text-center">
             <div className="lg:w-1/3 md:w-1/2 w-full px-4">
@@ -81,7 +81,7 @@ const Footer = () => {
                     Support
                   </a>
                 )}
-                <Link href="/#pricing" className="link link-hover">
+                {/* <Link href="/#pricing" className="link link-hover">
                   Pricing
                 </Link>
                 <Link href="/blog" className="link link-hover">
@@ -89,7 +89,7 @@ const Footer = () => {
                 </Link>
                 <a href="/#" target="_blank" className="link link-hover">
                   Affiliates
-                </a>
+                </a> */}
               </div>
             </div>
 
