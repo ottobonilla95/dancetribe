@@ -1,6 +1,6 @@
 "use client";
 
-import { ReactNode, useEffect } from "react";
+import { ReactNode, useEffect, Suspense } from "react";
 import { usePathname } from "next/navigation";
 import { useSession } from "next-auth/react";
 import { Crisp } from "crisp-sdk-web";
@@ -83,7 +83,9 @@ const ClientLayout = ({ children }: { children: ReactNode }) => {
         <FriendRequestWrapper />
         
         {/* Facebook Pixel - Track page views */}
-        <FacebookPixel />
+        <Suspense fallback={null}>
+          <FacebookPixel />
+        </Suspense>
       </SessionProvider>
     </>
   );

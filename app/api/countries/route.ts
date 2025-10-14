@@ -4,8 +4,6 @@ import Country from "@/models/Country";
 import Continent from "@/models/Continent";
 import { createAccentInsensitivePattern } from "@/utils/search";
 
-export const dynamic = 'force-dynamic';
-
 export async function GET(req: NextRequest) {
   try {
     await connectMongo();

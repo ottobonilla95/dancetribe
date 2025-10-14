@@ -8,6 +8,8 @@ import City from "@/models/City";
 import Country from "@/models/Country";
 import { createAccentInsensitivePattern } from "@/utils/search";
 
+export const dynamic = 'force-dynamic';
+
 export async function GET(req: NextRequest) {
   try {
     const session = await getServerSession(authOptions);
