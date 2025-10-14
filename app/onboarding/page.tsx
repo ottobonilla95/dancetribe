@@ -11,6 +11,7 @@ import { validateUsername, generateSuggestions } from "@/utils/username";
 import CitySelector from "@/components/CitySelector";
 import ImageCropPicker from "@/components/ImageCropPicker";
 import CurrentLocationPicker from "@/components/CurrentLocationPicker";
+import { event as fbEvent } from "@/components/FacebookPixel";
 
 interface OnboardingStep {
   id: string;
@@ -570,6 +571,12 @@ export default function Onboarding() {
         console.log(
           "🎉 Profile completed! Updating session and redirecting..."
         );
+
+        // Track profile completion with Facebook Pixel
+        fbEvent("CompleteRegistration", {
+          content_name: "Profile Completed",
+          status: true,
+        });
 
         try {
           // Update the session to reflect profile completion

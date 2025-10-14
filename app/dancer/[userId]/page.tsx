@@ -347,6 +347,17 @@ export default async function PublicProfile({ params }: Props) {
                           >
                             {userData.city.name}
                           </Link>
+                          {userData.city.country && (
+                            <>
+                              <span>, </span>
+                              <Link
+                                href={`/country/${userData.city.country._id || userData.city.country.id}`}
+                                className="link link-primary hover:link-accent"
+                              >
+                                {userData.city.country.name}
+                              </Link>
+                            </>
+                          )}
                         </div>
                       )}
                       {/* Nationality */}

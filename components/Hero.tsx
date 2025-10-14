@@ -19,18 +19,29 @@ const Hero = ({ featuredUsers = [] }: HeroProps) => {
   useEffect(() => {
     const video = videoRef.current;
     if (video) {
-      // Force play the video
-      video.play().catch((error) => {
-        console.log("Video autoplay failed:", error);
-        // If autoplay fails, try playing on user interaction
-        const playOnInteraction = () => {
-          video.play();
-          document.removeEventListener('touchstart', playOnInteraction);
-          document.removeEventListener('click', playOnInteraction);
-        };
-        document.addEventListener('touchstart', playOnInteraction);
-        document.addEventListener('click', playOnInteraction);
-      });
+      // Set attributes to ensure autoplay
+      video.setAttribute('playsinline', '');
+      video.setAttribute('webkit-playsinline', '');
+      video.muted = true;
+      
+      // Try to play immediately
+      const playPromise = video.play();
+      
+      if (playPromise !== undefined) {
+        playPromise.catch((error) => {
+          console.log("Video autoplay prevented:", error);
+          // Auto-play on first user interaction
+          const playOnInteraction = () => {
+            video.play();
+            document.removeEventListener('touchstart', playOnInteraction, { capture: true });
+            document.removeEventListener('click', playOnInteraction, { capture: true });
+            document.removeEventListener('scroll', playOnInteraction, { capture: true });
+          };
+          document.addEventListener('touchstart', playOnInteraction, { capture: true });
+          document.addEventListener('click', playOnInteraction, { capture: true });
+          document.addEventListener('scroll', playOnInteraction, { capture: true });
+        });
+      }
     }
   }, []);
 
@@ -46,10 +57,10 @@ const Hero = ({ featuredUsers = [] }: HeroProps) => {
           muted
           playsInline
           preload="auto"
-          className="absolute inset-0 w-full h-full object-cover"
+          controls={false}
+          disablePictureInPicture
+          className="absolute inset-0 w-full h-full object-cover [&::-webkit-media-controls]:hidden [&::-webkit-media-controls-enclosure]:hidden"
           style={{ pointerEvents: 'none' }}
-          webkit-playsinline="true"
-          x-webkit-airplay="allow"
         >
           <source 
             src="https://res.cloudinary.com/daenzc7ix/video/upload/q_auto,f_auto/v1760362543/Ya_esta%CC%81_aqui%CC%81_nuestro_nuevo_tema_Bachata_Bolero_Es_un_honor_tener_a_los_increi%CC%81bles_ata_t1kkhl.mp4" 

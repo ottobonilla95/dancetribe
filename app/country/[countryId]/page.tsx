@@ -1,9 +1,9 @@
 import { notFound } from "next/navigation";
 import connectMongo from "@/libs/mongoose";
-import City from "@/models/City";
 import Country from "@/models/Country";
 import Continent from "@/models/Continent";
 import User from "@/models/User";
+import City from "@/models/City";
 import DanceStyle from "@/models/DanceStyle";
 import { isValidObjectId } from "mongoose";
 import mongoose from "mongoose";
@@ -11,30 +11,30 @@ import { getServerSession } from "next-auth";
 import { authOptions } from "@/libs/next-auth";
 import Link from "next/link";
 import Pagination from "@/components/Pagination";
+import Flag from "@/components/Flag";
 import {
   FaMapMarkerAlt,
   FaUsers,
   FaGlobeAmericas,
   FaHeart,
   FaMusic,
-  FaWhatsapp,
+  FaCity,
 } from "react-icons/fa";
-import { SiLine, SiTelegram } from "react-icons/si";
 
 interface Props {
   params: {
-    cityId: string;
+    countryId: string;
   };
   searchParams: {
     page?: string;
   };
 }
 
-export default async function CityPage({ params, searchParams }: Props) {
+export default async function CountryPage({ params, searchParams }: Props) {
   await connectMongo();
 
-  // Check if the cityId is a valid ObjectId
-  if (!isValidObjectId(params.cityId)) {
+  // Check if the countryId is a valid ObjectId
+  if (!isValidObjectId(params.countryId)) {
     notFound();
   }
 
@@ -47,38 +47,48 @@ export default async function CityPage({ params, searchParams }: Props) {
   const dancersPerPage = 12;
   const skip = (currentPage - 1) * dancersPerPage;
 
-  let city: any;
+  let country: any;
   try {
-    city = await City.findById(params.cityId)
-      .populate({
-        path: "country",
-        model: Country,
-        select: "name code",
-      })
+    country = await Country.findById(params.countryId)
       .populate({
         path: "continent",
         model: Continent,
-        select: "name",
+        select: "name code",
       })
       .lean();
 
-    if (!city) {
+    if (!country) {
       notFound();
     }
   } catch (error) {
-    console.error("Error fetching city:", error);
+    console.error("Error fetching country:", error);
     notFound();
   }
 
-  // Convert cityId to ObjectId for MongoDB queries
-  const cityObjectId = new mongoose.Types.ObjectId(params.cityId);
+  // Convert countryId to ObjectId for MongoDB queries
+  const countryObjectId = new mongoose.Types.ObjectId(params.countryId);
 
-  // Get dancers in this city (with pagination)
+  // Get all cities in this country first
+  const citiesInCountry = await City.find({
+    country: countryObjectId,
+    isActive: true,
+  })
+    .select("_id")
+    .lean();
+
+  const cityIds = citiesInCountry.map((city: any) => city._id);
+
+  // Get dancers in this country (with pagination)
   const dancers = await User.find({
-    city: cityObjectId,
+    city: { $in: cityIds },
     isProfileComplete: true,
   })
-    .select("name username image danceStyles")
+    .select("name username image danceStyles city")
+    .populate({
+      path: "city",
+      model: City,
+      select: "name",
+    })
     .populate({
       path: "danceStyles.danceStyle",
       model: DanceStyle,
@@ -88,9 +98,21 @@ export default async function CityPage({ params, searchParams }: Props) {
     .limit(dancersPerPage)
     .lean();
 
-  // Get dance styles popular in this city
-  const danceStylesInCity = await User.aggregate([
-    { $match: { city: cityObjectId, isProfileComplete: true } },
+  // Get dancers count for this country
+  const totalDancers = await User.countDocuments({
+    city: { $in: cityIds },
+    isProfileComplete: true,
+  });
+
+  // Get dancers who have visited cities in this country
+  const totalDancersWhoVisited = await User.countDocuments({
+    citiesVisited: { $in: cityIds },
+    isProfileComplete: true,
+  });
+
+  // Get dance styles popular in this country
+  const danceStylesInCountry = await User.aggregate([
+    { $match: { city: { $in: cityIds }, isProfileComplete: true } },
     { $unwind: "$danceStyles" },
     { $group: { _id: "$danceStyles.danceStyle", count: { $sum: 1 } } },
     { $sort: { count: -1 } },
@@ -107,20 +129,9 @@ export default async function CityPage({ params, searchParams }: Props) {
     { $project: { name: "$style.name", count: 1 } },
   ]);
 
-  // Calculate some stats
-  const totalDancers = await User.countDocuments({
-    city: cityObjectId,
-    isProfileComplete: true,
-  });
-
-  const totalDancersWhoVisited = await User.countDocuments({
-    citiesVisited: cityObjectId,
-    isProfileComplete: true,
-  });
-
   // Get role distribution
   const roleDistribution = await User.aggregate([
-    { $match: { city: cityObjectId, isProfileComplete: true } },
+    { $match: { city: { $in: cityIds }, isProfileComplete: true } },
     { $group: { _id: "$danceRole", count: { $sum: 1 } } },
     { $sort: { count: -1 } },
   ]);
@@ -134,13 +145,18 @@ export default async function CityPage({ params, searchParams }: Props) {
     ? mostCommonRole._id.charAt(0).toUpperCase() + mostCommonRole._id.slice(1)
     : "N/A";
 
-  // Get teachers in this city
+  // Get teachers in this country
   const teachers = await User.find({
-    city: cityObjectId,
+    city: { $in: cityIds },
     isProfileComplete: true,
     isTeacher: true,
   })
-    .select("name username image danceStyles teacherProfile")
+    .select("name username image danceStyles teacherProfile city")
+    .populate({
+      path: "city",
+      model: City,
+      select: "name",
+    })
     .populate({
       path: "danceStyles.danceStyle",
       model: DanceStyle,
@@ -149,13 +165,24 @@ export default async function CityPage({ params, searchParams }: Props) {
     .limit(10)
     .lean();
 
+  // Get top cities in this country
+  const topCities = await City.find({
+    country: countryObjectId,
+    isActive: true,
+    totalDancers: { $gt: 0 },
+  })
+    .select("name totalDancers image")
+    .sort({ totalDancers: -1 })
+    .limit(10)
+    .lean();
+
   // Pagination calculations
   const totalPages = Math.ceil(totalDancers / dancersPerPage);
 
-  // Format population
+  // Format numbers
   const formatNumber = (num: number | null | undefined) => {
     if (!num || num === 0) {
-      return "Unknown";
+      return "0";
     }
     if (num >= 1000000) {
       return (num / 1000000).toFixed(1) + "M";
@@ -171,29 +198,17 @@ export default async function CityPage({ params, searchParams }: Props) {
         {/* Header */}
         <div className="mb-8">
           <div className="flex items-center gap-4 mb-4">
-            {city.image && (
-              <div className="w-20 h-20 rounded-lg overflow-hidden shadow-lg">
-                <img
-                  src={city.image}
-                  alt={city.name}
-                  className="w-full h-full object-cover"
-                />
-              </div>
-            )}
+            <div className="text-6xl">
+              <Flag countryCode={country.code} size="lg" />
+            </div>
             <div>
               <h1 className="text-4xl font-bold mb-2 bg-gradient-to-r from-purple-600 via-pink-500 to-orange-400 bg-clip-text text-transparent">
-                {city.name}
+                {country.name}
               </h1>
               <div className="flex items-center gap-4 text-base-content/70">
                 <span className="flex items-center gap-1">
-                  <FaMapMarkerAlt />
-                  <Link 
-                    href={`/country/${city.country?._id || city.country?.id}`}
-                    className="link link-primary hover:link-accent"
-                  >
-                    {city.country?.name}
-                  </Link>
-                  , {city.continent?.name}
+                  <FaGlobeAmericas />
+                  {country.continent?.name}
                 </span>
                 <span className="flex items-center gap-1">
                   <FaUsers />
@@ -202,12 +217,6 @@ export default async function CityPage({ params, searchParams }: Props) {
               </div>
             </div>
           </div>
-
-          {city.description && (
-            <p className="text-lg text-base-content/80 max-w-3xl">
-              {city.description}
-            </p>
-          )}
         </div>
 
         {/* Stats Grid */}
@@ -245,14 +254,56 @@ export default async function CityPage({ params, searchParams }: Props) {
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-          {/* Popular Dance Styles */}
+          {/* Sidebar */}
           <div className="lg:col-span-1">
+            {/* Top Cities */}
+            {topCities.length > 0 && (
+              <div className="card bg-base-200 shadow-xl mb-6">
+                <div className="card-body">
+                  <h2 className="card-title mb-4 flex items-center gap-2">
+                    <FaCity /> Top Cities
+                  </h2>
+                  <div className="space-y-3">
+                    {topCities.map((city: any, index: number) => (
+                      <Link
+                        key={city._id}
+                        href={`/city/${city._id}`}
+                        className="flex items-center justify-between hover:bg-base-300 rounded p-2 transition-colors"
+                      >
+                        <div className="flex items-center gap-3">
+                          {city.image && (
+                            <img
+                              src={city.image}
+                              alt={city.name}
+                              className="w-10 h-10 rounded object-cover"
+                            />
+                          )}
+                          <span className="text-sm font-medium hover:text-primary transition-colors">
+                            {city.name}
+                          </span>
+                        </div>
+                        <div className="flex items-center gap-2">
+                          <span className="text-xs text-base-content/60">
+                            {city.totalDancers} dancer{city.totalDancers !== 1 ? "s" : ""}
+                          </span>
+                          <div className="badge badge-primary badge-sm">
+                            #{index + 1}
+                          </div>
+                        </div>
+                      </Link>
+                    ))}
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {/* Popular Dance Styles */}
             <div className="card bg-base-200 shadow-xl">
               <div className="card-body">
                 <h2 className="card-title mb-4">Popular Dance Styles</h2>
-                {danceStylesInCity.length > 0 ? (
+                {danceStylesInCountry.length > 0 ? (
                   <div className="space-y-3">
-                    {danceStylesInCity.map((style: any, index: number) => (
+                    {danceStylesInCountry.map((style: any, index: number) => (
                       <Link
                         key={style._id}
                         href={`/dance-style/${style._id}`}
@@ -280,7 +331,7 @@ export default async function CityPage({ params, searchParams }: Props) {
               </div>
             </div>
 
-            {/* Teachers in this City */}
+            {/* Teachers in this Country */}
             {teachers.length > 0 && (
               <div className="card bg-base-200 shadow-xl mt-6">
                 <div className="card-body">
@@ -315,10 +366,9 @@ export default async function CityPage({ params, searchParams }: Props) {
                           <h3 className="font-medium text-sm truncate">
                             {teacher.name}
                           </h3>
-                          {teacher.teacherProfile?.yearsOfExperience && (
+                          {teacher.city && (
                             <p className="text-xs text-base-content/60">
-                              {teacher.teacherProfile.yearsOfExperience} year
-                              {teacher.teacherProfile.yearsOfExperience !== 1 ? "s" : ""} exp.
+                              {teacher.city.name}
                             </p>
                           )}
                         </div>
@@ -329,62 +379,14 @@ export default async function CityPage({ params, searchParams }: Props) {
                 </div>
               </div>
             )}
-
-            {/* City Dance Groups */}
-            {(city.socialGroups?.whatsapp || city.socialGroups?.line || city.socialGroups?.telegram) && (
-              <div className="card bg-base-200 shadow-xl mt-6">
-                <div className="card-body">
-                  <h2 className="card-title mb-4">💬 Community Groups</h2>
-                  <p className="text-sm text-base-content/70 mb-4">
-                    Join the dance community
-                  </p>
-                  <div className="space-y-2">
-                    {city.socialGroups.whatsapp && (
-                      <a
-                        href={city.socialGroups.whatsapp}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="btn btn-success btn-sm gap-2 w-full"
-                      >
-                        <FaWhatsapp className="text-lg" />
-                        WhatsApp
-                      </a>
-                    )}
-                    {city.socialGroups.line && (
-                      <a
-                        href={city.socialGroups.line}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="btn btn-sm gap-2 w-full"
-                        style={{ backgroundColor: '#00B900', color: 'white' }}
-                      >
-                        <SiLine className="text-lg" />
-                        LINE
-                      </a>
-                    )}
-                    {city.socialGroups.telegram && (
-                      <a
-                        href={city.socialGroups.telegram}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="btn btn-info btn-sm gap-2 w-full"
-                      >
-                        <SiTelegram className="text-lg" />
-                        Telegram
-                      </a>
-                    )}
-                  </div>
-                </div>
-              </div>
-            )}
           </div>
 
-          {/* Dancers in this City */}
+          {/* Dancers in this Country */}
           <div className="lg:col-span-2">
             <div className="card bg-base-200 shadow-xl">
               <div className="card-body">
                 <div className="flex justify-between items-center mb-4">
-                  <h2 className="card-title">Dancers in {city.name}</h2>
+                  <h2 className="card-title">Dancers in {country.name}</h2>
                   <span className="text-sm text-base-content/60">
                     Page {currentPage} of {totalPages} (
                     {formatNumber(totalDancers)} total)
@@ -425,9 +427,9 @@ export default async function CityPage({ params, searchParams }: Props) {
                                 <h3 className="font-medium text-sm truncate w-full">
                                   {dancer.name}
                                 </h3>
-                                {dancer.username && (
+                                {dancer.city && (
                                   <p className="text-xs text-base-content/60 truncate w-full">
-                                    @{dancer.username}
+                                    {dancer.city.name}
                                   </p>
                                 )}
                                 {dancer.danceStyles &&
@@ -461,13 +463,13 @@ export default async function CityPage({ params, searchParams }: Props) {
                     <Pagination
                       currentPage={currentPage}
                       totalPages={totalPages}
-                      baseUrl={`/city/${params.cityId}`}
+                      baseUrl={`/country/${params.countryId}`}
                     />
                   </>
                 ) : (
                   <div className="text-center py-8 text-base-content/60">
                     <FaUsers className="mx-auto text-4xl mb-4 opacity-50" />
-                    <p>No dancers found in {city.name} yet</p>
+                    <p>No dancers found in {country.name} yet</p>
                     {isLoggedIn && (
                       <p className="text-sm mt-2">
                         Be the first to{" "}
@@ -490,11 +492,11 @@ export default async function CityPage({ params, searchParams }: Props) {
             <div className="card bg-gradient-to-r from-purple-500 to-pink-500 text-white shadow-xl">
               <div className="card-body">
                 <h2 className="card-title justify-center text-2xl mb-2">
-                  Join the Dance Community in {city.name}
+                  Join the Dance Community in {country.name}
                 </h2>
                 <p className="mb-4">
                   Connect with {totalDancers} dancers and discover the amazing
-                  dance scene in your city!
+                  dance scene in {country.name}!
                 </p>
                 <div className="card-actions justify-center">
                   <Link href="/api/auth/signin" className="btn btn-white">
@@ -509,3 +511,4 @@ export default async function CityPage({ params, searchParams }: Props) {
     </div>
   );
 }
+

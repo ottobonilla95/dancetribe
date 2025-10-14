@@ -10,6 +10,7 @@ import { Toaster } from "react-hot-toast";
 import { Tooltip } from "react-tooltip";
 import config from "@/config";
 import FriendRequestWrapper from "./FriendRequestWrapper";
+import FacebookPixel from "./FacebookPixel";
 
 // Crisp customer chat support:
 // This component is separated from ClientLayout because it needs to be wrapped with <SessionProvider> to use useSession() hook
@@ -80,6 +81,9 @@ const ClientLayout = ({ children }: { children: ReactNode }) => {
         
         {/* Friend Request Notifications */}
         <FriendRequestWrapper />
+        
+        {/* Facebook Pixel - Track page views */}
+        <FacebookPixel />
       </SessionProvider>
     </>
   );
