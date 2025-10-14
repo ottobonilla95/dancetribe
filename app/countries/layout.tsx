@@ -1,4 +1,5 @@
 import { Metadata } from "next";
+import { ReactNode } from "react";
 
 export const metadata: Metadata = {
   title: "Countries | DanceTribe - Find Dance Communities Worldwide",
@@ -8,7 +9,7 @@ export const metadata: Metadata = {
 export default function CountriesLayout({
   children,
 }: {
-  children: React.ReactNode;
+  children: ReactNode;
 }) {
   return (
     <div>
