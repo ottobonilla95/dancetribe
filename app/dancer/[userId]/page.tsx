@@ -247,7 +247,7 @@ export default async function PublicProfile({ params }: Props) {
   
   // Get friends count from the original user document before population limit
   // Note: Even with populate limit, the array length reflects total friends
-  const userDoc = await User.findById(params.userId).select('friends').lean();
+  const userDoc = await User.findById(params.userId).select('friends').lean() as any;
   const friendsCount = userDoc?.friends?.length || 0;
   
   // Get populated friends (limited to 12)
