@@ -245,13 +245,12 @@ export default async function PublicProfile({ params }: Props) {
     ? userData.likedBy?.includes(session?.user?.id)
     : false;
   
-  // Get friends count from the original user document before population limit
-  // Note: Even with populate limit, the array length reflects total friends
-  const userDoc = await User.findById(params.userId).select('friends').lean() as any;
-  const friendsCount = userDoc?.friends?.length || 0;
-  
-  // Get populated friends (limited to 12)
-  const populatedFriends = userData.friends?.filter((f: any) => typeof f === 'object') || [];
+  // Separate populated friends from IDs
+  // When populate has a limit, some entries stay as IDs while others become objects
+  const allFriends = userData.friends || [];
+  const populatedFriends = allFriends.filter((f: any) => typeof f === 'object' && f !== null);
+  const friendIds = allFriends.map((f: any) => typeof f === 'object' && f !== null ? f._id.toString() : f.toString());
+  const friendsCount = friendIds.length;
 
   // Friend request status
   const hasSentFriendRequest = isLoggedIn
@@ -264,10 +263,9 @@ export default async function PublicProfile({ params }: Props) {
         (request: any) => request.user.toString() === session?.user?.id
       )
     : false;
+  // Check if current user's ID is in the friends list (handles both populated objects and IDs)
   const isFriend = isLoggedIn
-    ? userData.friends?.some(
-        (friendId: any) => friendId.toString() === session?.user?.id
-      )
+    ? friendIds.includes(session?.user?.id)
     : false;
 
   return (

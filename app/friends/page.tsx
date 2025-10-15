@@ -56,7 +56,24 @@ export default async function FriendsPage() {
   }
 
   // Convert to plain object for client component
+  // Filter out any null/undefined users from arrays (e.g., deleted users)
   const userData = JSON.parse(JSON.stringify(user));
+  if (userData.likedBy) {
+    userData.likedBy = userData.likedBy.filter((user: any) => user && user._id);
+  }
+  if (userData.friends) {
+    userData.friends = userData.friends.filter((friend: any) => friend && friend._id);
+  }
+  if (userData.friendRequestsReceived) {
+    userData.friendRequestsReceived = userData.friendRequestsReceived.filter(
+      (req: any) => req.user && req.user._id
+    );
+  }
+  if (userData.friendRequestsSent) {
+    userData.friendRequestsSent = userData.friendRequestsSent.filter(
+      (req: any) => req.user && req.user._id
+    );
+  }
 
   return (
     <div className="min-h-screen bg-base-100">

@@ -37,7 +37,7 @@ export default async function Profile({ searchParams }: ProfileProps) {
 
   const user = await User.findById(session.user.id)
     .select(
-      "name firstName lastName username email image dateOfBirth dancingStartYear city citiesVisited danceStyles anthem socialMedia danceRole gender nationality relationshipStatus isTeacher teacherProfile friends likedBy createdAt"
+      "name firstName lastName username email image dateOfBirth dancingStartYear city citiesVisited trips danceStyles anthem socialMedia danceRole gender nationality relationshipStatus isTeacher teacherProfile friends likedBy createdAt"
     )
     .populate({
       path: "city",
