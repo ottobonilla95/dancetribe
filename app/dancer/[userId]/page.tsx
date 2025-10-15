@@ -55,6 +55,22 @@ export default async function PublicProfile({ params }: Props) {
         "name username email image dateOfBirth dancingStartYear city citiesVisited trips danceStyles anthem socialMedia danceRole gender nationality relationshipStatus createdAt likedBy friends friendRequestsSent friendRequestsReceived isTeacher teacherProfile"
       )
       .populate({
+        path: "friends",
+        model: User,
+        select: "name username image city",
+        options: { limit: 12 }, // Only load first 12 friends for display
+        populate: {
+          path: "city",
+          model: City,
+          select: "name country",
+          populate: {
+            path: "country",
+            model: Country,
+            select: "name code",
+          },
+        },
+      })
+      .populate({
         path: "city",
         model: City,
         select: "name country continent rank image population",
@@ -228,7 +244,14 @@ export default async function PublicProfile({ params }: Props) {
   const isLikedByCurrentUser = isLoggedIn
     ? userData.likedBy?.includes(session?.user?.id)
     : false;
-  const friendsCount = userData.friends?.length || 0;
+  
+  // Get friends count from the original user document before population limit
+  // Note: Even with populate limit, the array length reflects total friends
+  const userDoc = await User.findById(params.userId).select('friends').lean();
+  const friendsCount = userDoc?.friends?.length || 0;
+  
+  // Get populated friends (limited to 12)
+  const populatedFriends = userData.friends?.filter((f: any) => typeof f === 'object') || [];
 
   // Friend request status
   const hasSentFriendRequest = isLoggedIn
@@ -561,6 +584,63 @@ export default async function PublicProfile({ params }: Props) {
                   />
                 </div>
               </div>
+
+              {/* Friends List */}
+              {populatedFriends && populatedFriends.length > 0 && (
+                <div className="card bg-base-200 shadow-xl">
+                  <div className="card-body">
+                    <h3 className="card-title text-xl mb-4">
+                      👥 Friends ({friendsCount})
+                    </h3>
+                    <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4">
+                      {populatedFriends.map((friend: any) => (
+                        <Link
+                          key={friend._id || friend.id}
+                          href={`/dancer/${friend._id || friend.id}`}
+                          className="group"
+                        >
+                          <div className="flex flex-col items-center gap-2 p-3 rounded-lg hover:bg-base-300 transition-colors">
+                            <div className="avatar">
+                              <div className="w-16 h-16 rounded-full ring ring-base-300 group-hover:ring-primary transition-all">
+                                {friend.image ? (
+                                  <img
+                                    src={friend.image}
+                                    alt={friend.name || friend.username}
+                                    className="w-full h-full object-cover rounded-full"
+                                  />
+                                ) : (
+                                  <div className="bg-primary text-primary-content rounded-full w-full h-full flex items-center justify-center">
+                                    <span className="text-2xl">
+                                      {friend.name?.charAt(0)?.toUpperCase() || "?"}
+                                    </span>
+                                  </div>
+                                )}
+                              </div>
+                            </div>
+                            <div className="text-center">
+                              <div className="font-semibold text-sm group-hover:text-primary transition-colors line-clamp-1">
+                                {friend.name}
+                              </div>
+                              {friend.city && (
+                                <div className="text-xs text-base-content/60 line-clamp-1">
+                                  {friend.city.name}
+                                </div>
+                              )}
+                            </div>
+                          </div>
+                        </Link>
+                      ))}
+                    </div>
+                    {friendsCount > 12 && (
+                      <div className="text-center mt-4">
+                        <p className="text-sm text-base-content/60">
+                          + {friendsCount - 12} more friends
+                        </p>
+                      </div>
+                    )}
+                  </div>
+                </div>
+              )}
 
               {/* Social Media */}
               {userData.socialMedia &&

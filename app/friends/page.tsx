@@ -4,6 +4,7 @@ import { redirect } from "next/navigation";
 import connectMongo from "@/libs/mongoose";
 import User from "@/models/User";
 import FriendsContent from "./FriendsContent";
+import FriendsMap from "@/components/FriendsMap";
 
 export default async function FriendsPage() {
   const session = await getServerSession(authOptions);
@@ -23,7 +24,7 @@ export default async function FriendsPage() {
         select: "name image username city",
         populate: {
           path: "city",
-          select: "name"
+          select: "name coordinates"
         }
       })
       .populate({
@@ -58,16 +59,18 @@ export default async function FriendsPage() {
   const userData = JSON.parse(JSON.stringify(user));
 
   return (
-    <div className="min-h-screen p-4 bg-base-100">
-      <div className="max-w-6xl mx-auto">
-        {/* Header */}
-        <div className="mb-8 text-center">
-          <h1 className="text-4xl font-bold mb-2">Your Dance Network</h1>
-          <p className="text-base-content/70">Connect with dancers, manage friendships, and grow your community</p>
+    <div className="min-h-screen bg-base-100">
+      {/* Friends World Map - Full width on mobile - Always show */}
+      <div className="mb-8 md:px-4">
+        <div className="max-w-6xl md:mx-auto">
+          <FriendsMap friends={userData.friends || []} />
         </div>
+      </div>
 
-        {/* Stats Overview */}
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-8">
+      <div className="p-4">
+        <div className="max-w-6xl mx-auto">
+          {/* Stats Overview */}
+          <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-8">
           <div className="stat bg-base-200 rounded-lg">
             <div className="stat-title">Friends</div>
             <div className="stat-value text-primary">{userData.friends?.length || 0}</div>
@@ -90,8 +93,9 @@ export default async function FriendsPage() {
           </div>
         </div>
 
-        {/* Main Content */}
-        <FriendsContent userData={userData} />
+          {/* Main Content */}
+          <FriendsContent userData={userData} />
+        </div>
       </div>
     </div>
   );

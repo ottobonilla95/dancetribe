@@ -12,6 +12,7 @@ import CitySelector from "@/components/CitySelector";
 import ImageCropPicker from "@/components/ImageCropPicker";
 import CurrentLocationPicker from "@/components/CurrentLocationPicker";
 import { event as fbEvent } from "@/components/FacebookPixel";
+import SupportButton from "@/components/SupportButton";
 
 interface OnboardingStep {
   id: string;
@@ -1469,6 +1470,9 @@ export default function Onboarding() {
           </div>
         </div>
       </div>
+
+      {/* Floating Support Button */}
+      <SupportButton />
     </div>
   );
 }

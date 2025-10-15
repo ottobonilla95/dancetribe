@@ -313,6 +313,10 @@ export default async function Home() {
                     Connect with dancers from around the world
                   </p>
                 </div>
+                <ButtonSignin 
+                  text="Discover All" 
+                  extraStyle="btn-primary btn-sm md:btn-md"
+                />
               </div>
 
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">

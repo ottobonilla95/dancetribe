@@ -9,9 +9,11 @@ import { FaFilter, FaSpinner } from "react-icons/fa";
 interface DiscoveryFeedProps {
   initialDancers?: any[];
   danceStyles?: DanceStyle[];
+  showViewAllLink?: boolean;
+  isPreview?: boolean; // Hide filters when showing as a preview on dashboard
 }
 
-export default function DiscoveryFeed({ initialDancers = [], danceStyles = [] }: DiscoveryFeedProps) {
+export default function DiscoveryFeed({ initialDancers = [], danceStyles = [], showViewAllLink = false, isPreview = false }: DiscoveryFeedProps) {
   const [dancers, setDancers] = useState(initialDancers);
   const [loading, setLoading] = useState(false);
   const [loadingMore, setLoadingMore] = useState(false);
@@ -87,16 +89,30 @@ export default function DiscoveryFeed({ initialDancers = [], danceStyles = [] }:
                "Dancers around the world"}
             </p>
           </div>
-          <button
-            onClick={() => setShowFilters(!showFilters)}
-            className="btn btn-outline btn-sm gap-2"
-          >
-            <FaFilter />
-            More Filters
-          </button>
+          <div className="flex gap-2">
+            {showViewAllLink && (
+              <a
+                href="/discover"
+                className="btn btn-primary btn-sm gap-2"
+              >
+                View All
+                <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7l5 5m0 0l-5 5m5-5H6" />
+                </svg>
+              </a>
+            )}
+            {/* Hide More Filters button on mobile when isPreview */}
+            <button
+              onClick={() => setShowFilters(!showFilters)}
+              className={`btn btn-outline btn-sm gap-2 ${isPreview ? 'hidden md:flex' : ''}`}
+            >
+              <FaFilter />
+              More Filters
+            </button>
+          </div>
         </div>
 
-        {/* Location Toggle Buttons */}
+        {/* Location Toggle Buttons - Always show */}
         <div className="flex gap-2 flex-wrap">
           <button
             onClick={() => setFilters({...filters, nearMe: true, inMyCountry: false})}

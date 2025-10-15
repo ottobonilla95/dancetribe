@@ -486,6 +486,8 @@ export default async function Dashboard() {
           <DiscoveryFeed
             initialDancers={initialDancers}
             danceStyles={danceStyles}
+            showViewAllLink={true}
+            isPreview={true}
           />
         </div>
       </div>

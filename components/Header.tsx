@@ -45,6 +45,7 @@ const Header = () => {
 
   const loggedInNavItems = [
     { href: "/dashboard", label: "Dashboard", icon: FaHome },
+    { href: "/discover", label: "Discover Dancers", icon: FaUserPlus },
     { href: "/profile", label: "My Profile", icon: FaUser },
     { 
       href: "/friends", 
@@ -330,20 +331,22 @@ const Header = () => {
                   <InstallAppButton />
                 </div>
 
-                {/* Collaborate Button */}
-                <div className="py-2">
-                  <a
-                    href={`mailto:${CONTACT.COLLABORATION_EMAIL}`}
-                    className="btn btn-outline btn-block gap-2"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                  >
-                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-5 h-5">
-                      <path strokeLinecap="round" strokeLinejoin="round" d="M21 8.25c0-2.485-2.099-4.5-4.688-4.5-1.935 0-3.597 1.126-4.312 2.733-.715-1.607-2.377-2.733-4.313-2.733C5.1 3.75 3 5.765 3 8.25c0 7.22 9 12 9 12s9-4.78 9-12z" />
-                    </svg>
-                    Collab
-                  </a>
-                </div>
+                {/* Support Button */}
+                {config.resend.supportEmail && (
+                  <div className="py-2">
+                    <a
+                      href={`mailto:${config.resend.supportEmail}?subject=DanceTribe Support Request`}
+                      className="btn btn-outline btn-block gap-2"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                    >
+                      <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-5 h-5">
+                        <path strokeLinecap="round" strokeLinejoin="round" d="M9.879 7.519c1.171-1.025 3.071-1.025 4.242 0 1.172 1.025 1.172 2.687 0 3.712-.203.179-.43.326-.67.442-.745.361-1.45.999-1.45 1.827v.75M21 12a9 9 0 11-18 0 9 9 0 0118 0zm-9 5.25h.008v.008H12v-.008z" />
+                      </svg>
+                      Get Support
+                    </a>
+                  </div>
+                )}
 
                 <div className="divider"></div>
                 

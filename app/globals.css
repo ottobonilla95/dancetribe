@@ -21,3 +21,40 @@ progress::-webkit-progress-value {
   }
 }
 @import "flag-icons/css/flag-icons.min.css";
+@import "mapbox-gl/dist/mapbox-gl.css";
+
+/* Mapbox friend markers */
+.friend-marker {
+  /* Marker container - Mapbox handles positioning */
+}
+
+.friend-marker-inner {
+  /* Inner wrapper handles hover effects without affecting map positioning */
+  transform-origin: center center;
+}
+
+/* Beautiful custom popups */
+.custom-popup .mapboxgl-popup-content {
+  padding: 16px;
+  border-radius: 12px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+  border: 1px solid #e5e7eb;
+}
+
+.custom-popup .mapboxgl-popup-close-button {
+  font-size: 20px;
+  padding: 8px;
+  color: #6b7280;
+  right: 8px;
+  top: 8px;
+  transition: color 0.2s;
+}
+
+.custom-popup .mapboxgl-popup-close-button:hover {
+  color: #1a1a1a;
+  background: transparent;
+}
+
+.custom-popup .mapboxgl-popup-tip {
+  border-top-color: white;
+}

@@ -41,8 +41,8 @@ export default function WelcomeModal({ userName, userUsername, userImage, userDa
       console.log("📱 WelcomeModal: Setting showInstallPrompt to true");
       setShowInstallPrompt(true);
     }, 500); // Small delay for smooth transition
-    // Remove the welcome param from URL
-    router.replace("/profile");
+    // Redirect to dashboard to explore the app
+    router.push("/dashboard");
   };
 
   const profileUrl = `${typeof window !== "undefined" ? window.location.origin : ""}/${userUsername}`;
@@ -164,8 +164,20 @@ export default function WelcomeModal({ userName, userUsername, userImage, userDa
               </button>
             </div>
 
+            {/* Divider */}
+            <div className="divider">OR</div>
+
+            {/* Primary CTA - Discover Dancers */}
+            <Link
+              href="/discover"
+              className="btn btn-primary btn-lg btn-block gap-2 mb-4"
+            >
+              <FaCompass className="text-xl" />
+              🎉 Start Discovering Dancers!
+            </Link>
+
             {/* Secondary Actions */}
-            <div className="flex flex-col sm:flex-row gap-3 mb-6">
+            <div className="flex flex-col sm:flex-row gap-3 mb-4">
               <Link
                 href="/invite"
                 className="btn btn-outline flex-1 gap-2"
@@ -180,17 +192,16 @@ export default function WelcomeModal({ userName, userUsername, userImage, userDa
                 className="btn btn-outline flex-1 gap-2"
                 onClick={handleClose}
               >
-                <FaCompass className="text-lg" />
-                Explore Dancers
+                View Dashboard
               </Link>
             </div>
 
             {/* Close Button */}
             <button
               onClick={handleClose}
-              className="btn btn-ghost btn-block"
+              className="btn btn-ghost btn-block text-sm"
             >
-              I&apos;ll share later
+              I&apos;ll do this later
             </button>
           </div>
         </div>
