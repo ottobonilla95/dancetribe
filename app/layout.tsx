@@ -53,11 +53,11 @@ export default function RootLayout({ children }: { children: ReactNode }) {
 				<link rel="apple-touch-icon" sizes="152x152" href="/apple-touch-icon-152.png" />
 				<link rel="apple-touch-icon" sizes="120x120" href="/apple-touch-icon-120.png" />
 				
-				{/* Standard favicons */}
-				<link rel="icon" type="image/png" sizes="192x192" href="/icon-192.png" />
-				<link rel="icon" type="image/png" sizes="512x512" href="/icon-512.png" />
-			</head>
-			
+			{/* Standard favicons */}
+			<link rel="icon" type="image/png" sizes="192x192" href="/icon-192.png" />
+			<link rel="icon" type="image/png" sizes="512x512" href="/icon-512.png" />
+		</head>
+		<body>
 			{/* Facebook Pixel */}
 			<Script
 				id="facebook-pixel"
@@ -77,18 +77,18 @@ export default function RootLayout({ children }: { children: ReactNode }) {
 					`,
 				}}
 			/>
-			<body>
-				<noscript>
-					<img
-						height="1"
-						width="1"
-						style={{ display: "none" }}
-						src={`https://www.facebook.com/tr?id=${FB_PIXEL_ID}&ev=PageView&noscript=1`}
-					/>
-				</noscript>
-				{/* ClientLayout contains all the client wrappers (Crisp chat support, toast messages, tooltips, etc.) */}
-				<ClientLayout>{children}</ClientLayout>
-			</body>
+			<noscript>
+				<img
+					height="1"
+					width="1"
+					style={{ display: "none" }}
+					src={`https://www.facebook.com/tr?id=${FB_PIXEL_ID}&ev=PageView&noscript=1`}
+					alt=""
+				/>
+			</noscript>
+			{/* ClientLayout contains all the client wrappers (Crisp chat support, toast messages, tooltips, etc.) */}
+			<ClientLayout>{children}</ClientLayout>
+		</body>
 		</html>
 	);
 }
