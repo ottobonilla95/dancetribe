@@ -3,7 +3,7 @@ export const getCountryCode = (countryName: string): string => {
   const countryMap: { [key: string]: string } = {
     "United States": "us", "United Kingdom": "gb", "Canada": "ca", "Australia": "au",
     "Germany": "de", "France": "fr", "Italy": "it", "Spain": "es", "Japan": "jp",
-    "China": "cn", "India": "in", "Brazil": "br", "Mexico": "mx", "Russia": "ru",
+    "China": "cn", "Hong Kong": "hk", "India": "in", "Brazil": "br", "Mexico": "mx", "Russia": "ru",
     "South Korea": "kr", "Netherlands": "nl", "Sweden": "se", "Norway": "no",
     "Denmark": "dk", "Finland": "fi", "Poland": "pl", "Turkey": "tr",
     "South Africa": "za", "Argentina": "ar", "Chile": "cl", "Colombia": "co",
