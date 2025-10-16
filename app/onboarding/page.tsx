@@ -1432,7 +1432,7 @@ export default function Onboarding() {
                   <div className="space-y-4 border-l-4 border-primary pl-4 ml-2">
                     <div className="form-control">
                       <label className="label">
-                        <span className="label-text">DJ Name/Alias</span>
+                        <span className="label-text">DJ Name/Alias (optional)</span>
                       </label>
                       <input
                         type="text"
@@ -1445,7 +1445,7 @@ export default function Onboarding() {
 
                     <div className="form-control">
                       <label className="label">
-                        <span className="label-text">Music Genres</span>
+                        <span className="label-text">Music Genres (optional)</span>
                       </label>
                       <input
                         type="text"
@@ -1494,7 +1494,7 @@ export default function Onboarding() {
                   <div className="space-y-4 border-l-4 border-primary pl-4 ml-2">
                     <div className="form-control">
                       <label className="label">
-                        <span className="label-text">Portfolio Link</span>
+                        <span className="label-text">Portfolio Link (optional)</span>
                       </label>
                       <input
                         type="url"
@@ -1507,7 +1507,7 @@ export default function Onboarding() {
 
                     <div className="form-control">
                       <label className="label">
-                        <span className="label-text">Specialties</span>
+                        <span className="label-text">Specialties (optional)</span>
                       </label>
                       <input
                         type="text"
