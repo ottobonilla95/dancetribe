@@ -53,6 +53,9 @@ export interface ConfigProps {
     fromAdmin: string;
     supportEmail?: string;
   };
+  social?: {
+    instagram?: string;
+  };
   colors: {
     theme: Theme;
     main: string;

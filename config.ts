@@ -79,6 +79,10 @@ const config = {
     // Email shown to customer if they need support. Leave empty if not needed => if empty, set up Crisp above, otherwise you won't be able to offer customer support."
     supportEmail: "mr.bonilla51@gmail.com",
   },
+  social: {
+    // Social media handles for support and marketing
+    instagram: "dancetribe.co",
+  },
   colors: {
     // REQUIRED — The DaisyUI theme to use (added to the main layout.js). Leave blank for default (light & dark mode). If you use any theme other than light/dark, you need to add it in config.tailwind.js in daisyui.themes.
     theme: "dark",

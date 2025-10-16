@@ -31,7 +31,12 @@ export type User = {
   priceId?: string;
   hasAccess?: boolean;
   isTeacher?: boolean;
+  isDJ?: boolean;
+  isPhotographer?: boolean;
   teacherProfile?: TeacherProfile;
+  djProfile?: DJProfile;
+  photographerProfile?: PhotographerProfile;
+  professionalContact?: ProfessionalContact;
   createdAt?: Date;
   updatedAt?: Date;
 }
@@ -71,10 +76,23 @@ export interface TeacherProfile {
   bio?: string;
   yearsOfExperience?: number;
   danceStylesTaught?: string[]; // Array of DanceStyle IDs
-  contact?: {
-    whatsapp?: string;
-    email?: string;
-  };
+}
+
+export interface DJProfile {
+  djName?: string;
+  genres?: string;
+  bio?: string;
+}
+
+export interface PhotographerProfile {
+  portfolioLink?: string;
+  specialties?: string;
+  bio?: string;
+}
+
+export interface ProfessionalContact {
+  whatsapp?: string;
+  email?: string;
 }
 
 export type DanceRole = "follower" | "leader" | "both";

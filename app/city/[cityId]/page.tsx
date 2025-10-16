@@ -94,7 +94,7 @@ export default async function CityPage({ params, searchParams }: Props) {
     { $unwind: "$danceStyles" },
     { $group: { _id: "$danceStyles.danceStyle", count: { $sum: 1 } } },
     { $sort: { count: -1 } },
-    { $limit: 10 },
+    { $limit: 5 },
     {
       $lookup: {
         from: "dancestyles",
@@ -148,6 +148,52 @@ export default async function CityPage({ params, searchParams }: Props) {
     })
     .limit(10)
     .lean();
+
+  // Get DJs in this city
+  const djs = await User.find({
+    city: cityObjectId,
+    isProfileComplete: true,
+    isDJ: true,
+  })
+    .select("name username image djProfile")
+    .limit(10)
+    .lean();
+
+  // Get photographers in this city
+  const photographers = await User.find({
+    city: cityObjectId,
+    isProfileComplete: true,
+    isPhotographer: true,
+  })
+    .select("name username image photographerProfile")
+    .limit(10)
+    .lean();
+
+  // Get most liked dancers in this city
+  const mostLikedDancers = await User.aggregate([
+    { 
+      $match: { 
+        city: cityObjectId, 
+        isProfileComplete: true 
+      } 
+    },
+    {
+      $addFields: {
+        likesCount: { $size: { $ifNull: ["$likedBy", []] } }
+      }
+    },
+    { $match: { likesCount: { $gt: 0 } } },
+    { $sort: { likesCount: -1 } },
+    { $limit: 10 },
+    {
+      $project: {
+        name: 1,
+        username: 1,
+        image: 1,
+        likesCount: 1
+      }
+    }
+  ]);
 
   // Pagination calculations
   const totalPages = Math.ceil(totalDancers / dancersPerPage);
@@ -323,6 +369,156 @@ export default async function CityPage({ params, searchParams }: Props) {
                           )}
                         </div>
                         <div className="badge badge-primary badge-sm">View</div>
+                      </Link>
+                    ))}
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {/* DJs in this City */}
+            {djs.length > 0 && (
+              <div className="card bg-base-200 shadow-xl mt-6">
+                <div className="card-body">
+                  <h2 className="card-title mb-4 flex items-center gap-2">
+                    🎵 DJs
+                  </h2>
+                  <div className="space-y-3">
+                    {djs.map((dj: any) => (
+                      <Link
+                        key={dj._id}
+                        href={`/dancer/${dj._id}`}
+                        className="flex items-center gap-3 hover:bg-base-300 rounded p-2 transition-colors"
+                      >
+                        <div className="avatar">
+                          <div className="w-10 h-10 rounded-full">
+                            {dj.image ? (
+                              <img
+                                src={dj.image}
+                                alt={dj.name}
+                                className="w-full h-full object-cover rounded-full"
+                              />
+                            ) : (
+                              <div className="bg-secondary text-secondary-content rounded-full w-full h-full flex items-center justify-center">
+                                <span className="text-sm">
+                                  {dj.name?.charAt(0)?.toUpperCase() || "?"}
+                                </span>
+                              </div>
+                            )}
+                          </div>
+                        </div>
+                        <div className="flex-1 min-w-0">
+                          <h3 className="font-medium text-sm truncate">
+                            {dj.djProfile?.djName || dj.name}
+                          </h3>
+                          {dj.djProfile?.genres && (
+                            <p className="text-xs text-base-content/60 truncate">
+                              {dj.djProfile.genres}
+                            </p>
+                          )}
+                        </div>
+                        <div className="badge badge-secondary badge-sm">View</div>
+                      </Link>
+                    ))}
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {/* Photographers in this City */}
+            {photographers.length > 0 && (
+              <div className="card bg-base-200 shadow-xl mt-6">
+                <div className="card-body">
+                  <h2 className="card-title mb-4 flex items-center gap-2">
+                    📷 Photographers
+                  </h2>
+                  <div className="space-y-3">
+                    {photographers.map((photographer: any) => (
+                      <Link
+                        key={photographer._id}
+                        href={`/dancer/${photographer._id}`}
+                        className="flex items-center gap-3 hover:bg-base-300 rounded p-2 transition-colors"
+                      >
+                        <div className="avatar">
+                          <div className="w-10 h-10 rounded-full">
+                            {photographer.image ? (
+                              <img
+                                src={photographer.image}
+                                alt={photographer.name}
+                                className="w-full h-full object-cover rounded-full"
+                              />
+                            ) : (
+                              <div className="bg-accent text-accent-content rounded-full w-full h-full flex items-center justify-center">
+                                <span className="text-sm">
+                                  {photographer.name?.charAt(0)?.toUpperCase() || "?"}
+                                </span>
+                              </div>
+                            )}
+                          </div>
+                        </div>
+                        <div className="flex-1 min-w-0">
+                          <h3 className="font-medium text-sm truncate">
+                            {photographer.name}
+                          </h3>
+                          {photographer.photographerProfile?.specialties && (
+                            <p className="text-xs text-base-content/60 truncate">
+                              {photographer.photographerProfile.specialties}
+                            </p>
+                          )}
+                        </div>
+                        <div className="badge badge-accent badge-sm">View</div>
+                      </Link>
+                    ))}
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {/* Most Liked Dancers */}
+            {mostLikedDancers.length > 0 && (
+              <div className="card bg-base-200 shadow-xl mt-6">
+                <div className="card-body">
+                  <h2 className="card-title mb-4 flex items-center gap-2">
+                    ❤️ Most Liked Dancers
+                  </h2>
+                  <div className="space-y-3">
+                    {mostLikedDancers.map((dancer: any, index: number) => (
+                      <Link
+                        key={dancer._id}
+                        href={`/dancer/${dancer._id}`}
+                        className="flex items-center gap-3 hover:bg-base-300 rounded p-2 transition-colors"
+                      >
+                        <div className="flex items-center gap-3 flex-1">
+                          <div className="badge badge-lg badge-ghost">
+                            #{index + 1}
+                          </div>
+                          <div className="avatar">
+                            <div className="w-10 h-10 rounded-full">
+                              {dancer.image ? (
+                                <img
+                                  src={dancer.image}
+                                  alt={dancer.name}
+                                  className="w-full h-full object-cover rounded-full"
+                                />
+                              ) : (
+                                <div className="bg-error text-error-content rounded-full w-full h-full flex items-center justify-center">
+                                  <span className="text-sm">
+                                    {dancer.name?.charAt(0)?.toUpperCase() || "?"}
+                                  </span>
+                                </div>
+                              )}
+                            </div>
+                          </div>
+                          <div className="flex-1 min-w-0">
+                            <h3 className="font-medium text-sm truncate">
+                              {dancer.name}
+                            </h3>
+                            <p className="text-xs text-base-content/60">
+                              ❤️ {dancer.likesCount} {dancer.likesCount === 1 ? 'like' : 'likes'}
+                            </p>
+                          </div>
+                        </div>
+                        <div className="badge badge-error badge-sm">View</div>
                       </Link>
                     ))}
                   </div>

@@ -20,7 +20,7 @@ export async function GET() {
 
     const user = await User.findById(session.user.id)
       .select(
-        "name firstName lastName username email image dateOfBirth dancingStartYear city citiesVisited danceStyles anthem socialMedia danceRole gender nationality relationshipStatus onboardingSteps isProfileComplete isTeacher teacherProfile createdAt"
+        "name firstName lastName username email image dateOfBirth dancingStartYear city citiesVisited danceStyles anthem socialMedia danceRole gender nationality relationshipStatus onboardingSteps isProfileComplete isTeacher isDJ isPhotographer teacherProfile djProfile photographerProfile professionalContact createdAt"
       )
       .populate({
         path: "city",
@@ -202,19 +202,53 @@ export async function PUT(req: NextRequest) {
         break;
 
       case "teacherInfo":
-        user.isTeacher = data.isTeacher;
+        // Handle all professional roles
+        user.isTeacher = data.isTeacher || false;
+        user.isDJ = data.isDJ || false;
+        user.isPhotographer = data.isPhotographer || false;
+        
+        // Update teacher profile
         if (data.isTeacher && data.teacherProfile) {
           user.teacherProfile = {
             bio: data.teacherProfile.bio,
             yearsOfExperience: data.teacherProfile.yearsOfExperience,
-            contact: {
-              whatsapp: data.teacherProfile.contact?.whatsapp || "",
-              email: data.teacherProfile.contact?.email || "",
-            },
           };
         } else {
           user.teacherProfile = undefined;
         }
+        
+        // Update DJ profile
+        if (data.isDJ && data.djProfile) {
+          user.djProfile = {
+            djName: data.djProfile.djName,
+            genres: data.djProfile.genres,
+            bio: data.djProfile.bio,
+          };
+        } else {
+          user.djProfile = undefined;
+        }
+        
+        // Update photographer profile
+        if (data.isPhotographer && data.photographerProfile) {
+          user.photographerProfile = {
+            portfolioLink: data.photographerProfile.portfolioLink,
+            specialties: data.photographerProfile.specialties,
+            bio: data.photographerProfile.bio,
+          };
+        } else {
+          user.photographerProfile = undefined;
+        }
+        
+        // Update shared professional contact
+        if (data.professionalContact && (data.isTeacher || data.isDJ || data.isPhotographer)) {
+          user.professionalContact = {
+            whatsapp: data.professionalContact.whatsapp || "",
+            email: data.professionalContact.email || "",
+          };
+        } else {
+          user.professionalContact = undefined;
+        }
+        
         user.onboardingSteps.teacherInfo = true;
         break;
 

@@ -52,7 +52,7 @@ export default async function PublicProfile({ params }: Props) {
   try {
     user = await User.findById(params.userId)
       .select(
-        "name username email image dateOfBirth dancingStartYear city citiesVisited trips danceStyles anthem socialMedia danceRole gender nationality relationshipStatus createdAt likedBy friends friendRequestsSent friendRequestsReceived isTeacher teacherProfile"
+        "name username email image dateOfBirth dancingStartYear city citiesVisited trips danceStyles anthem socialMedia danceRole gender nationality relationshipStatus createdAt likedBy friends friendRequestsSent friendRequestsReceived isTeacher isDJ isPhotographer teacherProfile djProfile photographerProfile professionalContact"
       )
       .populate({
         path: "friends",
@@ -340,6 +340,16 @@ export default async function PublicProfile({ params }: Props) {
                             🎓 Teacher
                           </div>
                         )}
+                        {userData.isDJ && (
+                          <div className="badge badge-secondary badge-lg gap-1">
+                            🎵 DJ
+                          </div>
+                        )}
+                        {userData.isPhotographer && (
+                          <div className="badge badge-accent badge-lg gap-1">
+                            📷 Photo
+                          </div>
+                        )}
                       </div>
                       {zodiac && (
                         <div className="mt-1 text-small">
@@ -411,9 +421,9 @@ export default async function PublicProfile({ params }: Props) {
                     </div>
                   </div>
 
-                  {/* Teacher Info - Prominent (Full Width on Mobile) */}
+                  {/* Professional Info - Prominent (Full Width) */}
                   {userData.isTeacher && userData.teacherProfile && (
-                    <div className="mt-4 -mx-[2rem] px-8 py-3 sm:rounded-lg sm:mx-6 sm:px-3 bg-gradient-to-br from-primary/20 to-secondary/20 border-y-2 sm:border-2 border-primary/40">
+                    <div className="mt-4 -mx-[2rem] px-8 py-3 sm:rounded-lg sm:mx-0 sm:px-6 bg-gradient-to-br from-primary/20 to-secondary/20 border-y-2 sm:border-2 border-primary/40">
                       <div className="flex items-center gap-2 mb-2">
                         <span className="text-xl">🎓</span>
                         <h3 className="font-bold">Dance Teacher</h3>
@@ -442,33 +452,109 @@ export default async function PublicProfile({ params }: Props) {
                           </p>
                         </div>
                       )}
+                    </div>
+                  )}
 
-                      {userData.teacherProfile.contact &&
-                        (userData.teacherProfile.contact.whatsapp ||
-                          userData.teacherProfile.contact.email) && (
-                          <div className="flex flex-wrap gap-2">
-                            {userData.teacherProfile.contact.whatsapp && (
-                              <a
-                                href={`https://wa.me/${userData.teacherProfile.contact.whatsapp.replace(/\D/g, "")}`}
-                                target="_blank"
-                                rel="noopener noreferrer"
-                                className="btn btn-success btn-xs gap-1 flex-1"
-                              >
-                                <FaWhatsapp />
-                                WhatsApp
-                              </a>
-                            )}
-                            {userData.teacherProfile.contact.email && (
-                              <a
-                                href={`mailto:${userData.teacherProfile.contact.email}`}
-                                className="btn btn-info btn-xs gap-1 flex-1"
-                              >
-                                <FaEnvelope />
-                                Email
-                              </a>
-                            )}
+                  {/* DJ Info */}
+                  {userData.isDJ && userData.djProfile && (
+                    <div className="mt-4 -mx-[2rem] px-8 py-3 sm:rounded-lg sm:mx-0 sm:px-6 bg-gradient-to-br from-secondary/20 to-accent/20 border-y-2 sm:border-2 border-secondary/40">
+                      <div className="flex items-center gap-2 mb-2">
+                        <span className="text-xl">🎵</span>
+                        <h3 className="font-bold">DJ</h3>
+                      </div>
+
+                      {userData.djProfile.djName && (
+                        <div className="mb-2">
+                          <div className="text-sm text-base-content/70">
+                            Known as: <span className="font-semibold text-secondary">{userData.djProfile.djName}</span>
                           </div>
-                        )}
+                        </div>
+                      )}
+
+                      {userData.djProfile.genres && (
+                        <div className="mb-2">
+                          <div className="text-sm text-base-content/70">
+                            Genres: <span className="font-medium">{userData.djProfile.genres}</span>
+                          </div>
+                        </div>
+                      )}
+
+                      {userData.djProfile.bio && (
+                        <div className="mb-2">
+                          <p className="text-sm text-base-content/80 italic line-clamp-3">
+                            &quot;{userData.djProfile.bio}&quot;
+                          </p>
+                        </div>
+                      )}
+                    </div>
+                  )}
+
+                  {/* Photographer Info */}
+                  {userData.isPhotographer && userData.photographerProfile && (
+                    <div className="mt-4 -mx-[2rem] px-8 py-3 sm:rounded-lg sm:mx-0 sm:px-6 bg-gradient-to-br from-accent/20 to-info/20 border-y-2 sm:border-2 border-accent/40 overflow-hidden">
+                      <div className="flex items-center gap-2 mb-2 flex-wrap">
+                        <div className="flex items-center gap-2">
+                          <span className="text-xl">📷</span>
+                          <h3 className="font-bold">Photographer</h3>
+                        </div>
+                      </div>
+
+                      {userData.photographerProfile.specialties && (
+                        <div className="mb-2">
+                          <div className="text-sm text-base-content/70">
+                            Specialties: <span className="font-medium">{userData.photographerProfile.specialties}</span>
+                          </div>
+                        </div>
+                      )}
+
+                      {userData.photographerProfile.portfolioLink && (
+                        <div className="mb-2">
+                          <a
+                            href={userData.photographerProfile.portfolioLink.startsWith('http')
+                              ? userData.photographerProfile.portfolioLink
+                              : `https://${userData.photographerProfile.portfolioLink}`}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="text-sm link link-accent"
+                          >
+                            📸 View Portfolio
+                          </a>
+                        </div>
+                      )}
+
+                      {userData.photographerProfile.bio && (
+                        <div className="mb-2">
+                          <p className="text-sm text-base-content/80 italic line-clamp-3">
+                            &quot;{userData.photographerProfile.bio}&quot;
+                          </p>
+                        </div>
+                      )}
+                    </div>
+                  )}
+
+                  {/* Shared Professional Contact */}
+                  {(userData.isTeacher || userData.isDJ || userData.isPhotographer) && userData.professionalContact && (
+                    <div className="mt-4 flex flex-wrap gap-2 px-4">
+                      {userData.professionalContact.whatsapp && (
+                        <a
+                          href={`https://wa.me/${userData.professionalContact.whatsapp.replace(/\D/g, "")}`}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="btn btn-success btn-sm gap-2 flex-1"
+                        >
+                          <FaWhatsapp />
+                          WhatsApp
+                        </a>
+                      )}
+                      {userData.professionalContact.email && (
+                        <a
+                          href={`mailto:${userData.professionalContact.email}`}
+                          className="btn btn-outline btn-sm gap-2 flex-1"
+                        >
+                          <FaEnvelope />
+                          Email
+                        </a>
+                      )}
                     </div>
                   )}
                 </div>
@@ -713,9 +799,10 @@ export default async function PublicProfile({ params }: Props) {
                       <h3 className="card-title text-xl mb-4">✈️ Upcoming Trips</h3>
                       <div className="space-y-3">
                         {upcomingTrips.map((trip: any) => (
-                          <div
+                          <Link
                             key={trip._id}
-                            className="card bg-base-300 overflow-hidden"
+                            href={`/city/${trip.city._id}`}
+                            className="card bg-base-300 overflow-hidden hover:bg-base-200 transition-colors cursor-pointer block"
                           >
                             <div className="flex items-stretch">
                               {/* City Image or Flag - Full bleed on left */}
@@ -753,7 +840,7 @@ export default async function PublicProfile({ params }: Props) {
                                 </p>
                               </div>
                             </div>
-                          </div>
+                          </Link>
                         ))}
                       </div>
                     </div>

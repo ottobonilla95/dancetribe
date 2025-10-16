@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { FaQuestionCircle, FaTimes, FaEnvelope, FaWhatsapp } from "react-icons/fa";
+import { FaQuestionCircle, FaTimes, FaEnvelope, FaInstagram } from "react-icons/fa";
 import config from "@/config";
 
 interface SupportButtonProps {
@@ -12,6 +12,7 @@ interface SupportButtonProps {
 export default function SupportButton({ variant = "floating", className = "" }: SupportButtonProps) {
   const [showOptions, setShowOptions] = useState(false);
   const supportEmail = config.resend.supportEmail;
+  const instagramHandle = config.social?.instagram;
 
   if (!supportEmail) {
     return null;
@@ -22,10 +23,10 @@ export default function SupportButton({ variant = "floating", className = "" }: 
     setShowOptions(false);
   };
 
-  const handleWhatsAppSupport = () => {
-    // Format email to WhatsApp number if needed, or use a dedicated WhatsApp number
-    const message = encodeURIComponent("Hi! I need help with DanceTribe.");
-    window.open(`https://wa.me/?text=${message}`, "_blank");
+  const handleInstagramSupport = () => {
+    if (instagramHandle) {
+      window.open(`https://instagram.com/${instagramHandle}`, "_blank");
+    }
     setShowOptions(false);
   };
 
@@ -67,11 +68,11 @@ export default function SupportButton({ variant = "floating", className = "" }: 
             </button>
 
             <button
-              onClick={handleWhatsAppSupport}
-              className="btn btn-sm btn-outline btn-success btn-block gap-2 justify-start"
+              onClick={handleInstagramSupport}
+              className="btn btn-sm btn-outline btn-secondary btn-block gap-2 justify-start"
             >
-              <FaWhatsapp />
-              WhatsApp Us
+              <FaInstagram />
+              Instagram DM
             </button>
 
             <p className="text-xs text-base-content/60 mt-3 pt-2 border-t border-base-300">

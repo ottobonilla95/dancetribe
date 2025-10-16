@@ -77,9 +77,17 @@ export default function Onboarding() {
   const [firstName, setFirstName] = useState("");
   const [lastName, setLastName] = useState("");
   const [isTeacher, setIsTeacher] = useState(false);
+  const [isDJ, setIsDJ] = useState(false);
+  const [isPhotographer, setIsPhotographer] = useState(false);
   const [teacherBio, setTeacherBio] = useState("");
   const [yearsOfExperience, setYearsOfExperience] = useState("");
-  const [teacherContact, setTeacherContact] = useState({
+  const [djName, setDjName] = useState("");
+  const [djGenres, setDjGenres] = useState("");
+  const [djBio, setDjBio] = useState("");
+  const [photographerPortfolio, setPhotographerPortfolio] = useState("");
+  const [photographerSpecialties, setPhotographerSpecialties] = useState("");
+  const [photographerBio, setPhotographerBio] = useState("");
+  const [professionalContact, setProfessionalContact] = useState({
     whatsapp: "",
     email: "",
   });
@@ -171,8 +179,8 @@ export default function Onboarding() {
     },
     {
       id: "teacherInfo",
-      title: "Are you a dance teacher?",
-      description: "Share your teaching experience and let students find you",
+      title: "Are you a dance professional?",
+      description: "Teacher, DJ, Photographer? Let the community find you!",
       completed: user?.onboardingSteps?.teacherInfo || false,
     },
   ];
@@ -348,11 +356,29 @@ export default function Onboarding() {
           setYearsOfExperience(
             userData.teacherProfile.yearsOfExperience?.toString() || ""
           );
-          setTeacherContact({
-            whatsapp: userData.teacherProfile.contact?.whatsapp || "",
-            email: userData.teacherProfile.contact?.email || "",
-          });
         }
+      }
+      if (userData.isDJ) {
+        setIsDJ(userData.isDJ);
+        if (userData.djProfile) {
+          setDjName(userData.djProfile.djName || "");
+          setDjGenres(userData.djProfile.genres || "");
+          setDjBio(userData.djProfile.bio || "");
+        }
+      }
+      if (userData.isPhotographer) {
+        setIsPhotographer(userData.isPhotographer);
+        if (userData.photographerProfile) {
+          setPhotographerPortfolio(userData.photographerProfile.portfolioLink || "");
+          setPhotographerSpecialties(userData.photographerProfile.specialties || "");
+          setPhotographerBio(userData.photographerProfile.bio || "");
+        }
+      }
+      if (userData.professionalContact) {
+        setProfessionalContact({
+          whatsapp: userData.professionalContact.whatsapp || "",
+          email: userData.professionalContact.email || "",
+        });
       }
 
       // Find the current step based on completion
@@ -526,28 +552,48 @@ export default function Onboarding() {
         // Relationship status is optional
         stepData = { relationshipStatus: relationshipStatus || undefined };
         break;
-      case "teacherInfo":
-        // Validate at least one contact method if teacher
-        if (isTeacher && !teacherContact.whatsapp && !teacherContact.email) {
+      case "teacherInfo": {
+        // Validate at least one contact method if any professional role is selected
+        const hasAnyProfessionalRole = isTeacher || isDJ || isPhotographer;
+        if (hasAnyProfessionalRole && !professionalContact.whatsapp && !professionalContact.email) {
           alert("Please provide at least one contact method (WhatsApp or Email)");
           return;
         }
         stepData = {
           isTeacher,
+          isDJ,
+          isPhotographer,
           teacherProfile: isTeacher
             ? {
                 bio: teacherBio,
                 yearsOfExperience: yearsOfExperience
                   ? parseInt(yearsOfExperience)
                   : undefined,
-                contact: {
-                  whatsapp: teacherContact.whatsapp || undefined,
-                  email: teacherContact.email || undefined,
-                },
+              }
+            : undefined,
+          djProfile: isDJ
+            ? {
+                djName: djName,
+                genres: djGenres,
+                bio: djBio,
+              }
+            : undefined,
+          photographerProfile: isPhotographer
+            ? {
+                portfolioLink: photographerPortfolio,
+                specialties: photographerSpecialties,
+                bio: photographerBio,
+              }
+            : undefined,
+          professionalContact: hasAnyProfessionalRole
+            ? {
+                whatsapp: professionalContact.whatsapp || undefined,
+                email: professionalContact.email || undefined,
               }
             : undefined,
         };
         break;
+      }
       default:
         console.error("Unknown step:", step.id);
         return;
@@ -1302,9 +1348,14 @@ export default function Onboarding() {
               </div>
             )}
 
-            {/* Teacher Info */}
+            {/* Professional Roles (Teacher/DJ/Photographer) */}
             {steps[currentStep].id === "teacherInfo" && (
-              <div className="space-y-4">
+              <div className="space-y-6">
+                <div className="text-sm text-base-content/70 mb-4">
+                  Select all that apply:
+                </div>
+
+                {/* Dance Teacher */}
                 <div className="form-control">
                   <label className="label cursor-pointer justify-start gap-4">
                     <input
@@ -1315,7 +1366,7 @@ export default function Onboarding() {
                     />
                     <div>
                       <span className="label-text font-semibold">
-                        I am a dance teacher
+                        🎓 Dance Teacher
                       </span>
                       <p className="text-sm text-base-content/60">
                         Let students find and contact you
@@ -1325,7 +1376,7 @@ export default function Onboarding() {
                 </div>
 
                 {isTeacher && (
-                  <div className="space-y-4 border-t pt-4">
+                  <div className="space-y-4 border-l-4 border-primary pl-4 ml-2">
                     <div className="form-control">
                       <label className="label">
                         <span className="label-text">Teaching Bio</span>
@@ -1354,9 +1405,138 @@ export default function Onboarding() {
                         onChange={(e) => setYearsOfExperience(e.target.value)}
                       />
                     </div>
+                  </div>
+                )}
 
+                {/* DJ */}
+                <div className="form-control">
+                  <label className="label cursor-pointer justify-start gap-4">
+                    <input
+                      type="checkbox"
+                      className="toggle toggle-primary"
+                      checked={isDJ}
+                      onChange={(e) => setIsDJ(e.target.checked)}
+                    />
+                    <div>
+                      <span className="label-text font-semibold">
+                        🎵 DJ
+                      </span>
+                      <p className="text-sm text-base-content/60">
+                        Show your DJ profile to event organizers
+                      </p>
+                    </div>
+                  </label>
+                </div>
+
+                {isDJ && (
+                  <div className="space-y-4 border-l-4 border-primary pl-4 ml-2">
+                    <div className="form-control">
+                      <label className="label">
+                        <span className="label-text">DJ Name/Alias</span>
+                      </label>
+                      <input
+                        type="text"
+                        className="input input-bordered"
+                        placeholder="e.g., DJ Salsa King"
+                        value={djName}
+                        onChange={(e) => setDjName(e.target.value)}
+                      />
+                    </div>
+
+                    <div className="form-control">
+                      <label className="label">
+                        <span className="label-text">Music Genres</span>
+                      </label>
+                      <input
+                        type="text"
+                        className="input input-bordered"
+                        placeholder="e.g., Bachata, Salsa, Kizomba"
+                        value={djGenres}
+                        onChange={(e) => setDjGenres(e.target.value)}
+                      />
+                    </div>
+
+                    <div className="form-control">
+                      <label className="label">
+                        <span className="label-text">DJ Bio (optional)</span>
+                      </label>
+                      <textarea
+                        className="textarea textarea-bordered h-20"
+                        placeholder="Tell us about your DJ experience, style, and what makes your sets special..."
+                        value={djBio}
+                        onChange={(e) => setDjBio(e.target.value)}
+                      />
+                    </div>
+                  </div>
+                )}
+
+                {/* Photographer */}
+                <div className="form-control">
+                  <label className="label cursor-pointer justify-start gap-4">
+                    <input
+                      type="checkbox"
+                      className="toggle toggle-primary"
+                      checked={isPhotographer}
+                      onChange={(e) => setIsPhotographer(e.target.checked)}
+                    />
+                    <div>
+                      <span className="label-text font-semibold">
+                        📷 Photographer/Videographer
+                      </span>
+                      <p className="text-sm text-base-content/60">
+                        Let event organizers and dancers book you
+                      </p>
+                    </div>
+                  </label>
+                </div>
+
+                {isPhotographer && (
+                  <div className="space-y-4 border-l-4 border-primary pl-4 ml-2">
+                    <div className="form-control">
+                      <label className="label">
+                        <span className="label-text">Portfolio Link</span>
+                      </label>
+                      <input
+                        type="url"
+                        className="input input-bordered"
+                        placeholder="Instagram, website, or portfolio link"
+                        value={photographerPortfolio}
+                        onChange={(e) => setPhotographerPortfolio(e.target.value)}
+                      />
+                    </div>
+
+                    <div className="form-control">
+                      <label className="label">
+                        <span className="label-text">Specialties</span>
+                      </label>
+                      <input
+                        type="text"
+                        className="input input-bordered"
+                        placeholder="e.g., Events, Portraits, Social Dancing"
+                        value={photographerSpecialties}
+                        onChange={(e) => setPhotographerSpecialties(e.target.value)}
+                      />
+                    </div>
+
+                    <div className="form-control">
+                      <label className="label">
+                        <span className="label-text">Bio (optional)</span>
+                      </label>
+                      <textarea
+                        className="textarea textarea-bordered h-20"
+                        placeholder="Tell us about your photography/videography style and experience..."
+                        value={photographerBio}
+                        onChange={(e) => setPhotographerBio(e.target.value)}
+                      />
+                    </div>
+                  </div>
+                )}
+
+                {/* Shared Professional Contact */}
+                {(isTeacher || isDJ || isPhotographer) && (
+                  <div className="space-y-4 border-t pt-4">
                     <div className="divider">
-                      Contact Information (at least one required)
+                      Professional Contact (at least one required)
                     </div>
 
                     <div className="form-control">
@@ -1369,9 +1549,9 @@ export default function Onboarding() {
                         type="tel"
                         className="input input-bordered"
                         placeholder="+1234567890"
-                        value={teacherContact.whatsapp}
+                        value={professionalContact.whatsapp}
                         onChange={(e) =>
-                          setTeacherContact((prev) => ({
+                          setProfessionalContact((prev) => ({
                             ...prev,
                             whatsapp: e.target.value,
                           }))
@@ -1386,10 +1566,10 @@ export default function Onboarding() {
                       <input
                         type="email"
                         className="input input-bordered"
-                        placeholder="teacher@example.com"
-                        value={teacherContact.email}
+                        placeholder="professional@example.com"
+                        value={professionalContact.email}
                         onChange={(e) =>
-                          setTeacherContact((prev) => ({
+                          setProfessionalContact((prev) => ({
                             ...prev,
                             email: e.target.value,
                           }))
@@ -1412,8 +1592,8 @@ export default function Onboarding() {
                         ></path>
                       </svg>
                       <span className="text-sm">
-                        Provide at least one contact method so dancers can reach
-                        you for lessons
+                        Provide at least one contact method so people can reach
+                        you for bookings and inquiries
                       </span>
                     </div>
                   </div>

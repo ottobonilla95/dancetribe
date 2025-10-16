@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { FaPlus, FaTrash, FaPlane, FaMapMarkerAlt, FaCalendar } from "react-icons/fa";
+import Link from "next/link";
 import Flag from "./Flag";
 import CityDropdown from "./CityDropdown";
 
@@ -237,44 +238,48 @@ export default function UpcomingTrips({ editable = false }: UpcomingTripsProps) 
                 className="card bg-base-200 hover:bg-base-300 transition-colors overflow-hidden"
               >
                 <div className="flex items-stretch">
-                  {/* City Image or Flag - Full bleed on left */}
-                  <div className="w-24 h-24 flex-shrink-0 relative">
-                    {trip.city.image ? (
-                      <img
-                        src={trip.city.image}
-                        alt={trip.city.name}
-                        className="w-full h-full object-cover"
-                      />
-                    ) : (
-                      <div className="w-full h-full flex items-center justify-center bg-base-300">
-                        <div className="text-5xl">
-                          <Flag countryCode={trip.city.country.code} size="lg" />
+                  <Link href={`/city/${trip.city._id}`} className="flex items-stretch flex-1 cursor-pointer">
+                    {/* City Image or Flag - Full bleed on left */}
+                    <div className="w-24 h-24 flex-shrink-0 relative">
+                      {trip.city.image ? (
+                        <img
+                          src={trip.city.image}
+                          alt={trip.city.name}
+                          className="w-full h-full object-cover"
+                        />
+                      ) : (
+                        <div className="w-full h-full flex items-center justify-center bg-base-300">
+                          <div className="text-5xl">
+                            <Flag countryCode={trip.city.country.code} size="lg" />
+                          </div>
                         </div>
-                      </div>
-                    )}
-                  </div>
-
-                  {/* Text Content with Padding */}
-                  <div className="flex-1 p-4 flex items-center justify-between">
-                    <div className="flex-1">
-                      <h4 className="font-semibold flex items-center gap-2">
-                        <FaMapMarkerAlt className="text-primary text-sm" />
-                        {trip.city.name}, {trip.city.country.name}
-                      </h4>
-                      <p className="text-sm text-base-content/70 flex items-center gap-2 mt-1">
-                        <FaCalendar className="text-xs" />
-                        {formatDate(trip.startDate)} - {formatDate(trip.endDate)}
-                      </p>
+                      )}
                     </div>
-                    {editable && (
+
+                    {/* Text Content with Padding */}
+                    <div className="flex-1 p-4 flex items-center justify-between">
+                      <div className="flex-1">
+                        <h4 className="font-semibold flex items-center gap-2">
+                          <FaMapMarkerAlt className="text-primary text-sm" />
+                          {trip.city.name}, {trip.city.country.name}
+                        </h4>
+                        <p className="text-sm text-base-content/70 flex items-center gap-2 mt-1">
+                          <FaCalendar className="text-xs" />
+                          {formatDate(trip.startDate)} - {formatDate(trip.endDate)}
+                        </p>
+                      </div>
+                    </div>
+                  </Link>
+                  {editable && (
+                    <div className="flex items-center pr-4">
                       <button
                         onClick={() => handleDeleteTrip(trip._id)}
                         className="btn btn-ghost btn-sm btn-circle text-error"
                       >
                         <FaTrash />
                       </button>
-                    )}
-                  </div>
+                    </div>
+                  )}
                 </div>
               </div>
             ))}
@@ -294,12 +299,16 @@ export default function UpcomingTrips({ editable = false }: UpcomingTripsProps) 
           </h3>
           <div className="space-y-2">
             {trips.past.slice(0, 5).map((trip) => (
-              <div key={trip._id} className="flex items-center gap-3 text-sm opacity-60">
+              <Link 
+                key={trip._id} 
+                href={`/city/${trip.city._id}`}
+                className="flex items-center gap-3 text-sm opacity-60 hover:opacity-100 transition-opacity cursor-pointer"
+              >
                 <Flag countryCode={trip.city.country.code} size="sm" />
                 <span>
                   {trip.city.name} • {formatDate(trip.endDate)}
                 </span>
-              </div>
+              </Link>
             ))}
           </div>
         </div>

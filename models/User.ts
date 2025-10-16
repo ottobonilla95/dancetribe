@@ -168,11 +168,20 @@ const userSchema = new mongoose.Schema(
       relationshipStatus: { type: Boolean, default: false },
       teacherInfo: { type: Boolean, default: false },
     },
-    // Teacher profile
+    // Professional roles
     isTeacher: {
       type: Boolean,
       default: false,
     },
+    isDJ: {
+      type: Boolean,
+      default: false,
+    },
+    isPhotographer: {
+      type: Boolean,
+      default: false,
+    },
+    // Teacher profile
     teacherProfile: {
       bio: String,
       yearsOfExperience: Number,
@@ -180,10 +189,23 @@ const userSchema = new mongoose.Schema(
         type: mongoose.Schema.Types.ObjectId,
         ref: "DanceStyle",
       }],
-      contact: {
-        whatsapp: String,
-        email: String,
-      },
+    },
+    // DJ profile
+    djProfile: {
+      djName: String,
+      genres: String, // Comma-separated or free text
+      bio: String,
+    },
+    // Photographer profile
+    photographerProfile: {
+      portfolioLink: String, // Instagram, website, etc.
+      specialties: String, // e.g., "Events, Portraits, Social Dancing"
+      bio: String,
+    },
+    // Shared professional contact (for all professional roles)
+    professionalContact: {
+      whatsapp: String,
+      email: String,
     },
     // Social features
     // Users who liked this profile
