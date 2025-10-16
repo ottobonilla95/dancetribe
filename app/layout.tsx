@@ -30,7 +30,7 @@ export const metadata = {
 	appleWebApp: {
 		capable: true,
 		statusBarStyle: "default",
-		title: "DanceTribe",
+		title: config.appName,
 	},
 };
 
@@ -45,7 +45,7 @@ export default function RootLayout({ children }: { children: ReactNode }) {
 				{/* iOS-specific PWA meta tags */}
 				<meta name="apple-mobile-web-app-capable" content="yes" />
 				<meta name="apple-mobile-web-app-status-bar-style" content="default" />
-				<meta name="apple-mobile-web-app-title" content="DanceTribe" />
+				<meta name="apple-mobile-web-app-title" content={config.appName} />
 				
 				{/* Apple Touch Icons for different devices */}
 				<link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png" />

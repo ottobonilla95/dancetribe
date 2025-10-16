@@ -5,23 +5,31 @@ export type SearchUser = {
   image?: string;
   city?: {
     name: string;
-    country: string;
-    continent: string;
   } | null;
-  danceStyles: {
-    name: string;
-    level: string;
-  }[];
-  gender?: string;
-  nationality?: string;
 };
 
-export type SearchResponse = {
+export type SearchCity = {
+  _id: string;
+  name: string;
+  country: {
+    name: string;
+    code: string;
+  } | null;
+  image?: string;
+  totalDancers: number;
+};
+
+export type SearchCountry = {
+  _id: string;
+  name: string;
+  code: string;
+};
+
+export type UnifiedSearchResponse = {
   users: SearchUser[];
-  total: number;
-  page: number;
-  totalPages: number;
-  hasMore: boolean;
+  cities: SearchCity[];
+  countries: SearchCountry[];
+  totalResults: number;
   message?: string;
 };
 

@@ -4,6 +4,8 @@ import { ConfigProps } from "./types/config";
 const config = {
   // REQUIRED
   appName: "DanceTribe",
+  // Company name for legal purposes
+  companyName: "JMO Ventures LLC",
   // REQUIRED: a short description of your app for SEO tags (can be overwritten)
   appDescription:
     "Connect with dancers worldwide! Discover music, cities, events, and dance communities. Find festivals, socials, DJs, and explore new places through dance.",
@@ -82,6 +84,7 @@ const config = {
   social: {
     // Social media handles for support and marketing
     instagram: "dancetribe.co",
+    twitter: "@dancetribeco",
   },
   colors: {
     // REQUIRED — The DaisyUI theme to use (added to the main layout.js). Leave blank for default (light & dark mode). If you use any theme other than light/dark, you need to add it in config.tailwind.js in daisyui.themes.

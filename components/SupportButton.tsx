@@ -19,7 +19,7 @@ export default function SupportButton({ variant = "floating", className = "" }: 
   }
 
   const handleEmailSupport = () => {
-    window.location.href = `mailto:${supportEmail}?subject=DanceTribe Support Request`;
+    window.location.href = `mailto:${supportEmail}?subject=${config.appName} Support Request`;
     setShowOptions(false);
   };
 

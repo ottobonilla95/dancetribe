@@ -2,6 +2,7 @@ import Link from "next/link";
 import Image from "next/image";
 import config from "@/config";
 import logo from "@/app/icon.png";
+import { FaInstagram, FaEnvelope } from "react-icons/fa";
 
 // Add the Footer to the bottom of your landing page and more.
 // The support link is connected to the config.js file. If there's no config.resend.supportEmail, the link won't be displayed.
@@ -34,8 +35,32 @@ const Footer = () => {
               {config.appDescription}
             </p>
             <p className="mt-3 text-sm text-base-content/60">
-              Copyright © {new Date().getFullYear()} - All rights reserved
+              © {new Date().getFullYear()} {config.companyName || config.appName}. All rights reserved.
             </p>
+            
+            {/* Social Links */}
+            <div className="flex gap-3 mt-4 justify-center md:justify-start">
+              {config.social?.instagram && (
+                <a
+                  href={`https://instagram.com/${config.social.instagram}`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="btn btn-ghost btn-sm btn-circle"
+                  aria-label="Instagram"
+                >
+                  <FaInstagram className="text-lg" />
+                </a>
+              )}
+              {config.resend.supportEmail && (
+                <a
+                  href={`mailto:${config.resend.supportEmail}`}
+                  className="btn btn-ghost btn-sm btn-circle"
+                  aria-label="Email"
+                >
+                  <FaEnvelope className="text-lg" />
+                </a>
+              )}
+            </div>
 
             {/* <a
               href="https://shipfa.st/?ref=shipfast_badge"
@@ -67,7 +92,28 @@ const Footer = () => {
           <div className="flex-grow flex flex-wrap justify-center -mb-10 md:mt-0 mt-10 text-center">
             <div className="lg:w-1/3 md:w-1/2 w-full px-4">
               <div className="footer-title font-semibold text-base-content tracking-widest text-sm md:text-left mb-3">
-                LINKS
+                COMPANY
+              </div>
+
+              <div className="flex flex-col justify-center items-center md:items-start gap-2 mb-10 text-sm">
+                <Link href="/discover" className="link link-hover">
+                  Discover Dancers
+                </Link>
+                <Link href="/cities" className="link link-hover">
+                  Cities
+                </Link>
+                <Link href="/countries" className="link link-hover">
+                  Countries
+                </Link>
+                <Link href="/dance-style" className="link link-hover">
+                  Dance Styles
+                </Link>
+              </div>
+            </div>
+
+            <div className="lg:w-1/3 md:w-1/2 w-full px-4">
+              <div className="footer-title font-semibold text-base-content tracking-widest text-sm md:text-left mb-3">
+                SUPPORT
               </div>
 
               <div className="flex flex-col justify-center items-center md:items-start gap-2 mb-10 text-sm">
@@ -78,18 +124,20 @@ const Footer = () => {
                     className="link link-hover"
                     aria-label="Contact Support"
                   >
-                    Support
+                    Contact Us
                   </a>
                 )}
-                {/* <Link href="/#pricing" className="link link-hover">
-                  Pricing
-                </Link>
-                <Link href="/blog" className="link link-hover">
-                  Blog
-                </Link>
-                <a href="/#" target="_blank" className="link link-hover">
-                  Affiliates
-                </a> */}
+                {config.social?.instagram && (
+                  <a
+                    href={`https://instagram.com/${config.social.instagram}`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="link link-hover"
+                    aria-label="Instagram"
+                  >
+                    Instagram
+                  </a>
+                )}
               </div>
             </div>
 
@@ -100,10 +148,10 @@ const Footer = () => {
 
               <div className="flex flex-col justify-center items-center md:items-start gap-2 mb-10 text-sm">
                 <Link href="/tos" className="link link-hover">
-                  Terms of services
+                  Terms of Service
                 </Link>
                 <Link href="/privacy-policy" className="link link-hover">
-                  Privacy policy
+                  Privacy Policy
                 </Link>
               </div>
             </div>

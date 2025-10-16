@@ -4,7 +4,7 @@ import { authOptions } from "@/libs/next-auth";
 import connectMongo from "@/libs/mongoose";
 import User from "@/models/User";
 import City from "@/models/City";
-import DanceStyle from "@/models/DanceStyle";
+import Country from "@/models/Country";
 import { createAccentInsensitivePattern } from "@/utils/search";
 
 export async function GET(req: NextRequest) {
@@ -19,13 +19,12 @@ export async function GET(req: NextRequest) {
     
     const { searchParams } = new URL(req.url);
     const query = searchParams.get("q");
-    const limit = parseInt(searchParams.get("limit") || "10");
-    const page = parseInt(searchParams.get("page") || "1");
     
     if (!query || query.length < 2) {
       return NextResponse.json({ 
-        users: [], 
-        total: 0,
+        users: [],
+        cities: [],
+        countries: [],
         message: "Query must be at least 2 characters" 
       });
     }
@@ -33,14 +32,11 @@ export async function GET(req: NextRequest) {
     // Create accent-insensitive search pattern
     const accentInsensitivePattern = createAccentInsensitivePattern(query);
     
-    // Create search conditions
-    const searchConditions = {
+    // Search Users (limit to 5 for variety)
+    const userSearchConditions = {
       $and: [
-        // Exclude current user
         { _id: { $ne: session.user.id } },
-        // Only search users with complete profiles
         { isProfileComplete: true },
-        // Search criteria with accent-insensitive matching
         {
           $or: [
             { username: { $regex: accentInsensitivePattern, $options: "i" } },
@@ -50,56 +46,75 @@ export async function GET(req: NextRequest) {
       ]
     };
 
-    // Get total count for pagination
-    const total = await User.countDocuments(searchConditions);
-
-    // Find users with pagination
-    const users = await User.find(searchConditions)
-      .select("name username image city danceStyles gender nationality createdAt")
+    const users = await User.find(userSearchConditions)
+      .select("name username image city")
       .populate({
         path: "city",
         model: City,
-        select: "name country continent"
-      })
-      .populate({
-        path: "danceStyles.danceStyle",
-        model: DanceStyle,
         select: "name"
       })
-      .sort({ 
-        // Prioritize exact username matches
-        username: query.toLowerCase() === query ? 1 : -1,
-        createdAt: -1 
-      })
-      .limit(limit)
-      .skip((page - 1) * limit)
+      .sort({ createdAt: -1 })
+      .limit(5)
       .lean();
 
-    // Format results for frontend
+    // Search Cities (limit to 3 for variety)
+    const cities = await City.find({
+      $or: [
+        { name: { $regex: accentInsensitivePattern, $options: "i" } }
+      ],
+      isActive: true
+    })
+      .select("name country image totalDancers")
+      .populate({
+        path: "country",
+        model: Country,
+        select: "name code"
+      })
+      .sort({ totalDancers: -1 })
+      .limit(3)
+      .lean();
+
+    // Search Countries (limit to 2 for variety)
+    const countries = await Country.find({
+      name: { $regex: accentInsensitivePattern, $options: "i" },
+      isActive: true
+    })
+      .select("name code")
+      .sort({ name: 1 })
+      .limit(2)
+      .lean();
+
+    // Format results
     const formattedUsers = users.map((user: any) => ({
       _id: user._id,
       name: user.name,
       username: user.username,
       image: user.image,
-      city: user.city ? {
-        name: user.city.name || '',
-        country: user.city.country || '',
-        continent: user.city.continent || ''
+      city: user.city ? { name: user.city.name } : null,
+    }));
+
+    const formattedCities = cities.map((city: any) => ({
+      _id: city._id,
+      name: city.name,
+      country: city.country ? {
+        name: city.country.name,
+        code: city.country.code
       } : null,
-      danceStyles: user.danceStyles?.slice(0, 3).map((ds: any) => ({
-        name: ds.danceStyle?.name,
-        level: ds.level
-      })) || [],
-      gender: user.gender,
-      nationality: user.nationality
+      image: city.image,
+      totalDancers: city.totalDancers || 0
+    }));
+
+    const formattedCountries = countries.map((country: any) => ({
+      _id: country._id,
+      name: country.name,
+      code: country.code
     }));
 
     return NextResponse.json({
       users: formattedUsers,
-      total,
-      page,
-      totalPages: Math.ceil(total / limit),
-      hasMore: page * limit < total
+      cities: formattedCities,
+      countries: formattedCountries,
+      totalResults: formattedUsers.length + formattedCities.length + formattedCountries.length
     });
 
   } catch (error) {

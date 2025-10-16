@@ -36,15 +36,15 @@ export const getSEOTags = ({
       title: openGraph?.title || config.appName,
       description: openGraph?.description || config.appDescription,
       url: openGraph?.url || `https://${config.domainName}/`,
-      siteName: openGraph?.title || config.appName,
-      // If you add an opengraph-image.(jpg|jpeg|png|gif) image to the /app folder, you don't need the code below
-      // images: [
-      //   {
-      //     url: `https://${config.domainName}/share.png`,
-      //     width: 1200,
-      //     height: 660,
-      //   },
-      // ],
+      siteName: openGraph?.siteName || config.appName,
+      images: openGraph?.images || [
+        {
+          url: `/og-image.png`,
+          width: 1200,
+          height: 630,
+          alt: `${config.appName} - ${config.appDescription}`,
+        },
+      ],
       locale: "en_US",
       type: "website",
     },
@@ -52,10 +52,9 @@ export const getSEOTags = ({
     twitter: {
       title: openGraph?.title || config.appName,
       description: openGraph?.description || config.appDescription,
-      // If you add an twitter-image.(jpg|jpeg|png|gif) image to the /app folder, you don't need the code below
-      // images: [openGraph?.image || defaults.og.image],
+      images: ['/og-image.png'],
       card: "summary_large_image",
-      creator: "@marc_louvion",
+      creator: config.social?.twitter || "@dancetribeco",
     },
 
     // If a canonical URL is given, we add it. The metadataBase will turn the relative URL into a fully qualified URL

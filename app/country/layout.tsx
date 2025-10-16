@@ -1,20 +1,28 @@
-import { Metadata } from "next";
-import { ReactNode } from "react";
+import { ReactNode, Suspense } from "react";
+import { getServerSession } from "next-auth";
+import { authOptions } from "@/libs/next-auth";
+import Header from "@/components/Header";
 
-export const metadata: Metadata = {
-  title: "Country Dance Scene | DanceTribe",
-  description: "Explore the dance community in countries around the world. Find dancers, teachers, and popular dance styles.",
-};
-
-export default function CountryLayout({
+// Layout for country pages
+// Shows Header only for authenticated users
+export default async function CountryLayout({
   children,
 }: {
   children: ReactNode;
 }) {
+  const session = await getServerSession(authOptions);
+  const isLoggedIn = !!session;
+
   return (
-    <div>
+    <>
+      {/* Show Header only for authenticated users */}
+      {isLoggedIn && (
+        <Suspense>
+          <Header />
+        </Suspense>
+      )}
       {children}
-    </div>
+    </>
   );
 }
 

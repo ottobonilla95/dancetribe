@@ -135,7 +135,7 @@ const Header = () => {
         {/* Search Bar */}
         {session && (
           <div className="hidden lg:flex lg:justify-center lg:flex-1 lg:max-w-lg lg:mx-6">
-            <SearchBar placeholder="Find dancers..." compact className="w-full" />
+            <SearchBar compact className="w-full" />
           </div>
         )}
 
@@ -295,7 +295,7 @@ const Header = () => {
 
                 {/* Search Bar */}
                 <div className="py-4 border-b border-base-300">
-                  <SearchBar placeholder="Find dancers..." />
+                  <SearchBar />
                 </div>
 
                 {/* Navigation Items */}

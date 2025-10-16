@@ -1,7 +1,9 @@
 /**
- * Email templates for DanceTribe notifications
+ * Email templates for transactional notifications
  * These templates are used for sending transactional emails to users
  */
+
+import config from "@/config";
 
 interface UserData {
   name?: string;
@@ -16,8 +18,8 @@ interface UserData {
  */
 export function friendRequestReceivedEmail(sender: UserData, recipient: UserData) {
   return {
-    subject: `${sender.name || 'Someone'} sent you a friend request on DanceTribe! 👋`,
-    text: `Hi ${recipient.name || 'there'}! ${sender.name || 'A dancer'} wants to connect with you on DanceTribe.`,
+    subject: `${sender.name || 'Someone'} sent you a friend request on ${config.appName}! 👋`,
+    text: `Hi ${recipient.name || 'there'}! ${sender.name || 'A dancer'} wants to connect with you on ${config.appName}.`,
     html: `
       <!DOCTYPE html>
       <html>
@@ -59,8 +61,8 @@ export function friendRequestReceivedEmail(sender: UserData, recipient: UserData
               </p>
             </div>
             <div class="footer">
-              <p>You're receiving this because someone sent you a friend request on DanceTribe.</p>
-              <p><a href="https://dancetribe.co/profile?settings=notifications" style="color: #667eea;">Manage notification preferences</a></p>
+              <p>You're receiving this because someone sent you a friend request on ${config.appName}.</p>
+              <p><a href="https://${config.domainName}/profile?settings=notifications" style="color: #667eea;">Manage notification preferences</a></p>
             </div>
           </div>
         </body>
@@ -75,7 +77,7 @@ export function friendRequestReceivedEmail(sender: UserData, recipient: UserData
 export function friendRequestAcceptedEmail(accepter: UserData, sender: UserData) {
   return {
     subject: `${accepter.name || 'Someone'} accepted your friend request! 🎉`,
-    text: `Hi ${sender.name || 'there'}! ${accepter.name || 'A dancer'} accepted your friend request on DanceTribe.`,
+    text: `Hi ${sender.name || 'there'}! ${accepter.name || 'A dancer'} accepted your friend request on ${config.appName}.`,
     html: `
       <!DOCTYPE html>
       <html>
@@ -117,8 +119,8 @@ export function friendRequestAcceptedEmail(accepter: UserData, sender: UserData)
               </p>
             </div>
             <div class="footer">
-              <p>You're receiving this because your friend request was accepted on DanceTribe.</p>
-              <p><a href="https://dancetribe.co/profile?settings=notifications" style="color: #667eea;">Manage notification preferences</a></p>
+              <p>You're receiving this because your friend request was accepted on ${config.appName}.</p>
+              <p><a href="https://${config.domainName}/profile?settings=notifications" style="color: #667eea;">Manage notification preferences</a></p>
             </div>
           </div>
         </body>
@@ -133,7 +135,7 @@ export function friendRequestAcceptedEmail(accepter: UserData, sender: UserData)
 export function profileLikedEmail(liker: UserData, recipient: UserData) {
   return {
     subject: `${liker.name || 'Someone'} liked your profile! ❤️`,
-    text: `Hi ${recipient.name || 'there'}! ${liker.name || 'A dancer'} liked your profile on DanceTribe.`,
+    text: `Hi ${recipient.name || 'there'}! ${liker.name || 'A dancer'} liked your profile on ${config.appName}.`,
     html: `
       <!DOCTYPE html>
       <html>
@@ -177,8 +179,8 @@ export function profileLikedEmail(liker: UserData, recipient: UserData) {
               </p>
             </div>
             <div class="footer">
-              <p>You're receiving this because someone liked your profile on DanceTribe.</p>
-              <p><a href="https://dancetribe.co/profile?settings=notifications" style="color: #667eea;">Manage notification preferences</a></p>
+              <p>You're receiving this because someone liked your profile on ${config.appName}.</p>
+              <p><a href="https://${config.domainName}/profile?settings=notifications" style="color: #667eea;">Manage notification preferences</a></p>
             </div>
           </div>
         </body>

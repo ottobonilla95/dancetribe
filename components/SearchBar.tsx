@@ -4,8 +4,9 @@ import { useState, useEffect, useRef } from "react";
 import { useSession } from "next-auth/react";
 import Link from "next/link";
 import Image from "next/image";
-import { FaSearch, FaTimes, FaMapMarkerAlt, FaUser } from "react-icons/fa";
-import { SearchUser, SearchResponse } from "@/types/search";
+import { FaSearch, FaTimes, FaUser, FaCity, FaGlobe, FaUsers } from "react-icons/fa";
+import { SearchUser, SearchCity, SearchCountry, UnifiedSearchResponse } from "@/types/search";
+import Flag from "./Flag";
 
 interface SearchBarProps {
   placeholder?: string;
@@ -15,14 +16,16 @@ interface SearchBarProps {
 }
 
 export default function SearchBar({
-  placeholder = "Find dancers...",
+  placeholder = "Search dancers, cities, countries...",
   onUserSelect,
   className = "",
   compact = false
 }: SearchBarProps) {
   const { data: session } = useSession();
   const [query, setQuery] = useState("");
-  const [results, setResults] = useState<SearchUser[]>([]);
+  const [users, setUsers] = useState<SearchUser[]>([]);
+  const [cities, setCities] = useState<SearchCity[]>([]);
+  const [countries, setCountries] = useState<SearchCountry[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [isOpen, setIsOpen] = useState(false);
   const [error, setError] = useState("");
@@ -44,9 +47,11 @@ export default function SearchBar({
   }, []);
 
   // Search function with debouncing
-  const searchUsers = async (searchQuery: string) => {
+  const searchAll = async (searchQuery: string) => {
     if (!searchQuery.trim() || searchQuery.length < 2) {
-      setResults([]);
+      setUsers([]);
+      setCities([]);
+      setCountries([]);
       setError("");
       return;
     }
@@ -55,22 +60,28 @@ export default function SearchBar({
     setError("");
 
     try {
-      const response = await fetch(`/api/user/search?q=${encodeURIComponent(searchQuery)}&limit=8`);
-      const data: SearchResponse = await response.json();
+      const response = await fetch(`/api/user/search?q=${encodeURIComponent(searchQuery)}`);
+      const data: UnifiedSearchResponse = await response.json();
 
       if (response.ok) {
-        setResults(data.users);
-        if (data.users.length === 0 && searchQuery.length >= 2) {
-          setError("No dancers found");
+        setUsers(data.users || []);
+        setCities(data.cities || []);
+        setCountries(data.countries || []);
+        if (data.totalResults === 0 && searchQuery.length >= 2) {
+          setError("No results found");
         }
       } else {
         setError(data.message || "Search failed");
-        setResults([]);
+        setUsers([]);
+        setCities([]);
+        setCountries([]);
       }
     } catch (error) {
       console.error("Search error:", error);
       setError("Network error");
-      setResults([]);
+      setUsers([]);
+      setCities([]);
+      setCountries([]);
     } finally {
       setIsLoading(false);
     }
@@ -88,7 +99,7 @@ export default function SearchBar({
 
     // Debounce search
     timeoutRef.current = setTimeout(() => {
-      searchUsers(value);
+      searchAll(value);
     }, 300);
   };
 
@@ -98,12 +109,16 @@ export default function SearchBar({
     }
     setQuery("");
     setIsOpen(false);
-    setResults([]);
+    setUsers([]);
+    setCities([]);
+    setCountries([]);
   };
 
   const clearSearch = () => {
     setQuery("");
-    setResults([]);
+    setUsers([]);
+    setCities([]);
+    setCountries([]);
     setIsOpen(false);
     setError("");
     inputRef.current?.focus();
@@ -126,7 +141,7 @@ export default function SearchBar({
           type="text"
           className={`input input-bordered w-full pl-10 pr-10 ${
             compact ? "input-sm" : ""
-          } ${isOpen && results.length > 0 ? "rounded-b-none" : ""}`}
+          } ${isOpen && (users.length > 0 || cities.length > 0 || countries.length > 0) ? "rounded-b-none" : ""}`}
           placeholder={placeholder}
           value={query}
           onChange={(e) => handleInputChange(e.target.value)}
@@ -158,83 +173,119 @@ export default function SearchBar({
             </div>
           )}
 
-          {!isLoading && !error && results.length > 0 && (
+          {!isLoading && !error && (users.length > 0 || cities.length > 0 || countries.length > 0) && (
             <div className="py-2">
-              {results.map((user) => (
-                <Link
-                  key={user._id}
-                  href={`/dancer/${user._id}`}
-                  onClick={() => handleUserClick(user)}
-                  className="block px-6 py-4 hover:bg-base-200 transition-colors"
-                >
-                  <div className="flex items-start gap-3">
-                    {/* User Avatar */}
-                    <div className="avatar flex-shrink-0">
-                      <div className="w-12 h-12 rounded-full">
-                        {user.image ? (
-                          <Image
-                            src={user.image}
-                            alt={user.name}
-                            width={48}
-                            height={48}
-                            className="rounded-full object-cover"
-                          />
-                        ) : (
-                          <div className="w-full h-full bg-base-300 flex items-center justify-center rounded-full">
-                            <FaUser className="text-base-content/50" />
+              {/* Dancers Section */}
+              {users.length > 0 && (
+                <div className="mb-2">
+                  <div className="px-4 py-2 text-xs font-semibold text-base-content/60 flex items-center gap-2">
+                    <FaUsers className="h-3 w-3" />
+                    DANCERS ({users.length})
+                  </div>
+                  {users.map((user) => (
+                    <Link
+                      key={user._id}
+                      href={`/dancer/${user._id}`}
+                      onClick={() => handleUserClick(user)}
+                      className="block px-6 py-3 hover:bg-base-200 transition-colors"
+                    >
+                      <div className="flex items-center gap-3">
+                        <div className="avatar flex-shrink-0">
+                          <div className="w-10 h-10 rounded-full">
+                            {user.image ? (
+                              <Image
+                                src={user.image}
+                                alt={user.name}
+                                width={40}
+                                height={40}
+                                className="rounded-full object-cover"
+                              />
+                            ) : (
+                              <div className="w-full h-full bg-base-300 flex items-center justify-center rounded-full">
+                                <FaUser className="text-base-content/50" />
+                              </div>
+                            )}
                           </div>
-                        )}
-                      </div>
-                    </div>
-
-                    {/* User Info */}
-                    <div className="flex-1 min-w-0">
-                      {/* Name and Username Row */}
-                      <div className="flex items-center gap-2 mb-1">
-                        <div className="font-medium text-base-content truncate flex-shrink">
-                          {user.name}
                         </div>
-                        <div className="text-sm text-base-content/60 flex-shrink-0">
-                          @{user.username}
-                        </div>
-                      </div>
-                      
-                      {/* Location Row */}
-                      {user.city && (
-                        <div className="flex items-center gap-1 text-sm text-base-content/50 mb-1">
-                          <FaMapMarkerAlt className="h-3 w-3 flex-shrink-0" />
-                          <span className="truncate">{user.city.name}</span>
-                        </div>
-                      )}
-                      
-                      {/* Dance Styles Row */}
-                      {user.danceStyles.length > 0 && (
-                        <div className="flex flex-wrap gap-1">
-                          {user.danceStyles.slice(0, 3).map((ds, index) => (
-                            <span 
-                              key={index}
-                              className="badge badge-outline badge-sm"
-                            >
-                              {ds.name}
-                            </span>
-                          ))}
-                          {user.danceStyles.length > 3 && (
-                            <span className="badge badge-ghost badge-sm">
-                              +{user.danceStyles.length - 3}
-                            </span>
+                        <div className="flex-1 min-w-0">
+                          <div className="flex items-center gap-2 mb-0.5">
+                            <span className="font-medium text-sm truncate">{user.name}</span>
+                            <span className="text-xs text-base-content/60">@{user.username}</span>
+                          </div>
+                          {user.city && (
+                            <div className="text-xs text-base-content/50 truncate">
+                              {user.city.name}
+                            </div>
                           )}
                         </div>
-                      )}
-                    </div>
+                      </div>
+                    </Link>
+                  ))}
+                </div>
+              )}
+
+              {/* Cities Section */}
+              {cities.length > 0 && (
+                <div className="mb-2">
+                  <div className="px-4 py-2 text-xs font-semibold text-base-content/60 flex items-center gap-2">
+                    <FaCity className="h-3 w-3" />
+                    CITIES ({cities.length})
                   </div>
-                </Link>
-              ))}
+                  {cities.map((city) => (
+                    <Link
+                      key={city._id}
+                      href={`/city/${city._id}`}
+                      onClick={clearSearch}
+                      className="block px-6 py-3 hover:bg-base-200 transition-colors"
+                    >
+                      <div className="flex items-center gap-3">
+                        <div className="flex-shrink-0">
+                          <Flag countryCode={city.country?.code || ''} size="md" />
+                        </div>
+                        <div className="flex-1 min-w-0">
+                          <div className="font-medium text-sm truncate">{city.name}</div>
+                          <div className="text-xs text-base-content/50">
+                            {city.country?.name} • {city.totalDancers} dancers
+                          </div>
+                        </div>
+                      </div>
+                    </Link>
+                  ))}
+                </div>
+              )}
+
+              {/* Countries Section */}
+              {countries.length > 0 && (
+                <div>
+                  <div className="px-4 py-2 text-xs font-semibold text-base-content/60 flex items-center gap-2">
+                    <FaGlobe className="h-3 w-3" />
+                    COUNTRIES ({countries.length})
+                  </div>
+                  {countries.map((country) => (
+                    <Link
+                      key={country._id}
+                      href={`/country/${country._id}`}
+                      onClick={clearSearch}
+                      className="block px-6 py-3 hover:bg-base-200 transition-colors"
+                    >
+                      <div className="flex items-center gap-3">
+                        <div className="flex-shrink-0">
+                          <Flag countryCode={country.code} size="md" />
+                        </div>
+                        <div className="flex-1 min-w-0">
+                          <div className="font-medium text-sm truncate">{country.name}</div>
+                        </div>
+                      </div>
+                    </Link>
+                  ))}
+                </div>
+              )}
             </div>
           )}
 
-          {!isLoading && !error && query.length >= 2 && results.length === 0 && (
+          {!isLoading && !error && query.length >= 2 && users.length === 0 && cities.length === 0 && countries.length === 0 && (
             <div className="p-4 text-center text-base-content/60">
-              No dancers found for &quot;{query}&quot;
+              No results found for &quot;{query}&quot;
             </div>
           )}
         </div>

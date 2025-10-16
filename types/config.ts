@@ -24,6 +24,7 @@ export type Theme =
 
 export interface ConfigProps {
   appName: string;
+  companyName?: string;
   appDescription: string;
   domainName: string;
   crisp: {
@@ -55,6 +56,7 @@ export interface ConfigProps {
   };
   social?: {
     instagram?: string;
+    twitter?: string;
   };
   colors: {
     theme: Theme;
