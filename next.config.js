@@ -34,7 +34,7 @@ const nextConfig = {
         has: [
           {
             type: 'host',
-            value: 'dancetribe.co'
+            value: 'dancecircle.co'
           }
         ]
       }

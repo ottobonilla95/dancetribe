@@ -54,7 +54,7 @@ export const getSEOTags = ({
       description: openGraph?.description || config.appDescription,
       images: ['/og-image.png'],
       card: "summary_large_image",
-      creator: config.social?.twitter || "@dancetribeco",
+      creator: config.social?.twitter || "@dancecircleco",
     },
 
     // If a canonical URL is given, we add it. The metadataBase will turn the relative URL into a fully qualified URL

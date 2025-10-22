@@ -1,6 +1,6 @@
 {
-  "name": "DanceTribe",
-  "short_name": "DanceTribe",
+  "name": "DanceCircle",
+  "short_name": "DanceCircle",
   "description": "Your Global Dance Network - Connect with dancers worldwide",
   "start_url": "/",
   "display": "standalone",

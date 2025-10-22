@@ -83,7 +83,7 @@ export default function InstallPrompt({ show, onClose }: InstallPromptProps) {
           {/* Content */}
           <div className="text-center mb-4">
             <div className="text-5xl mb-3">📱</div>
-            <h3 className="text-2xl font-bold mb-2">Install DanceTribe!</h3>
+            <h3 className="text-2xl font-bold mb-2">Install DanceCircle!</h3>
             <p className="text-sm opacity-90">
               Get faster access and a native app experience
             </p>

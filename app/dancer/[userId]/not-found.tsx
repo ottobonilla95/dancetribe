@@ -39,7 +39,7 @@ export default function NotFound() {
                   href="/api/auth/signin"
                   className="btn btn-sm md:btn-md btn-outline btn-primary w-full"
                 >
-                  🕺 Join DanceTribe 💃
+                  🕺 Join DanceCircle 💃
                 </Link>
               </div>
 

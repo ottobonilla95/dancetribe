@@ -73,7 +73,7 @@ const ShareCard = forwardRef<HTMLDivElement, ShareCardProps>(
     // Create short URL for both display and QR code
     const baseUrl =
       process.env.NODE_ENV === "production"
-        ? "https://dancetribe.co"
+        ? "https://dancecircle.co"
         : "http://localhost:3000";
 
     const fullShortUrl = userData.username
@@ -532,7 +532,7 @@ const ShareCard = forwardRef<HTMLDivElement, ShareCardProps>(
               boxShadow: "0 8px 25px rgba(116, 128, 255, 0.3)",
             }}
           >
-            🌐 DanceTribe.co
+            🌐 DanceCircle.co
           </div>
 
           {/* Community Message */}

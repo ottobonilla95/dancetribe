@@ -20,7 +20,7 @@ const CTA = () => {
             Join thousands of dancers worldwide. Connect, explore, and discover your next dance adventure.
           </p>
 
-          <ButtonSignin text="🕺 Join DanceTribe 💃" extraStyle="btn-primary btn-wide" />
+          <ButtonSignin text="🕺 Join DanceCircle 💃" extraStyle="btn-primary btn-wide" />
         </div>
       </div>
     </section>

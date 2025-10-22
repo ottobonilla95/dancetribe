@@ -54,7 +54,7 @@ export default function WelcomeModal({ userName, userUsername, userImage, userDa
   };
 
   const shareToWhatsApp = () => {
-    const text = `Check out my dance profile on DanceTribe! 🕺💃\n${profileUrl}`;
+    const text = `Check out my dance profile on DanceCircle! 🕺💃\n${profileUrl}`;
     window.open(`https://wa.me/?text=${encodeURIComponent(text)}`, "_blank");
   };
 
@@ -98,7 +98,7 @@ export default function WelcomeModal({ userName, userUsername, userImage, userDa
                 <div className="text-center mb-6">
               <div className="text-6xl mb-4 animate-bounce">🎉</div>
               <h2 className="text-3xl md:text-4xl font-bold mb-2">
-                Welcome to DanceTribe, {userName}!
+                Welcome to DanceCircle, {userName}!
               </h2>
               <p className="text-lg text-base-content/70">
                 Your dance profile is live! Share it with the world 🌍
@@ -117,7 +117,7 @@ export default function WelcomeModal({ userName, userUsername, userImage, userDa
                 <div className="flex gap-2">
                   <input
                     type="text"
-                    value={`dancetribe.co/${userUsername}`}
+                    value={`dancecircle.co/${userUsername}`}
                     readOnly
                     className="input input-sm input-bordered flex-1 font-mono text-xs"
                   />

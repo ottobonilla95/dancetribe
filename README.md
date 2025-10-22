@@ -36,4 +36,4 @@ Let's ship it, FAST ⚡️
 ShipFast members get 30% OFF on all plans! 🎁
 
 ![datafast](https://github.com/user-attachments/assets/0bf09937-31d1-41d7-82bc-234b5c359a93)
-# dancetribe
+# dancecircle

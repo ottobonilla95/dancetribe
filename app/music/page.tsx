@@ -3,7 +3,7 @@ import User from "@/models/User";
 import { FaMusic, FaSpotify, FaFire, FaUsers, FaYoutube } from "react-icons/fa";
 
 export const metadata = {
-  title: "Trending Dance Music | DanceTribe",
+  title: "Trending Dance Music | DanceCircle",
   description: "Discover the most popular dance anthems from our community",
 };
 

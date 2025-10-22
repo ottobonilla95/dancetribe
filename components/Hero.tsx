@@ -126,7 +126,7 @@ const Hero = ({ featuredUsers = [] }: HeroProps) => {
         {/* CTA */}
         <div className="flex flex-col items-center gap-3 sm:gap-4">
           <ButtonSignin
-            text="Join DanceTribe →"
+            text="Join DanceCircle →"
             extraStyle="btn-primary btn-md sm:btn-lg text-base sm:text-lg px-8 sm:px-12"
           />
           <p className="text-sm sm:text-base text-white/80">

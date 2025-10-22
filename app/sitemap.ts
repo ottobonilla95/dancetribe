@@ -5,7 +5,7 @@ import City from '@/models/City';
 import DanceStyle from '@/models/DanceStyle';
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
-  const baseUrl = 'https://dancetribe.co';
+  const baseUrl = 'https://dancecircle.co';
 
   try {
     await connectMongo();

@@ -7,9 +7,9 @@ import connectMongo from "@/libs/mongoose";
 import User from "@/models/User";
 
 export const metadata = {
-  title: "Invite Friends | DanceTribe",
+  title: "Invite Friends | DanceCircle",
   description:
-    "Invite your dance friends to join DanceTribe and grow the global dance community",
+    "Invite your dance friends to join DanceCircle and grow the global dance community",
 };
 
 export default async function InvitePage() {
@@ -73,7 +73,7 @@ export default async function InvitePage() {
                 <div className="text-4xl mb-2">💬</div>
                 <h4 className="font-bold">Share Daily</h4>
                 <p className="text-sm text-base-content/70">
-                  Post about DanceTribe in your dance groups
+                  Post about DanceCircle in your dance groups
                 </p>
               </div>
             </div>

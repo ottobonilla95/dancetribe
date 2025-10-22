@@ -13,34 +13,34 @@ export default function InviteFriends({ userName = "A friend" }: InviteFriendsPr
   // Simple URL - no referral codes
   const baseUrl = typeof window !== 'undefined' 
     ? window.location.origin 
-    : 'https://dancetribe.co';
+    : 'https://dancecircle.co';
   
   const shareUrl = baseUrl;
 
   // Pre-written viral messages
   const messages = {
-    default: `Hey! You NEED to check out DanceTribe! 💃🕺\n\nIt's like Instagram meets LinkedIn but for DANCERS. Find dancers in any city, connect globally, share your journey.\n\nFREE to join: ${shareUrl}\n\nThe dance community is already there! 🔥`,
+    default: `Hey! You NEED to check out DanceCircle! 💃🕺\n\nIt's like Instagram meets LinkedIn but for DANCERS. Find dancers in any city, connect globally, share your journey.\n\nFREE to join: ${shareUrl}\n\nThe dance community is already there! 🔥`,
     
-    whatsapp: `Yooo! 🔥\n\nJust found DanceTribe - it's basically the app we've been waiting for as dancers!\n\n✨ Find dancers in ANY city worldwide\n🌍 Connect with your dance fam globally  \n🎯 See who dances what and where\n🏆 Share your journey & get recognized\n\nIt's FREE and already has dancers from everywhere!\n\nJoin here: ${shareUrl}\n\nSee you there! 💃🕺`,
+    whatsapp: `Yooo! 🔥\n\nJust found DanceCircle - it's basically the app we've been waiting for as dancers!\n\n✨ Find dancers in ANY city worldwide\n🌍 Connect with your dance fam globally  \n🎯 See who dances what and where\n🏆 Share your journey & get recognized\n\nIt's FREE and already has dancers from everywhere!\n\nJoin here: ${shareUrl}\n\nSee you there! 💃🕺`,
     
-    sms: `Yo! Found the perfect app for dancers - DanceTribe. Connect with dancers worldwide, find people in any city. FREE! ${shareUrl}`,
+    sms: `Yo! Found the perfect app for dancers - DanceCircle. Connect with dancers worldwide, find people in any city. FREE! ${shareUrl}`,
     
     email: {
       subject: "Found THE app for dancers! 🔥",
-      body: `Hey!\n\nOkay so I just discovered DanceTribe and had to share it with you!\n\nIt's like if Instagram and LinkedIn had a baby... but for dancers. 😄\n\nWhat makes it cool:\n✨ Find dancers in ANY city (super useful when traveling!)\n🌍 Global dance community - connect with dancers worldwide\n🎯 See people's dance styles, experience, and journey\n🏆 Achievement badges for your dance milestones\n💃 Share your story and connect with like-minded dancers\n\nIt's completely FREE and the community is already growing!\n\nCheck it out: ${shareUrl}\n\nHope to see you there!\n${userName}`
+      body: `Hey!\n\nOkay so I just discovered DanceCircle and had to share it with you!\n\nIt's like if Instagram and LinkedIn had a baby... but for dancers. 😄\n\nWhat makes it cool:\n✨ Find dancers in ANY city (super useful when traveling!)\n🌍 Global dance community - connect with dancers worldwide\n🎯 See people's dance styles, experience, and journey\n🏆 Achievement badges for your dance milestones\n💃 Share your story and connect with like-minded dancers\n\nIt's completely FREE and the community is already growing!\n\nCheck it out: ${shareUrl}\n\nHope to see you there!\n${userName}`
     },
     
-    twitter: `Just discovered @DanceTribe - finally an app built FOR dancers! 💃🕺\n\nFind dancers worldwide, connect in any city, share your journey.\n\nFREE to join & already has amazing dancers: ${shareUrl}\n\n#DanceTribe #DanceCommunity #Dancers`,
+    twitter: `Just discovered @DanceCircle - finally an app built FOR dancers! 💃🕺\n\nFind dancers worldwide, connect in any city, share your journey.\n\nFREE to join & already has amazing dancers: ${shareUrl}\n\n#DanceCircle #DanceCommunity #Dancers`,
     
-    facebook: `Dancers! 🔥\n\nFound an app that's actually built for US - DanceTribe!\n\nConnect with dancers globally, find people in any city, share your journey. It's FREE and the community is already lit!\n\nJoin: ${shareUrl}`,
+    facebook: `Dancers! 🔥\n\nFound an app that's actually built for US - DanceCircle!\n\nConnect with dancers globally, find people in any city, share your journey. It's FREE and the community is already lit!\n\nJoin: ${shareUrl}`,
     
-    instagram: `Found the app we've been waiting for! 💃🕺\n\nDanceTribe lets you:\n✨ Find dancers in any city\n🌍 Connect globally\n🎯 Share your dance journey\n\nFREE to join!\n\nLink: ${shareUrl}\n\n#DanceTribe #DanceCommunity #Dancers`
+    instagram: `Found the app we've been waiting for! 💃🕺\n\nDanceCircle lets you:\n✨ Find dancers in any city\n🌍 Connect globally\n🎯 Share your dance journey\n\nFREE to join!\n\nLink: ${shareUrl}\n\n#DanceCircle #DanceCommunity #Dancers`
   };
 
   const copyToClipboard = async () => {
     try {
       // Copy a compelling message with the link
-      const copyText = `Check out DanceTribe - the global community for dancers! 💃🕺\n\nFind dancers worldwide, connect in any city.\n\n${shareUrl}`;
+      const copyText = `Check out DanceCircle - the global community for dancers! 💃🕺\n\nFind dancers worldwide, connect in any city.\n\n${shareUrl}`;
       await navigator.clipboard.writeText(copyText);
       setCopied(true);
       setTimeout(() => setCopied(false), 2000);
@@ -82,7 +82,7 @@ export default function InviteFriends({ userName = "A friend" }: InviteFriendsPr
     if (navigator.share) {
       try {
         await navigator.share({
-          title: 'DanceTribe - Global Dance Community 💃🕺',
+          title: 'DanceCircle - Global Dance Community 💃🕺',
           text: messages.default,
           url: shareUrl,
         });
@@ -117,7 +117,7 @@ export default function InviteFriends({ userName = "A friend" }: InviteFriendsPr
           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path>
         </svg>
         <div>
-          <h3 className="font-bold">DanceTribe is growing fast!</h3>
+          <h3 className="font-bold">DanceCircle is growing fast!</h3>
           <div className="text-sm">Dancers from every continent are already connecting 🌍</div>
         </div>
       </div>
@@ -242,7 +242,7 @@ export default function InviteFriends({ userName = "A friend" }: InviteFriendsPr
             <li>• 📱 <strong>Instagram Stories</strong> - Use your profile share card!</li>
             <li>• 🎯 <strong>Dance festivals</strong> - When you meet new dancers</li>
             <li>• 💬 <strong>Dance communities</strong> - Facebook groups, Discord servers</li>
-            <li>• 🎪 <strong>After socials</strong> - &quot;Add me on DanceTribe!&quot;</li>
+            <li>• 🎪 <strong>After socials</strong> - &quot;Add me on DanceCircle!&quot;</li>
           </ul>
         </div>
       </div>

@@ -112,7 +112,7 @@ export default function SharePreviewModal({
           const url = URL.createObjectURL(blob);
           const link = document.createElement('a');
           link.href = url;
-          link.download = `dancetribe-${userData.username || "profile"}.png`;
+          link.download = `dancecircle-${userData.username || "profile"}.png`;
           document.body.appendChild(link);
           link.click();
           document.body.removeChild(link);

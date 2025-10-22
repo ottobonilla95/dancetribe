@@ -716,7 +716,7 @@ export default async function CountryPage({ params, searchParams }: Props) {
                 </p>
                 <div className="card-actions justify-center">
                   <Link href="/api/auth/signin" className="btn btn-white">
-                    Join DanceTribe
+                    Join DanceCircle
                   </Link>
                 </div>
               </div>

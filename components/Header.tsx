@@ -335,7 +335,7 @@ const Header = () => {
                 {config.resend.supportEmail && (
                   <div className="py-2">
                     <a
-                      href={`mailto:${config.resend.supportEmail}?subject=DanceTribe Support Request`}
+                      href={`mailto:${config.resend.supportEmail}?subject=DanceCircle Support Request`}
                       className="btn btn-outline btn-block gap-2"
                       target="_blank"
                       rel="noopener noreferrer"

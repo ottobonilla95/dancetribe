@@ -54,7 +54,7 @@ export function friendRequestReceivedEmail(sender: UserData, recipient: UserData
                 <p style="color: #666; margin: 10px 0;">wants to connect with you!</p>
               </div>
               <div style="text-align: center;">
-                <a href="https://dancetribe.co/friends" class="button">View Friend Request</a>
+                <a href="https://dancecircle.co/friends" class="button">View Friend Request</a>
               </div>
               <p style="margin-top: 30px; color: #666; font-size: 14px;">
                 Connect with dancers worldwide and grow your network! 🌍
@@ -112,7 +112,7 @@ export function friendRequestAcceptedEmail(accepter: UserData, sender: UserData)
                 ${accepter.username ? `<p style="color: #666; margin: 5px 0;">@${accepter.username}</p>` : ''}
               </div>
               <div style="text-align: center;">
-                <a href="https://dancetribe.co/${accepter.username || `dancer/${accepter._id}`}" class="button">View Profile</a>
+                <a href="https://dancecircle.co/${accepter.username || `dancer/${accepter._id}`}" class="button">View Profile</a>
               </div>
               <p style="margin-top: 30px; color: #666; font-size: 14px;">
                 You're now connected! Start exploring their dance journey. 💃🕺
@@ -172,7 +172,7 @@ export function profileLikedEmail(liker: UserData, recipient: UserData) {
                 <p style="color: #666; margin: 10px 0;">liked your profile!</p>
               </div>
               <div style="text-align: center;">
-                <a href="https://dancetribe.co/${liker.username || `dancer/${liker._id}`}" class="button">View Their Profile</a>
+                <a href="https://dancecircle.co/${liker.username || `dancer/${liker._id}`}" class="button">View Their Profile</a>
               </div>
               <p style="margin-top: 30px; color: #666; font-size: 14px;">
                 Maybe it's time to connect? Send them a friend request! 💃🕺

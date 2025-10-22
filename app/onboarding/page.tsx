@@ -102,7 +102,7 @@ export default function Onboarding() {
     {
       id: "username",
       title: "Choose your username",
-      description: "This will be your unique identifier on DanceTribe",
+      description: "This will be your unique identifier on DanceCircle",
       completed: user?.onboardingSteps?.username || false,
     },
     {
@@ -1037,7 +1037,7 @@ export default function Onboarding() {
 
                 <div className="label">
                   <span className="label-text-alt">
-                    Your profile will be available at: DanceTribe.co/
+                    Your profile will be available at: DanceCircle.co/
                     {username || "username"}
                   </span>
                 </div>

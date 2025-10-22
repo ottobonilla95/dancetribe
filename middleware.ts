@@ -58,7 +58,7 @@ export async function middleware(request: NextRequest) {
   }
 
   // Allow username routes (/{username} pattern - single segment, no slashes)
-  // This allows users to share their profile via dancetribe.com/username
+  // This allows users to share their profile via dancecircle.co/username
   const pathSegments = pathname.split('/').filter(Boolean)
   if (pathSegments.length === 1) {
     // Single segment path - likely a username

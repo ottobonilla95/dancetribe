@@ -3,14 +3,14 @@ import { ConfigProps } from "./types/config";
 
 const config = {
   // REQUIRED
-  appName: "DanceTribe",
+  appName: "DanceCircle",
   // Company name for legal purposes
   companyName: "JMO Ventures LLC",
   // REQUIRED: a short description of your app for SEO tags (can be overwritten)
   appDescription:
     "Connect with dancers worldwide! Discover music, cities, events, and dance communities. Find festivals, socials, DJs, and explore new places through dance.",
   // REQUIRED (no https://, not trailing slash at the end, just the naked domain)
-  domainName: "dancetribe.co",
+  domainName: "dancecircle.co",
   crisp: {
     // Crisp website ID. IF YOU DON'T USE CRISP: just remove this => Then add a support email in this config file (resend.supportEmail) otherwise customer support won't work.
     id: "",
@@ -75,16 +75,16 @@ const config = {
   },
   resend: {
     // REQUIRED — Email 'From' field to be used when sending magic login links
-    fromNoReply: `DanceTribe <noreply@dancetribe.co>`,
+    fromNoReply: `DanceCircle <noreply@dancecircle.co>`,
     // REQUIRED — Email 'From' field to be used when sending other emails, like abandoned carts, updates etc..
-    fromAdmin: `DanceTribe <hello@dancetribe.co>`,
+    fromAdmin: `DanceCircle <hello@dancecircle.co>`,
     // Email shown to customer if they need support. Leave empty if not needed => if empty, set up Crisp above, otherwise you won't be able to offer customer support."
     supportEmail: "mr.bonilla51@gmail.com",
   },
   social: {
     // Social media handles for support and marketing
-    instagram: "dancetribe.co",
-    twitter: "@dancetribeco",
+    instagram: "dancecircle.co",
+    twitter: "@dancecircleco",
   },
   colors: {
     // REQUIRED — The DaisyUI theme to use (added to the main layout.js). Leave blank for default (light & dark mode). If you use any theme other than light/dark, you need to add it in config.tailwind.js in daisyui.themes.

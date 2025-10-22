@@ -1,4 +1,4 @@
-// Essential database indexes for DanceTribe performance
+// Essential database indexes for DanceCircle performance
 // 🛡️ SAFETY: Indexes are 100% safe - they only speed up reads, never modify data
 // 
 // HOW TO USE:

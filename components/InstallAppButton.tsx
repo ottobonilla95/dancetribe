@@ -59,7 +59,7 @@ export default function InstallAppButton() {
               {/* Header */}
               <div className="text-center mb-6">
                 <div className="text-4xl mb-3">📱</div>
-                <h3 className="text-2xl font-bold mb-2">Install DanceTribe</h3>
+                <h3 className="text-2xl font-bold mb-2">Install DanceCircle</h3>
                 <p className="text-sm text-base-content/70">
                   Get the app experience on your device
                 </p>
@@ -88,7 +88,7 @@ export default function InstallAppButton() {
                     </li>
                     <li className="flex gap-3">
                       <span className="font-bold">4.</span>
-                      <span>The DanceTribe app will appear on your home screen! 🎉</span>
+                      <span>The DanceCircle app will appear on your home screen! 🎉</span>
                     </li>
                   </ol>
                 </div>
@@ -116,7 +116,7 @@ export default function InstallAppButton() {
                     </li>
                     <li className="flex gap-3">
                       <span className="font-bold">4.</span>
-                      <span>The DanceTribe app will appear on your home screen! 🎉</span>
+                      <span>The DanceCircle app will appear on your home screen! 🎉</span>
                     </li>
                   </ol>
                 </div>
@@ -129,7 +129,7 @@ export default function InstallAppButton() {
                       <p className="font-semibold">Desktop Instructions</p>
                       <ol className="list-decimal ml-4 mt-2 text-sm">
                         <li>Look for an install icon in your browser&apos;s address bar</li>
-                        <li>Or check your browser menu for &quot;Install DanceTribe&quot;</li>
+                        <li>Or check your browser menu for &quot;Install DanceCircle&quot;</li>
                         <li>Click it to install the app on your computer</li>
                       </ol>
                     </div>

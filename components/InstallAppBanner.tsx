@@ -74,7 +74,7 @@ export default function InstallAppBanner() {
         <div className="flex items-center gap-3 flex-1">
           <FaDownload className="text-2xl flex-shrink-0" />
           <div className="flex-1">
-            <p className="font-semibold text-sm">Install DanceTribe</p>
+            <p className="font-semibold text-sm">Install DanceCircle</p>
             <p className="text-xs opacity-90">Get the full app experience</p>
           </div>
         </div>
