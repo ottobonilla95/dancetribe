@@ -99,23 +99,65 @@ export default function DancersMap({ dancers, mapboxToken }: DancersMapProps) {
         innerWrapper.style.position = 'relative';
         innerWrapper.style.transition = 'transform 0.3s ease';
 
-        // Show dancer count badge
-        const badge = document.createElement('div');
-        badge.textContent = cityDancers.length.toString();
-        badge.style.width = '50px';
-        badge.style.height = '50px';
-        badge.style.borderRadius = '50%';
-        badge.style.background = 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)';
-        badge.style.color = 'white';
-        badge.style.display = 'flex';
-        badge.style.alignItems = 'center';
-        badge.style.justifyContent = 'center';
-        badge.style.fontSize = cityDancers.length > 99 ? '14px' : '18px';
-        badge.style.fontWeight = 'bold';
-        badge.style.border = '3px solid white';
-        badge.style.boxShadow = '0 4px 12px rgba(0,0,0,0.4)';
+        // Show first dancer's avatar or stacked avatars
+        if (cityDancers.length === 1) {
+          const img = document.createElement('img');
+          img.src = firstDancer.image || `https://ui-avatars.com/api/?name=${encodeURIComponent(firstDancer.name)}&background=random`;
+          img.crossOrigin = 'anonymous';
+          img.style.width = '50px';
+          img.style.height = '50px';
+          img.style.borderRadius = '50%';
+          img.style.border = '3px solid #fff';
+          img.style.boxShadow = '0 4px 12px rgba(0,0,0,0.4)';
+          img.style.backgroundColor = '#fff';
+          img.style.display = 'block';
+          img.onerror = () => {
+            img.src = `https://ui-avatars.com/api/?name=${encodeURIComponent(firstDancer.name)}&background=random`;
+          };
+          innerWrapper.appendChild(img);
+        } else {
+          // Show stacked avatars for multiple dancers
+          cityDancers.slice(0, 3).forEach((dancer, index) => {
+            const img = document.createElement('img');
+            img.src = dancer.image || `https://ui-avatars.com/api/?name=${encodeURIComponent(dancer.name)}&background=random`;
+            img.crossOrigin = 'anonymous';
+            img.style.width = '40px';
+            img.style.height = '40px';
+            img.style.borderRadius = '50%';
+            img.style.border = '2px solid #fff';
+            img.style.position = 'absolute';
+            img.style.left = `${index * 15}px`;
+            img.style.top = `${index * 5}px`;
+            img.style.boxShadow = '0 2px 8px rgba(0,0,0,0.4)';
+            img.style.backgroundColor = '#fff';
+            img.onerror = () => {
+              img.src = `https://ui-avatars.com/api/?name=${encodeURIComponent(dancer.name)}&background=random`;
+            };
+            innerWrapper.appendChild(img);
+          });
 
-        innerWrapper.appendChild(badge);
+          // Add count badge if more than 3 dancers
+          if (cityDancers.length > 3) {
+            const badge = document.createElement('div');
+            badge.textContent = `+${cityDancers.length - 3}`;
+            badge.style.position = 'absolute';
+            badge.style.right = '0';
+            badge.style.top = '0';
+            badge.style.backgroundColor = '#ff4444';
+            badge.style.color = 'white';
+            badge.style.borderRadius = '50%';
+            badge.style.width = '20px';
+            badge.style.height = '20px';
+            badge.style.display = 'flex';
+            badge.style.alignItems = 'center';
+            badge.style.justifyContent = 'center';
+            badge.style.fontSize = '10px';
+            badge.style.fontWeight = 'bold';
+            badge.style.border = '2px solid white';
+            innerWrapper.appendChild(badge);
+          }
+        }
+
         el.appendChild(innerWrapper);
 
         // Hover effect
@@ -174,11 +216,15 @@ export default function DancersMap({ dancers, mapboxToken }: DancersMapProps) {
           
           const dancerImg = document.createElement('img');
           dancerImg.src = dancer.image || `https://ui-avatars.com/api/?name=${encodeURIComponent(dancer.name)}&background=random`;
+          dancerImg.crossOrigin = 'anonymous';
           dancerImg.style.width = '40px';
           dancerImg.style.height = '40px';
           dancerImg.style.borderRadius = '50%';
           dancerImg.style.border = '2px solid #e5e7eb';
           dancerImg.style.flexShrink = '0';
+          dancerImg.onerror = () => {
+            dancerImg.src = `https://ui-avatars.com/api/?name=${encodeURIComponent(dancer.name)}&background=random`;
+          };
           
           const dancerInfo = document.createElement('div');
           dancerInfo.style.flex = '1';
