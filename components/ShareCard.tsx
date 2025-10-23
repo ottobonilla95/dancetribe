@@ -82,40 +82,34 @@ const ShareCard = forwardRef<HTMLDivElement, ShareCardProps>(
           background: "#2c3442",
           color: "#f3f4f6",
           position: "relative",
-          overflow: "hidden",
+          overflow: "visible",
           display: "flex",
           flexDirection: "column",
           alignItems: "center",
-          justifyContent: "space-between",
-          padding: "50px 60px",
+          justifyContent: "space-evenly",
+          padding: "40px 50px",
         }}
       >
         {/* Header - Meet [Name] */}
         <div style={{ textAlign: "center", width: "100%" }}>
           <div
             style={{
-              fontSize: "72px",
-              fontWeight: "bold",
-              background: "linear-gradient(135deg, #a78bfa 0%, #ec4899 100%)",
-              WebkitBackgroundClip: "text",
-              WebkitTextFillColor: "transparent",
-              backgroundClip: "text",
-              marginBottom: "16px",
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
-              gap: "20px",
+              fontSize: "56px",
+              fontWeight: "900",
+              color: "#ec4899",
+              margin: "0 0 10px 0",
+              padding: 0,
+              textShadow: "2px 2px 8px rgba(236, 72, 153, 0.3)",
+              letterSpacing: "-1px",
             }}
           >
-            <span style={{ fontSize: "48px" }}>✨</span>
-            Meet {userData.name.charAt(0).toUpperCase() + userData.name.slice(1)}
-            <span style={{ fontSize: "48px" }}>✨</span>
+            ✨ Meet {userData.name.charAt(0).toUpperCase() + userData.name.slice(1)} ✨
           </div>
           <div
             style={{
-              fontSize: "32px",
+              fontSize: "26px",
               color: "#9ca3af",
-              fontWeight: "500",
+              fontWeight: "600",
             }}
           >
             Dancing their way through {userData.city.name}
@@ -125,12 +119,13 @@ const ShareCard = forwardRef<HTMLDivElement, ShareCardProps>(
         {/* Main Content - Profile Card */}
         <div
           style={{
-            background: "#1f2937",
+            background: "linear-gradient(135deg, #1f2937 0%, #111827 100%)",
             borderRadius: "24px",
-            padding: "40px",
+            padding: "50px 50px 55px 50px",
             width: "100%",
             maxWidth: "900px",
-            boxShadow: "0 20px 60px rgba(0,0,0,0.3)",
+            boxShadow: "0 25px 70px rgba(0,0,0,0.4), inset 0 1px 0 rgba(255,255,255,0.05)",
+            border: "1px solid rgba(255,255,255,0.05)",
           }}
         >
           {/* Profile Picture and Info */}
@@ -138,19 +133,19 @@ const ShareCard = forwardRef<HTMLDivElement, ShareCardProps>(
             style={{
               display: "flex",
               alignItems: "center",
-              gap: "40px",
-              marginBottom: "40px",
+              gap: "24px",
+              marginBottom: "20px",
             }}
           >
             {/* Profile Picture */}
             <div
               style={{
-                width: "280px",
-                height: "280px",
+                width: "180px",
+                height: "180px",
                 borderRadius: "50%",
                 overflow: "hidden",
-                border: "6px solid #374151",
-                boxShadow: "0 10px 30px rgba(0,0,0,0.3)",
+                // border: "5px solid #ec4899",
+                // boxShadow: "0 15px 40px rgba(236, 72, 153, 0.4), 0 0 20px rgba(236, 72, 153, 0.2)",
                 flexShrink: 0,
               }}
             >
@@ -171,10 +166,12 @@ const ShareCard = forwardRef<HTMLDivElement, ShareCardProps>(
               {/* Name and Age */}
               <h1
                 style={{
-                  fontSize: "56px",
-                  fontWeight: "bold",
-                  marginBottom: "16px",
+                  fontSize: "40px",
+                  fontWeight: "900",
+                  marginBottom: "10px",
                   lineHeight: "1",
+                  color: "#ffffff",
+                  textShadow: "1px 1px 3px rgba(0,0,0,0.3)",
                 }}
               >
                 {userData.name.charAt(0).toUpperCase() + userData.name.slice(1)}
@@ -184,12 +181,13 @@ const ShareCard = forwardRef<HTMLDivElement, ShareCardProps>(
               {/* Zodiac */}
               <div
                 style={{
-                  fontSize: "32px",
-                  fontWeight: "500",
+                  fontSize: "24px",
+                  fontWeight: "600",
                   display: "flex",
                   alignItems: "center",
-                  gap: "12px",
-                  marginBottom: "16px",
+                  gap: "8px",
+                  marginBottom: "10px",
+                  color: "#e5e7eb",
                 }}
               >
                 <span>{zodiac.emoji}</span>
@@ -199,9 +197,9 @@ const ShareCard = forwardRef<HTMLDivElement, ShareCardProps>(
               {/* Location */}
               <div
                 style={{
-                  fontSize: "32px",
-                  color: "#f3f4f6",
-                  fontWeight: "500",
+                  fontSize: "24px",
+                  // color: "#60a5fa",
+                  fontWeight: "600",
                 }}
               >
                 📍 {userData.city.name}, {userData.city.country.name}
@@ -214,7 +212,8 @@ const ShareCard = forwardRef<HTMLDivElement, ShareCardProps>(
             style={{
               display: "grid",
               gridTemplateColumns: "1fr 1fr",
-              gap: "32px",
+              gridTemplateRows: "auto auto",
+              gap: "22px 28px",
               paddingTop: "24px",
             }}
           >
@@ -223,17 +222,19 @@ const ShareCard = forwardRef<HTMLDivElement, ShareCardProps>(
               <div>
                 <div
                   style={{
-                    fontSize: "28px",
+                    fontSize: "18px",
                     color: "#9ca3af",
-                    marginBottom: "8px",
+                    marginBottom: "6px",
+                    fontWeight: "500",
                   }}
                 >
                   Nationality
                 </div>
                 <div
                   style={{
-                    fontSize: "32px",
-                    fontWeight: "600",
+                    fontSize: "24px",
+                    fontWeight: "700",
+                    color: "#f3f4f6",
                   }}
                 >
                   🇨🇴 {userData.nationality}
@@ -246,17 +247,19 @@ const ShareCard = forwardRef<HTMLDivElement, ShareCardProps>(
               <div>
                 <div
                   style={{
-                    fontSize: "28px",
+                    fontSize: "18px",
                     color: "#9ca3af",
-                    marginBottom: "8px",
+                    marginBottom: "6px",
+                    fontWeight: "500",
                   }}
                 >
                   Dance Role
                 </div>
                 <div
                   style={{
-                    fontSize: "32px",
-                    fontWeight: "600",
+                    fontSize: "24px",
+                    fontWeight: "700",
+                    color: "#f3f4f6",
                   }}
                 >
                   {userData.danceRole === "leader"
@@ -273,17 +276,19 @@ const ShareCard = forwardRef<HTMLDivElement, ShareCardProps>(
               <div>
                 <div
                   style={{
-                    fontSize: "28px",
+                    fontSize: "18px",
                     color: "#9ca3af",
-                    marginBottom: "8px",
+                    marginBottom: "6px",
+                    fontWeight: "500",
                   }}
                 >
                   Experience
                 </div>
                 <div
                   style={{
-                    fontSize: "32px",
-                    fontWeight: "600",
+                    fontSize: "24px",
+                    fontWeight: "700",
+                    color: "#f3f4f6",
                   }}
                 >
                   🎵 {userData.yearsDancing} {userData.yearsDancing === 1 ? 'year' : 'years'}
@@ -296,17 +301,19 @@ const ShareCard = forwardRef<HTMLDivElement, ShareCardProps>(
               <div>
                 <div
                   style={{
-                    fontSize: "28px",
+                    fontSize: "18px",
                     color: "#9ca3af",
-                    marginBottom: "8px",
+                    marginBottom: "6px",
+                    fontWeight: "500",
                   }}
                 >
                   Danced In
                 </div>
                 <div
                   style={{
-                    fontSize: "32px",
-                    fontWeight: "600",
+                    fontSize: "24px",
+                    fontWeight: "700",
+                    color: "#f3f4f6",
                   }}
                 >
                   🌍 {userData.citiesVisited} {userData.citiesVisited === 1 ? 'city' : 'cities'}
@@ -323,24 +330,29 @@ const ShareCard = forwardRef<HTMLDivElement, ShareCardProps>(
             alignItems: "center",
             justifyContent: "center",
             gap: "16px",
-            background: "#1f2937",
-            padding: "20px 40px",
+            background: "linear-gradient(135deg, #1f2937 0%, #111827 100%)",
+            padding: "16px 40px 46px 40px",
             borderRadius: "16px",
+            boxShadow: "0 10px 30px rgba(0,0,0,0.3)",
+            border: "1px solid rgba(255,255,255,0.05)",
           }}
         >
           <img
             src="/icon.png"
             alt="DanceCircle"
             style={{
+              marginTop:"20px",
               width: "40px",
               height: "40px",
+              filter: "drop-shadow(0 2px 4px rgba(236, 72, 153, 0.3))",
             }}
           />
           <div
             style={{
               fontSize: "36px",
-              fontWeight: "700",
-              color: "#f3f4f6",
+              fontWeight: "900",
+              color: "#ffffff",
+              textShadow: "1px 1px 3px rgba(0,0,0,0.3)",
             }}
           >
             DanceCircle

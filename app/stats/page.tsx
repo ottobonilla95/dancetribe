@@ -13,6 +13,7 @@ import {
   FaMapMarkerAlt
 } from "react-icons/fa";
 import WorldMap from "@/components/WorldMap";
+import DancersMap from "@/components/DancersMap";
 import { getCountryCode } from "@/utils/countries";
 
 export const dynamic = "force-dynamic";
@@ -163,7 +164,18 @@ async function getDetailedStats() {
       },
     ]);
 
-
+    // Get top 1000 dancers with their city coordinates for the map
+    const dancersForMap = await User.find({ 
+      isProfileComplete: true, 
+      city: { $exists: true } 
+    })
+      .select('name image username city')
+      .populate({
+        path: 'city',
+        select: 'name coordinates'
+      })
+      .limit(1000)
+      .lean();
 
     // Process role data
     const roleData = { leaders: 0, followers: 0, both: 0 };
@@ -184,21 +196,23 @@ async function getDetailedStats() {
       ageStats,
       genderStats,
       nationalityStats,
+      dancersForMap,
     };
   } catch (error) {
     console.error("Error fetching detailed stats:", error);
-          return {
-        totalDancers: 0,
-        totalCountries: 0,
-        totalCities: 0,
-        countryStats: [],
-        cityStats: [],
-        danceStyleStats: [],
-        roleStats: { leaders: 0, followers: 0, both: 0 },
-        ageStats: [],
-        genderStats: [],
-        nationalityStats: [],
-      };
+    return {
+      totalDancers: 0,
+      totalCountries: 0,
+      totalCities: 0,
+      countryStats: [],
+      cityStats: [],
+      danceStyleStats: [],
+      roleStats: { leaders: 0, followers: 0, both: 0 },
+      ageStats: [],
+      genderStats: [],
+      nationalityStats: [],
+      dancersForMap: [],
+    };
   }
 }
 
@@ -210,6 +224,9 @@ export default async function StatsPage() {
   }
 
   const stats = await getDetailedStats();
+
+  // Convert dancers for map to plain objects
+  const dancersData = JSON.parse(JSON.stringify(stats.dancersForMap || []));
 
   const formatNumber = (num: number) => {
     if (num >= 1000) {
@@ -247,6 +264,22 @@ export default async function StatsPage() {
             </div>
           </div>
         </div>
+
+        {/* Dancers World Map */}
+        {dancersData.length > 0 && (
+          <div className="mb-8">
+            <div className="mb-4">
+              <h2 className="text-2xl font-bold flex items-center gap-2">
+                <span className="text-2xl">🌍</span>
+                Global Dance Community
+              </h2>
+              <p className="text-base-content/60 mt-1">
+                Explore where dancers are located around the world
+              </p>
+            </div>
+            <DancersMap dancers={dancersData} />
+          </div>
+        )}
 
         {/* Overview Stats */}
         <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">

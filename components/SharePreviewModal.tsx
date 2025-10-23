@@ -25,6 +25,8 @@ interface SharePreviewModalProps {
       name: string;
       level: string;
     }>;
+    yearsDancing?: number;
+    citiesVisited?: number;
   };
   profileUrl: string;
 }
@@ -54,8 +56,9 @@ export default function SharePreviewModal({
       iframe.style.left = '-10000px';
       iframe.style.top = '-10000px';
       iframe.style.width = '1080px';
-      iframe.style.height = '1920px';
+      iframe.style.height = '1080px';
       iframe.style.border = 'none';
+      iframe.style.overflow = 'hidden';
       
       document.body.appendChild(iframe);
       
@@ -94,7 +97,7 @@ export default function SharePreviewModal({
 
       const canvas = await html2canvas(element, {
         width: 1080,
-        height: 1920,
+        height: 1080,
         scale: 1,
         useCORS: true,
         allowTaint: true,
@@ -168,7 +171,7 @@ export default function SharePreviewModal({
             </div>
 
             {/* Profile Card Preview */}
-            <div className="flex justify-center mb-4 overflow-hidden" style={{ height: '340px' }}>
+            <div className="flex justify-center mb-4 overflow-hidden" style={{ height: '240px' }}>
               <div className="transform scale-[0.2] pointer-events-none origin-top">
                 <ShareCard userData={userData} />
               </div>

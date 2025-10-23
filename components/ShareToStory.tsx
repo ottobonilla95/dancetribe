@@ -21,6 +21,8 @@ interface ShareToStoryProps {
       name: string;
       level: string;
     }>;
+    yearsDancing?: number;
+    citiesVisited?: number;
   };
 }
 

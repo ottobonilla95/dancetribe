@@ -482,6 +482,8 @@ export default async function Profile({ searchParams }: ProfileProps) {
                             name: userStyle.danceStyle?.name || userStyle.danceStyle,
                             level: userStyle.level || "beginner",
                           })) || [],
+                        yearsDancing: userData.dancingStartYear ? new Date().getFullYear() - userData.dancingStartYear : undefined,
+                        citiesVisited: userData.citiesVisited?.length || 0,
                       }}
                     />
                   </div>
