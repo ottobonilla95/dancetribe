@@ -102,8 +102,12 @@ export default function DancersMap({ dancers, mapboxToken }: DancersMapProps) {
         // Show first dancer's avatar or stacked avatars
         if (cityDancers.length === 1) {
           const img = document.createElement('img');
-          img.src = firstDancer.image || `https://ui-avatars.com/api/?name=${encodeURIComponent(firstDancer.name)}&background=random`;
-          img.crossOrigin = 'anonymous';
+          const fallbackUrl = `https://ui-avatars.com/api/?name=${encodeURIComponent(firstDancer.name)}&background=random`;
+          img.src = firstDancer.image || fallbackUrl;
+          // Don't set crossOrigin for Google images (lh3.googleusercontent.com) - they block CORS
+          if (firstDancer.image && !firstDancer.image.includes('googleusercontent.com')) {
+            img.crossOrigin = 'anonymous';
+          }
           img.style.width = '50px';
           img.style.height = '50px';
           img.style.borderRadius = '50%';
@@ -112,15 +116,19 @@ export default function DancersMap({ dancers, mapboxToken }: DancersMapProps) {
           img.style.backgroundColor = '#fff';
           img.style.display = 'block';
           img.onerror = () => {
-            img.src = `https://ui-avatars.com/api/?name=${encodeURIComponent(firstDancer.name)}&background=random`;
+            img.src = fallbackUrl;
           };
           innerWrapper.appendChild(img);
         } else {
           // Show stacked avatars for multiple dancers
           cityDancers.slice(0, 3).forEach((dancer, index) => {
             const img = document.createElement('img');
-            img.src = dancer.image || `https://ui-avatars.com/api/?name=${encodeURIComponent(dancer.name)}&background=random`;
-            img.crossOrigin = 'anonymous';
+            const fallbackUrl = `https://ui-avatars.com/api/?name=${encodeURIComponent(dancer.name)}&background=random`;
+            img.src = dancer.image || fallbackUrl;
+            // Don't set crossOrigin for Google images
+            if (dancer.image && !dancer.image.includes('googleusercontent.com')) {
+              img.crossOrigin = 'anonymous';
+            }
             img.style.width = '40px';
             img.style.height = '40px';
             img.style.borderRadius = '50%';
@@ -131,7 +139,7 @@ export default function DancersMap({ dancers, mapboxToken }: DancersMapProps) {
             img.style.boxShadow = '0 2px 8px rgba(0,0,0,0.4)';
             img.style.backgroundColor = '#fff';
             img.onerror = () => {
-              img.src = `https://ui-avatars.com/api/?name=${encodeURIComponent(dancer.name)}&background=random`;
+              img.src = fallbackUrl;
             };
             innerWrapper.appendChild(img);
           });
@@ -215,15 +223,19 @@ export default function DancersMap({ dancers, mapboxToken }: DancersMapProps) {
           });
           
           const dancerImg = document.createElement('img');
-          dancerImg.src = dancer.image || `https://ui-avatars.com/api/?name=${encodeURIComponent(dancer.name)}&background=random`;
-          dancerImg.crossOrigin = 'anonymous';
+          const fallbackUrl = `https://ui-avatars.com/api/?name=${encodeURIComponent(dancer.name)}&background=random`;
+          dancerImg.src = dancer.image || fallbackUrl;
+          // Don't set crossOrigin for Google images (lh3.googleusercontent.com)
+          if (dancer.image && !dancer.image.includes('googleusercontent.com')) {
+            dancerImg.crossOrigin = 'anonymous';
+          }
           dancerImg.style.width = '40px';
           dancerImg.style.height = '40px';
           dancerImg.style.borderRadius = '50%';
           dancerImg.style.border = '2px solid #e5e7eb';
           dancerImg.style.flexShrink = '0';
           dancerImg.onerror = () => {
-            dancerImg.src = `https://ui-avatars.com/api/?name=${encodeURIComponent(dancer.name)}&background=random`;
+            dancerImg.src = fallbackUrl;
           };
           
           const dancerInfo = document.createElement('div');
