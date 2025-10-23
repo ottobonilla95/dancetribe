@@ -5,6 +5,7 @@ import Link from "next/link";
 import { User } from "@/types/user";
 import { FaMapMarkerAlt, FaHeart, FaInstagram, FaTiktok, FaYoutube } from "react-icons/fa";
 import { getZodiacSign } from "@/utils/zodiac";
+import { getCountryCode } from "@/utils/countries";
 
 interface DancerCardProps {
   dancer: User & { 
@@ -57,10 +58,10 @@ export default function DancerCard({ dancer, showLikeButton = true, showFlag = f
             
             <div className="flex-1 min-w-0">
               <div className="flex items-center gap-2">
-                <h3 className="font-bold text-lg truncate">{dancer.name}</h3>
-                {showFlag && dancer.city?.country?.code && (
-                  <span className="text-xl">{getFlagEmoji(dancer.city.country.code)}</span>
+                {dancer.nationality && (
+                  <span className="text-xl">{getFlagEmoji(getCountryCode(dancer.nationality))}</span>
                 )}
+                <h3 className="font-bold text-lg truncate">{dancer.name}</h3>
               </div>
               <p className="text-sm text-base-content/60">@{dancer.username}</p>
               
@@ -73,12 +74,17 @@ export default function DancerCard({ dancer, showLikeButton = true, showFlag = f
               )}
             </div>
 
-            {/* Age and Zodiac */}
-            <div className="flex flex-col items-end text-sm text-base-content/60">
+            {/* Age, Zodiac, and Experience */}
+            <div className="flex flex-col items-end text-sm text-base-content/60 gap-0.5">
               {dancer.dateOfBirth && (
-                <span>{new Date().getFullYear() - new Date(dancer.dateOfBirth).getFullYear()}</span>
+                <span className="font-semibold">{new Date().getFullYear() - new Date(dancer.dateOfBirth).getFullYear()}</span>
               )}
               {zodiacInfo && <span className="text-lg">{zodiacInfo.emoji}</span>}
+              {dancer.dancingStartYear && (
+                <span className="text-xs font-medium flex items-center gap-0.5">
+                  💃 {new Date().getFullYear() - dancer.dancingStartYear}y
+                </span>
+              )}
             </div>
           </div>
 
@@ -114,15 +120,7 @@ export default function DancerCard({ dancer, showLikeButton = true, showFlag = f
             </div>
           )}
 
-          {/* Anthem Preview */}
-          {dancer.anthem && (
-            <div className="mb-3 p-2 bg-base-200 rounded-lg">
-              <p className="text-xs text-base-content/60 mb-1">Dance Anthem</p>
-              <p className="text-sm font-medium truncate">
-                {dancer.anthem.title} {dancer.anthem.artist && `- ${dancer.anthem.artist}`}
-              </p>
-            </div>
-          )}
+        
 
           {/* Social Media Icons */}
           <div className="flex items-center justify-between mt-auto">

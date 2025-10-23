@@ -264,23 +264,24 @@ export default async function StatsPage() {
             </div>
           </div>
         </div>
+      </div>
 
-        {/* Dancers World Map */}
-        {dancersData.length > 0 && (
-          <div className="mb-8">
-            <div className="mb-4">
+      {/* Dancers World Map - Full width on mobile */}
+      {dancersData.length > 0 && (
+        <div className="mb-8 md:px-4">
+          <div className="max-w-7xl md:mx-auto">
+            <div className="mb-4 px-4 md:px-0">
               <h2 className="text-2xl font-bold flex items-center gap-2">
                 <span className="text-2xl">🌍</span>
                 Global Dance Community
               </h2>
-              <p className="text-base-content/60 mt-1">
-                Explore where dancers are located around the world
-              </p>
             </div>
             <DancersMap dancers={dancersData} />
           </div>
-        )}
+        </div>
+      )}
 
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Overview Stats */}
         <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
           <div className="stat bg-base-200 rounded-lg p-6">
