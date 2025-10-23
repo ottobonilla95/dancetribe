@@ -21,17 +21,17 @@ const mockUserData = {
     { name: "Bachata", level: "advanced" },
     { name: "Salsa", level: "intermediate" },
     { name: "Kizomba", level: "beginner" }
-  ]
+  ],
+  yearsDancing: 5,
+  citiesVisited: 23
 };
 
 export default function ShareCardDev() {
   return (
-    <div className="bg-gray-100 flex ">
+    <div className="bg-gray-900 min-h-screen flex items-center justify-center p-8">
       <div className="relative" style={{ 
-        width: '270px', 
-        height: '480px', 
         transform: 'scale(0.5)', 
-        // transformOrigin: 'center',
+        transformOrigin: 'center',
       }}>
         <ShareCard userData={mockUserData} />
       </div>
