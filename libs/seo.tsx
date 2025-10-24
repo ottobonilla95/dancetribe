@@ -39,7 +39,7 @@ export const getSEOTags = ({
       siteName: openGraph?.siteName || config.appName,
       images: openGraph?.images || [
         {
-          url: `/og-image.png`,
+          url: `/preview-insta-image.png`,
           width: 1200,
           height: 630,
           alt: `${config.appName} - ${config.appDescription}`,
@@ -52,7 +52,7 @@ export const getSEOTags = ({
     twitter: {
       title: openGraph?.title || config.appName,
       description: openGraph?.description || config.appDescription,
-      images: ['/og-image.png'],
+      images: ['/preview-insta-image.png'],
       card: "summary_large_image",
       creator: config.social?.twitter || "@dancecircleco",
     },
