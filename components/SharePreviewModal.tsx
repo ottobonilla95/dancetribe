@@ -14,6 +14,7 @@ interface SharePreviewModalProps {
     username?: string;
     profilePicture: string;
     dateOfBirth: string;
+    hideAge?: boolean;
     nationality?: string;
     danceRole?: string;
     city: {

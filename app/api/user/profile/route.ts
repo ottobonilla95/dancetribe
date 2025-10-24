@@ -20,7 +20,7 @@ export async function GET() {
 
     const user = await User.findById(session.user.id)
       .select(
-        "name firstName lastName username email image dateOfBirth dancingStartYear city citiesVisited danceStyles anthem socialMedia danceRole gender nationality relationshipStatus onboardingSteps isProfileComplete isTeacher isDJ isPhotographer teacherProfile djProfile photographerProfile professionalContact createdAt"
+        "name firstName lastName username email image dateOfBirth hideAge dancingStartYear city citiesVisited danceStyles anthem socialMedia danceRole gender nationality relationshipStatus onboardingSteps isProfileComplete isTeacher isDJ isPhotographer teacherProfile djProfile photographerProfile professionalContact createdAt"
       )
       .populate({
         path: "city",
@@ -120,6 +120,7 @@ export async function PUT(req: NextRequest) {
 
       case "dateOfBirth":
         user.dateOfBirth = new Date(data.dateOfBirth);
+        user.hideAge = data.hideAge || false;
         user.onboardingSteps.dateOfBirth = true;
         break;
 

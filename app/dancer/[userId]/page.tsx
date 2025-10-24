@@ -52,7 +52,7 @@ export default async function PublicProfile({ params }: Props) {
   try {
     user = await User.findById(params.userId)
       .select(
-        "name username email image dateOfBirth dancingStartYear city citiesVisited trips danceStyles anthem socialMedia danceRole gender nationality relationshipStatus createdAt likedBy friends friendRequestsSent friendRequestsReceived isTeacher isDJ isPhotographer teacherProfile djProfile photographerProfile professionalContact"
+        "name username email image dateOfBirth hideAge dancingStartYear city citiesVisited trips danceStyles anthem socialMedia danceRole gender nationality relationshipStatus createdAt likedBy friends friendRequestsSent friendRequestsReceived isTeacher isDJ isPhotographer teacherProfile djProfile photographerProfile professionalContact"
       )
       .populate({
         path: "friends",
@@ -333,7 +333,7 @@ export default async function PublicProfile({ params }: Props) {
                     <div className="flex-1">
                       <div className="flex items-center gap-2 flex-wrap">
                         <h2 className="card-title text-2xl mb-1">
-                          {`${userData.name.charAt(0).toUpperCase() + userData.name.slice(1)}${age ? `, ${age}` : ""}`}
+                          {`${userData.name.charAt(0).toUpperCase() + userData.name.slice(1)}${age && !userData.hideAge ? `, ${age}` : ""}`}
                         </h2>
                         {userData.isTeacher && (
                           <div className="badge badge-primary badge-lg gap-1">

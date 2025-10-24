@@ -37,7 +37,7 @@ export default async function Profile({ searchParams }: ProfileProps) {
 
   const user = await User.findById(session.user.id)
     .select(
-      "name firstName lastName username email image dateOfBirth dancingStartYear city citiesVisited trips danceStyles anthem socialMedia danceRole gender nationality relationshipStatus isTeacher isDJ isPhotographer teacherProfile djProfile photographerProfile professionalContact friends likedBy createdAt"
+      "name firstName lastName username email image dateOfBirth hideAge dancingStartYear city citiesVisited trips danceStyles anthem socialMedia danceRole gender nationality relationshipStatus isTeacher isDJ isPhotographer teacherProfile djProfile photographerProfile professionalContact friends likedBy createdAt"
     )
     .populate({
       path: "city",
@@ -214,6 +214,7 @@ export default async function Profile({ searchParams }: ProfileProps) {
           username: userData.username,
           profilePicture: userData.image || "/default-avatar.png",
           dateOfBirth: userData.dateOfBirth,
+          hideAge: userData.hideAge,
           nationality: userData.nationality,
           danceRole: userData.danceRole,
           city: userData.city ? {
@@ -474,6 +475,7 @@ export default async function Profile({ searchParams }: ProfileProps) {
                         username: userData.username,
                         profilePicture: userData.image,
                         dateOfBirth: userData.dateOfBirth,
+                        hideAge: userData.hideAge,
                         nationality: userData.nationality,
                         danceRole: userData.danceRole,
                         city: userData.city,

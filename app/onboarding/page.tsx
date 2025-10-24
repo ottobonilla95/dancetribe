@@ -76,6 +76,7 @@ export default function Onboarding() {
   const [relationshipStatus, setRelationshipStatus] = useState<"single" | "in_a_relationship" | "married" | "its_complicated" | "prefer_not_to_say" | "">("");
   const [firstName, setFirstName] = useState("");
   const [lastName, setLastName] = useState("");
+  const [hideAge, setHideAge] = useState(false);
   const [isTeacher, setIsTeacher] = useState(false);
   const [isDJ, setIsDJ] = useState(false);
   const [isPhotographer, setIsPhotographer] = useState(false);
@@ -293,6 +294,9 @@ export default function Onboarding() {
           new Date(userData.dateOfBirth).toISOString().split("T")[0]
         );
       }
+      if (userData.hideAge !== undefined) {
+        setHideAge(userData.hideAge);
+      }
       if (userData.dancingStartYear) {
         setDancingStartYear(userData.dancingStartYear.toString());
       }
@@ -477,7 +481,7 @@ export default function Onboarding() {
           alert("Please enter your date of birth");
           return;
         }
-        stepData = { dateOfBirth };
+        stepData = { dateOfBirth, hideAge };
         break;
       case "dancingStartYear": {
         if (!dancingStartYear) {
@@ -1054,17 +1058,33 @@ export default function Onboarding() {
             )}
 
             {steps[currentStep].id === "dateOfBirth" && (
-              <div className="form-control">
-                <label className="label">
-                  <span className="label-text">Date of Birth</span>
-                </label>
-                <input
-                  type="date"
-                  className="input input-bordered"
-                  value={dateOfBirth}
-                  onChange={(e) => setDateOfBirth(e.target.value)}
-                  max={new Date().toISOString().split("T")[0]}
-                />
+              <div className="form-control space-y-4">
+                <div>
+                  <label className="label">
+                    <span className="label-text">Date of Birth</span>
+                  </label>
+                  <input
+                    type="date"
+                    className="input input-bordered"
+                    value={dateOfBirth}
+                    onChange={(e) => setDateOfBirth(e.target.value)}
+                    max={new Date().toISOString().split("T")[0]}
+                  />
+                </div>
+                <div className="form-control">
+                  <label className="label cursor-pointer justify-start gap-3">
+                    <input
+                      type="checkbox"
+                      className="checkbox checkbox-primary"
+                      checked={hideAge}
+                      onChange={(e) => setHideAge(e.target.checked)}
+                    />
+                    <div>
+                      <span className="label-text font-medium">Hide my age from my profile</span>
+                      <p className="text-sm text-base-content/60 mt-1">Your age won&apos;t be visible to other dancers</p>
+                    </div>
+                  </label>
+                </div>
               </div>
             )}
 

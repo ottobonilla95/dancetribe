@@ -76,7 +76,7 @@ export default function DancerCard({ dancer, showLikeButton = true, showFlag = f
 
             {/* Age, Zodiac, and Experience */}
             <div className="flex flex-col items-end text-sm text-base-content/60 gap-0.5">
-              {dancer.dateOfBirth && (
+              {dancer.dateOfBirth && !dancer.hideAge && (
                 <span className="font-semibold">{new Date().getFullYear() - new Date(dancer.dateOfBirth).getFullYear()}</span>
               )}
               {zodiacInfo && <span className="text-lg">{zodiacInfo.emoji}</span>}

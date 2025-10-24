@@ -9,6 +9,7 @@ interface ShareCardProps {
     username?: string;
     profilePicture: string;
     dateOfBirth: string;
+    hideAge?: boolean;
     nationality?: string;
     danceRole?: string;
     city: {
@@ -175,7 +176,7 @@ const ShareCard = forwardRef<HTMLDivElement, ShareCardProps>(
                 }}
               >
                 {userData.name.charAt(0).toUpperCase() + userData.name.slice(1)}
-                , {age}
+                {!userData.hideAge && `, ${age}`}
               </h1>
 
               {/* Zodiac */}

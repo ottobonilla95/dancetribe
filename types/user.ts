@@ -10,6 +10,7 @@ export type User = {
   image?: string;
   username?: string;
   dateOfBirth?: Date;
+  hideAge?: boolean;
   dancingStartYear?: number;
   city?: City;
   citiesVisited?: City[];

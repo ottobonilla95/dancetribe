@@ -78,6 +78,11 @@ const userSchema = new mongoose.Schema(
     dateOfBirth: {
       type: Date,
     },
+    // Hide age from profile
+    hideAge: {
+      type: Boolean,
+      default: false,
+    },
     // Year when user started dancing
     dancingStartYear: {
       type: Number,
