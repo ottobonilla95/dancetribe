@@ -14,6 +14,7 @@ export default function ConnectPage() {
   const [dancers, setDancers] = useState<any[]>([]);
   const [loading, setLoading] = useState(false);
   const [isChangingCity, setIsChangingCity] = useState(false);
+  const [hasSearched, setHasSearched] = useState(false);
   const [toast, setToast] = useState<{ message: string; show: boolean }>({ message: "", show: false });
   const [userPreferences, setUserPreferences] = useState({
     openToMeetTravelers: false,
@@ -68,6 +69,7 @@ export default function ConnectPage() {
     }
 
     setLoading(true);
+    setHasSearched(true);
     try {
       const cityId = typeof selectedCity === "string" ? selectedCity : selectedCity.id;
       const allDancers: any[] = [];
@@ -339,7 +341,7 @@ export default function ConnectPage() {
         )}
 
         {/* Empty State */}
-        {!loading && dancers.length === 0 && selectedCity && (
+        {!loading && hasSearched && dancers.length === 0 && selectedCity && (
           <div className="text-center py-16">
             <div className="text-6xl mb-4">😔</div>
             <h3 className="text-2xl font-bold mb-2">No dancers found</h3>
