@@ -1,5 +1,6 @@
 export type City = {
-  _id: string;
+  _id?: string;
+  id: string;
   name: string;
   country: {
     name: string;

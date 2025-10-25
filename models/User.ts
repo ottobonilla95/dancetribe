@@ -60,6 +60,11 @@ const userSchema = new mongoose.Schema(
       type: mongoose.Schema.Types.ObjectId,
       ref: "City",
     },
+    // Active city - where user currently is (defaults to home city, can be changed when traveling)
+    activeCity: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "City",
+    },
     // Dance styles the user is interested in/practices with their skill levels
     danceStyles: [{
       danceStyle: {
@@ -247,6 +252,17 @@ const userSchema = new mongoose.Schema(
         default: Date.now
       }
     }],
+    // Travel & Practice Partner Preferences
+    // Willing to meet solo dancers (traveling or visiting)
+    openToMeetTravelers: {
+      type: Boolean,
+      default: false,
+    },
+    // Looking for practice partners
+    lookingForPracticePartners: {
+      type: Boolean,
+      default: false,
+    },
   },
   {
     timestamps: true,

@@ -31,9 +31,9 @@ export default function TrendyMusicPreview({ songs }: { songs: Song[] }) {
 
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
         {topSongs.map((song, index) => (
-          <div key={song.url} className="card bg-base-200 shadow-xl">
-            <div className="card-body p-4">
-              <div className="flex items-center gap-2 mb-3">
+          <div key={song.url} className="card bg-base-200 shadow-xl overflow-hidden">
+            <div className="card-body p-4 pb-0 md:pb-4">
+              <div className="flex items-center gap-2 mb-1 sm:mb-3">
                 <div className="text-2xl font-bold text-primary">
                   #{index + 1}
                 </div>
@@ -44,14 +44,14 @@ export default function TrendyMusicPreview({ songs }: { songs: Song[] }) {
 
               {/* Spotify Embed */}
               {song.platform === 'spotify' && song.spotifyTrackId && (
-                <div className="w-full rounded-lg overflow-hidden" style={{ height: "152px" }}>
+                <div className="w-[calc(100%+2rem)] rounded-2xl overflow-hidden -mx-4 md:w-full md:mx-0" style={{ height: "152px" }}>
                   <iframe
                     src={`https://open.spotify.com/embed/track/${song.spotifyTrackId}?utm_source=generator`}
                     width="100%"
                     height="152"
                     frameBorder="0"
                     scrolling="no"
-                    className="rounded-2xl"
+                    className="md:rounded-2xl"
                     style={{ overflow: "hidden" }}
                     allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture"
                     loading="lazy"
@@ -61,9 +61,9 @@ export default function TrendyMusicPreview({ songs }: { songs: Song[] }) {
 
               {/* YouTube Embed */}
               {song.platform === 'youtube' && song.youtubeVideoId && (
-                <div className="w-full aspect-video rounded-lg overflow-hidden">
+                <div className="w-[calc(100%+2rem)] aspect-video rounded-lg overflow-hidden -mx-4 md:w-full md:mx-0">
                   <iframe
-                    style={{ borderRadius: "12px" }}
+                    className="md:rounded-xl"
                     src={`https://www.youtube.com/embed/${song.youtubeVideoId}`}
                     width="100%"
                     height="100%"

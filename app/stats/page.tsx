@@ -5,12 +5,12 @@ import connectMongo from "@/libs/mongoose";
 import User from "@/models/User";
 import Link from "next/link";
 import BackButton from "@/components/BackButton";
-import { 
-  FaUsers, 
-  FaGlobeAmericas, 
-  FaMusic, 
+import {
+  FaUsers,
+  FaGlobeAmericas,
+  FaMusic,
   FaTrophy,
-  FaMapMarkerAlt
+  FaMapMarkerAlt,
 } from "react-icons/fa";
 import WorldMap from "@/components/WorldMap";
 import DancersMap from "@/components/DancersMap";
@@ -24,7 +24,7 @@ async function getDetailedStats() {
 
     // Basic stats
     const totalDancers = await User.countDocuments({ isProfileComplete: true });
-    
+
     // Countries with dancer counts
     const countryStats = await User.aggregate([
       { $match: { isProfileComplete: true, city: { $exists: true } } },
@@ -57,7 +57,14 @@ async function getDetailedStats() {
       { $sort: { dancerCount: -1 } },
     ]);
 
-    // Cities with dancer counts
+    // Get total unique cities count (efficient - just counts, no lookups)
+    const totalCitiesCount = await User.aggregate([
+      { $match: { isProfileComplete: true, city: { $exists: true } } },
+      { $group: { _id: "$city" } },
+      { $count: "total" }
+    ]);
+
+    // Get top 20 cities with full details for display
     const cityStats = await User.aggregate([
       { $match: { isProfileComplete: true, city: { $exists: true } } },
       {
@@ -89,7 +96,7 @@ async function getDetailedStats() {
         },
       },
       { $sort: { dancerCount: -1 } },
-      { $limit: 20 },
+      { $limit: 20 }, // Limit in the database, not in JS
     ]);
 
     // Dance styles with counts
@@ -147,7 +154,12 @@ async function getDetailedStats() {
 
     // Nationality distribution (top 15) - using actual nationality field
     const nationalityStats = await User.aggregate([
-      { $match: { isProfileComplete: true, nationality: { $exists: true, $ne: "" } } },
+      {
+        $match: {
+          isProfileComplete: true,
+          nationality: { $exists: true, $ne: "" },
+        },
+      },
       {
         $group: {
           _id: "$nationality",
@@ -165,14 +177,14 @@ async function getDetailedStats() {
     ]);
 
     // Get top 1000 dancers with their city coordinates for the map
-    const dancersForMap = await User.find({ 
-      isProfileComplete: true, 
-      city: { $exists: true } 
+    const dancersForMap = await User.find({
+      isProfileComplete: true,
+      city: { $exists: true },
     })
-      .select('name image username city')
+      .select("name image username city")
       .populate({
-        path: 'city',
-        select: 'name coordinates'
+        path: "city",
+        select: "name coordinates",
       })
       .limit(1000)
       .lean();
@@ -188,7 +200,7 @@ async function getDetailedStats() {
     return {
       totalDancers,
       totalCountries: countryStats.length,
-      totalCities: cityStats.length,
+      totalCities: totalCitiesCount[0]?.total || 0, // Efficient count of unique cities
       countryStats,
       cityStats,
       danceStyleStats,
@@ -218,7 +230,7 @@ async function getDetailedStats() {
 
 export default async function StatsPage() {
   const session = await getServerSession(authOptions);
-  
+
   if (!session) {
     redirect("/");
   }
@@ -240,7 +252,8 @@ export default async function StatsPage() {
     return Math.round((value / total) * 100);
   };
 
-  const totalRoles = stats.roleStats.leaders + stats.roleStats.followers + stats.roleStats.both;
+  const totalRoles =
+    stats.roleStats.leaders + stats.roleStats.followers + stats.roleStats.both;
 
   return (
     <main className="min-h-screen pb-24 py-8">
@@ -251,14 +264,15 @@ export default async function StatsPage() {
           <div className="mb-4 md:mb-0">
             <BackButton label="Back" className="md:hidden" />
           </div>
-          
+
           <div className="flex items-center gap-4">
             <BackButton label="Back" className="hidden md:flex" />
             <div>
-              <h1 className="text-3xl md:text-4xl font-extrabold tracking-tight">
+              <h1 className="text-3xl md:text-4xl font-extrabold tracking-tight gap-2 flex items-center">
+                <span className="text-2xl">🌍</span>
                 Community Analytics
               </h1>
-              <p className="text-base-content/60 mt-2">
+              <p className="hidden sm:block text-base-content/60 mt-2">
                 Comprehensive insights into our global dance community
               </p>
             </div>
@@ -270,12 +284,6 @@ export default async function StatsPage() {
       {dancersData.length > 0 && (
         <div className="mb-8 md:px-4">
           <div className="max-w-7xl md:mx-auto">
-            <div className="mb-4 px-4 md:px-0">
-              <h2 className="text-2xl font-bold flex items-center gap-2">
-                <span className="text-2xl">🌍</span>
-                Global Dance Community
-              </h2>
-            </div>
             <DancersMap dancers={dancersData} />
           </div>
         </div>
@@ -374,7 +382,9 @@ export default async function StatsPage() {
                 </div>
               </div>
             ) : (
-              <p className="text-center text-base-content/60">No role data available yet</p>
+              <p className="text-center text-base-content/60">
+                No role data available yet
+              </p>
             )}
           </div>
 
@@ -387,9 +397,12 @@ export default async function StatsPage() {
             {stats.genderStats.length > 0 ? (
               <div className="space-y-3">
                 {stats.genderStats.map((gender: any) => (
-                  <div key={gender._id} className="flex items-center justify-between">
+                  <div
+                    key={gender._id}
+                    className="flex items-center justify-between"
+                  >
                     <span className="text-sm font-medium capitalize">
-                      {gender._id || 'Not specified'}
+                      {gender._id || "Not specified"}
                     </span>
                     <div className="text-right">
                       <span className="text-lg font-bold text-primary">
@@ -403,7 +416,9 @@ export default async function StatsPage() {
                 ))}
               </div>
             ) : (
-              <p className="text-center text-base-content/60">No gender data available yet</p>
+              <p className="text-center text-base-content/60">
+                No gender data available yet
+              </p>
             )}
           </div>
         </div>
@@ -415,23 +430,31 @@ export default async function StatsPage() {
             Most Popular Dance Styles
           </h2>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-            {stats.danceStyleStats.slice(0, 9).map((style: any, index: number) => (
-              <Link key={style._id} href={`/dance-style/${style._id}`}>
-                <div className="flex items-center justify-between p-3 bg-base-100 rounded-lg hover:bg-base-200 transition-colors cursor-pointer">
-                  <div className="flex items-center gap-3">
-                    <span className="text-2xl">{style.emoji || "💃"}</span>
-                    <div>
-                      <div className="font-medium">{style.name}</div>
-                      <div className="text-xs text-base-content/60 capitalize">{style.category}</div>
+            {stats.danceStyleStats
+              .slice(0, 9)
+              .map((style: any, index: number) => (
+                <Link key={style._id} href={`/dance-style/${style._id}`}>
+                  <div className="flex items-center justify-between p-3 bg-base-100 rounded-lg hover:bg-base-200 transition-colors cursor-pointer">
+                    <div className="flex items-center gap-3">
+                      <span className="text-2xl">{style.emoji || "💃"}</span>
+                      <div>
+                        <div className="font-medium">{style.name}</div>
+                        <div className="text-xs text-base-content/60 capitalize">
+                          {style.category}
+                        </div>
+                      </div>
+                    </div>
+                    <div className="text-right">
+                      <div className="font-bold text-primary">
+                        {style.count}
+                      </div>
+                      <div className="text-xs text-base-content/60">
+                        dancers
+                      </div>
                     </div>
                   </div>
-                  <div className="text-right">
-                    <div className="font-bold text-primary">{style.count}</div>
-                    <div className="text-xs text-base-content/60">dancers</div>
-                  </div>
-                </div>
-              </Link>
-            ))}
+                </Link>
+              ))}
           </div>
         </div>
 
@@ -449,22 +472,31 @@ export default async function StatsPage() {
                 if (!countryCode || countryCode.length !== 2) return "🌍";
                 const codePoints = countryCode
                   .toUpperCase()
-                  .split('')
-                  .map(char => 127397 + char.charCodeAt(0));
+                  .split("")
+                  .map((char) => 127397 + char.charCodeAt(0));
                 return String.fromCodePoint(...codePoints);
               };
 
               return (
-                <div key={country._id} className="flex items-center justify-between p-3 bg-base-100 rounded-lg">
+                <div
+                  key={country._id}
+                  className="flex items-center justify-between p-3 bg-base-100 rounded-lg"
+                >
                   <div className="flex items-center gap-3">
-                    <span className="text-lg">{getCountryFlag(country.name)}</span>
+                    <span className="text-lg">
+                      {getCountryFlag(country.name)}
+                    </span>
                     <div>
                       <div className="font-medium text-sm">{country.name}</div>
-                      <div className="text-xs text-base-content/60">#{index + 1}</div>
+                      <div className="text-xs text-base-content/60">
+                        #{index + 1}
+                      </div>
                     </div>
                   </div>
                   <div className="text-right">
-                    <div className="font-bold text-primary">{country.count}</div>
+                    <div className="font-bold text-primary">
+                      {country.count}
+                    </div>
                     <div className="text-xs text-base-content/60">
                       {getPercentage(country.count, stats.totalDancers)}%
                     </div>
@@ -501,11 +533,15 @@ export default async function StatsPage() {
                     </div>
                     <div>
                       <div className="font-medium">{city.name}</div>
-                      <div className="text-xs text-base-content/60">{city.country}</div>
+                      <div className="text-xs text-base-content/60">
+                        {city.country}
+                      </div>
                     </div>
                   </div>
                   <div className="text-right">
-                    <div className="font-bold text-primary">{city.dancerCount}</div>
+                    <div className="font-bold text-primary">
+                      {city.dancerCount}
+                    </div>
                     <div className="text-xs text-base-content/60">dancers</div>
                   </div>
                 </div>
@@ -524,9 +560,7 @@ export default async function StatsPage() {
             <WorldMap countryData={stats.countryStats} />
           </div>
         )}
-
-
       </div>
     </main>
   );
-} 
+}

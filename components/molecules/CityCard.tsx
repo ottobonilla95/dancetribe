@@ -14,7 +14,7 @@ const CityCard = ({ city, index }: CityCardProps) => {
         {city.image ? (
           <img
             src={city.image}
-            alt={`${city.name}, ${city.country}`}
+            alt={`${city.name}, ${city.country?.name || 'Unknown'}`}
             className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-110"
           />
         ) : (

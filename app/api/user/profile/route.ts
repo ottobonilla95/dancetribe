@@ -20,12 +20,29 @@ export async function GET() {
 
     const user = await User.findById(session.user.id)
       .select(
-        "name firstName lastName username email image dateOfBirth hideAge dancingStartYear city citiesVisited danceStyles anthem socialMedia danceRole gender nationality relationshipStatus onboardingSteps isProfileComplete isTeacher isDJ isPhotographer teacherProfile djProfile photographerProfile professionalContact createdAt"
+        "name firstName lastName username email image dateOfBirth hideAge dancingStartYear city activeCity citiesVisited danceStyles anthem socialMedia danceRole gender nationality relationshipStatus onboardingSteps isProfileComplete isTeacher isDJ isPhotographer teacherProfile djProfile photographerProfile professionalContact openToMeetTravelers lookingForPracticePartners createdAt"
       )
       .populate({
         path: "city",
         model: City,
         select: "name country continent rank image population totalDancers",
+        populate: [
+          {
+            path: "country",
+            model: Country,
+            select: "name code"
+          },
+          {
+            path: "continent", 
+            model: Continent,
+            select: "name code"
+          }
+        ]
+      })
+      .populate({
+        path: "activeCity",
+        model: City,
+        select: "_id name country continent rank image population totalDancers",
         populate: [
           {
             path: "country",
@@ -149,6 +166,10 @@ export async function PUT(req: NextRequest) {
         }
 
         user.city = newCityId;
+        // Also set activeCity to home city by default (can be changed later)
+        if (!user.activeCity) {
+          user.activeCity = newCityId;
+        }
         user.onboardingSteps.currentLocation = true;
         break;
       }

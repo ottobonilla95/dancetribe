@@ -13,6 +13,7 @@ export type User = {
   hideAge?: boolean;
   dancingStartYear?: number;
   city?: City;
+  activeCity?: City;
   citiesVisited?: City[];
   danceStyles?: UserDanceStyle[];
   anthem?: {
@@ -38,8 +39,19 @@ export type User = {
   djProfile?: DJProfile;
   photographerProfile?: PhotographerProfile;
   professionalContact?: ProfessionalContact;
+  trips?: Trip[];
+  openToMeetTravelers?: boolean;
+  lookingForPracticePartners?: boolean;
   createdAt?: Date;
   updatedAt?: Date;
+}
+
+export interface Trip {
+  _id?: string;
+  city: City | string;
+  startDate: Date;
+  endDate: Date;
+  createdAt?: Date;
 }
 
 export interface OnboardingSteps {

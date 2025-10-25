@@ -159,7 +159,7 @@ export default function SearchBar({
 
       {/* Search Results Dropdown */}
       {isOpen && (
-        <div className="absolute top-full left-0 right-0 bg-base-100 border border-base-300 border-t-0 rounded-b-lg shadow-lg z-50 max-h-96 overflow-y-auto min-w-[400px]">
+        <div className="absolute top-full left-0 right-0 bg-base-100 border border-base-300 border-t-0 rounded-b-lg shadow-lg z-50 max-h-96 overflow-y-auto min-w-full lg:min-w-[400px]">
           {isLoading && (
             <div className="p-4 text-center">
               <span className="loading loading-spinner loading-sm"></span>

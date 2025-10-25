@@ -11,7 +11,7 @@ import SearchBar from "./SearchBar";
 import logo from "@/app/icon.png";
 import config from "@/config";
 import { useFriendRequestCount } from "@/libs/hooks";
-import { FaUser, FaUserFriends, FaCog, FaSignOutAlt, FaHome, FaUserPlus, FaMusic } from "react-icons/fa";
+import { FaUser, FaUserFriends, FaCog, FaSignOutAlt, FaHome, FaUserPlus, FaMusic, FaSearch, FaPlane } from "react-icons/fa";
 import { signOut } from "next-auth/react";
 import { CONTACT } from "@/constants/contact";
 import InstallAppButton from "./InstallAppButton";
@@ -34,11 +34,13 @@ const Header = () => {
   const searchParams = useSearchParams();
   const { data: session } = useSession();
   const [isOpen, setIsOpen] = useState<boolean>(false);
+  const [isSearchOpen, setIsSearchOpen] = useState<boolean>(false);
   const pendingRequests = useFriendRequestCount();
 
   // setIsOpen(false) when the route changes (i.e: when the user clicks on a link on mobile)
   useEffect(() => {
     setIsOpen(false);
+    setIsSearchOpen(false);
   }, [searchParams]);
 
 
@@ -46,6 +48,7 @@ const Header = () => {
   const loggedInNavItems = [
     { href: "/dashboard", label: "Dashboard", icon: FaHome },
     { href: "/discover", label: "Discover Dancers", icon: FaUserPlus },
+    { href: "/connect", label: "Travel & Practice", icon: FaPlane },
     { href: "/profile", label: "My Profile", icon: FaUser },
     { 
       href: "/friends", 
@@ -87,8 +90,21 @@ const Header = () => {
             <span className="font-extrabold text-lg">{config.appName}</span>
           </Link>
         </div>
-        {/* Burger button to open menu on mobile */}
-        <div className="flex lg:hidden">
+        {/* Search and Burger buttons on mobile */}
+        <div className="flex lg:hidden gap-2">
+          {/* Search button on mobile */}
+          {session && (
+            <button
+              type="button"
+              className="-m-2.5 inline-flex items-center justify-center rounded-md p-2.5"
+              onClick={() => setIsSearchOpen(true)}
+            >
+              <span className="sr-only">Open search</span>
+              <FaSearch className="w-5 h-5 text-base-content" />
+            </button>
+          )}
+          
+          {/* Burger button to open menu on mobile */}
           <button
             type="button"
             className="-m-2.5 inline-flex items-center justify-center rounded-md p-2.5 relative"
@@ -293,13 +309,8 @@ const Header = () => {
                   </div>
                 </div>
 
-                {/* Search Bar */}
-                <div className="py-4 border-b border-base-300">
-                  <SearchBar />
-                </div>
-
                 {/* Navigation Items */}
-                <div className="py-4">
+                <div className="py-4 mt-4">
                   <div className="flex flex-col gap-y-3">
                     {loggedInNavItems.map((item) => (
                       <Link
@@ -383,6 +394,40 @@ const Header = () => {
                 <div className="flex flex-col">{cta}</div>
               </>
             )}
+          </div>
+        </div>
+      </div>
+
+      {/* Mobile Search Overlay */}
+      <div className={`relative z-50 ${isSearchOpen ? "" : "hidden"}`}>
+        <div className="fixed inset-0 bg-base-300/80 backdrop-blur-sm" onClick={() => setIsSearchOpen(false)} />
+        <div className="fixed inset-x-0 top-0 z-10 bg-base-200 p-4 shadow-lg">
+          <div className="container mx-auto">
+            <div className="flex items-center gap-3 mb-4">
+              <button
+                type="button"
+                className="btn btn-ghost btn-sm btn-circle"
+                onClick={() => setIsSearchOpen(false)}
+              >
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  strokeWidth={1.5}
+                  stroke="currentColor"
+                  className="w-6 h-6"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    d="M6 18L18 6M6 6l12 12"
+                  />
+                </svg>
+              </button>
+              <div className="flex-1">
+                <SearchBar />
+              </div>
+            </div>
           </div>
         </div>
       </div>

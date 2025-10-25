@@ -11,6 +11,8 @@ interface DancerCardProps {
   dancer: User & { 
     likedBy?: string[]; 
     danceStylesPopulated?: Array<{ name: string; _id: string }>;
+    openToMeetTravelers?: boolean;
+    lookingForPracticePartners?: boolean;
   };
   showLikeButton?: boolean;
   showFlag?: boolean;
@@ -99,6 +101,22 @@ export default function DancerCard({ dancer, showLikeButton = true, showFlag = f
                 {dancer.danceRole === 'both' ? 'Leader & Follower' : 
                  dancer.danceRole.charAt(0).toUpperCase() + dancer.danceRole.slice(1)}
               </span>
+            </div>
+          )}
+
+          {/* Connect Preferences Badges */}
+          {(dancer.openToMeetTravelers || dancer.lookingForPracticePartners) && (
+            <div className="mb-3 flex flex-wrap gap-2">
+              {dancer.openToMeetTravelers && (
+                <span className="badge badge-sm badge-info gap-1">
+                  💃 Meet Solo Dancers
+                </span>
+              )}
+              {dancer.lookingForPracticePartners && (
+                <span className="badge badge-sm badge-success gap-1">
+                  🤝 Practice Partner
+                </span>
+              )}
             </div>
           )}
 

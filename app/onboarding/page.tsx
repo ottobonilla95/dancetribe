@@ -765,6 +765,25 @@ export default function Onboarding() {
     };
   }, []);
 
+  // Auto-add current location to visited cities when they reach that step
+  useEffect(() => {
+    const currentStepId = steps[currentStep]?.id;
+    
+    if (currentStepId === "citiesVisited" && currentLocation) {
+      // Check if current location is already in visited cities
+      const cityId = currentLocation._id || (currentLocation as any).id;
+      const isAlreadyAdded = citiesVisited.some(
+        (city) => (city._id || (city as any).id) === cityId
+      );
+      
+      // If not already added, add it to the beginning of the array
+      if (!isAlreadyAdded) {
+        setCitiesVisited((prev) => [currentLocation, ...prev]);
+      }
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [currentStep, currentLocation]);
+
   if (loading) {
     return (
       <div className="flex justify-center items-center min-h-screen">
@@ -1122,12 +1141,24 @@ export default function Onboarding() {
             )}
 
             {steps[currentStep].id === "citiesVisited" && (
-              <CitySelector
-                selectedCities={citiesVisited}
-                onCitiesChange={setCitiesVisited}
-                placeholder="Search for cities where you've danced..."
-                label="Cities you've danced in (optional)"
-              />
+              <div className="space-y-3">
+                {currentLocation && citiesVisited.some(city => 
+                  (city._id || (city as any).id) === (currentLocation._id || (currentLocation as any).id)
+                ) && (
+                  <div className="alert alert-info">
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" className="stroke-current shrink-0 w-6 h-6">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                    </svg>
+                    <span className="text-sm">We&apos;ve added {currentLocation.name} (your current city) to get you started! Feel free to add or remove cities.</span>
+                  </div>
+                )}
+                <CitySelector
+                  selectedCities={citiesVisited}
+                  onCitiesChange={setCitiesVisited}
+                  placeholder="Search for cities where you've danced..."
+                  label="Cities you've danced in (optional)"
+                />
+              </div>
             )}
 
             {/* Rest of the existing form steps remain the same... */}

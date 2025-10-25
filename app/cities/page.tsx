@@ -20,7 +20,7 @@ export default function CitiesPage() {
   const observerRef = useRef<IntersectionObserver | null>(null);
   const lastCityRef = useRef<HTMLDivElement | null>(null);
 
-  const fetchCities = useCallback(async (pageNum: number, reset = false) => {
+  const fetchCities = async (pageNum: number, reset = false) => {
     if (loading || loadingMore) return;
     
     if (reset) {
@@ -57,12 +57,23 @@ export default function CitiesPage() {
       setLoading(false);
       setLoadingMore(false);
     }
-  }, [sortBy, searchQuery, loading, loadingMore]);
+  };
 
   // Initial load and when sort/search changes
   useEffect(() => {
+    setPage(1);
+    setHasMore(true);
     fetchCities(1, true);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [sortBy, searchQuery]);
+
+  // Load more when page changes (except initial load)
+  useEffect(() => {
+    if (page > 1) {
+      fetchCities(page, false);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [page]);
 
   // Infinite scroll setup
   useEffect(() => {
@@ -72,12 +83,8 @@ export default function CitiesPage() {
 
     observerRef.current = new IntersectionObserver(
       (entries) => {
-        if (entries[0].isIntersecting && hasMore && !loadingMore) {
-          setPage(prev => {
-            const nextPage = prev + 1;
-            fetchCities(nextPage, false);
-            return nextPage;
-          });
+        if (entries[0].isIntersecting && hasMore && !loadingMore && !loading) {
+          setPage(prev => prev + 1);
         }
       },
       { threshold: 0.1 }
@@ -92,7 +99,7 @@ export default function CitiesPage() {
         observerRef.current.disconnect();
       }
     };
-  }, [hasMore, loadingMore, fetchCities]);
+  }, [hasMore, loadingMore, loading]);
 
   const handleSortChange = (newSort: SortOption) => {
     setSortBy(newSort);
@@ -193,9 +200,7 @@ export default function CitiesPage() {
         {/* Cities Grid */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 md:gap-6">
           {cities.map((city, index) => (
-            <div key={city._id}>
-              <CityCard city={city} index={index + 1} />
-            </div>
+            <CityCard key={city._id} city={city} index={index + 1} />
           ))}
         </div>
 
