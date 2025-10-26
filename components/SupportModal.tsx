@@ -45,7 +45,7 @@ export default function SupportModal({ isOpen, onClose }: SupportModalProps) {
             <div>
               <h2 className="text-2xl font-bold">Need Help?</h2>
               <p className="text-sm text-base-content/60 mt-1">
-                Choose how you'd like to contact us
+                Choose how you&apos;d like to contact us
               </p>
             </div>
             <button
