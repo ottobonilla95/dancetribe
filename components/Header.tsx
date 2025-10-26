@@ -15,6 +15,7 @@ import { FaUser, FaUserFriends, FaCog, FaSignOutAlt, FaHome, FaUserPlus, FaMusic
 import { signOut } from "next-auth/react";
 import { CONTACT } from "@/constants/contact";
 import InstallAppButton from "./InstallAppButton";
+import SupportModal from "./SupportModal";
 
 const links: {
   href: string;
@@ -35,6 +36,7 @@ const Header = () => {
   const { data: session } = useSession();
   const [isOpen, setIsOpen] = useState<boolean>(false);
   const [isSearchOpen, setIsSearchOpen] = useState<boolean>(false);
+  const [isSupportModalOpen, setIsSupportModalOpen] = useState<boolean>(false);
   const pendingRequests = useFriendRequestCount();
 
   // setIsOpen(false) when the route changes (i.e: when the user clicks on a link on mobile)
@@ -48,7 +50,7 @@ const Header = () => {
   const loggedInNavItems = [
     { href: "/dashboard", label: "Dashboard", icon: FaHome },
     { href: "/discover", label: "Discover Dancers", icon: FaUserPlus },
-    { href: "/connect", label: "Travel & Practice", icon: FaPlane },
+    { href: "/connect", label: "Travel & Connect", icon: FaPlane },
     { href: "/profile", label: "My Profile", icon: FaUser },
     { 
       href: "/friends", 
@@ -58,7 +60,6 @@ const Header = () => {
     },
     { href: "/music", label: "Trendy Music", icon: FaMusic },
     { href: "/invite", label: "Invite Friends", icon: FaUserPlus, highlight: true },
-    { href: "/onboarding?mode=edit", label: "Edit Profile", icon: FaCog },
   ];
 
   const handleSignOut = () => {
@@ -215,6 +216,20 @@ const Header = () => {
                     </li>
                   ))}
                   <li><hr /></li>
+                  {config.resend.supportEmail && (
+                    <li>
+                      <button
+                        onClick={() => setIsSupportModalOpen(true)}
+                        className="flex items-center gap-2"
+                      >
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-4 h-4">
+                          <path strokeLinecap="round" strokeLinejoin="round" d="M9.879 7.519c1.171-1.025 3.071-1.025 4.242 0 1.172 1.025 1.172 2.687 0 3.712-.203.179-.43.326-.67.442-.745.361-1.45.999-1.45 1.827v.75M21 12a9 9 0 11-18 0 9 9 0 0118 0zm-9 5.25h.008v.008H12v-.008z" />
+                        </svg>
+                        Get Support
+                      </button>
+                    </li>
+                  )}
+                  <li><hr /></li>
                   <li>
                     <button onClick={handleSignOut} className="flex items-center gap-2 text-error">
                       <FaSignOutAlt />
@@ -345,17 +360,15 @@ const Header = () => {
                 {/* Support Button */}
                 {config.resend.supportEmail && (
                   <div className="py-2">
-                    <a
-                      href={`mailto:${config.resend.supportEmail}?subject=DanceCircle Support Request`}
+                    <button
+                      onClick={() => setIsSupportModalOpen(true)}
                       className="btn btn-outline btn-block gap-2"
-                      target="_blank"
-                      rel="noopener noreferrer"
                     >
                       <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-5 h-5">
                         <path strokeLinecap="round" strokeLinejoin="round" d="M9.879 7.519c1.171-1.025 3.071-1.025 4.242 0 1.172 1.025 1.172 2.687 0 3.712-.203.179-.43.326-.67.442-.745.361-1.45.999-1.45 1.827v.75M21 12a9 9 0 11-18 0 9 9 0 0118 0zm-9 5.25h.008v.008H12v-.008z" />
                       </svg>
                       Get Support
-                    </a>
+                    </button>
                   </div>
                 )}
 
@@ -431,6 +444,12 @@ const Header = () => {
           </div>
         </div>
       </div>
+
+      {/* Support Modal */}
+      <SupportModal 
+        isOpen={isSupportModalOpen} 
+        onClose={() => setIsSupportModalOpen(false)} 
+      />
     </header>
   );
 };

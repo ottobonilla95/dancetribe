@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
-import { FaInstagram, FaWhatsapp, FaCopy, FaUserFriends, FaCompass } from "react-icons/fa";
+import { FaInstagram, FaCompass, FaCopy } from "react-icons/fa";
 import SharePreviewModal from "./SharePreviewModal";
 import InstallPrompt from "./InstallPrompt";
 
@@ -53,11 +53,6 @@ export default function WelcomeModal({ userName, userUsername, userImage, userDa
     setTimeout(() => setCopied(false), 2000);
   };
 
-  const shareToWhatsApp = () => {
-    const text = `Check out my dance profile on DanceCircle! 🕺💃\n${profileUrl}`;
-    window.open(`https://wa.me/?text=${encodeURIComponent(text)}`, "_blank");
-  };
-
   return (
     <>
       {/* Share Preview Modal */}
@@ -84,7 +79,7 @@ export default function WelcomeModal({ userName, userUsername, userImage, userDa
       
           {/* Modal */}
           <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
-            <div className="bg-base-100 rounded-2xl shadow-2xl max-w-2xl w-full max-h-[90vh] overflow-y-auto relative">
+            <div className="bg-base-100 rounded-2xl shadow-2xl max-w-md sm:max-w-lg w-full max-h-[90vh] overflow-y-auto relative">
               {/* Close Button */}
               <button
                 onClick={handleClose}
@@ -93,113 +88,53 @@ export default function WelcomeModal({ userName, userUsername, userImage, userDa
                 ✕
               </button>
 
-              <div className="p-6 md:p-8">
+              <div className="p-6 sm:p-8 md:p-10">
                 {/* Celebration Header */}
-                <div className="text-center mb-6">
-              <div className="text-6xl mb-4 animate-bounce">🎉</div>
-              <h2 className="text-3xl md:text-4xl font-bold mb-2">
+                <div className="text-center mb-6 sm:mb-8">
+              <div className="text-6xl sm:text-7xl mb-3 sm:mb-4 animate-bounce">🎉</div>
+              <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold mb-2 sm:mb-3 px-2">
                 Welcome to DanceCircle, {userName}!
               </h2>
-              <p className="text-lg text-base-content/70">
-                Your dance profile is live! Share it with the world 🌍
+              <p className="text-base sm:text-lg text-base-content/60">
+                Your dance profile is live! 🌍
               </p>
             </div>
 
-            {/* Link in Bio Suggestion - FIRST! */}
-            <div className="mb-6 card bg-gradient-to-br from-info/20 to-primary/20 border-2 border-info/30">
-              <div className="card-body p-4">
-                <h4 className="font-bold flex items-center gap-2 mb-2">
-                  <span>🔥</span> Add this to your Instagram bio!
-                </h4>
-                <p className="text-sm text-base-content/70 mb-3">
-                  Let your followers discover your full dance profile
-                </p>
-                <div className="flex gap-2">
-                  <input
-                    type="text"
-                    value={`dancecircle.co/${userUsername}`}
-                    readOnly
-                    className="input input-sm input-bordered flex-1 font-mono text-xs"
-                  />
-                  <button
-                    onClick={copyProfileLink}
-                    className={`btn btn-sm ${copied ? 'btn-success' : 'btn-primary'}`}
-                  >
-                    {copied ? '✓' : <FaCopy />}
-                  </button>
-                </div>
-              </div>
-            </div>
-
-            {/* Share Actions */}
-            <div className="space-y-3 mb-6">
-              <h3 className="font-bold text-lg mb-3 text-center">📢 Share your profile now!</h3>
-              
-              {/* View Profile & Share */}
-              {/* Instagram - Open Share Preview Modal */}
+            {/* Main Actions */}
+            <div className="space-y-3 sm:space-y-4 mb-6">
+              {/* Instagram Story - Primary Action */}
               <button
                 onClick={() => setShowSharePreview(true)}
-                className="btn btn-primary btn-block gap-2"
+                className="btn btn-primary btn-lg btn-block gap-2 sm:gap-3 text-base sm:text-lg h-14 sm:h-16"
               >
-                <FaInstagram className="text-xl" />
-                Share to Instagram Story
+                <FaInstagram className="text-xl sm:text-2xl" />
+                Share To Instagram Story
               </button>
 
-              {/* WhatsApp */}
-              <button
-                onClick={shareToWhatsApp}
-                className="btn btn-success btn-block gap-2"
-              >
-                <FaWhatsapp className="text-xl" />
-                Share on WhatsApp
-              </button>
-
-              {/* Copy Link */}
+              {/* Copy Link for Instagram Bio */}
               <button
                 onClick={copyProfileLink}
-                className="btn btn-outline btn-block gap-2"
+                className="btn btn-outline btn-lg btn-block gap-2 sm:gap-3 text-base sm:text-lg h-14 sm:h-16"
               >
-                <FaCopy className="text-lg" />
-                {copied ? "Copied! ✓" : "Copy Profile Link"}
+                <FaCopy className="text-xl sm:text-2xl" />
+                {copied ? "Copied! ✓" : "Copy Link for Bio"}
               </button>
-            </div>
 
-            {/* Divider */}
-            <div className="divider">OR</div>
-
-            {/* Primary CTA - Discover Dancers */}
-            <Link
-              href="/discover"
-              className="btn btn-primary btn-lg btn-block gap-2 mb-4"
-            >
-              <FaCompass className="text-xl" />
-              🎉 Start Discovering Dancers!
-            </Link>
-
-            {/* Secondary Actions */}
-            <div className="flex flex-col sm:flex-row gap-3 mb-4">
+              {/* Start Discovering - Secondary Action */}
               <Link
-                href="/invite"
-                className="btn btn-outline flex-1 gap-2"
+                href="/discover"
+                className="btn btn-outline btn-lg btn-block gap-2 sm:gap-3 text-base sm:text-lg h-14 sm:h-16"
                 onClick={handleClose}
               >
-                <FaUserFriends className="text-lg" />
-                Invite Friends
-              </Link>
-              
-              <Link
-                href="/dashboard"
-                className="btn btn-outline flex-1 gap-2"
-                onClick={handleClose}
-              >
-                View Dashboard
+                <FaCompass className="text-xl sm:text-2xl" />
+                <span>Start Discovering Dancers!</span>
               </Link>
             </div>
 
-            {/* Close Button */}
+            {/* Skip Button */}
             <button
               onClick={handleClose}
-              className="btn btn-ghost btn-block text-sm"
+              className="btn btn-ghost btn-block text-sm sm:text-base text-base-content/60"
             >
               I&apos;ll do this later
             </button>

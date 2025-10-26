@@ -11,6 +11,7 @@ import { getServerSession } from "next-auth";
 import { authOptions } from "@/libs/next-auth";
 import Link from "next/link";
 import Pagination from "@/components/Pagination";
+import DancersFilter from "@/components/DancersFilter";
 import {
   FaMapMarkerAlt,
   FaUsers,
@@ -41,6 +42,19 @@ export default async function CityPage({ params, searchParams }: Props) {
   // Get current session
   const session = await getServerSession(authOptions);
   const isLoggedIn = !!session;
+
+  // Get current user's dance styles for filtering
+  let userDanceStyles: string[] = [];
+  if (session?.user?.id) {
+    const currentUser: any = await User.findById(session.user.id)
+      .select("danceStyles")
+      .lean();
+    if (currentUser?.danceStyles && Array.isArray(currentUser.danceStyles)) {
+      userDanceStyles = currentUser.danceStyles.map((ds: any) => 
+        ds.danceStyle.toString()
+      );
+    }
+  }
 
   // Pagination setup
   const currentPage = parseInt(searchParams.page || "1");
@@ -73,8 +87,8 @@ export default async function CityPage({ params, searchParams }: Props) {
   // Convert cityId to ObjectId for MongoDB queries
   const cityObjectId = new mongoose.Types.ObjectId(params.cityId);
 
-  // Get dancers in this city (with pagination)
-  const dancers = await User.find({
+  // Get ALL dancers in this city (for client-side filtering)
+  const dancers: any[] = await User.find({
     city: cityObjectId,
     isProfileComplete: true,
   })
@@ -84,8 +98,6 @@ export default async function CityPage({ params, searchParams }: Props) {
       model: DanceStyle,
       select: "name",
     })
-    .skip(skip)
-    .limit(dancersPerPage)
     .lean();
 
   // Get dance styles popular in this city
@@ -239,7 +251,17 @@ export default async function CityPage({ params, searchParams }: Props) {
                   >
                     {city.country?.name}
                   </Link>
-                  , {city.continent?.name}
+                  {city.continent && (
+                    <>
+                      {", "}
+                      <Link 
+                        href={`/continent/${city.continent?._id || city.continent?.id}`}
+                        className="link link-primary hover:link-accent"
+                      >
+                        {city.continent?.name}
+                      </Link>
+                    </>
+                  )}
                 </span>
                 <span className="flex items-center gap-1">
                   <FaUsers />
@@ -579,87 +601,14 @@ export default async function CityPage({ params, searchParams }: Props) {
           <div className="lg:col-span-2">
             <div className="card bg-base-200 shadow-xl">
               <div className="card-body">
-                <div className="flex justify-between items-center mb-4">
-                  <h2 className="card-title">Dancers in {city.name}</h2>
-                  <span className="text-sm text-base-content/60">
-                    Page {currentPage} of {totalPages} (
-                    {formatNumber(totalDancers)} total)
-                  </span>
-                </div>
+                <h2 className="card-title mb-6">Dancers in {city.name}</h2>
 
                 {dancers.length > 0 ? (
-                  <>
-                    <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 mb-6">
-                      {dancers.map((dancer: any) => (
-                        <Link
-                          key={dancer._id}
-                          href={`/dancer/${dancer._id}`}
-                          className="group"
-                        >
-                          <div className="card bg-base-100 shadow-sm hover:shadow-md transition-all duration-200 group-hover:scale-105">
-                            <div className="card-body p-3">
-                              <div className="flex flex-col items-center text-center">
-                                <div className="avatar mb-2">
-                                  <div className="w-12 h-12 rounded-full">
-                                    {dancer.image ? (
-                                      <img
-                                        src={dancer.image}
-                                        alt={dancer.name}
-                                        className="w-full h-full object-cover rounded-full"
-                                      />
-                                    ) : (
-                                      <div className="bg-primary text-primary-content rounded-full w-full h-full flex items-center justify-center">
-                                        <span className="text-sm">
-                                          {dancer.name
-                                            ?.charAt(0)
-                                            ?.toUpperCase() || "?"}
-                                        </span>
-                                      </div>
-                                    )}
-                                  </div>
-                                </div>
-                                <h3 className="font-medium text-sm truncate w-full">
-                                  {dancer.name}
-                                </h3>
-                                {dancer.username && (
-                                  <p className="text-xs text-base-content/60 truncate w-full">
-                                    @{dancer.username}
-                                  </p>
-                                )}
-                                {dancer.danceStyles &&
-                                  dancer.danceStyles.length > 0 && (
-                                    <div className="flex flex-wrap gap-1 mt-1 justify-center">
-                                      {dancer.danceStyles
-                                        .slice(0, 2)
-                                        .map((ds: any, index: number) => (
-                                          <span
-                                            key={index}
-                                            className="badge badge-xs badge-outline"
-                                          >
-                                            {ds.danceStyle?.name}
-                                          </span>
-                                        ))}
-                                      {dancer.danceStyles.length > 2 && (
-                                        <span className="badge badge-xs badge-outline">
-                                          +{dancer.danceStyles.length - 2}
-                                        </span>
-                                      )}
-                                    </div>
-                                  )}
-                              </div>
-                            </div>
-                          </div>
-                        </Link>
-                      ))}
-                    </div>
-
-                    {/* Pagination */}
-                    <Pagination
-                      currentPage={currentPage}
-                      totalPages={totalPages}
-                      baseUrl={`/city/${params.cityId}`}
-                    />
-                  </>
+                  <DancersFilter
+                    dancers={dancers}
+                    userDanceStyles={userDanceStyles}
+                    locationName={city.name}
+                  />
                 ) : (
                   <div className="text-center py-8 text-base-content/60">
                     <FaUsers className="mx-auto text-4xl mb-4 opacity-50" />

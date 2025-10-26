@@ -14,6 +14,7 @@ import CityList from "@/components/organisims/CityList";
 import HotDanceStyles from "@/components/HotDanceStyles";
 import StatsPreview from "@/components/StatsPreview";
 import TrendyMusicPreview from "@/components/TrendyMusicPreview";
+import FriendsTripsPreview from "@/components/FriendsTripsPreview";
 import Link from "next/link";
 
 export const dynamic = "force-dynamic";
@@ -468,6 +469,11 @@ export default async function Dashboard() {
         {/* Hot Dance Styles Section */}
         <div className="mt-12">
           <HotDanceStyles danceStyles={hotDanceStyles} />
+        </div>
+
+        {/* Friends' Trips Preview */}
+        <div className="mt-12">
+          <FriendsTripsPreview />
         </div>
 
         {/* Trendy Music Section */}

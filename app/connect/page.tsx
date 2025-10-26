@@ -13,6 +13,7 @@ export default function ConnectPage() {
   const [userHomeCity, setUserHomeCity] = useState<City | null>(null);
   const [dancers, setDancers] = useState<any[]>([]);
   const [loading, setLoading] = useState(false);
+  const [loadingUserData, setLoadingUserData] = useState(true);
   const [isChangingCity, setIsChangingCity] = useState(false);
   const [hasSearched, setHasSearched] = useState(false);
   const [toast, setToast] = useState<{ message: string; show: boolean }>({ message: "", show: false });
@@ -48,13 +49,17 @@ export default function ConnectPage() {
         }
       } catch (error) {
         console.error("Error fetching user data:", error);
+      } finally {
+        setLoadingUserData(false);
       }
     };
 
     if (session) {
       fetchUserData();
+    } else if (status !== "loading") {
+      setLoadingUserData(false);
     }
-  }, [session]);
+  }, [session, status]);
 
   const searchDancers = async () => {
     if (!selectedCity) {
@@ -187,10 +192,10 @@ export default function ConnectPage() {
         {/* Header */}
         <div className="mb-8">
           <h1 className="text-3xl md:text-4xl font-extrabold tracking-tight mb-4">
-            Connect with Dancers 🌍
+            Travel & Connect with Dancers 🌍
           </h1>
-          <p className="text-base-content/70">
-            Find solo dancers or practice partners in any city
+          <p className="text-base-content/70 text-lg">
+            Traveling to a new city? Find local dancers to connect with. Or find practice partners in your city.
           </p>
         </div>
 
@@ -201,7 +206,11 @@ export default function ConnectPage() {
             Your Location
           </h3>
           
-          {selectedCity ? (
+          {loadingUserData ? (
+            <div className="flex justify-center py-8">
+              <span className="loading loading-spinner loading-lg"></span>
+            </div>
+          ) : selectedCity ? (
             <>
               {!isChangingCity ? (
                 <>
