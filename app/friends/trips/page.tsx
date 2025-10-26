@@ -230,16 +230,6 @@ export default function FriendsTripsPage() {
             ))}
           </div>
         )}
-
-        {/* CTA */}
-        {!isLoading && trips.length > 0 && (
-          <div className="mt-8 text-center">
-            <Link href="/connect" className="btn btn-primary btn-lg gap-2">
-              <FaPlane />
-              Plan Your Next Dance Trip
-            </Link>
-          </div>
-        )}
       </div>
     </div>
   );
