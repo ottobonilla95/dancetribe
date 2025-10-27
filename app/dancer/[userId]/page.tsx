@@ -53,7 +53,7 @@ export default async function PublicProfile({ params }: Props) {
   try {
     user = await User.findById(params.userId)
       .select(
-        "name username email image dateOfBirth hideAge dancingStartYear city citiesVisited trips danceStyles anthem socialMedia danceRole gender nationality relationshipStatus createdAt likedBy friends friendRequestsSent friendRequestsReceived isTeacher isDJ isPhotographer teacherProfile djProfile photographerProfile professionalContact"
+        "name username email image dateOfBirth hideAge dancingStartYear city citiesVisited trips danceStyles anthem socialMedia danceRole gender nationality relationshipStatus createdAt likedBy friends friendRequestsSent friendRequestsReceived isTeacher isDJ isPhotographer teacherProfile djProfile photographerProfile professionalContact jackAndJillCompetitions"
       )
       .populate({
         path: "friends",
@@ -118,6 +118,11 @@ export default async function PublicProfile({ params }: Props) {
         path: "danceStyles.danceStyle",
         model: DanceStyle,
         select: "name description category",
+      })
+      .populate({
+        path: "jackAndJillCompetitions.danceStyle",
+        model: DanceStyle,
+        select: "name",
       })
       .lean();
 
@@ -669,6 +674,43 @@ export default async function PublicProfile({ params }: Props) {
                   />
                 </div>
               </div>
+
+              {/* Jack & Jill Competitions - Read Only Display */}
+              {userData.jackAndJillCompetitions && userData.jackAndJillCompetitions.length > 0 && (
+                <div className="card bg-base-200 shadow-xl">
+                  <div className="card-body">
+                    <h3 className="card-title text-xl mb-4">🏅 Jack & Jill Competitions</h3>
+                    <div className="space-y-3">
+                      {userData.jackAndJillCompetitions
+                        .sort((a: any, b: any) => {
+                          const placementOrder: {[key: string]: number} = { '1st': 1, '2nd': 2, '3rd': 3, 'participated': 4 };
+                          const placementDiff = (placementOrder[a.placement] || 5) - (placementOrder[b.placement] || 5);
+                          if (placementDiff !== 0) return placementDiff;
+                          return b.year - a.year;
+                        })
+                        .map((comp: any, index: number) => {
+                          const placementEmoji = comp.placement === '1st' ? '🥇' : comp.placement === '2nd' ? '🥈' : comp.placement === '3rd' ? '🥉' : '🎯';
+                          const danceStyleName = typeof comp.danceStyle === 'object' && comp.danceStyle?.name ? comp.danceStyle.name : 'Dance';
+                          
+                          return (
+                            <div key={index} className="flex items-start gap-3 p-3 rounded-lg bg-base-300/50 hover:bg-base-300 transition-colors">
+                              <div className="text-3xl flex-shrink-0">{placementEmoji}</div>
+                              <div className="flex-1 min-w-0">
+                                <h4 className="font-bold text-base truncate">{comp.eventName}</h4>
+                                <p className="text-sm text-base-content/70">
+                                  {danceStyleName} · {comp.year}
+                                  {comp.placement !== 'participated' && (
+                                    <span className="ml-1 font-semibold text-primary">· {comp.placement} Place</span>
+                                  )}
+                                </p>
+                              </div>
+                            </div>
+                          );
+                        })}
+                    </div>
+                  </div>
+                </div>
+              )}
 
               {/* Friends List */}
               <FriendsListSection friends={populatedFriends} totalCount={friendsCount} />

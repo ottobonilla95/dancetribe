@@ -155,7 +155,8 @@ export async function GET(req: NextRequest) {
           } : null
         } : null,
         danceStylesPopulated,
-        likedBy: user.likedBy || []
+        likedBy: user.likedBy || [],
+        jackAndJillCompetitions: user.jackAndJillCompetitions || []
       };
     });
 

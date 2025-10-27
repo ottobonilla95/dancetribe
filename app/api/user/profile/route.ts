@@ -20,7 +20,7 @@ export async function GET() {
 
     const user = await User.findById(session.user.id)
       .select(
-        "name firstName lastName username email image dateOfBirth hideAge dancingStartYear city activeCity citiesVisited danceStyles anthem socialMedia danceRole gender nationality relationshipStatus onboardingSteps isProfileComplete isTeacher isDJ isPhotographer teacherProfile djProfile photographerProfile professionalContact openToMeetTravelers lookingForPracticePartners createdAt"
+        "name firstName lastName username email image dateOfBirth hideAge dancingStartYear city activeCity citiesVisited danceStyles anthem socialMedia danceRole gender nationality relationshipStatus onboardingSteps isProfileComplete isTeacher isDJ isPhotographer teacherProfile djProfile photographerProfile professionalContact openToMeetTravelers lookingForPracticePartners jackAndJillCompetitions createdAt"
       )
       .populate({
         path: "city",
@@ -77,6 +77,11 @@ export async function GET() {
         path: "danceStyles.danceStyle",
         model: DanceStyle,
         select: "name description category",
+      })
+      .populate({
+        path: "jackAndJillCompetitions.danceStyle",
+        model: DanceStyle,
+        select: "name",
       });
 
     if (!user) {

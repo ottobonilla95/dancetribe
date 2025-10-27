@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState } from 'react';
-import SharePreviewModal from './SharePreviewModal';
+import { FaLink, FaCheck } from 'react-icons/fa';
 
 interface ShareToStoryProps {
   userData: {
@@ -28,34 +28,39 @@ interface ShareToStoryProps {
 }
 
 const ShareToStory: React.FC<ShareToStoryProps> = ({ userData }) => {
-  const [showModal, setShowModal] = useState(false);
+  const [copied, setCopied] = useState(false);
 
   const handleShareClick = () => {
-    setShowModal(true);
+    const profileUrl = `${typeof window !== "undefined" ? window.location.origin : ""}/${userData.username || userData.id}`;
+    navigator.clipboard.writeText(profileUrl);
+    setCopied(true);
+    setTimeout(() => setCopied(false), 2000);
   };
 
-  const profileUrl = `${typeof window !== "undefined" ? window.location.origin : ""}/${userData.username || userData.id}`;
-
   return (
-    <>
-      {/* Share Preview Modal */}
-      <SharePreviewModal
-        isOpen={showModal}
-        onClose={() => setShowModal(false)}
-        userData={userData}
-        profileUrl={profileUrl}
-      />
-
-      {/* Share Button */}
-      <div className="w-full">
-        <button
-          onClick={handleShareClick}
-          className="btn btn-primary gap-2 w-full"
-        >
-          📱 Share my profile
-        </button>
-      </div>
-    </>
+    <div className="w-full">
+      <button
+        onClick={handleShareClick}
+        className="btn btn-primary gap-2 w-full"
+      >
+        {copied ? (
+          <>
+            <FaCheck />
+            Link Copied!
+          </>
+        ) : (
+          <>
+            <FaLink />
+            Share my profile
+          </>
+        )}
+      </button>
+      {copied && (
+        <p className="text-xs text-center mt-2 text-success">
+          ✨ Add to your bio or share with friends!
+        </p>
+      )}
+    </div>
   );
 };
 

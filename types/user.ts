@@ -42,8 +42,18 @@ export type User = {
   trips?: Trip[];
   openToMeetTravelers?: boolean;
   lookingForPracticePartners?: boolean;
+  jackAndJillCompetitions?: JackAndJillCompetition[];
   createdAt?: Date;
   updatedAt?: Date;
+}
+
+export interface JackAndJillCompetition {
+  _id?: string;
+  eventName: string;
+  danceStyle: any; // Can be DanceStyle object or string ID
+  placement: "participated" | "1st" | "2nd" | "3rd";
+  year: number;
+  addedAt?: Date;
 }
 
 export interface Trip {

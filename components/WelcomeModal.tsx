@@ -3,22 +3,20 @@
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
-import { FaInstagram, FaCompass, FaCopy } from "react-icons/fa";
-import SharePreviewModal from "./SharePreviewModal";
+import { FaCompass, FaCopy, FaUserFriends, FaLink } from "react-icons/fa";
 import InstallPrompt from "./InstallPrompt";
 
 interface WelcomeModalProps {
   userName: string;
   userUsername: string;
   userImage?: string;
-  userData: any; // Full user data for ShareToStory
+  userData: any;
   showWelcome: boolean;
 }
 
 export default function WelcomeModal({ userName, userUsername, userImage, userData, showWelcome }: WelcomeModalProps) {
   const [isOpen, setIsOpen] = useState(false);
   const [copied, setCopied] = useState(false);
-  const [showSharePreview, setShowSharePreview] = useState(false);
   const [showInstallPrompt, setShowInstallPrompt] = useState(false);
   const router = useRouter();
 
@@ -55,16 +53,6 @@ export default function WelcomeModal({ userName, userUsername, userImage, userDa
 
   return (
     <>
-      {/* Share Preview Modal */}
-      {userData && (
-        <SharePreviewModal
-          isOpen={showSharePreview}
-          onClose={() => setShowSharePreview(false)}
-          userData={userData}
-          profileUrl={profileUrl}
-        />
-      )}
-      
       {/* Install Prompt - Shows after welcome modal is closed */}
       <InstallPrompt
         show={showInstallPrompt}
@@ -91,56 +79,62 @@ export default function WelcomeModal({ userName, userUsername, userImage, userDa
               <div className="p-6 sm:p-8 md:p-10">
                 {/* Celebration Header */}
                 <div className="text-center mb-6 sm:mb-8">
-              <div className="text-6xl sm:text-7xl mb-3 sm:mb-4 animate-bounce">🎉</div>
-              <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold mb-2 sm:mb-3 px-2">
-                Welcome to DanceCircle, {userName}!
-              </h2>
-              <p className="text-base sm:text-lg text-base-content/60">
-                Your dance profile is live! 🌍
-              </p>
+                  <div className="text-6xl sm:text-7xl mb-3 sm:mb-4 animate-bounce">🎉</div>
+                  <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold mb-2 sm:mb-3 px-2">
+                    Welcome to DanceCircle, {userName}!
+                  </h2>
+                  <p className="text-base sm:text-lg text-base-content/60">
+                    Your dance profile is live! 🌍
+                  </p>
+                </div>
+
+                {/* Share Instructions */}
+                <div className="bg-primary/10 rounded-xl p-4 sm:p-5 mb-6">
+                  <div className="flex gap-3 items-start">
+                    <div className="text-2xl sm:text-3xl">💡</div>
+                    <div className="flex-1">
+                      <h3 className="font-bold mb-2 text-base sm:text-lg">Share your profile!</h3>
+                      <ul className="text-sm sm:text-base space-y-1 text-base-content/80">
+                        <li>✨ Add to your Instagram bio</li>
+                        <li>✨ Share with dance friends</li>
+                        <li>✨ Connect with dancers worldwide</li>
+                      </ul>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Main Actions */}
+                <div className="space-y-3 sm:space-y-4 mb-6">
+                  {/* Copy Profile Link - Primary Action */}
+                  <button
+                    onClick={copyProfileLink}
+                    className="btn btn-primary btn-lg btn-block gap-2 sm:gap-3 text-base sm:text-lg h-14 sm:h-16"
+                  >
+                    <FaCopy className="text-xl sm:text-2xl" />
+                    {copied ? "Link Copied! ✓" : "Copy Your Profile Link"}
+                  </button>
+
+                  {/* Start Discovering */}
+                  <Link
+                    href="/discover"
+                    className="btn btn-outline btn-lg btn-block gap-2 sm:gap-3 text-base sm:text-lg h-14 sm:h-16"
+                    onClick={handleClose}
+                  >
+                    <FaCompass className="text-xl sm:text-2xl" />
+                    <span>Start Discovering Dancers!</span>
+                  </Link>
+                </div>
+
+                {/* Skip Button */}
+                <button
+                  onClick={handleClose}
+                  className="btn btn-ghost btn-block text-sm sm:text-base text-base-content/60"
+                >
+                  I&apos;ll do this later
+                </button>
+              </div>
             </div>
-
-            {/* Main Actions */}
-            <div className="space-y-3 sm:space-y-4 mb-6">
-              {/* Instagram Story - Primary Action */}
-              <button
-                onClick={() => setShowSharePreview(true)}
-                className="btn btn-primary btn-lg btn-block gap-2 sm:gap-3 text-base sm:text-lg h-14 sm:h-16"
-              >
-                <FaInstagram className="text-xl sm:text-2xl" />
-                Share To Instagram Story
-              </button>
-
-              {/* Copy Link for Instagram Bio */}
-              <button
-                onClick={copyProfileLink}
-                className="btn btn-outline btn-lg btn-block gap-2 sm:gap-3 text-base sm:text-lg h-14 sm:h-16"
-              >
-                <FaCopy className="text-xl sm:text-2xl" />
-                {copied ? "Copied! ✓" : "Copy Link for Bio"}
-              </button>
-
-              {/* Start Discovering - Secondary Action */}
-              <Link
-                href="/discover"
-                className="btn btn-outline btn-lg btn-block gap-2 sm:gap-3 text-base sm:text-lg h-14 sm:h-16"
-                onClick={handleClose}
-              >
-                <FaCompass className="text-xl sm:text-2xl" />
-                <span>Start Discovering Dancers!</span>
-              </Link>
-            </div>
-
-            {/* Skip Button */}
-            <button
-              onClick={handleClose}
-              className="btn btn-ghost btn-block text-sm sm:text-base text-base-content/60"
-            >
-              I&apos;ll do this later
-            </button>
           </div>
-        </div>
-      </div>
         </>
       )}
     </>

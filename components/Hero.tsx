@@ -107,19 +107,23 @@ const Hero = ({ featuredUsers = [] }: HeroProps) => {
           </div>
         )}
 
-        {/* 3 Key Features */}
+        {/* Key Features */}
         <div className="space-y-3 sm:space-y-4 mb-8 sm:mb-10 text-left md:text-center max-w-2xl mx-auto">
+          <div className="flex items-start md:items-center gap-2 sm:gap-3 text-base sm:text-lg md:text-xl">
+            <span className="text-2xl sm:text-3xl flex-shrink-0">✨</span>
+            <span><strong>Create your dance profile</strong> & track your achievements</span>
+          </div>
           <div className="flex items-start md:items-center gap-2 sm:gap-3 text-base sm:text-lg md:text-xl">
             <span className="text-2xl sm:text-3xl flex-shrink-0">🌍</span>
             <span><strong>Find dancers in 100+ cities</strong> worldwide</span>
           </div>
           <div className="flex items-start md:items-center gap-2 sm:gap-3 text-base sm:text-lg md:text-xl">
-            <span className="text-2xl sm:text-3xl flex-shrink-0">💃</span>
-            <span><strong>Connect with teachers & dance partners</strong> for dating and friendship</span>
+            <span className="text-2xl sm:text-3xl flex-shrink-0">👯</span>
+            <span><strong>Connect with teachers & practice partners</strong></span>
           </div>
           <div className="flex items-start md:items-center gap-2 sm:gap-3 text-base sm:text-lg md:text-xl">
-            <span className="text-2xl sm:text-3xl flex-shrink-0">🏆</span>
-            <span><strong>Track your journey</strong> and earn achievement badges</span>
+            <span className="text-2xl sm:text-3xl flex-shrink-0">🔥</span>
+            <span><strong>Discover trending music, cities & dance styles</strong></span>
           </div>
         </div>
 

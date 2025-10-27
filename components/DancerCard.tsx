@@ -13,6 +13,10 @@ interface DancerCardProps {
     danceStylesPopulated?: Array<{ name: string; _id: string }>;
     openToMeetTravelers?: boolean;
     lookingForPracticePartners?: boolean;
+    jackAndJillCompetitions?: Array<{
+      placement: string;
+      year: number;
+    }>;
   };
   showLikeButton?: boolean;
   showFlag?: boolean;
@@ -30,6 +34,21 @@ export default function DancerCard({ dancer, showLikeButton = true, showFlag = f
       .map(char => 127397 + char.charCodeAt(0));
     return String.fromCodePoint(...codePoints);
   };
+
+  // Calculate J&J competition stats
+  const getJJStats = () => {
+    if (!dancer.jackAndJillCompetitions || dancer.jackAndJillCompetitions.length === 0) {
+      return null;
+    }
+    const first = dancer.jackAndJillCompetitions.filter(c => c.placement === '1st').length;
+    const second = dancer.jackAndJillCompetitions.filter(c => c.placement === '2nd').length;
+    const third = dancer.jackAndJillCompetitions.filter(c => c.placement === '3rd').length;
+    const total = dancer.jackAndJillCompetitions.length;
+    
+    return { first, second, third, total };
+  };
+
+  const jjStats = getJJStats();
 
   return (
     <div className="card bg-base-100 shadow-lg hover:shadow-xl transition-all duration-300 border border-base-200">
@@ -105,7 +124,7 @@ export default function DancerCard({ dancer, showLikeButton = true, showFlag = f
           )}
 
           {/* Connect Preferences Badges */}
-          {(dancer.openToMeetTravelers || dancer.lookingForPracticePartners) && (
+          {(dancer.openToMeetTravelers || dancer.lookingForPracticePartners || jjStats) && (
             <div className="mb-3 flex flex-wrap gap-2">
               {dancer.openToMeetTravelers && (
                 <span className="badge badge-sm badge-info gap-1">
@@ -115,6 +134,18 @@ export default function DancerCard({ dancer, showLikeButton = true, showFlag = f
               {dancer.lookingForPracticePartners && (
                 <span className="badge badge-sm badge-success gap-1">
                   🤝 Practice Partner
+                </span>
+              )}
+              {jjStats && (jjStats.first > 0 || jjStats.second > 0 || jjStats.third > 0) && (
+                <span className="badge badge-sm badge-warning gap-1 font-semibold">
+                  {jjStats.first > 0 && `🥇${jjStats.first > 1 ? `×${jjStats.first}` : ''}`}
+                  {jjStats.second > 0 && ` 🥈${jjStats.second > 1 ? `×${jjStats.second}` : ''}`}
+                  {jjStats.third > 0 && ` 🥉${jjStats.third > 1 ? `×${jjStats.third}` : ''}`}
+                </span>
+              )}
+              {jjStats && jjStats.first === 0 && jjStats.second === 0 && jjStats.third === 0 && (
+                <span className="badge badge-sm badge-outline gap-1">
+                  🏅 J&J: {jjStats.total}
                 </span>
               )}
             </div>

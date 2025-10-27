@@ -17,6 +17,8 @@ import Flag from "@/components/Flag";
 import DanceStyleCard from "@/components/DanceStyleCard";
 import CopyProfileLink from "@/components/CopyProfileLink";
 import AchievementBadges from "@/components/AchievementBadges";
+import JackAndJillManager from "@/components/JackAndJillManager";
+import CitiesVisitedManager from "@/components/CitiesVisitedManager";
 import { calculateUserBadges } from "@/utils/badges";
 import WelcomeModal from "@/components/WelcomeModal";
 import UpcomingTrips from "@/components/UpcomingTrips";
@@ -37,7 +39,7 @@ export default async function Profile({ searchParams }: ProfileProps) {
 
   const user = await User.findById(session.user.id)
     .select(
-      "name firstName lastName username email image dateOfBirth hideAge dancingStartYear city citiesVisited trips danceStyles anthem socialMedia danceRole gender nationality relationshipStatus isTeacher isDJ isPhotographer teacherProfile djProfile photographerProfile professionalContact friends likedBy createdAt"
+      "name firstName lastName username email image dateOfBirth hideAge dancingStartYear city citiesVisited trips danceStyles anthem socialMedia danceRole gender nationality relationshipStatus isTeacher isDJ isPhotographer teacherProfile djProfile photographerProfile professionalContact friends likedBy jackAndJillCompetitions createdAt"
     )
     .populate({
       path: "city",
@@ -77,6 +79,11 @@ export default async function Profile({ searchParams }: ProfileProps) {
       path: "danceStyles.danceStyle",
       model: DanceStyle,
       select: "name description category",
+    })
+    .populate({
+      path: "jackAndJillCompetitions.danceStyle",
+      model: DanceStyle,
+      select: "name",
     })
     .lean();
 
@@ -543,42 +550,7 @@ export default async function Profile({ searchParams }: ProfileProps) {
                 )}
 
                 {/* Cities Visited */}
-                {userData.citiesVisited &&
-                  userData.citiesVisited.length > 0 && (
-                    <div>
-                      <div className="text-sm font-medium text-base-content/60 mb-2">
-                        Cities Danced In
-                      </div>
-                      <div className="flex flex-wrap gap-3">
-                        {userData.citiesVisited.map(
-                          (city: any, index: number) => (
-                            <Link
-                              key={index}
-                              href={`/city/${city._id || city.id || city}`}
-                              className="group"
-                            >
-                              <div className="flex items-center gap-2 bg-base-300 rounded-md h-10 hover:bg-base-200 transition-colors cursor-pointer">
-                                {city.image ? (
-                                  <img
-                                    src={city.image}
-                                    alt={city.name}
-                                    className="h-full aspect-square rounded object-cover"
-                                  />
-                                ) : (
-                                  <div className="h-full aspect-square rounded bg-primary/20 flex items-center justify-center">
-                                    <span className="text-xs">🌍</span>
-                                  </div>
-                                )}
-                                <span className="text-sm font-medium pl-2 pr-4 py-2 group-hover:text-primary">
-                                  {typeof city === "string" ? city : city.name}
-                                </span>
-                              </div>
-                            </Link>
-                          )
-                        )}
-                      </div>
-                    </div>
-                  )}
+                <CitiesVisitedManager cities={userData.citiesVisited || []} />
               </div>
             </div>
 
@@ -589,6 +561,16 @@ export default async function Profile({ searchParams }: ProfileProps) {
                 <AchievementBadges badges={calculateUserBadges(userData)} maxDisplay={6} />
               </div>
             </div>
+
+            {/* Jack & Jill Competitions */}
+            <JackAndJillManager
+              competitions={userData.jackAndJillCompetitions || []}
+              danceStyles={userData.danceStyles?.map((ds: any) => ({
+                _id: typeof ds.danceStyle === 'object' ? ds.danceStyle._id : ds.danceStyle,
+                name: typeof ds.danceStyle === 'object' ? ds.danceStyle.name : danceStyles.find((style: any) => style._id === ds.danceStyle)?.name || ''
+              })) || []}
+              isOwnProfile={true}
+            />
 
             {/* Member Since */}
             {/* <div className="card bg-base-200 shadow-xl">

@@ -263,6 +263,34 @@ const userSchema = new mongoose.Schema(
       type: Boolean,
       default: false,
     },
+    // Jack & Jill competition achievements
+    jackAndJillCompetitions: [{
+      eventName: {
+        type: String,
+        required: true,
+        trim: true,
+      },
+      danceStyle: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "DanceStyle",
+        required: true,
+      },
+      placement: {
+        type: String,
+        enum: ['participated', '1st', '2nd', '3rd'],
+        required: true,
+      },
+      year: {
+        type: Number,
+        required: true,
+        min: 1900,
+        max: new Date().getFullYear() + 1, // Allow next year for upcoming competitions
+      },
+      addedAt: {
+        type: Date,
+        default: Date.now,
+      }
+    }],
   },
   {
     timestamps: true,

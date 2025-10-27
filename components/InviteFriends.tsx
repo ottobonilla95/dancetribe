@@ -75,7 +75,7 @@ export default function InviteFriends({ userName = "A friend" }: InviteFriendsPr
   };
 
   const shareViaInstagramStories = () => {
-    alert('💡 Tip: Use "Share my profile" from your profile page to create a beautiful Instagram Story card!');
+    alert('💡 Tip: Use "Share my profile" from your profile page to copy your link, then add it to your Instagram bio or share with friends!');
   };
 
   const shareNative = async () => {

@@ -135,16 +135,41 @@ export default async function ContinentPage({ params }: Props) {
     { $project: { name: "$style.name", count: 1 } },
   ]);
 
-  // Get top countries in this continent
-  const topCountries = await Country.find({
+  // Get all countries in this continent
+  const allCountries = await Country.find({
     continent: continentObjectId,
     isActive: true,
-    totalDancers: { $gt: 0 },
   })
-    .select("name code totalDancers")
-    .sort({ totalDancers: -1 })
-    .limit(10)
+    .select("name code")
     .lean();
+
+  // Calculate dancers per country dynamically
+  const countriesWithDancers = await Promise.all(
+    allCountries.map(async (country: any) => {
+      const citiesInCountry = await City.find({
+        country: country._id,
+        isActive: true,
+      }).select("_id").lean();
+      
+      const cityIdsInCountry = citiesInCountry.map((c: any) => c._id);
+      
+      const dancerCount = await User.countDocuments({
+        city: { $in: cityIdsInCountry },
+        isProfileComplete: true,
+      });
+
+      return {
+        ...country,
+        totalDancers: dancerCount,
+      };
+    })
+  );
+
+  // Filter and sort countries with dancers
+  const topCountries = countriesWithDancers
+    .filter((c: any) => c.totalDancers > 0)
+    .sort((a: any, b: any) => b.totalDancers - a.totalDancers)
+    .slice(0, 10);
 
   // Get top cities in this continent
   const topCities = await City.find({
