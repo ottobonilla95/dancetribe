@@ -1,7 +1,14 @@
 import { getRequestConfig } from 'next-intl/server';
+import { headers } from 'next/headers';
 
-export default getRequestConfig(async ({ locale }) => ({
-  locale,
-  messages: (await import(`./messages/${locale}.json`)).default
-}));
+export default getRequestConfig(async () => {
+  // Get locale from headers set by middleware, default to 'en'
+  const headersList = await headers();
+  const locale = headersList.get('x-locale') || 'en';
+  
+  return {
+    locale,
+    messages: (await import(`./messages/${locale}.json`)).default
+  };
+});
 

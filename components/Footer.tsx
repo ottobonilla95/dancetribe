@@ -3,13 +3,14 @@ import Image from "next/image";
 import config from "@/config";
 import logo from "@/app/icon.png";
 import { FaInstagram, FaEnvelope } from "react-icons/fa";
-import { getTranslations } from "next-intl/server";
+import { getTranslations, getLocale } from "next-intl/server";
 
 // Add the Footer to the bottom of your landing page and more.
 // The support link is connected to the config.js file. If there's no config.resend.supportEmail, the link won't be displayed.
 
 const Footer = async () => {
-  const t = await getTranslations('footer');
+  const locale = await getLocale();
+  const t = await getTranslations({ locale, namespace: 'footer' });
   
   return (
     <footer className="bg-base-200 border-t border-base-content/10">
