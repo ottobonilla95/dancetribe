@@ -7,6 +7,7 @@ import Image from "next/image";
 import { FaSearch, FaTimes, FaUser, FaCity, FaGlobe, FaUsers } from "react-icons/fa";
 import { SearchUser, SearchCity, SearchCountry, UnifiedSearchResponse } from "@/types/search";
 import Flag from "./Flag";
+import { useTranslation } from "./I18nProvider";
 
 interface SearchBarProps {
   placeholder?: string;
@@ -16,12 +17,13 @@ interface SearchBarProps {
 }
 
 export default function SearchBar({
-  placeholder = "Search dancers, cities, countries...",
+  placeholder,
   onUserSelect,
   className = "",
   compact = false
 }: SearchBarProps) {
   const { data: session } = useSession();
+  const { t } = useTranslation();
   const [query, setQuery] = useState("");
   const [users, setUsers] = useState<SearchUser[]>([]);
   const [cities, setCities] = useState<SearchCity[]>([]);
@@ -68,10 +70,10 @@ export default function SearchBar({
         setCities(data.cities || []);
         setCountries(data.countries || []);
         if (data.totalResults === 0 && searchQuery.length >= 2) {
-          setError("No results found");
+          setError(t('search.noResults'));
         }
       } else {
-        setError(data.message || "Search failed");
+        setError(data.message || t('search.searchFailed'));
         setUsers([]);
         setCities([]);
         setCountries([]);

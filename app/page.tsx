@@ -272,7 +272,7 @@ export default async function Home() {
   }
 
   // Get translations
-  const messages = getMessages();
+  const messages = await getMessages();
   const t = (key: string) => getTranslation(messages, key);
 
   // Fetch data in parallel

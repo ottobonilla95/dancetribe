@@ -41,7 +41,7 @@ export default async function PublicProfile({ params }: Props) {
   await connectMongo();
 
   // Get translations
-  const messages = getMessages();
+  const messages = await getMessages();
   const t = (key: string) => getTranslation(messages, key);
 
   // Check if the userId is a valid ObjectId

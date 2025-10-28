@@ -427,7 +427,7 @@ export default async function Dashboard() {
   const session = await getServerSession(authOptions);
 
   // Get translations
-  const messages = getMessages();
+  const messages = await getMessages();
   const t = (key: string) => getTranslation(messages, key);
 
   // Check if user profile is complete

@@ -10,8 +10,8 @@ interface Song {
   youtubeVideoId?: string | null;
 }
 
-export default function TrendyMusicPreview({ songs }: { songs: Song[] }) {
-  const messages = getMessages();
+export default async function TrendyMusicPreview({ songs }: { songs: Song[] }) {
+  const messages = await getMessages();
   const t = (key: string) => getTranslation(messages, key);
 
   if (songs.length === 0) {

@@ -7,8 +7,8 @@ interface HotDanceStylesProps {
   danceStyles: (DanceStyle & { userCount: number })[];
 }
 
-export default function HotDanceStyles({ danceStyles }: HotDanceStylesProps) {
-  const messages = getMessages();
+export default async function HotDanceStyles({ danceStyles }: HotDanceStylesProps) {
+  const messages = await getMessages();
   const t = (key: string) => getTranslation(messages, key);
 
   return (

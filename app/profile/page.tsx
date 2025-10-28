@@ -36,7 +36,7 @@ export default async function Profile({ searchParams }: ProfileProps) {
   }
 
   // Get translations
-  const messages = getMessages();
+  const messages = await getMessages();
   const t = (key: string) => getTranslation(messages, key);
 
   // Fetch user data server-side

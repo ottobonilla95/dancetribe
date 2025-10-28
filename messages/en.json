@@ -1,4 +1,16 @@
 {
+  "auth": {
+    "welcomeBack": "Welcome to DanceCircle",
+    "signInWithGoogle": "Sign in with Google",
+    "signInWithEmail": "Sign in with Email",
+    "email": "Email",
+    "emailPlaceholder": "email@example.com",
+    "or": "OR",
+    "bySigningIn": "By signing in, you agree to our",
+    "terms": "Terms of Service",
+    "and": "and",
+    "privacy": "Privacy Policy"
+  },
   "hero": {
     "title": "Connect with dancers worldwide",
     "subtitle": "Join a global community of dancers connecting, learning, and traveling around the world",

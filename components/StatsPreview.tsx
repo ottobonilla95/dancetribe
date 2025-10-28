@@ -19,11 +19,11 @@ interface StatsPreviewProps {
   }>;
 }
 
-export default function StatsPreview({
+export default async function StatsPreview({
   stats,
   countryData = [],
 }: StatsPreviewProps) {
-  const messages = getMessages();
+  const messages = await getMessages();
   const t = (key: string) => getTranslation(messages, key);
 
   const formatNumber = (num: number) => {

@@ -1,4 +1,16 @@
 {
+  "auth": {
+    "welcomeBack": "Bienvenido a DanceCircle",
+    "signInWithGoogle": "Iniciar sesión con Google",
+    "signInWithEmail": "Iniciar sesión con Email",
+    "email": "Email",
+    "emailPlaceholder": "email@ejemplo.com",
+    "or": "O",
+    "bySigningIn": "Al iniciar sesión, aceptas nuestros",
+    "terms": "Términos de Servicio",
+    "and": "y",
+    "privacy": "Política de Privacidad"
+  },
   "hero": {
     "title": "Conecta con bailarines de todo el mundo",
     "subtitle": "La red social para bailarines. Encuentra compañeros, descubre música y ciudades, y conecta con la comunidad global",

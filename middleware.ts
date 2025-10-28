@@ -11,6 +11,7 @@ const publicRoutes = [
   '/privacy-policy',
   '/tos',
   '/dev',
+  '/signin',
   '/api/auth/signin',
   '/api/auth/signout',
   '/api/auth/callback',
