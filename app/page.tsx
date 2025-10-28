@@ -216,7 +216,7 @@ async function getRecentDancers() {
           select: "name code",
         },
       })
-      .select("name username image danceStyles city likedBy dateOfBirth nationality dancingStartYear socialMedia danceRole")
+      .select("name username image danceStyles city likedBy dateOfBirth nationality dancingStartYear socialMedia danceRole isTeacher isDJ isPhotographer jackAndJillCompetitions openToMeetTravelers lookingForPracticePartners")
       .sort({ createdAt: -1 })
       .limit(16)
       .lean();

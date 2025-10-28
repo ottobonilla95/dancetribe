@@ -3,7 +3,7 @@
 import Image from "next/image";
 import Link from "next/link";
 import { User } from "@/types/user";
-import { FaMapMarkerAlt, FaHeart, FaInstagram, FaTiktok, FaYoutube } from "react-icons/fa";
+import { FaMapMarkerAlt, FaHeart, FaInstagram, FaTiktok, FaYoutube, FaGraduationCap, FaHeadphones, FaCamera } from "react-icons/fa";
 import { getZodiacSign } from "@/utils/zodiac";
 import { getCountryCode } from "@/utils/countries";
 
@@ -13,6 +13,9 @@ interface DancerCardProps {
     danceStylesPopulated?: Array<{ name: string; _id: string }>;
     openToMeetTravelers?: boolean;
     lookingForPracticePartners?: boolean;
+    isTeacher?: boolean;
+    isDJ?: boolean;
+    isPhotographer?: boolean;
     jackAndJillCompetitions?: Array<{
       placement: string;
       year: number;
@@ -111,7 +114,7 @@ export default function DancerCard({ dancer, showLikeButton = true, showFlag = f
 
           {/* Dance Role Badge */}
           {dancer.danceRole && (
-            <div className="mb-3">
+            <div className="">
               <span className={`badge badge-sm ${
                 dancer.danceRole === 'leader' ? 'badge-primary' : 
                 dancer.danceRole === 'follower' ? 'badge-secondary' : 
@@ -123,29 +126,70 @@ export default function DancerCard({ dancer, showLikeButton = true, showFlag = f
             </div>
           )}
 
-          {/* Connect Preferences Badges */}
-          {(dancer.openToMeetTravelers || dancer.lookingForPracticePartners || jjStats) && (
-            <div className="mb-3 flex flex-wrap gap-2">
+          {/* Professional Roles - Prominent Display */}
+          {(dancer.isTeacher || dancer.isDJ || dancer.isPhotographer) && (
+            <div className="flex flex-wrap gap-2">
+              {dancer.isTeacher && (
+                <span className="badge badge-sm badge-primary gap-1.5 font-semibold">
+                  <FaGraduationCap className="text-sm" />
+                  Teacher
+                </span>
+              )}
+              {dancer.isDJ && (
+                <span className="badge badge-sm badge-secondary gap-1.5 font-semibold">
+                  <FaHeadphones className="text-sm" />
+                  DJ
+                </span>
+              )}
+              {dancer.isPhotographer && (
+                <span className="badge badge-sm badge-accent gap-1.5 font-semibold">
+                  <FaCamera className="text-sm" />
+                  Photographer
+                </span>
+              )}
+            </div>
+          )}
+
+          {/* J&J Competition Achievements */}
+          {jjStats && jjStats.total > 0 && (
+            <div className="flex flex-wrap gap-2">
+              {jjStats.first > 0 || jjStats.second > 0 || jjStats.third > 0 ? (
+                <>
+                  {jjStats.first > 0 && (
+                    <span className="badge badge-sm bg-yellow-500/90 text-white border-0 gap-1 font-bold">
+                      🥇 {jjStats.first}
+                    </span>
+                  )}
+                  {jjStats.second > 0 && (
+                    <span className="badge badge-sm bg-gray-400/90 text-white border-0 gap-1 font-bold">
+                      🥈 {jjStats.second}
+                    </span>
+                  )}
+                  {jjStats.third > 0 && (
+                    <span className="badge badge-sm bg-orange-600/90 text-white border-0 gap-1 font-bold">
+                      🥉 {jjStats.third}
+                    </span>
+                  )}
+                </>
+              ) : (
+                <span className="badge badge-sm badge-outline gap-1">
+                  🏅 J&J {jjStats.total}
+                </span>
+              )}
+            </div>
+          )}
+
+          {/* Connect Preferences */}
+          {(dancer.openToMeetTravelers || dancer.lookingForPracticePartners) && (
+            <div className="flex flex-wrap gap-2">
               {dancer.openToMeetTravelers && (
                 <span className="badge badge-sm badge-info gap-1">
-                  💃 Meet Solo Dancers
+                  ✈️ Solo Traveler
                 </span>
               )}
               {dancer.lookingForPracticePartners && (
                 <span className="badge badge-sm badge-success gap-1">
-                  🤝 Practice Partner
-                </span>
-              )}
-              {jjStats && (jjStats.first > 0 || jjStats.second > 0 || jjStats.third > 0) && (
-                <span className="badge badge-sm badge-warning gap-1 font-semibold">
-                  {jjStats.first > 0 && `🥇${jjStats.first > 1 ? `×${jjStats.first}` : ''}`}
-                  {jjStats.second > 0 && ` 🥈${jjStats.second > 1 ? `×${jjStats.second}` : ''}`}
-                  {jjStats.third > 0 && ` 🥉${jjStats.third > 1 ? `×${jjStats.third}` : ''}`}
-                </span>
-              )}
-              {jjStats && jjStats.first === 0 && jjStats.second === 0 && jjStats.third === 0 && (
-                <span className="badge badge-sm badge-outline gap-1">
-                  🏅 J&J: {jjStats.total}
+                  🤝 Open to practice
                 </span>
               )}
             </div>
@@ -153,7 +197,7 @@ export default function DancerCard({ dancer, showLikeButton = true, showFlag = f
 
           {/* Dance Styles */}
           {dancer.danceStylesPopulated && dancer.danceStylesPopulated.length > 0 && (
-            <div className="mb-3">
+            <div className="mb-1.5">
               <div className="flex flex-wrap gap-1">
                 {dancer.danceStylesPopulated.slice(0, 3).map((style, index) => (
                   <span key={index} className="badge badge-outline badge-sm">
