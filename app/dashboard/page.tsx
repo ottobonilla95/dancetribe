@@ -338,19 +338,19 @@ function extractYouTubeVideoId(url: string): string | null {
     /(?:youtube\.com\/watch\?v=|youtu\.be\/)([a-zA-Z0-9_-]+)/,
     /youtube\.com\/embed\/([a-zA-Z0-9_-]+)/,
   ];
-  
+
   for (const pattern of patterns) {
     const match = url.match(pattern);
     if (match) return match[1];
   }
-  
+
   return null;
 }
 
 // Determine platform from URL
-function detectPlatform(url: string): 'spotify' | 'youtube' | null {
-  if (url.includes('spotify.com')) return 'spotify';
-  if (url.includes('youtube.com') || url.includes('youtu.be')) return 'youtube';
+function detectPlatform(url: string): "spotify" | "youtube" | null {
+  if (url.includes("spotify.com")) return "spotify";
+  if (url.includes("youtube.com") || url.includes("youtu.be")) return "youtube";
   return null;
 }
 
@@ -359,8 +359,8 @@ async function getTrendingSongs() {
     await connectMongo();
 
     // Get all users with anthem URLs
-    const users = await User.find({ 
-      "anthem.url": { $exists: true, $ne: "" } 
+    const users = await User.find({
+      "anthem.url": { $exists: true, $ne: "" },
     })
       .select("anthem")
       .lean();
@@ -381,8 +381,10 @@ async function getTrendingSongs() {
           url,
           count,
           platform,
-          spotifyTrackId: platform === 'spotify' ? extractSpotifyTrackId(url) : null,
-          youtubeVideoId: platform === 'youtube' ? extractYouTubeVideoId(url) : null,
+          spotifyTrackId:
+            platform === "spotify" ? extractSpotifyTrackId(url) : null,
+          youtubeVideoId:
+            platform === "youtube" ? extractYouTubeVideoId(url) : null,
         };
       })
       .filter((song) => song.spotifyTrackId || song.youtubeVideoId) // Only valid URLs
@@ -438,15 +440,19 @@ async function getFriendsTrips(userId: string) {
               image: friend.image,
               username: friend.username,
             },
-            city: trip.city ? {
-              _id: trip.city._id.toString(),
-              name: trip.city.name,
-              image: trip.city.image,
-              country: trip.city.country ? {
-                name: trip.city.country.name,
-                code: trip.city.country.code,
-              } : null,
-            } : null,
+            city: trip.city
+              ? {
+                  _id: trip.city._id.toString(),
+                  name: trip.city.name,
+                  image: trip.city.image,
+                  country: trip.city.country
+                    ? {
+                        name: trip.city.country.name,
+                        code: trip.city.country.code,
+                      }
+                    : null,
+                }
+              : null,
             startDate: trip.startDate,
             endDate: trip.endDate,
           });
@@ -456,9 +462,11 @@ async function getFriendsTrips(userId: string) {
 
     // Sort by start date and limit to 4
     return allTrips
-      .sort((a, b) => new Date(a.startDate).getTime() - new Date(b.startDate).getTime())
+      .sort(
+        (a, b) =>
+          new Date(a.startDate).getTime() - new Date(b.startDate).getTime()
+      )
       .slice(0, 4);
-
   } catch (error) {
     console.error("Error fetching friends' trips:", error);
     return [];
@@ -626,43 +634,38 @@ export default async function Dashboard() {
   }
 
   // Fetch data in parallel
-  const [initialDancers, danceStyles, cities, hotDanceStyles, communityStats, trendingSongs, trendyCountries, friendsTrips] =
-    await Promise.all([
-      getInitialDancers(session.user.id),
-      getDanceStyles(),
-      getCities(),
-      getHotDanceStyles(),
-      getCommunityStats(),
-      getTrendingSongs(),
-      getTrendyCountries(),
-      getFriendsTrips(session.user.id),
-    ]);
+  const [
+    initialDancers,
+    danceStyles,
+    cities,
+    hotDanceStyles,
+    communityStats,
+    trendingSongs,
+    trendyCountries,
+    friendsTrips,
+  ] = await Promise.all([
+    getInitialDancers(session.user.id),
+    getDanceStyles(),
+    getCities(),
+    getHotDanceStyles(),
+    getCommunityStats(),
+    getTrendingSongs(),
+    getTrendyCountries(),
+    getFriendsTrips(session.user.id),
+  ]);
 
   return (
     <main className="min-h-screen pb-24 py-8">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Hot Cities Section */}
         <h2 className="max-w-3xl font-extrabold text-xl md:text-2xl tracking-tight mb-2 md:mb-8">
-          {t('dashboard.hottestCities')}
+          {t("dashboard.hottestCities")}
         </h2>
         <CityList initialCities={cities} />
         <div className="flex justify-center mt-6">
-          <Link
-            href="/cities"
-            className="btn btn-outline btn-sm md:btn-md"
-          >
-            {t('dashboard.viewAllCities')}
+          <Link href="/cities" className="btn btn-outline btn-sm md:btn-md">
+            {t("dashboard.viewAllCities")}
           </Link>
-        </div>
-
-        {/* Trendy Countries Section */}
-        <div className="mt-12">
-          <TrendyCountries countries={trendyCountries} />
-        </div>
-
-        {/* Hot Dance Styles Section */}
-        <div className="mt-12">
-          <HotDanceStyles danceStyles={hotDanceStyles} />
         </div>
 
         {/* Friends' Trips Preview */}
@@ -671,6 +674,16 @@ export default async function Dashboard() {
             <FriendsTripsPreview trips={friendsTrips} />
           </div>
         )}
+
+        {/* Trendy Countries Section */}
+        {/* <div className="mt-12">
+          <TrendyCountries countries={trendyCountries} />
+        </div> */}
+
+        {/* Hot Dance Styles Section */}
+        <div className="mt-12">
+          <HotDanceStyles danceStyles={hotDanceStyles} />
+        </div>
 
         {/* Trendy Music Section */}
         <TrendyMusicPreview songs={trendingSongs} />

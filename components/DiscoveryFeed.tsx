@@ -256,8 +256,8 @@ export default function DiscoveryFeed({ initialDancers = [], danceStyles = [], s
                  t('discovery.tryAdjustingFilters')}
               </p>
               
-              {/* Expand Search Suggestions */}
-              {filters.nearMe && (
+              {/* Expand Search Suggestions - Only show if NOT in preview mode */}
+              {!isPreview && filters.nearMe && (
                 <div className="space-y-2">
                   <p className="text-sm text-base-content/50">{t('discovery.tryExpanding')}</p>
                   <div className="flex gap-2 justify-center">
@@ -277,7 +277,7 @@ export default function DiscoveryFeed({ initialDancers = [], danceStyles = [], s
                 </div>
               )}
               
-              {filters.inMyCountry && (
+              {!isPreview && filters.inMyCountry && (
                 <div className="space-y-2">
                   <p className="text-sm text-base-content/50">{t('discovery.tryExpanding')}</p>
                   <button
@@ -317,7 +317,7 @@ export default function DiscoveryFeed({ initialDancers = [], danceStyles = [], s
                     </div>
 
                     {/* Load More Button */}
-                    {hasMore && (
+                    {hasMore && !isPreview && (
                       <div className="flex justify-center mt-8">
                         <button
                           onClick={loadMore}
@@ -339,6 +339,20 @@ export default function DiscoveryFeed({ initialDancers = [], danceStyles = [], s
                 </div>
               )}
             </>
+          )}
+
+          {/* View All Button for Preview Mode - Show regardless of dancers count */}
+          {isPreview && showViewAllLink && (
+            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+              <div className="flex justify-center mt-6">
+                <a
+                  href="/discover"
+                  className="btn btn-outline btn-sm md:btn-md"
+                >
+                  {t('dashboard.viewAllDancers')}
+                </a>
+              </div>
+            </div>
           )}
         </>
       )}
