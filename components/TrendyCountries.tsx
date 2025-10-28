@@ -29,36 +29,42 @@ export default async function TrendyCountries({ countries }: TrendyCountriesProp
         </h2>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3 md:gap-4">
-        {countries.map((country, index) => (
-          <Link
-            href={`/country/${country._id}`}
-            key={country._id}
-            className="block bg-base-200 hover:bg-base-300 transition-all duration-200 hover:shadow-lg group overflow-hidden rounded-2xl"
-          >
-            <div className="flex items-stretch">
-              {/* Left side - Content */}
-              <div className="flex-1 p-3 flex flex-col justify-center">
-                <div className="flex items-center gap-2 mb-1">
-                  <span className="text-sm font-bold opacity-50">#{index + 1}</span>
-                  <h3 className="font-bold text-lg group-hover:text-primary transition-colors truncate">
-                    {country.name}
-                  </h3>
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-2 md:gap-4">
+        {countries.map((country, index) => {
+          // Show only top 4 on mobile, top 6 on desktop
+          const isHidden = index >= 4 && index < 6;
+          
+          return (
+            <Link
+              href={`/country/${country._id}`}
+              key={country._id}
+              className={`block bg-base-200 hover:bg-base-300 transition-all duration-200 hover:shadow-lg group overflow-hidden rounded-xl md:rounded-2xl ${isHidden ? 'hidden md:block' : ''}`}
+            >
+              <div className="flex items-stretch">
+                {/* Left side - Content */}
+                <div className="flex-1 p-2 md:p-3 flex flex-col justify-center">
+                  <div className="flex items-center gap-1.5 md:gap-2 mb-0.5 md:mb-1">
+                    <span className="text-xs md:text-sm font-bold opacity-50">#{index + 1}</span>
+                    <h3 className="font-bold text-base md:text-lg group-hover:text-primary transition-colors truncate">
+                      {country.name}
+                    </h3>
+                  </div>
+                  
+                  <div className="flex items-center gap-1 text-xs md:text-sm opacity-70">
+                    <span className="font-semibold">{country.totalDancers}</span>
+                    <span className="text-[10px] md:text-xs">{t('common.dancers')}</span>
+                  </div>
                 </div>
                 
-                <div className="flex items-center gap-1 text-sm opacity-70">
-                  <span className="font-semibold">{country.totalDancers}</span>
-                  <span className="text-xs">{t('common.dancers')}</span>
+                {/* Right side - Flag (Full Height from edge to edge) */}
+                <div className="flex items-center justify-center bg-base-300/50 min-w-[70px] md:min-w-[100px] -my-[1px] -mr-[1px]">
+                  <Flag countryCode={country.code} size="xl" className="md:hidden" />
+                  <Flag countryCode={country.code} size="2xl" className="hidden md:block" />
                 </div>
               </div>
-              
-              {/* Right side - Flag (Full Height from edge to edge) */}
-              <div className="flex items-center justify-center bg-base-300/50 min-w-[100px] -my-[1px] -mr-[1px]">
-                <Flag countryCode={country.code} size="2xl" />
-              </div>
-            </div>
-          </Link>
-        ))}
+            </Link>
+          );
+        })}
       </div>
 
       {countries.length === 0 && (
