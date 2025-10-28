@@ -19,12 +19,17 @@ export const authOptions: NextAuthOptionsExtended = {
       clientId: process.env.GOOGLE_ID,
       clientSecret: process.env.GOOGLE_SECRET,
       async profile(profile) {
+        // Google provides locale info
+        const browserLocale = profile.locale || 'en';
+        const detectedLang = browserLocale.toLowerCase().includes('es') ? 'es' : 'en';
+        
         return {
           id: profile.sub,
           name: profile.given_name ? profile.given_name : profile.name,
           email: profile.email,
           image: profile.picture,
           createdAt: new Date(),
+          preferredLanguage: detectedLang,
         };
       },
     }),
@@ -60,10 +65,18 @@ export const authOptions: NextAuthOptionsExtended = {
         
         const User = (await import('@/models/User')).default;
         
-        // Update the newly created user with onboarding fields
+        // Detect language from Google profile if available
+        let detectedLanguage = 'en';
+        const googleLocale = (user as any).preferredLanguage;
+        if (googleLocale) {
+          detectedLanguage = googleLocale;
+        }
+        
+        // Update the newly created user with onboarding fields and language
         await User.findByIdAndUpdate(user.id, {
           $set: {
             isProfileComplete: false,
+            preferredLanguage: detectedLanguage,
             onboardingSteps: {
               nameDetails: false,
               danceStyles: false,
@@ -81,14 +94,14 @@ export const authOptions: NextAuthOptionsExtended = {
           }
         });
         
-        console.log(`✅ Initialized onboarding fields for new user: ${user.email}`);
+        console.log(`✅ Initialized onboarding fields for new user: ${user.email} with language: ${detectedLanguage}`);
       } catch (error) {
         console.error('Error initializing new user onboarding fields:', error);
       }
     },
   },
   callbacks: {
-    jwt: async ({ token, user, trigger }) => {
+    jwt: async ({ token, user, trigger, account }) => {
       // ALWAYS check the database for profile completion status to avoid stale JWT tokens
       // This ensures the middleware gets the most up-to-date profile status
       try {
@@ -97,7 +110,7 @@ export const authOptions: NextAuthOptionsExtended = {
         await connectMongoose();
         
         const User = (await import('@/models/User')).default;
-        const userData = await User.findById(token.sub || user?.id).select('isProfileComplete onboardingSteps image name');
+        const userData = await User.findById(token.sub || user?.id).select('isProfileComplete onboardingSteps image name preferredLanguage');
         
         console.log('🔍 JWT Callback - User data:', {
           userId: token.sub || user?.id,
@@ -114,17 +127,22 @@ export const authOptions: NextAuthOptionsExtended = {
           token.isProfileComplete = userData?.isProfileComplete || false;
         }
         
-        // Update token with current user image and name
+        
+        // Update token with current user image, name, and language preference
         if (userData?.image) {
           token.picture = userData.image;
         }
         if (userData?.name) {
           token.name = userData.name;
         }
+        if (userData?.preferredLanguage) {
+          token.preferredLanguage = userData.preferredLanguage;
+        }
         
         console.log('🔍 JWT Callback - Token updated:', {
           isProfileComplete: token.isProfileComplete,
           picture: token.picture,
+          preferredLanguage: token.preferredLanguage,
           changed: token.isProfileComplete !== (userData?.isProfileComplete || false)
         });
       } catch (error) {

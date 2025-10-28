@@ -37,19 +37,11 @@ export function I18nProvider({ children, initialLocale = 'en' }: { children: Rea
   const [locale, setLocaleState] = useState<Locale>(initialLocale);
   const [messages, setMessages] = useState<Messages>(messagesByLocale[initialLocale]);
 
-  // Load locale from cookie on mount
+  // Update state if initialLocale changes (e.g., after user changes language)
   useEffect(() => {
-    const cookieValue = document.cookie
-      .split('; ')
-      .find(row => row.startsWith('NEXT_LOCALE='))
-      ?.split('=')[1];
-    
-    if (cookieValue && ['en', 'es'].includes(cookieValue)) {
-      const savedLocale = cookieValue as Locale;
-      setLocaleState(savedLocale);
-      setMessages(messagesByLocale[savedLocale]);
-    }
-  }, []);
+    setLocaleState(initialLocale);
+    setMessages(messagesByLocale[initialLocale]);
+  }, [initialLocale]);
 
   const setLocale = async (newLocale: Locale) => {
     // Set cookie

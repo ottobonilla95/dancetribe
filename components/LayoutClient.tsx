@@ -54,30 +54,11 @@ const CrispChat = (): null => {
 // 3. Toaster: Show Success/Error messages anywhere from the app with toast()
 // 4. Tooltip: Show a tooltip if any JSX element has these 2 attributes: data-tooltip-id="tooltip" data-tooltip-content=""
 // 5. CrispChat: Set Crisp customer chat support (see above)
-const ClientLayout = ({ children }: { children: ReactNode }) => {
-  // Get initial locale from cookie or browser
-  const getInitialLocale = () => {
-    if (typeof window !== 'undefined') {
-      const cookieValue = document.cookie
-        .split('; ')
-        .find(row => row.startsWith('NEXT_LOCALE='))
-        ?.split('=')[1];
-      
-      if (cookieValue && ['en', 'es'].includes(cookieValue)) {
-        return cookieValue as 'en' | 'es';
-      }
-      
-      if (navigator.language.includes('es')) {
-        return 'es';
-      }
-    }
-    return 'en';
-  };
-
+const ClientLayout = ({ children, initialLocale }: { children: ReactNode; initialLocale: 'en' | 'es' }) => {
   return (
     <>
       <SessionProvider>
-        <I18nProvider initialLocale={getInitialLocale()}>
+        <I18nProvider initialLocale={initialLocale}>
           {/* Show a progress bar at the top when navigating between pages */}
           <NextTopLoader color={config.colors.main} showSpinner={false} />
 

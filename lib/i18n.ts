@@ -1,4 +1,4 @@
-import { headers as getHeaders, cookies } from 'next/headers';
+import { headers as getHeaders } from 'next/headers';
 import enMessages from '@/messages/en.json';
 import esMessages from '@/messages/es.json';
 
@@ -10,20 +10,14 @@ const messages: Record<Locale, Messages> = {
   es: esMessages,
 };
 
-export function getLocale(): Locale {
+export async function getLocale(): Promise<Locale> {
   try {
-    const cookieStore = cookies();
-    const localeCookie = cookieStore.get('NEXT_LOCALE');
+    // Get locale from x-locale header set by middleware
+    const headers = await getHeaders();
+    const locale = headers.get('x-locale');
     
-    if (localeCookie && ['en', 'es'].includes(localeCookie.value)) {
-      return localeCookie.value as Locale;
-    }
-
-    const headers = getHeaders();
-    const headerLang = headers.get('accept-language') || '';
-    
-    if (headerLang.includes('es')) {
-      return 'es';
+    if (locale && ['en', 'es'].includes(locale)) {
+      return locale as Locale;
     }
     
     return 'en';
@@ -32,8 +26,8 @@ export function getLocale(): Locale {
   }
 }
 
-export function getMessages(locale?: Locale): Messages {
-  const currentLocale = locale || getLocale();
+export async function getMessages(locale?: Locale): Promise<Messages> {
+  const currentLocale = locale || await getLocale();
   return messages[currentLocale] || messages.en;
 }
 
@@ -50,9 +44,9 @@ export function getTranslation(messages: Messages, key: string): string {
   return typeof value === 'string' ? value : key;
 }
 
-// Shorthand translation function
-export function t(key: string, locale?: Locale): string {
-  const msgs = getMessages(locale);
+// Shorthand translation function for server components
+export async function t(key: string, locale?: Locale): Promise<string> {
+  const msgs = await getMessages(locale);
   return getTranslation(msgs, key);
 }
 

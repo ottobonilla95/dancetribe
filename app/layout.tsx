@@ -5,6 +5,7 @@ import { getSEOTags } from "@/libs/seo";
 import ClientLayout from "@/components/LayoutClient";
 import config from "@/config";
 import Script from "next/script";
+import { headers } from "next/headers";
 import "./globals.css";
 
 const font = Inter({ subsets: ["latin"] });
@@ -34,10 +35,14 @@ export const metadata = {
 	},
 };
 
-export default function RootLayout({ children }: { children: ReactNode }) {
+export default async function RootLayout({ children }: { children: ReactNode }) {
+	// Get locale from headers
+	const headersList = await headers();
+	const locale = (headersList.get('x-locale') || 'en') as 'en' | 'es';
+	
 	return (
 		<html
-			lang="en"
+			lang={locale}
 			data-theme={config.colors.theme}
 			className={font.className}
 		>
@@ -87,7 +92,7 @@ export default function RootLayout({ children }: { children: ReactNode }) {
 				/>
 			</noscript>
 			{/* ClientLayout contains all the client wrappers (Crisp chat support, toast messages, tooltips, etc.) */}
-			<ClientLayout>{children}</ClientLayout>
+			<ClientLayout initialLocale={locale}>{children}</ClientLayout>
 		</body>
 		</html>
 	);

@@ -41,12 +41,21 @@ export async function middleware(request: NextRequest) {
   // ========================================
   // Language Detection (for i18n)
   // ========================================
+  
+  // Get user's token to check their preferred language
+  const token = await getToken({ 
+    req: request, 
+    secret: process.env.NEXTAUTH_SECRET 
+  });
+  
   const cookieLang = request.cookies.get('NEXT_LOCALE')?.value;
   const headerLang = request.headers.get('accept-language');
   
-  // Determine language (priority: cookie > header > default 'en')
+  // Determine language (priority: user DB preference > cookie > header > default 'en')
   let locale = 'en';
-  if (cookieLang && ['en', 'es'].includes(cookieLang)) {
+  if (token?.preferredLanguage && ['en', 'es'].includes(token.preferredLanguage as string)) {
+    locale = token.preferredLanguage as string;
+  } else if (cookieLang && ['en', 'es'].includes(cookieLang)) {
     locale = cookieLang;
   } else if (headerLang?.includes('es')) {
     locale = 'es';
@@ -99,12 +108,7 @@ export async function middleware(request: NextRequest) {
     })
   }
 
-  // Get the token (user session)
-  const token = await getToken({ 
-    req: request, 
-    secret: process.env.NEXTAUTH_SECRET 
-  })
-
+  // Token was already fetched above for language detection
   // If not authenticated, allow normal auth flow (will be handled by individual layouts)
   if (!token) {
     return NextResponse.next({
