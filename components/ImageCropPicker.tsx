@@ -3,6 +3,7 @@
 import React, { useState, useRef } from "react";
 import ReactCrop, { Crop, PixelCrop } from "react-image-crop";
 import "react-image-crop/dist/ReactCrop.css";
+import { useTranslation } from "./I18nProvider";
 
 interface ImageCropPickerProps {
   currentImage?: string;
@@ -19,6 +20,7 @@ export default function ImageCropPicker({
   uploading = false,
   selectedFileName,
 }: ImageCropPickerProps) {
+  const { t } = useTranslation();
   const [crop, setCrop] = useState<Crop>({
     unit: "%",
     width: 90,
@@ -181,11 +183,10 @@ export default function ImageCropPicker({
 
         <div className="space-y-2">
           <p className="text-base-content/70">
-            Your profile picture helps other dancers recognize you in the
-            community.
+            {t('onboarding.profilePicHelp')}
           </p>
           <p className="text-sm text-base-content/50">
-            Supported formats: JPEG, PNG, WebP (max 10MB)
+            {t('onboarding.profilePicFormats')}
           </p>
         </div>
 
@@ -205,8 +206,8 @@ export default function ImageCropPicker({
           >
             📷{" "}
             {profilePicPreview || currentImage
-              ? "Change Photo"
-              : "Upload Photo"}
+              ? t('onboarding.changePhoto')
+              : t('onboarding.uploadPhoto')}
           </label>
 
           {selectedFileName && !uploading && (
@@ -227,9 +228,9 @@ export default function ImageCropPicker({
           <div className="bg-base-100 rounded-lg w-full max-w-md flex flex-col max-h-[85vh]">
             {/* Header */}
             <div className="p-4 border-b border-base-300">
-              <h3 className="text-lg font-bold">Crop Your Photo</h3>
+              <h3 className="text-lg font-bold">{t('onboarding.cropPhoto')}</h3>
               <p className="text-sm text-base-content/70 mt-1">
-                Drag to select the area you want to use as your profile picture.
+                {t('onboarding.cropPhotoDesc')}
               </p>
             </div>
 
@@ -260,14 +261,14 @@ export default function ImageCropPicker({
                 className="btn btn-outline"
                 onClick={() => setShowCropModal(false)}
               >
-                Cancel
+                {t('common.cancel')}
               </button>
               <button
                 className="btn btn-primary"
                 onClick={handleCropComplete}
                 disabled={!completedCrop}
               >
-                Use This Crop
+                {t('onboarding.useThisCrop')}
               </button>
             </div>
           </div>

@@ -860,7 +860,7 @@ export default function Onboarding() {
                 {/* Partner Dance Styles */}
                 <div>
                   <h3 className="font-semibold text-base-content mb-3">
-                    Partner Dances
+                    {t('onboarding.partnerDances')}
                   </h3>
                   <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
                     {danceStylesOptions
@@ -890,7 +890,7 @@ export default function Onboarding() {
                 {/* Solo/Non-Partner Dance Styles */}
                 <div>
                   <h3 className="font-semibold text-base-content mb-3">
-                    Solo Dances
+                    {t('onboarding.soloDances')}
                   </h3>
                   <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
                     {danceStylesOptions
@@ -921,7 +921,7 @@ export default function Onboarding() {
                 {danceStyles.length > 0 && (
                   <div className="space-y-4">
                     <h3 className="font-medium text-base-content">
-                      Set your skill levels:
+                      {t('onboarding.setSkillLevels')}
                     </h3>
                     {danceStyles.map((userStyle) => (
                       <div
@@ -939,7 +939,7 @@ export default function Onboarding() {
                               removeDanceStyle(userStyle.danceStyle)
                             }
                           >
-                            Remove
+                            {t('onboarding.remove')}
                           </button>
                         </div>
                         <div className="grid grid-cols-2 md:grid-cols-4 gap-2">
@@ -988,7 +988,7 @@ export default function Onboarding() {
             {steps[currentStep].id === "username" && (
               <div className="form-control">
                 <label className="label">
-                  <span className="label-text">Choose your username</span>
+                  <span className="label-text">{t('onboarding.usernameLabel')}</span>
                 </label>
                 <div className="relative">
                   <input
@@ -1000,7 +1000,7 @@ export default function Onboarding() {
                           ? "input-success"
                           : ""
                     }`}
-                    placeholder="e.g., sarah_dancer"
+                    placeholder={t('onboarding.usernamePlaceholder')}
                     value={username}
                     onChange={(e) => handleUsernameChange(e.target.value)}
                   />
@@ -1032,7 +1032,7 @@ export default function Onboarding() {
                 {usernameStatus.available === true && !usernameStatus.error && (
                   <div className="label">
                     <span className="label-text-alt text-success">
-                      Username is available!
+                      {t('onboarding.usernameAvailable')}
                     </span>
                   </div>
                 )}
@@ -1041,7 +1041,7 @@ export default function Onboarding() {
                 {usernameStatus.suggestions.length > 0 && (
                   <div className="mt-3">
                     <span className="text-sm text-base-content/70">
-                      Suggestions:
+                      {t('onboarding.suggestions')}:
                     </span>
                     <div className="flex flex-wrap gap-2 mt-2">
                       {usernameStatus.suggestions.map((suggestion) => (
@@ -1062,7 +1062,7 @@ export default function Onboarding() {
 
                 <div className="label">
                   <span className="label-text-alt">
-                    Your profile will be available at: DanceCircle.co/
+                    {t('onboarding.profileUrl')}: DanceCircle.co/
                     {username || "username"}
                   </span>
                 </div>
@@ -1082,7 +1082,7 @@ export default function Onboarding() {
               <div className="form-control space-y-4">
                 <div>
                   <label className="label">
-                    <span className="label-text">Date of Birth</span>
+                    <span className="label-text">{t('onboarding.dateOfBirth')}</span>
                   </label>
                   <input
                     type="date"
@@ -1101,8 +1101,8 @@ export default function Onboarding() {
                       onChange={(e) => setHideAge(e.target.checked)}
                     />
                     <div>
-                      <span className="label-text font-medium">Hide my age from my profile</span>
-                      <p className="text-sm text-base-content/60 mt-1">Your age won&apos;t be visible to other dancers</p>
+                      <span className="label-text font-medium">{t('onboarding.hideAgeLabel')}</span>
+                      <p className="text-sm text-base-content/60 mt-1">{t('onboarding.hideAgeDesc')}</p>
                     </div>
                   </label>
                 </div>
@@ -1112,12 +1112,12 @@ export default function Onboarding() {
             {steps[currentStep].id === "dancingStartYear" && (
               <div className="form-control">
                 <label className="label">
-                  <span className="label-text">What year did you start dancing?</span>
+                  <span className="label-text">{t('onboarding.yearStartedDancing')}</span>
                 </label>
                 <input
                   type="number"
                   className="input input-bordered"
-                  placeholder={`e.g., ${new Date().getFullYear() - 5}`}
+                  placeholder={`${t('onboarding.example')} ${new Date().getFullYear() - 5}`}
                   value={dancingStartYear}
                   onChange={(e) => setDancingStartYear(e.target.value)}
                   min="1900"
@@ -1126,7 +1126,7 @@ export default function Onboarding() {
                 {dancingStartYear && (
                   <label className="label">
                     <span className="label-text-alt text-base-content/60">
-                      That&apos;s {new Date().getFullYear() - parseInt(dancingStartYear)} years of dancing! 🎉
+                      {t('onboarding.yearsOfDancing').replace('{years}', String(new Date().getFullYear() - parseInt(dancingStartYear)))} 🎉
                     </span>
                   </label>
                 )}
@@ -1137,8 +1137,8 @@ export default function Onboarding() {
               <CurrentLocationPicker
                 selectedCity={currentLocation}
                 onCitySelect={setCurrentLocation}
-                label="Where do you currently live?"
-                placeholder="Search for your current city..."
+                label={t('onboarding.currentLocationLabel')}
+                placeholder={t('onboarding.currentLocationPlaceholder')}
               />
             )}
 
@@ -1151,14 +1151,14 @@ export default function Onboarding() {
                     <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" className="stroke-current shrink-0 w-6 h-6">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
                     </svg>
-                    <span className="text-sm">We&apos;ve added {currentLocation.name} (your current city) to get you started! Feel free to add or remove cities.</span>
+                    <span className="text-sm">{t('onboarding.cityAdded').replace('{city}', currentLocation.name)}</span>
                   </div>
                 )}
                 <CitySelector
                   selectedCities={citiesVisited}
                   onCitiesChange={setCitiesVisited}
-                  placeholder="Search for cities where you've danced..."
-                  label="Cities you've danced in (optional)"
+                  placeholder={t('onboarding.searchCitiesPlaceholder')}
+                  label={t('onboarding.citiesYouDanced')}
                 />
               </div>
             )}
@@ -1170,12 +1170,12 @@ export default function Onboarding() {
               <div className="space-y-4">
                 <div className="form-control">
                   <label className="label">
-                    <span className="label-text">Spotify Song URL (optional)</span>
+                    <span className="label-text">{t('onboarding.spotifySongUrl')}</span>
                   </label>
                   <input
                     type="url"
                     className="input input-bordered"
-                    placeholder="Paste your Spotify link here..."
+                    placeholder={t('onboarding.pasteSpotifyLink')}
                     value={anthem.url}
                     onChange={(e) => {
                       const url = e.target.value;
@@ -1192,14 +1192,14 @@ export default function Onboarding() {
                   />
                   <label className="label">
                     <span className="label-text-alt text-base-content/60">
-                      Example: https://open.spotify.com/track/...
+                      {t('onboarding.spotifyExample')}
                     </span>
                   </label>
                 </div>
 
                 {!mediaInfo && anthem.url && (
                   <div className="alert alert-warning">
-                    <span>Please enter a valid Spotify URL</span>
+                    <span>{t('onboarding.validSpotifyUrl')}</span>
                   </div>
                 )}
 
@@ -1210,7 +1210,7 @@ export default function Onboarding() {
                         Spotify
                       </span>
                       <span className="text-sm text-base-content/70">
-                        Preview your song below
+                        {t('onboarding.previewSong')}
                       </span>
                     </div>
                     <div className="flex justify-center mt-4">
@@ -1291,20 +1291,24 @@ export default function Onboarding() {
               <div className="form-control">
                 <label className="label">
                   <span className="label-text">
-                    What&apos;s your dance role?
+                    {t('onboarding.danceRoleQuestion')}
                   </span>
                 </label>
                 <div className="flex flex-col gap-3">
-                  {["leader", "follower", "both"].map((role) => (
-                    <label key={role} className="label cursor-pointer">
-                      <span className="label-text capitalize">{role}</span>
+                  {[
+                    { value: "leader", label: t('profile.leader') },
+                    { value: "follower", label: t('profile.follower') },
+                    { value: "both", label: t('common.both') }
+                  ].map((role) => (
+                    <label key={role.value} className="label cursor-pointer">
+                      <span className="label-text">{role.label}</span>
                       <input
                         type="radio"
                         name="danceRole"
                         className="radio radio-primary"
-                        checked={danceRole === role}
+                        checked={danceRole === role.value}
                         onChange={() =>
-                          setDanceRole(role as "follower" | "leader" | "both")
+                          setDanceRole(role.value as "follower" | "leader" | "both")
                         }
                       />
                     </label>
@@ -1317,13 +1321,13 @@ export default function Onboarding() {
             {steps[currentStep].id === "gender" && (
               <div className="form-control">
                 <label className="label">
-                  <span className="label-text">What&apos;s your gender?</span>
+                  <span className="label-text">{t('onboarding.genderQuestion')}</span>
                 </label>
                 <div className="flex flex-col gap-3">
                   {[
-                    { value: "male", label: "Male" },
-                    { value: "female", label: "Female" },
-                    { value: "other", label: "Other" },
+                    { value: "male", label: t('onboarding.male') },
+                    { value: "female", label: t('onboarding.female') },
+                    { value: "other", label: t('onboarding.other') },
                   ].map((option) => (
                     <label key={option.value} className="label cursor-pointer">
                       <span className="label-text">{option.label}</span>
@@ -1347,7 +1351,7 @@ export default function Onboarding() {
               <div className="form-control">
                 <label className="label">
                   <span className="label-text">
-                    What&apos;s your nationality?
+                    {t('onboarding.nationalityQuestion')}
                   </span>
                 </label>
                 <select
@@ -1355,7 +1359,7 @@ export default function Onboarding() {
                   value={nationality}
                   onChange={(e) => setNationality(e.target.value)}
                 >
-                  <option value="">Select your country...</option>
+                  <option value="">{t('onboarding.selectCountry')}</option>
                   {COUNTRIES.map((country) => (
                     <option key={country} value={country}>
                       {country}
@@ -1369,20 +1373,20 @@ export default function Onboarding() {
             {steps[currentStep].id === "relationshipStatus" && (
               <div className="form-control">
                 <div className="alert alert-info mb-4">
-                  <span className="text-sm">This step is optional - you can skip it if you prefer!</span>
+                  <span className="text-sm">{t('onboarding.optionalStep')}</span>
                 </div>
                 <label className="label">
                   <span className="label-text">
-                    What&apos;s your relationship status?
+                    {t('onboarding.relationshipQuestion')}
                   </span>
                 </label>
                 <div className="flex flex-col gap-3">
                   {[
-                    { value: "", label: "Prefer not to say" },
-                    { value: "single", label: "Single 💙" },
-                    { value: "in_a_relationship", label: "In a relationship 💕" },
-                    { value: "married", label: "Married 💍" },
-                    { value: "its_complicated", label: "It's complicated 🤷" },
+                    { value: "", label: t('onboarding.preferNotToSay') },
+                    { value: "single", label: `${t('profile.single')} 💙` },
+                    { value: "in_a_relationship", label: `${t('profile.inRelationship')} 💕` },
+                    { value: "married", label: `${t('profile.married')} 💍` },
+                    { value: "its_complicated", label: `${t('profile.itsComplicated')} 🤷` },
                   ].map((option) => (
                     <label key={option.value} className="label cursor-pointer">
                       <span className="label-text">{option.label}</span>
@@ -1405,7 +1409,7 @@ export default function Onboarding() {
             {steps[currentStep].id === "teacherInfo" && (
               <div className="space-y-6">
                 <div className="text-sm text-base-content/70 mb-4">
-                  Select all that apply:
+                  {t('onboarding.selectAllThatApply')}
                 </div>
 
                 {/* Dance Teacher */}
@@ -1419,10 +1423,10 @@ export default function Onboarding() {
                     />
                     <div>
                       <span className="label-text font-semibold">
-                        🎓 Dance Teacher
+                        🎓 {t('onboarding.danceTeacher')}
                       </span>
                       <p className="text-sm text-base-content/60">
-                        Let students find and contact you
+                        {t('onboarding.danceTeacherDesc')}
                       </p>
                     </div>
                   </label>
@@ -1472,10 +1476,10 @@ export default function Onboarding() {
                     />
                     <div>
                       <span className="label-text font-semibold">
-                        🎵 DJ
+                        🎵 {t('onboarding.dj')}
                       </span>
                       <p className="text-sm text-base-content/60">
-                        Show your DJ profile to event organizers
+                        {t('onboarding.djDesc')}
                       </p>
                     </div>
                   </label>
@@ -1534,10 +1538,10 @@ export default function Onboarding() {
                     />
                     <div>
                       <span className="label-text font-semibold">
-                        📷 Photographer/Videographer
+                        📷 {t('onboarding.photographer')}
                       </span>
                       <p className="text-sm text-base-content/60">
-                        Let event organizers and dancers book you
+                        {t('onboarding.photographerDesc')}
                       </p>
                     </div>
                   </label>

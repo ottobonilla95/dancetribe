@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { City } from "@/types";
 import CityDropdown from "./CityDropdown";
+import { useTranslation } from "./I18nProvider";
 
 interface CurrentLocationPickerProps {
   selectedCity: City | null;
@@ -15,6 +16,7 @@ export default function CurrentLocationPicker({
   label = "Where do you live?",
   placeholder = "Search for your current city...",
 }: CurrentLocationPickerProps) {
+  const { t } = useTranslation();
   const [searchTerm, setSearchTerm] = useState("");
 
   const handleCitySelect = (city: City) => {
@@ -36,9 +38,9 @@ export default function CurrentLocationPicker({
 
   const getDancerMessage = (count: number) => {
     if (count >= 30) {
-      return `${count} dancers in your area`;
+      return t('onboarding.dancersInArea').replace('{count}', String(count));
     }
-    return "Growing community 🌱";
+    return t('onboarding.growingCommunity');
   };
 
   return (
@@ -101,7 +103,7 @@ export default function CurrentLocationPicker({
                     {/* Population (optional additional info) */}
                     {selectedCity.population && (
                       <p className="text-xs text-base-content/50 mt-1">
-                        Population: {selectedCity.population.toLocaleString()}
+                        {t('onboarding.population')}: {selectedCity.population.toLocaleString()}
                       </p>
                     )}
                   </div>
@@ -110,7 +112,7 @@ export default function CurrentLocationPicker({
                   <button
                     className="btn btn-ghost btn-sm btn-circle"
                     onClick={handleRemoveCity}
-                    title="Change location"
+                    title={t('onboarding.changeLocation')}
                   >
                     ✕
                   </button>
@@ -124,7 +126,7 @@ export default function CurrentLocationPicker({
                 className="btn btn-outline btn-sm"
                 onClick={handleRemoveCity}
               >
-                📍 Change Location
+                📍 {t('onboarding.changeLocation')}
               </button>
             </div>
           </div>
