@@ -17,6 +17,7 @@ import DanceStyle from "@/models/DanceStyle";
 import ButtonSignin from "@/components/ButtonSignin";
 import DancerCard from "@/components/DancerCard";
 import TrendyMusicPreview from "@/components/TrendyMusicPreview";
+import { getMessages, getTranslation } from "@/lib/i18n";
 
 async function getHotDanceStyles(): Promise<
   (DanceStyleType & { userCount: number })[]
@@ -270,6 +271,10 @@ export default async function Home() {
     redirect("/dashboard");
   }
 
+  // Get translations
+  const messages = getMessages();
+  const t = (key: string) => getTranslation(messages, key);
+
   // Fetch data in parallel
   const [cities, hotDanceStyles, recentDancers, trendingSongs, featuredUsers] = await Promise.all([
     getCities(),
@@ -285,7 +290,7 @@ export default async function Home() {
         <Hero featuredUsers={featuredUsers} />
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mt-12 md:mt-16">
           <h2 className="max-w-3xl font-extrabold text-xl md:text-2xl tracking-tight mb-2 md:mb-8">
-            Hottest Dance Cities 🔥
+            {t('landing.hottestCities')}
           </h2>
           <CityList initialCities={cities} />
           {/* <div className="flex justify-center mt-6">
@@ -307,14 +312,14 @@ export default async function Home() {
               <div className="flex items-center justify-between mb-6">
                 <div>
                   <h2 className="max-w-3xl font-extrabold text-xl md:text-2xl tracking-tight">
-                    Meet Dancers, Make Friends 🌍
+                    {t('landing.meetDancers')}
                   </h2>
                   <p className="text-base-content/60 mt-1">
-                    Connect with dancers from around the world
+                    {t('landing.meetDancersSubtitle')}
                   </p>
                 </div>
                 <ButtonSignin 
-                  text="Discover All" 
+                  text={t('landing.discoverAll')}
                   extraStyle="btn-primary btn-sm md:btn-md"
                 />
               </div>
@@ -328,7 +333,7 @@ export default async function Home() {
               {/* CTA */}
               <div className="text-center mt-8">
                 <ButtonSignin 
-                  text="Join the Community" 
+                  text={t('landing.joinCommunity')}
                   extraStyle="btn-primary btn-lg"
                 />
               </div>

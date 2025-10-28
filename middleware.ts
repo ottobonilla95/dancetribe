@@ -38,6 +38,28 @@ const authRoutes = [
 export async function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl
 
+  // ========================================
+  // Language Detection (for i18n)
+  // ========================================
+  const cookieLang = request.cookies.get('NEXT_LOCALE')?.value;
+  const headerLang = request.headers.get('accept-language');
+  
+  // Determine language (priority: cookie > header > default 'en')
+  let locale = 'en';
+  if (cookieLang && ['en', 'es'].includes(cookieLang)) {
+    locale = cookieLang;
+  } else if (headerLang?.includes('es')) {
+    locale = 'es';
+  }
+
+  // Add locale to request headers for server components
+  const requestHeaders = new Headers(request.headers);
+  requestHeaders.set('x-locale', locale);
+
+  // ========================================
+  // Authentication & Onboarding Logic
+  // ========================================
+
   // Skip middleware for static files and Next.js internals
   if (
     pathname.startsWith('/_next') ||
@@ -49,12 +71,20 @@ export async function middleware(request: NextRequest) {
     pathname.startsWith('/opengraph-image.png') ||
     pathname.startsWith('/twitter-image.png')
   ) {
-    return NextResponse.next()
+    return NextResponse.next({
+      request: {
+        headers: requestHeaders,
+      },
+    })
   }
 
   // Allow public routes
   if (publicRoutes.some(route => pathname === route || pathname.startsWith(route + '/'))) {
-    return NextResponse.next()
+    return NextResponse.next({
+      request: {
+        headers: requestHeaders,
+      },
+    })
   }
 
   // Allow username routes (/{username} pattern - single segment, no slashes)
@@ -62,7 +92,11 @@ export async function middleware(request: NextRequest) {
   const pathSegments = pathname.split('/').filter(Boolean)
   if (pathSegments.length === 1) {
     // Single segment path - likely a username
-    return NextResponse.next()
+    return NextResponse.next({
+      request: {
+        headers: requestHeaders,
+      },
+    })
   }
 
   // Get the token (user session)
@@ -73,12 +107,20 @@ export async function middleware(request: NextRequest) {
 
   // If not authenticated, allow normal auth flow (will be handled by individual layouts)
   if (!token) {
-    return NextResponse.next()
+    return NextResponse.next({
+      request: {
+        headers: requestHeaders,
+      },
+    })
   }
 
   // Allow auth-related routes for authenticated users
   if (authRoutes.some(route => pathname === route || pathname.startsWith(route + '/'))) {
-    return NextResponse.next()
+    return NextResponse.next({
+      request: {
+        headers: requestHeaders,
+      },
+    })
   }
 
   // Check if user has completed onboarding
@@ -100,7 +142,11 @@ export async function middleware(request: NextRequest) {
     return NextResponse.redirect(new URL('/dashboard', request.url))
   }
 
-  return NextResponse.next()
+  return NextResponse.next({
+    request: {
+      headers: requestHeaders,
+    },
+  })
 }
 
 export const config = {
@@ -115,4 +161,4 @@ export const config = {
      */
     '/((?!api/auth|api/webhook|_next/static|_next/image|favicon.ico).*)',
   ],
-} 
+}

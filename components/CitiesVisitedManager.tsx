@@ -5,12 +5,14 @@ import { FaPlus, FaTimes } from "react-icons/fa";
 import CitySelector from "./CitySelector";
 import Link from "next/link";
 import { City } from "@/types";
+import { useTranslation } from "./I18nProvider";
 
 interface CitiesVisitedManagerProps {
   cities: City[];
 }
 
 export default function CitiesVisitedManager({ cities: initialCities }: CitiesVisitedManagerProps) {
+  const { t } = useTranslation();
   const [cities, setCities] = useState<City[]>(initialCities || []);
   const [isAdding, setIsAdding] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
@@ -20,14 +22,14 @@ export default function CitiesVisitedManager({ cities: initialCities }: CitiesVi
 
   const handleAdd = async () => {
     if (!selectedCity) {
-      alert("Please select a city");
+      alert(t('profile.pleaseSelectCity'));
       return;
     }
 
     // Check if city already exists
     const cityId = selectedCity._id || (selectedCity as any).id;
     if (cities.some(c => (c._id || (c as any).id) === cityId)) {
-      alert("You've already added this city!");
+      alert(t('profile.cityAlreadyAdded'));
       return;
     }
 
@@ -47,11 +49,11 @@ export default function CitiesVisitedManager({ cities: initialCities }: CitiesVi
         setIsAdding(false);
         window.location.reload(); // Reload to get populated city data
       } else {
-        alert("Failed to add city");
+        alert(t('profile.failedToAddCity'));
       }
     } catch (error) {
       console.error("Error adding city:", error);
-      alert("Failed to add city");
+      alert(t('profile.failedToAddCity'));
     } finally {
       setIsSaving(false);
     }
@@ -83,11 +85,11 @@ export default function CitiesVisitedManager({ cities: initialCities }: CitiesVi
         setShowDeleteConfirm(false);
         setCityToDelete(null);
       } else {
-        alert("Failed to remove city");
+        alert(t('profile.failedToRemoveCity'));
       }
     } catch (error) {
       console.error("Error removing city:", error);
-      alert("Failed to remove city");
+      alert(t('profile.failedToRemoveCity'));
     } finally {
       setIsSaving(false);
     }
@@ -98,7 +100,7 @@ export default function CitiesVisitedManager({ cities: initialCities }: CitiesVi
       <div>
         <div className="flex items-center justify-between mb-2">
           <div className="text-sm font-medium text-base-content/60">
-            Cities Danced In
+            {t('profile.citiesDancedIn')}
           </div>
           {!isAdding && (
             <button
@@ -106,15 +108,15 @@ export default function CitiesVisitedManager({ cities: initialCities }: CitiesVi
               className="btn btn-primary btn-xs gap-1"
               disabled={isSaving}
             >
-              <FaPlus className="text-xs" /> Add City
+              <FaPlus className="text-xs" /> {t('profile.addCity')}
             </button>
           )}
         </div>
 
         {cities.length === 0 && !isAdding ? (
           <div className="text-center py-6 text-base-content/60 text-sm">
-            <p>No cities added yet</p>
-            <p className="text-xs mt-1">Share your dance journey!</p>
+            <p>{t('profile.noCitiesAdded')}</p>
+            <p className="text-xs mt-1">{t('profile.shareYourJourney')}</p>
           </div>
         ) : (
           <div className="flex flex-wrap gap-3">
@@ -151,7 +153,7 @@ export default function CitiesVisitedManager({ cities: initialCities }: CitiesVi
                   }}
                   className="absolute top-0.5 right-0.5 btn btn-ghost btn-xs btn-circle bg-error/80 hover:bg-error text-white"
                   disabled={isSaving}
-                  title="Remove city"
+                  title={t('profile.removeCity')}
                 >
                   <FaTimes className="text-[10px]" />
                 </button>
@@ -169,7 +171,7 @@ export default function CitiesVisitedManager({ cities: initialCities }: CitiesVi
             <div className="bg-base-100 rounded-2xl shadow-2xl max-w-md w-full">
               <div className="p-6">
                 <div className="flex items-center justify-between mb-4">
-                  <h3 className="text-xl font-bold">Add City</h3>
+                  <h3 className="text-xl font-bold">{t('profile.addCity')}</h3>
                   <button
                     onClick={() => setIsAdding(false)}
                     className="btn btn-ghost btn-sm btn-circle"
@@ -187,12 +189,12 @@ export default function CitiesVisitedManager({ cities: initialCities }: CitiesVi
                       const newCity = cities[cities.length - 1] || null;
                       setSelectedCity(newCity);
                     }}
-                    placeholder="Search for a city you've danced in..."
-                    label="Select City"
+                    placeholder={t('profile.searchCityPlaceholder')}
+                    label={t('profile.selectCity')}
                   />
                   {selectedCity && (
                     <p className="text-xs text-base-content/60 mt-2">
-                      Selected: <strong>{selectedCity.name}</strong>
+                      {t('profile.selected')}: <strong>{selectedCity.name}</strong>
                     </p>
                   )}
                 </div>
@@ -206,10 +208,10 @@ export default function CitiesVisitedManager({ cities: initialCities }: CitiesVi
                     {isSaving ? (
                       <>
                         <span className="loading loading-spinner loading-sm"></span>
-                        Adding...
+                        {t('profile.adding')}
                       </>
                     ) : (
-                      "Add City"
+                      t('profile.addCity')
                     )}
                   </button>
                   <button
@@ -217,7 +219,7 @@ export default function CitiesVisitedManager({ cities: initialCities }: CitiesVi
                     className="btn btn-ghost"
                     disabled={isSaving}
                   >
-                    Cancel
+                    {t('common.cancel')}
                   </button>
                 </div>
               </div>
@@ -233,9 +235,9 @@ export default function CitiesVisitedManager({ cities: initialCities }: CitiesVi
           <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
             <div className="bg-base-100 rounded-2xl shadow-2xl max-w-sm w-full">
               <div className="p-6">
-                <h3 className="text-xl font-bold mb-4">Remove City?</h3>
+                <h3 className="text-xl font-bold mb-4">{t('profile.removeCityConfirm')}</h3>
                 <p className="text-base-content/70 mb-6">
-                  Are you sure you want to remove <strong>{cityToDelete.name}</strong> from your visited cities?
+                  {t('profile.removeCityQuestion')} <strong>{cityToDelete.name}</strong> {t('profile.fromVisitedCities')}
                 </p>
                 <div className="flex gap-2">
                   <button
@@ -246,10 +248,10 @@ export default function CitiesVisitedManager({ cities: initialCities }: CitiesVi
                     {isSaving ? (
                       <>
                         <span className="loading loading-spinner loading-sm"></span>
-                        Removing...
+                        {t('profile.removing')}
                       </>
                     ) : (
-                      "Yes, Remove"
+                      t('profile.yesRemove')
                     )}
                   </button>
                   <button
@@ -260,7 +262,7 @@ export default function CitiesVisitedManager({ cities: initialCities }: CitiesVi
                     className="btn btn-ghost"
                     disabled={isSaving}
                   >
-                    Cancel
+                    {t('common.cancel')}
                   </button>
                 </div>
               </div>

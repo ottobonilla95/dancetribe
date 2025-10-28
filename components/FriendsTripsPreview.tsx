@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import { FaPlane, FaCalendar, FaMapMarkerAlt } from "react-icons/fa";
+import { useTranslation } from "./I18nProvider";
 
 interface FriendTrip {
   _id: string;
@@ -28,6 +29,7 @@ interface FriendTrip {
 export default function FriendsTripsPreview() {
   const [trips, setTrips] = useState<FriendTrip[]>([]);
   const [isLoading, setIsLoading] = useState(true);
+  const { t } = useTranslation();
 
   useEffect(() => {
     fetchTrips();
@@ -77,7 +79,7 @@ export default function FriendsTripsPreview() {
         <div className="card-body">
           <h2 className="card-title">
             <FaPlane className="text-primary" />
-            Friends&apos; Upcoming Trips
+            {t('dashboard.friendsTrips')}
           </h2>
           <div className="space-y-3">
             {[1, 2, 3].map((i) => (
@@ -100,10 +102,10 @@ export default function FriendsTripsPreview() {
         <div className="flex items-center justify-between mb-4">
           <h2 className="card-title">
             <FaPlane className="text-primary" />
-            Friends&apos; Upcoming Trips
+            {t('dashboard.friendsTrips')}
           </h2>
           <Link href="/friends/trips" className="btn btn-ghost btn-sm">
-            View All
+            {t('common.viewAll')}
           </Link>
         </div>
 
@@ -175,7 +177,7 @@ export default function FriendsTripsPreview() {
             href="/friends/trips"
             className="btn btn-outline btn-sm btn-block mt-4"
           >
-            See All Friends&apos; Trips
+            {t('common.viewAll')}
           </Link>
         )}
       </div>

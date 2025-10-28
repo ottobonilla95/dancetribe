@@ -16,6 +16,7 @@ import { signOut } from "next-auth/react";
 import { CONTACT } from "@/constants/contact";
 import InstallAppButton from "./InstallAppButton";
 import SupportModal from "./SupportModal";
+import LanguageSwitcher from "./LanguageSwitcher";
 
 const links: {
   href: string;
@@ -173,6 +174,9 @@ const Header = () => {
                 Collab
               </a> */}
 
+              {/* Language Switcher */}
+              <LanguageSwitcher />
+
               {/* Friend Requests Badge */}
               {pendingRequests > 0 && (
                 <Link href="/friends" className="btn btn-ghost btn-sm gap-2">
@@ -240,7 +244,10 @@ const Header = () => {
               </div>
             </div>
           ) : (
-            cta
+            <div className="flex items-center gap-3">
+              <LanguageSwitcher />
+              {cta}
+            </div>
           )}
         </div>
       </nav>
@@ -352,6 +359,11 @@ const Header = () => {
 
                 <div className="divider"></div>
 
+                {/* Language Switcher */}
+                <div className="py-2">
+                  <LanguageSwitcher />
+                </div>
+
                 {/* Install App Button */}
                 <div className="py-2">
                   <InstallAppButton />
@@ -401,6 +413,11 @@ const Header = () => {
                       </Link>
                     ))}
                   </div>
+                </div>
+                <div className="divider"></div>
+                {/* Language Switcher */}
+                <div className="py-2">
+                  <LanguageSwitcher />
                 </div>
                 <div className="divider"></div>
                 {/* Your CTA on small screens */}

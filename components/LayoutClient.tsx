@@ -11,6 +11,7 @@ import { Tooltip } from "react-tooltip";
 import config from "@/config";
 import FriendRequestWrapper from "./FriendRequestWrapper";
 import FacebookPixel from "./FacebookPixel";
+import { I18nProvider } from "./I18nProvider";
 
 // Crisp customer chat support:
 // This component is separated from ClientLayout because it needs to be wrapped with <SessionProvider> to use useSession() hook
@@ -54,38 +55,59 @@ const CrispChat = (): null => {
 // 4. Tooltip: Show a tooltip if any JSX element has these 2 attributes: data-tooltip-id="tooltip" data-tooltip-content=""
 // 5. CrispChat: Set Crisp customer chat support (see above)
 const ClientLayout = ({ children }: { children: ReactNode }) => {
+  // Get initial locale from cookie or browser
+  const getInitialLocale = () => {
+    if (typeof window !== 'undefined') {
+      const cookieValue = document.cookie
+        .split('; ')
+        .find(row => row.startsWith('NEXT_LOCALE='))
+        ?.split('=')[1];
+      
+      if (cookieValue && ['en', 'es'].includes(cookieValue)) {
+        return cookieValue as 'en' | 'es';
+      }
+      
+      if (navigator.language.includes('es')) {
+        return 'es';
+      }
+    }
+    return 'en';
+  };
+
   return (
     <>
       <SessionProvider>
-        {/* Show a progress bar at the top when navigating between pages */}
-        <NextTopLoader color={config.colors.main} showSpinner={false} />
+        <I18nProvider initialLocale={getInitialLocale()}>
+          {/* Show a progress bar at the top when navigating between pages */}
+          <NextTopLoader color={config.colors.main} showSpinner={false} />
 
-        {/* Content inside app/page.js files  */}
-        {children}
+          {/* Content inside app/page.js files  */}
+          {children}
 
-        {/* Show Success/Error messages anywhere from the app with toast() */}
-        <Toaster
-          toastOptions={{
-            duration: 3000,
-          }}
-        />
+          {/* Show Success/Error messages anywhere from the app with toast() */}
+          <Toaster
+            toastOptions={{
+              duration: 3000,
+            }}
+          />
 
-        {/* Show a tooltip if any JSX element has these 2 attributes: data-tooltip-id="tooltip" data-tooltip-content="" */}
-        <Tooltip
-          id="tooltip"
-          className="z-[60] !opacity-100 max-w-sm shadow-lg"
-        />
+          {/* Show a tooltip if any JSX element has these 2 attributes: data-tooltip-id="tooltip" data-tooltip-content="" */}
+          <Tooltip
+            id="tooltip"
+            className="z-[60] !opacity-100 max-w-sm shadow-lg"
+          />
 
-        {/* Set Crisp customer chat support */}
-        <CrispChat />
-        
-        {/* Friend Request Notifications */}
-        <FriendRequestWrapper />
-        
-        {/* Facebook Pixel - Track page views */}
-        <Suspense fallback={null}>
-          <FacebookPixel />
-        </Suspense>
+          {/* Set Crisp customer chat support */}
+          <CrispChat />
+          
+          {/* Friend Request Notifications */}
+          <FriendRequestWrapper />
+          
+          {/* Facebook Pixel - Track page views */}
+          <Suspense fallback={null}>
+            <FacebookPixel />
+          </Suspense>
+        </I18nProvider>
       </SessionProvider>
     </>
   );

@@ -4,6 +4,7 @@ import Image from "next/image";
 import ButtonSignin from "./ButtonSignin";
 import { CONTACT } from "@/constants/contact";
 import { useEffect, useRef } from "react";
+import { useTranslation } from "./I18nProvider";
 
 interface HeroProps {
   featuredUsers?: Array<{
@@ -15,6 +16,7 @@ interface HeroProps {
 
 const Hero = ({ featuredUsers = [] }: HeroProps) => {
   const videoRef = useRef<HTMLVideoElement>(null);
+  const { t } = useTranslation();
 
   useEffect(() => {
     const video = videoRef.current;
@@ -73,11 +75,11 @@ const Hero = ({ featuredUsers = [] }: HeroProps) => {
       <div className="relative z-20 max-w-4xl mx-auto px-4 sm:px-6 py-6 sm:py-8 text-center">
         {/* Main Heading */}
         <h1 className="text-4xl sm:text-5xl md:text-6xl font-extrabold tracking-tight mb-4 sm:mb-6 mt-4">
-          💃 Connect with dancers worldwide 
+          💃 {t('hero.title')}
         </h1>
         
         <p className="text-lg sm:text-xl md:text-2xl mb-6 sm:mb-8 text-white/95 max-w-3xl mx-auto leading-relaxed">
-          Join a global community of dancers connecting, learning, and traveling around the world
+          {t('hero.subtitle')}
         </p>
 
         {/* User Avatars */}
@@ -111,36 +113,36 @@ const Hero = ({ featuredUsers = [] }: HeroProps) => {
         <div className="space-y-3 sm:space-y-4 mb-8 sm:mb-10 text-left md:text-center max-w-2xl mx-auto">
           <div className="flex items-start md:items-center gap-2 sm:gap-3 text-base sm:text-lg md:text-xl">
             <span className="text-2xl sm:text-3xl flex-shrink-0">✨</span>
-            <span><strong>Create your dance profile</strong> & track your achievements</span>
+            <span><strong>{t('hero.feature1')}</strong> {t('hero.feature1b')}</span>
           </div>
           <div className="flex items-start md:items-center gap-2 sm:gap-3 text-base sm:text-lg md:text-xl">
             <span className="text-2xl sm:text-3xl flex-shrink-0">🌍</span>
-            <span><strong>Find dancers in 100+ cities</strong> worldwide</span>
+            <span><strong>{t('hero.feature2')}</strong> {t('hero.feature2b')}</span>
           </div>
           <div className="flex items-start md:items-center gap-2 sm:gap-3 text-base sm:text-lg md:text-xl">
             <span className="text-2xl sm:text-3xl flex-shrink-0">👯</span>
-            <span><strong>Connect with teachers & practice partners</strong></span>
+            <span><strong>{t('hero.feature3')}</strong></span>
           </div>
           <div className="flex items-start md:items-center gap-2 sm:gap-3 text-base sm:text-lg md:text-xl">
             <span className="text-2xl sm:text-3xl flex-shrink-0">🔥</span>
-            <span><strong>Discover trending music, cities & dance styles</strong></span>
+            <span><strong>{t('hero.feature4')}</strong></span>
           </div>
         </div>
 
         {/* CTA */}
         <div className="flex flex-col items-center gap-3 sm:gap-4">
           <ButtonSignin
-            text="Join DanceCircle →"
+            text={t('hero.ctaButton')}
             extraStyle="btn-primary btn-md sm:btn-lg text-base sm:text-lg px-8 sm:px-12"
           />
           <p className="text-sm sm:text-base text-white/80">
-            If you already have an account, we&apos;ll log you in
+            {t('hero.alreadyMember')}
           </p>
         </div>
 
         {/* Scroll indicator */}
         <div className="flex flex-col items-center gap-1 sm:gap-2 mt-8 sm:mt-12 animate-bounce">
-          <span className="text-xs sm:text-sm text-white/70">Explore more</span>
+          <span className="text-xs sm:text-sm text-white/70">{t('hero.exploreMore')}</span>
           <svg 
             className="w-5 h-5 sm:w-6 sm:h-6 text-white/60" 
             fill="none" 

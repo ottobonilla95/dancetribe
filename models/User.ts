@@ -160,6 +160,12 @@ const userSchema = new mongoose.Schema(
       type: Boolean,
       default: false,
     },
+    // Language preference for UI and emails
+    preferredLanguage: {
+      type: String,
+      enum: ['en', 'es'],
+      default: 'en',
+    },
     // Onboarding completion tracking
     onboardingSteps: {
       nameDetails: { type: Boolean, default: false },

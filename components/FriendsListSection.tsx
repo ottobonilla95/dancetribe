@@ -3,6 +3,7 @@
 import { useState } from "react";
 import Link from "next/link";
 import { FaTimes } from "react-icons/fa";
+import { useTranslation } from "./I18nProvider";
 
 interface Friend {
   _id?: string;
@@ -21,6 +22,7 @@ interface FriendsListSectionProps {
 }
 
 export default function FriendsListSection({ friends, totalCount }: FriendsListSectionProps) {
+  const { t } = useTranslation();
   const [isModalOpen, setIsModalOpen] = useState(false);
 
   if (!friends || friends.length === 0) {
@@ -35,7 +37,7 @@ export default function FriendsListSection({ friends, totalCount }: FriendsListS
       <div className="card bg-base-200 shadow-xl">
         <div className="card-body">
           <h3 className="card-title text-xl mb-4">
-            👥 Friends ({totalCount})
+            👥 {t('profile.friends')} ({totalCount})
           </h3>
           <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4">
             {displayedFriends.map((friend) => (
@@ -82,7 +84,7 @@ export default function FriendsListSection({ friends, totalCount }: FriendsListS
                 onClick={() => setIsModalOpen(true)}
                 className="btn btn-outline btn-sm gap-2"
               >
-                View All {friends.length} Friends
+                {t('profile.viewAllFriends')} {friends.length} {t('profile.friends').toLowerCase()}
               </button>
             </div>
           )}
@@ -101,7 +103,7 @@ export default function FriendsListSection({ friends, totalCount }: FriendsListS
               {/* Header */}
               <div className="flex items-center justify-between p-6 border-b border-base-300">
                 <h3 className="text-2xl font-bold">
-                  👥 All Friends ({friends.length})
+                  👥 {t('profile.friends')} ({friends.length})
                 </h3>
                 <button
                   onClick={() => setIsModalOpen(false)}

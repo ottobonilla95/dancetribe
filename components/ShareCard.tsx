@@ -1,6 +1,7 @@
 "use client";
 
 import React, { forwardRef } from "react";
+import { useTranslation } from "./I18nProvider";
 
 interface ShareCardProps {
   userData: {
@@ -28,6 +29,7 @@ interface ShareCardProps {
 
 const ShareCard = forwardRef<HTMLDivElement, ShareCardProps>(
   ({ userData }, ref) => {
+    const { t } = useTranslation();
     // Calculate age
     const birthDate = new Date(userData.dateOfBirth);
     const today = new Date();
@@ -104,7 +106,7 @@ const ShareCard = forwardRef<HTMLDivElement, ShareCardProps>(
               letterSpacing: "-1px",
             }}
           >
-            ✨ Meet {userData.name.charAt(0).toUpperCase() + userData.name.slice(1)} ✨
+            ✨ {t('profile.meet')} {userData.name.charAt(0).toUpperCase() + userData.name.slice(1)} ✨
           </div>
           <div
             style={{
@@ -113,7 +115,7 @@ const ShareCard = forwardRef<HTMLDivElement, ShareCardProps>(
               fontWeight: "600",
             }}
           >
-            Dancing their way through {userData.city.name}
+            {t('profile.dancingTheirWayThrough')} {userData.city.name}
           </div>
         </div>
 

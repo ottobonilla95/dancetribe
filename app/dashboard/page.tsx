@@ -16,6 +16,7 @@ import StatsPreview from "@/components/StatsPreview";
 import TrendyMusicPreview from "@/components/TrendyMusicPreview";
 import FriendsTripsPreview from "@/components/FriendsTripsPreview";
 import Link from "next/link";
+import { getMessages, getTranslation } from "@/lib/i18n";
 
 export const dynamic = "force-dynamic";
 
@@ -425,6 +426,10 @@ async function getCities(): Promise<CityType[]> {
 export default async function Dashboard() {
   const session = await getServerSession(authOptions);
 
+  // Get translations
+  const messages = getMessages();
+  const t = (key: string) => getTranslation(messages, key);
+
   // Check if user profile is complete
   try {
     await connectMongo();
@@ -454,7 +459,7 @@ export default async function Dashboard() {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Hot Cities Section */}
         <h2 className="max-w-3xl font-extrabold text-xl md:text-2xl tracking-tight mb-2 md:mb-8">
-          Hottest Dance Cities 🔥
+          {t('dashboard.hottestCities')}
         </h2>
         <CityList initialCities={cities} />
         <div className="flex justify-center mt-6">
@@ -462,7 +467,7 @@ export default async function Dashboard() {
             href="/cities"
             className="btn btn-outline btn-sm md:btn-md"
           >
-            View All Cities
+            {t('dashboard.viewAllCities')}
           </Link>
         </div>
 

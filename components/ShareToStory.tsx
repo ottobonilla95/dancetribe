@@ -2,6 +2,7 @@
 
 import React, { useState } from 'react';
 import { FaLink, FaCheck } from 'react-icons/fa';
+import { useTranslation } from './I18nProvider';
 
 interface ShareToStoryProps {
   userData: {
@@ -28,6 +29,7 @@ interface ShareToStoryProps {
 }
 
 const ShareToStory: React.FC<ShareToStoryProps> = ({ userData }) => {
+  const { t } = useTranslation();
   const [copied, setCopied] = useState(false);
 
   const handleShareClick = () => {
@@ -46,18 +48,18 @@ const ShareToStory: React.FC<ShareToStoryProps> = ({ userData }) => {
         {copied ? (
           <>
             <FaCheck />
-            Link Copied!
+            {t('profile.linkCopied')}
           </>
         ) : (
           <>
             <FaLink />
-            Share my profile
+            {t('profile.shareMyProfile')}
           </>
         )}
       </button>
       {copied && (
         <p className="text-xs text-center mt-2 text-success">
-          ✨ Add to your bio or share with friends!
+          ✨ {t('profile.addToBio')}
         </p>
       )}
     </div>

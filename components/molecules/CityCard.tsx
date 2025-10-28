@@ -1,6 +1,7 @@
 import Flag from "../Flag";
 import { City } from "@/types";
 import Link from "next/link";
+import { useTranslation } from "../I18nProvider";
 
 interface CityCardProps {
   city: City;
@@ -8,6 +9,7 @@ interface CityCardProps {
 }
 
 const CityCard = ({ city, index }: CityCardProps) => {
+  const { t } = useTranslation();
   return (
     <Link href={`/city/${city._id}`}>
       <div className="relative group cursor-pointer bg-base-100 rounded-lg shadow-lg overflow-hidden hover:shadow-xl transition-shadow duration-300 h-48">
@@ -40,18 +42,18 @@ const CityCard = ({ city, index }: CityCardProps) => {
                 <h3 className="text-xl font-bold">{city.name}</h3>
               </div>
               <div className="flex items-center gap-1">
-                <span className="font-bold text-sm">Dancers:</span>
+                <span className="font-bold text-sm">{t('common.dancers')}:</span>
                 {city.totalDancers >= 30 ? (
                   <span className="text-sm">{city.totalDancers}</span>
                 ) : (
                   <span className="text-sm text-orange-400 animate-pulse font-medium">
-                    Growing...
+                    {t('common.growing')}
                   </span>
                 )}
               </div>
               {city.danceStyles.length > 0 && (
                 <div className="flex items-center gap-1">
-                  <span className="font-bold text-sm">Popular styles:</span>
+                  <span className="font-bold text-sm">{t('common.popularStyles')}:</span>
                   <span className="text-sm">
                     {city.danceStyles.map((style) => style.style).join(", ")}
                   </span>

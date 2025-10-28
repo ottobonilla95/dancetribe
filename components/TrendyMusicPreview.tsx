@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { FaMusic, FaSpotify, FaYoutube, FaFire } from "react-icons/fa";
+import { getMessages, getTranslation } from "@/lib/i18n";
 
 interface Song {
   url: string;
@@ -10,6 +11,9 @@ interface Song {
 }
 
 export default function TrendyMusicPreview({ songs }: { songs: Song[] }) {
+  const messages = getMessages();
+  const t = (key: string) => getTranslation(messages, key);
+
   if (songs.length === 0) {
     return null;
   }
@@ -22,10 +26,10 @@ export default function TrendyMusicPreview({ songs }: { songs: Song[] }) {
       <div className="flex items-center justify-between mb-6">
         <h2 className="font-extrabold text-xl md:text-2xl tracking-tight flex items-center gap-2">
           <FaFire className="text-error" />
-          Trendy Music 🎵
+          {t('dashboard.trendyMusic')}
         </h2>
         <Link href="/music" className="btn btn-outline btn-sm md:btn-md">
-          View All
+          {t('common.viewAll')}
         </Link>
       </div>
 
@@ -38,7 +42,7 @@ export default function TrendyMusicPreview({ songs }: { songs: Song[] }) {
                   #{index + 1}
                 </div>
                 <div className="badge badge-sm badge-primary">
-                  {song.count} {song.count === 1 ? "dancer" : "dancers"}
+                  {song.count} {song.count === 1 ? t('common.dancer') : t('common.dancers').toLowerCase()}
                 </div>
               </div>
 

@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { FaUsers, FaGlobeAmericas, FaMusic, FaChartBar } from "react-icons/fa";
 import WorldMap from "./WorldMap";
+import { getMessages, getTranslation } from "@/lib/i18n";
 
 interface StatsPreviewProps {
   stats: {
@@ -22,6 +23,9 @@ export default function StatsPreview({
   stats,
   countryData = [],
 }: StatsPreviewProps) {
+  const messages = getMessages();
+  const t = (key: string) => getTranslation(messages, key);
+
   const formatNumber = (num: number) => {
     if (num >= 1000) {
       return `${(num / 1000).toFixed(1)}k`;
@@ -44,7 +48,7 @@ export default function StatsPreview({
       <div className="flex items-center justify-between mb-6">
         <div>
           <h2 className="max-w-3xl font-extrabold text-xl md:text-2xl tracking-tight">
-            Community Stats
+            {t('dashboard.communityStats')}
           </h2>
           {/* <p className="text-base-content/60">
             See how our dance community is growing worldwide
@@ -52,7 +56,7 @@ export default function StatsPreview({
         </div>
         <Link href="/stats" className="btn btn-outline btn-sm gap-2">
           <FaChartBar />
-          View Full Stats
+          {t('common.viewAll')}
         </Link>
       </div>
 
@@ -62,7 +66,7 @@ export default function StatsPreview({
           <div className="stat-figure text-primary">
             <FaUsers className="text-2xl" />
           </div>
-          <div className="stat-title text-xs">Total Dancers</div>
+          <div className="stat-title text-xs">{t('dashboard.totalDancers')}</div>
           <div className="stat-value text-primary text-xl">
             {formatNumber(stats.totalDancers)}
           </div>
@@ -72,7 +76,7 @@ export default function StatsPreview({
           <div className="stat-figure text-secondary">
             <FaGlobeAmericas className="text-2xl" />
           </div>
-          <div className="stat-title text-xs">Countries</div>
+          <div className="stat-title text-xs">{t('common.countries')}</div>
           <div className="stat-value text-secondary text-xl">
             {stats.totalCountries}
           </div>
@@ -82,12 +86,12 @@ export default function StatsPreview({
           <div className="stat-figure text-accent">
             <FaMusic className="text-2xl" />
           </div>
-          <div className="stat-title text-xs">Top Style</div>
+          <div className="stat-title text-xs">{t('dashboard.topStyle')}</div>
           <div className="stat-value text-accent text-lg">
             {stats.topDanceStyle.emoji} {stats.topDanceStyle.name}
           </div>
           <div className="stat-desc text-xs">
-            {formatNumber(stats.topDanceStyle.count)} dancers
+            {formatNumber(stats.topDanceStyle.count)} {t('common.dancers').toLowerCase()}
           </div>
         </div>
 

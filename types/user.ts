@@ -28,6 +28,7 @@ export type User = {
   nationality?: string;
   relationshipStatus?: "single" | "in_a_relationship" | "married" | "its_complicated" | "prefer_not_to_say";
   isProfileComplete?: boolean;
+  preferredLanguage?: "en" | "es";
   onboardingSteps?: OnboardingSteps;
   customerId?: string;
   priceId?: string;

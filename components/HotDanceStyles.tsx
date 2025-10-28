@@ -1,20 +1,24 @@
 import Link from "next/link";
 import { DanceStyle } from "@/types/dance-style";
 import HotDanceStyleCard from "./HotDanceStyleCard";
+import { getMessages, getTranslation } from "@/lib/i18n";
 
 interface HotDanceStylesProps {
   danceStyles: (DanceStyle & { userCount: number })[];
 }
 
 export default function HotDanceStyles({ danceStyles }: HotDanceStylesProps) {
+  const messages = getMessages();
+  const t = (key: string) => getTranslation(messages, key);
+
   return (
     <section className="text-neutral-content">
       <div className="flex items-center justify-between mb-4">
         <h2 className="max-w-3xl font-extrabold text-xl md:text-2xl tracking-tight">
-          Hottest Dance Styles 🔥
+          {t('dashboard.hotDanceStyles')}
         </h2>
         <Link href="/dance-style" className="btn btn-outline btn-sm">
-          View All Styles
+          {t('common.viewAll')}
         </Link>
       </div>
 

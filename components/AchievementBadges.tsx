@@ -2,6 +2,7 @@
 
 import { Badge, CATEGORY_IMAGES } from "@/constants/badges";
 import Image from "next/image";
+import { useTranslation } from "./I18nProvider";
 
 interface AchievementBadgesProps {
   badges: Badge[];
@@ -41,6 +42,7 @@ export default function AchievementBadges({
   maxDisplay = 6,
   showAll = false,
 }: AchievementBadgesProps) {
+  const { t } = useTranslation();
   const displayBadges = showAll ? badges : badges.slice(0, maxDisplay);
   const hasMore = !showAll && badges.length > maxDisplay;
 
@@ -48,8 +50,8 @@ export default function AchievementBadges({
     return (
       <div className="text-center py-8 text-base-content/60">
         <p className="text-lg mb-2">🏆</p>
-        <p>No badges earned yet</p>
-        <p className="text-sm">Keep dancing to unlock achievements!</p>
+        <p>{t('profile.noBadgesYet')}</p>
+        <p className="text-sm">{t('profile.keepDancing')}</p>
       </div>
     );
   }
@@ -131,7 +133,7 @@ export default function AchievementBadges({
       {hasMore && (
         <div className="text-center mt-8">
           <button className="btn btn-sm btn-outline">
-            View all {badges.length} badges
+            {t('profile.viewAllBadges')} {badges.length} {t('common.badges')}
           </button>
         </div>
       )}

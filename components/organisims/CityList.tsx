@@ -4,6 +4,7 @@ import { useState, useEffect } from "react";
 import CityCard from "../molecules/CityCard";
 import { City } from "@/types";
 import { FaSort, FaSpinner } from "react-icons/fa";
+import { useTranslation } from "../I18nProvider";
 
 interface CityListProps {
   initialCities: City[];
@@ -13,6 +14,7 @@ const CityList = ({ initialCities }: CityListProps) => {
   const [cities, setCities] = useState(initialCities);
   const [sortBy, setSortBy] = useState<"rank" | "totalDancers">("totalDancers");
   const [loading, setLoading] = useState(false);
+  const { t } = useTranslation();
   
   const fetchSortedCities = async (sortOption: "rank" | "totalDancers") => {
     setLoading(true);
@@ -39,7 +41,7 @@ const CityList = ({ initialCities }: CityListProps) => {
       {/* Sort Controls */}
       <div className="flex items-center justify-between mb-4">
         <div className="text-sm text-base-content/60">
-          {cities.length} cities {loading && "(updating...)"}
+          {cities.length} {t('common.cities').toLowerCase()} {loading && `(${t('common.updating')})`}
         </div>
         <div className="flex items-center gap-2">
           {loading ? (
@@ -53,8 +55,8 @@ const CityList = ({ initialCities }: CityListProps) => {
             className="select select-bordered select-sm text-base-content bg-base-100"
             disabled={loading}
           >
-            <option value="rank">Most Popular</option>
-            <option value="totalDancers">Most Dancers</option>
+            <option value="rank">{t('common.mostPopular')}</option>
+            <option value="totalDancers">{t('common.mostDancers')}</option>
           </select>
         </div>
       </div>
@@ -68,7 +70,7 @@ const CityList = ({ initialCities }: CityListProps) => {
       {cities.length === 0 && (
         <div className="text-center py-12">
           <p className="text-lg opacity-75">
-            No cities available at the moment.
+            {t('common.noCitiesAvailable')}
           </p>
         </div>
       )}

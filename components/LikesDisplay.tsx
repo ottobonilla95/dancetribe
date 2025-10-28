@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { useLikes } from "@/contexts/LikesContext";
+import { useTranslation } from "./I18nProvider";
 
 interface LikesDisplayProps {
   targetUserId: string;
@@ -12,6 +13,7 @@ export default function LikesDisplay({
   targetUserId,
   initialLikesCount
 }: LikesDisplayProps) {
+  const { t } = useTranslation();
   const { likesCount: contextLikesCount } = useLikes();
   const [likesCount, setLikesCount] = useState(initialLikesCount);
 
@@ -23,6 +25,6 @@ export default function LikesDisplay({
   }, [contextLikesCount, targetUserId]);
 
   return (
-    <span>❤️ {likesCount} like{likesCount !== 1 ? 's' : ''}</span>
+    <span>❤️ {likesCount} {t('profile.likes')}</span>
   );
 } 

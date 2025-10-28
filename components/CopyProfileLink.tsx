@@ -2,12 +2,14 @@
 
 import { useState } from "react";
 import { FaLink, FaCheck } from "react-icons/fa";
+import { useTranslation } from "./I18nProvider";
 
 interface CopyProfileLinkProps {
   username: string;
 }
 
 export default function CopyProfileLink({ username }: CopyProfileLinkProps) {
+  const { t } = useTranslation();
   const [copied, setCopied] = useState(false);
 
   const copyToClipboard = async () => {
@@ -36,12 +38,12 @@ export default function CopyProfileLink({ username }: CopyProfileLinkProps) {
       {copied ? (
         <>
           <FaCheck className="text-lg" />
-          Link Copied!
+          {t('profile.linkCopied')}
         </>
       ) : (
         <>
           <FaLink className="text-lg" />
-          Copy Profile Link
+          {t('profile.copyProfileLink')}
         </>
       )}
     </button>

@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { FaPlus, FaTimes, FaEdit, FaCheck } from "react-icons/fa";
+import { useTranslation } from "./I18nProvider";
 
 interface JackAndJillCompetition {
   _id?: string;
@@ -22,6 +23,7 @@ export default function JackAndJillManager({
   danceStyles,
   isOwnProfile 
 }: JackAndJillManagerProps) {
+  const { t } = useTranslation();
   const [competitions, setCompetitions] = useState<JackAndJillCompetition[]>(initialCompetitions || []);
   const [isAdding, setIsAdding] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
@@ -34,7 +36,7 @@ export default function JackAndJillManager({
 
   const handleAdd = async () => {
     if (!newComp.eventName || !newComp.danceStyle) {
-      alert("Please fill in all required fields");
+      alert(t('profile.pleaseAllFields'));
       return;
     }
 
@@ -68,18 +70,18 @@ export default function JackAndJillManager({
         setIsAdding(false);
         window.location.reload(); // Reload to show updated data
       } else {
-        alert("Failed to save competition");
+        alert(t('profile.failedToSaveCompetition'));
       }
     } catch (error) {
       console.error("Error saving competition:", error);
-      alert("Failed to save competition");
+      alert(t('profile.failedToSaveCompetition'));
     } finally {
       setIsSaving(false);
     }
   };
 
   const handleDelete = async (index: number) => {
-    if (!confirm("Are you sure you want to delete this competition?")) return;
+    if (!confirm(t('profile.deleteCompetitionConfirm'))) return;
 
     setIsSaving(true);
     try {
@@ -101,11 +103,11 @@ export default function JackAndJillManager({
         setCompetitions(updatedComps);
         window.location.reload();
       } else {
-        alert("Failed to delete competition");
+        alert(t('profile.failedToDeleteCompetition'));
       }
     } catch (error) {
       console.error("Error deleting competition:", error);
-      alert("Failed to delete competition");
+      alert(t('profile.failedToDeleteCompetition'));
     } finally {
       setIsSaving(false);
     }
@@ -136,22 +138,22 @@ export default function JackAndJillManager({
     <div className="card bg-base-200 shadow-xl">
       <div className="card-body">
         <div className="flex items-center justify-between mb-4">
-          <h3 className="card-title text-xl">🏅 Jack & Jill Competitions</h3>
+          <h3 className="card-title text-xl">🏅 {t('profile.jackAndJill')}</h3>
           {isOwnProfile && !isAdding && (
             <button
               onClick={() => setIsAdding(true)}
               className="btn btn-primary btn-sm gap-2"
               disabled={isSaving}
             >
-              <FaPlus /> Add
+              <FaPlus /> {t('common.add')}
             </button>
           )}
         </div>
 
         {competitions.length === 0 && isOwnProfile && !isAdding ? (
           <div className="text-center py-8 text-base-content/60">
-            <p className="mb-2">No competitions added yet</p>
-            <p className="text-sm">Showcase your Jack & Jill achievements!</p>
+            <p className="mb-2">{t('profile.noCompetitionsYet')}</p>
+            <p className="text-sm">{t('profile.showcaseAchievements')}</p>
           </div>
         ) : (
           <div className="space-y-3">
@@ -168,7 +170,7 @@ export default function JackAndJillManager({
                     <p className="text-sm text-base-content/70">
                       {danceStyleName} · {comp.year}
                       {comp.placement !== 'participated' && (
-                        <span className="ml-1 font-semibold text-primary">· {comp.placement} Place</span>
+                        <span className="ml-1 font-semibold text-primary">· {comp.placement} {t('profile.place')}</span>
                       )}
                     </p>
                   </div>
@@ -191,7 +193,7 @@ export default function JackAndJillManager({
         {isAdding && (
           <div className="mt-4 p-4 rounded-lg bg-base-300 space-y-3">
             <div className="flex items-center justify-between mb-2">
-              <h4 className="font-semibold">Add Competition</h4>
+              <h4 className="font-semibold">{t('profile.addCompetition')}</h4>
               <button
                 onClick={() => setIsAdding(false)}
                 className="btn btn-ghost btn-sm btn-circle"
@@ -202,7 +204,7 @@ export default function JackAndJillManager({
 
             <div className="form-control">
               <label className="label">
-                <span className="label-text">Event/Festival Name *</span>
+                <span className="label-text">{t('profile.eventName')} *</span>
               </label>
               <input
                 type="text"
@@ -215,7 +217,7 @@ export default function JackAndJillManager({
 
             <div className="form-control">
               <label className="label">
-                <span className="label-text">Dance Style *</span>
+                <span className="label-text">{t('profile.danceStyle')} *</span>
               </label>
               <select
                 className="select select-bordered"
@@ -233,23 +235,23 @@ export default function JackAndJillManager({
 
             <div className="form-control">
               <label className="label">
-                <span className="label-text">Placement *</span>
+                <span className="label-text">{t('profile.placement')} *</span>
               </label>
               <select
                 className="select select-bordered"
                 value={newComp.placement}
                 onChange={(e) => setNewComp({ ...newComp, placement: e.target.value as any })}
               >
-                <option value="participated">Participated</option>
-                <option value="1st">1st Place 🥇</option>
-                <option value="2nd">2nd Place 🥈</option>
-                <option value="3rd">3rd Place 🥉</option>
+                <option value="participated">{t('profile.participated')}</option>
+                <option value="1st">{t('profile.firstPlace')} 🥇</option>
+                <option value="2nd">{t('profile.secondPlace')} 🥈</option>
+                <option value="3rd">{t('profile.thirdPlace')} 🥉</option>
               </select>
             </div>
 
             <div className="form-control">
               <label className="label">
-                <span className="label-text">Year *</span>
+                <span className="label-text">{t('profile.year')} *</span>
               </label>
               <select
                 className="select select-bordered"
@@ -268,14 +270,14 @@ export default function JackAndJillManager({
                 className="btn btn-primary btn-sm flex-1"
                 disabled={isSaving}
               >
-                {isSaving ? <span className="loading loading-spinner loading-sm"></span> : <><FaCheck /> Save</>}
+                {isSaving ? <span className="loading loading-spinner loading-sm"></span> : <><FaCheck /> {t('common.save')}</>}
               </button>
               <button
                 onClick={() => setIsAdding(false)}
                 className="btn btn-ghost btn-sm"
                 disabled={isSaving}
               >
-                Cancel
+                {t('common.cancel')}
               </button>
             </div>
           </div>

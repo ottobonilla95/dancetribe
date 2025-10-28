@@ -1,3 +1,5 @@
+import Link from "next/link";
+
 interface DanceStyle {
   id?: string;
   name: string;
@@ -9,15 +11,14 @@ interface DanceStyle {
 
 interface DanceStyleCardProps {
   danceStyles: DanceStyle[];
+  title?: string;
 }
 
-import Link from "next/link";
-
-export default function DanceStyleCard({ danceStyles }: DanceStyleCardProps) {
+export default function DanceStyleCard({ danceStyles, title = "Dance Styles & Levels" }: DanceStyleCardProps) {
   return (
     <div className="mb-4">
       <div className="text-sm font-medium text-base-content/60 mb-3">
-        Dance Styles & Levels
+        {title}
       </div>
       <div className="space-y-4">
         {danceStyles.map((style: DanceStyle, index: number) => {
