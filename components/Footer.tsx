@@ -11,6 +11,7 @@ import { getTranslations, getLocale } from "next-intl/server";
 const Footer = async () => {
   const locale = await getLocale();
   const t = await getTranslations({ locale, namespace: 'footer' });
+  const tCommon = await getTranslations({ locale, namespace: 'common' });
   
   return (
     <footer className="bg-base-200 border-t border-base-content/10">
@@ -104,10 +105,10 @@ const Footer = async () => {
                   {t('discoverDancers')}
                 </Link>
                 <Link href="/cities" className="link link-hover">
-                  {t('cities')}
+                  {tCommon('cities')}
                 </Link>
                 <Link href="/countries" className="link link-hover">
-                  {t('countries')}
+                  {tCommon('countries')}
                 </Link>
                 <Link href="/dance-style" className="link link-hover">
                   {t('danceStyles')}

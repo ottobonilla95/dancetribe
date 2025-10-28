@@ -5,6 +5,7 @@ import { User } from "@/types/user";
 import { DanceStyle } from "@/types/dance-style";
 import DancerCard from "./DancerCard";
 import { FaFilter, FaSpinner } from "react-icons/fa";
+import { useTranslation } from "./I18nProvider";
 
 interface DiscoveryFeedProps {
   initialDancers?: any[];
@@ -14,6 +15,7 @@ interface DiscoveryFeedProps {
 }
 
 export default function DiscoveryFeed({ initialDancers = [], danceStyles = [], showViewAllLink = false, isPreview = false }: DiscoveryFeedProps) {
+  const { t } = useTranslation();
   const [dancers, setDancers] = useState(initialDancers);
   const [loading, setLoading] = useState(false);
   const [loadingMore, setLoadingMore] = useState(false);
@@ -82,11 +84,11 @@ export default function DiscoveryFeed({ initialDancers = [], danceStyles = [], s
       <div className="space-y-4">
         <div className="flex items-center justify-between">
           <div>
-            <h2 className="text-2xl font-bold">Discover Dancers</h2>
+            <h2 className="text-2xl font-bold">{t('discovery.title')}</h2>
             <p className="text-base-content/60">
-              {filters.nearMe ? "Dancers in your city" : 
-               filters.inMyCountry ? "Dancers in your country" :
-               "Dancers around the world"}
+              {filters.nearMe ? t('discovery.dancersInYourCity') : 
+               filters.inMyCountry ? t('discovery.dancersInYourCountry') :
+               t('discovery.dancersAroundTheWorld')}
             </p>
           </div>
           <div className="flex gap-2">
@@ -95,7 +97,7 @@ export default function DiscoveryFeed({ initialDancers = [], danceStyles = [], s
                 href="/discover"
                 className="btn btn-primary btn-sm gap-2"
               >
-                View All
+                {t('discovery.viewAll')}
                 <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7l5 5m0 0l-5 5m5-5H6" />
                 </svg>
@@ -107,7 +109,7 @@ export default function DiscoveryFeed({ initialDancers = [], danceStyles = [], s
               className={`btn btn-outline btn-sm gap-2 ${isPreview ? 'hidden md:flex' : ''}`}
             >
               <FaFilter />
-              More Filters
+              {t('discovery.moreFilters')}
             </button>
           </div>
         </div>
@@ -118,19 +120,19 @@ export default function DiscoveryFeed({ initialDancers = [], danceStyles = [], s
             onClick={() => setFilters({...filters, nearMe: true, inMyCountry: false})}
             className={`btn btn-sm ${filters.nearMe ? 'btn-primary' : 'btn-outline'}`}
           >
-            📍 Near Me
+            📍 {t('discovery.nearMe')}
           </button>
           <button
             onClick={() => setFilters({...filters, nearMe: false, inMyCountry: true})}
             className={`btn btn-sm ${filters.inMyCountry ? 'btn-primary' : 'btn-outline'}`}
           >
-            🏳️ My Country
+            🏳️ {t('discovery.myCountry')}
           </button>
           <button
             onClick={() => setFilters({...filters, nearMe: false, inMyCountry: false})}
             className={`btn btn-sm ${(!filters.nearMe && !filters.inMyCountry) ? 'btn-primary' : 'btn-outline'}`}
           >
-            🌍 Worldwide
+            🌍 {t('discovery.worldwide')}
           </button>
         </div>
       </div>
@@ -143,14 +145,14 @@ export default function DiscoveryFeed({ initialDancers = [], danceStyles = [], s
             {/* Dance Style Filter */}
             <div className="form-control">
               <label className="label">
-                <span className="label-text">Dance Style</span>
+                <span className="label-text">{t('discovery.danceStyle')}</span>
               </label>
               <select
                 className="select select-bordered select-sm"
                 value={filters.danceStyle}
                 onChange={(e) => setFilters({ ...filters, danceStyle: e.target.value })}
               >
-                <option value="">All Styles</option>
+                <option value="">{t('discovery.allStyles')}</option>
                 {danceStyles.map((style) => (
                   <option key={style._id || style.id} value={style.name}>
                     {style.name}
@@ -162,28 +164,28 @@ export default function DiscoveryFeed({ initialDancers = [], danceStyles = [], s
             {/* Dance Role Filter */}
             <div className="form-control">
               <label className="label">
-                <span className="label-text">Dance Role</span>
+                <span className="label-text">{t('discovery.danceRole')}</span>
               </label>
               <select
                 className="select select-bordered select-sm"
                 value={filters.danceRole}
                 onChange={(e) => setFilters({ ...filters, danceRole: e.target.value })}
               >
-                <option value="">All Roles</option>
-                <option value="leader">Leaders</option>
-                <option value="follower">Followers</option>
-                <option value="both">Both</option>
+                <option value="">{t('discovery.allRoles')}</option>
+                <option value="leader">{t('common.leaders')}</option>
+                <option value="follower">{t('common.followers')}</option>
+                <option value="both">{t('common.both')}</option>
               </select>
             </div>
 
             {/* City Filter */}
             <div className="form-control">
               <label className="label">
-                <span className="label-text">City</span>
+                <span className="label-text">{t('discovery.city')}</span>
               </label>
               <input
                 type="text"
-                placeholder="Enter city name..."
+                placeholder={t('discovery.enterCityName')}
                 className="input input-bordered input-sm"
                 value={filters.city}
                 onChange={(e) => setFilters({ ...filters, city: e.target.value })}
@@ -194,7 +196,7 @@ export default function DiscoveryFeed({ initialDancers = [], danceStyles = [], s
           {/* Clear Filters Button */}
           {(filters.danceStyle || filters.danceRole || filters.city) && (
             <button onClick={clearFilters} className="btn btn-ghost btn-sm">
-              Clear All Filters
+              {t('discovery.clearAllFilters')}
             </button>
           )}
         </div>
@@ -213,29 +215,29 @@ export default function DiscoveryFeed({ initialDancers = [], danceStyles = [], s
           {dancers.length === 0 ? (
             <div className="text-center py-12">
               <div className="text-6xl mb-4">💃</div>
-              <h3 className="text-xl font-semibold mb-2">No dancers found</h3>
+              <h3 className="text-xl font-semibold mb-2">{t('discovery.noDancersFound')}</h3>
               <p className="text-base-content/60 mb-4">
-                {filters.nearMe ? "No dancers in your city yet." :
-                 filters.inMyCountry ? "No dancers in your country yet." :
-                 "Try adjusting your filters or check back later for new dancers!"}
+                {filters.nearMe ? t('discovery.noDancersInCity') :
+                 filters.inMyCountry ? t('discovery.noDancersInCountry') :
+                 t('discovery.tryAdjustingFilters')}
               </p>
               
               {/* Expand Search Suggestions */}
               {filters.nearMe && (
                 <div className="space-y-2">
-                  <p className="text-sm text-base-content/50">Try expanding your search:</p>
+                  <p className="text-sm text-base-content/50">{t('discovery.tryExpanding')}</p>
                   <div className="flex gap-2 justify-center">
                     <button
                       onClick={() => setFilters({...filters, nearMe: false, inMyCountry: true})}
                       className="btn btn-outline btn-sm"
                     >
-                      🏳️ Search My Country
+                      🏳️ {t('discovery.searchMyCountry')}
                     </button>
                     <button
                       onClick={() => setFilters({...filters, nearMe: false, inMyCountry: false})}
                       className="btn btn-outline btn-sm"
                     >
-                      🌍 Go Worldwide
+                      🌍 {t('discovery.goWorldwide')}
                     </button>
                   </div>
                 </div>
@@ -243,12 +245,12 @@ export default function DiscoveryFeed({ initialDancers = [], danceStyles = [], s
               
               {filters.inMyCountry && (
                 <div className="space-y-2">
-                  <p className="text-sm text-base-content/50">Try expanding your search:</p>
+                  <p className="text-sm text-base-content/50">{t('discovery.tryExpanding')}</p>
                   <button
                     onClick={() => setFilters({...filters, nearMe: false, inMyCountry: false})}
                     className="btn btn-outline btn-sm"
                   >
-                    🌍 Search Worldwide
+                    🌍 {t('discovery.searchWorldwide')}
                   </button>
                 </div>
               )}
@@ -257,7 +259,7 @@ export default function DiscoveryFeed({ initialDancers = [], danceStyles = [], s
             <>
               <div className="flex items-center justify-between">
                 <p className="text-sm text-base-content/60">
-                  Showing {dancers.length} of {total} dancer{total !== 1 ? 's' : ''}
+                  {t('discovery.showing')} {dancers.length} {t('discovery.of')} {total} {total !== 1 ? t('search.dancers').toLowerCase() : t('search.dancers').toLowerCase().replace('s', '')}
                 </p>
               </div>
               
@@ -278,10 +280,10 @@ export default function DiscoveryFeed({ initialDancers = [], danceStyles = [], s
                     {loadingMore ? (
                       <>
                         <FaSpinner className="animate-spin" />
-                        Loading...
+                        {t('discovery.loading')}
                       </>
                     ) : (
-                      "Load More Dancers"
+                      t('discovery.loadMoreDancers')
                     )}
                   </button>
                 </div>

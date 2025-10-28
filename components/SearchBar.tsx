@@ -80,7 +80,7 @@ export default function SearchBar({
       }
     } catch (error) {
       console.error("Search error:", error);
-      setError("Network error");
+      setError(t('search.networkError'));
       setUsers([]);
       setCities([]);
       setCountries([]);
@@ -144,7 +144,7 @@ export default function SearchBar({
           className={`input input-bordered w-full pl-10 pr-10 ${
             compact ? "input-sm" : ""
           } ${isOpen && (users.length > 0 || cities.length > 0 || countries.length > 0) ? "rounded-b-none" : ""}`}
-          placeholder={placeholder}
+          placeholder={placeholder || t('search.placeholder')}
           value={query}
           onChange={(e) => handleInputChange(e.target.value)}
           onFocus={() => query.length > 0 && setIsOpen(true)}
@@ -165,7 +165,7 @@ export default function SearchBar({
           {isLoading && (
             <div className="p-4 text-center">
               <span className="loading loading-spinner loading-sm"></span>
-              <span className="ml-2">Searching...</span>
+              <span className="ml-2">{t('search.searching')}</span>
             </div>
           )}
 
@@ -182,7 +182,7 @@ export default function SearchBar({
                 <div className="mb-2">
                   <div className="px-4 py-2 text-xs font-semibold text-base-content/60 flex items-center gap-2">
                     <FaUsers className="h-3 w-3" />
-                    DANCERS ({users.length})
+                    {t('search.dancers').toUpperCase()} ({users.length})
                   </div>
                   {users.map((user) => (
                     <Link
@@ -231,7 +231,7 @@ export default function SearchBar({
                 <div className="mb-2">
                   <div className="px-4 py-2 text-xs font-semibold text-base-content/60 flex items-center gap-2">
                     <FaCity className="h-3 w-3" />
-                    CITIES ({cities.length})
+                    {t('common.cities').toUpperCase()} ({cities.length})
                   </div>
                   {cities.map((city) => (
                     <Link
@@ -247,7 +247,7 @@ export default function SearchBar({
                         <div className="flex-1 min-w-0">
                           <div className="font-medium text-sm truncate">{city.name}</div>
                           <div className="text-xs text-base-content/50">
-                            {city.country?.name} • {city.totalDancers} dancers
+                            {city.country?.name} • {city.totalDancers} {t('search.dancers').toLowerCase()}
                           </div>
                         </div>
                       </div>
@@ -261,7 +261,7 @@ export default function SearchBar({
                 <div>
                   <div className="px-4 py-2 text-xs font-semibold text-base-content/60 flex items-center gap-2">
                     <FaGlobe className="h-3 w-3" />
-                    COUNTRIES ({countries.length})
+                    {t('common.countries').toUpperCase()} ({countries.length})
                   </div>
                   {countries.map((country) => (
                     <Link
@@ -287,7 +287,7 @@ export default function SearchBar({
 
           {!isLoading && !error && query.length >= 2 && users.length === 0 && cities.length === 0 && countries.length === 0 && (
             <div className="p-4 text-center text-base-content/60">
-              No results found for &quot;{query}&quot;
+              {t('search.noResultsFor')} &quot;{query}&quot;
             </div>
           )}
         </div>

@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { FaCompass, FaCopy, FaUserFriends, FaLink } from "react-icons/fa";
 import InstallPrompt from "./InstallPrompt";
+import { useTranslation } from "./I18nProvider";
 
 interface WelcomeModalProps {
   userName: string;
@@ -15,6 +16,7 @@ interface WelcomeModalProps {
 }
 
 export default function WelcomeModal({ userName, userUsername, userImage, userData, showWelcome }: WelcomeModalProps) {
+  const { t } = useTranslation();
   const [isOpen, setIsOpen] = useState(false);
   const [copied, setCopied] = useState(false);
   const [showInstallPrompt, setShowInstallPrompt] = useState(false);
@@ -81,10 +83,10 @@ export default function WelcomeModal({ userName, userUsername, userImage, userDa
                 <div className="text-center mb-6 sm:mb-8">
                   <div className="text-6xl sm:text-7xl mb-3 sm:mb-4 animate-bounce">🎉</div>
                   <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold mb-2 sm:mb-3 px-2">
-                    Welcome to DanceCircle, {userName}!
+                    {t('welcome.welcomeTo')} {userName}!
                   </h2>
                   <p className="text-base sm:text-lg text-base-content/60">
-                    Your dance profile is live! 🌍
+                    {t('welcome.profileLive')} 🌍
                   </p>
                 </div>
 
@@ -93,11 +95,11 @@ export default function WelcomeModal({ userName, userUsername, userImage, userDa
                   <div className="flex gap-3 items-start">
                     <div className="text-2xl sm:text-3xl">💡</div>
                     <div className="flex-1">
-                      <h3 className="font-bold mb-2 text-base sm:text-lg">Share your profile!</h3>
+                      <h3 className="font-bold mb-2 text-base sm:text-lg">{t('welcome.shareProfile')}</h3>
                       <ul className="text-sm sm:text-base space-y-1 text-base-content/80">
-                        <li>✨ Add to your Instagram bio</li>
-                        <li>✨ Share with dance friends</li>
-                        <li>✨ Connect with dancers worldwide</li>
+                        <li>✨ {t('welcome.addToBio')}</li>
+                        <li>✨ {t('welcome.shareWithFriends')}</li>
+                        <li>✨ {t('welcome.connectWorldwide')}</li>
                       </ul>
                     </div>
                   </div>
@@ -111,7 +113,7 @@ export default function WelcomeModal({ userName, userUsername, userImage, userDa
                     className="btn btn-primary btn-lg btn-block gap-2 sm:gap-3 text-base sm:text-lg h-14 sm:h-16"
                   >
                     <FaCopy className="text-xl sm:text-2xl" />
-                    {copied ? "Link Copied! ✓" : "Copy Your Profile Link"}
+                    {copied ? t('welcome.linkCopied') : t('welcome.copyLink')}
                   </button>
 
                   {/* Start Discovering */}
@@ -121,7 +123,7 @@ export default function WelcomeModal({ userName, userUsername, userImage, userDa
                     onClick={handleClose}
                   >
                     <FaCompass className="text-xl sm:text-2xl" />
-                    <span>Start Discovering Dancers!</span>
+                    <span>{t('welcome.startDiscovering')}</span>
                   </Link>
                 </div>
 
@@ -130,7 +132,7 @@ export default function WelcomeModal({ userName, userUsername, userImage, userDa
                   onClick={handleClose}
                   className="btn btn-ghost btn-block text-sm sm:text-base text-base-content/60"
                 >
-                  I&apos;ll do this later
+                  {t('welcome.doLater')}
                 </button>
               </div>
             </div>
