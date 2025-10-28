@@ -4,6 +4,7 @@ import { useState } from "react";
 import { FaUserPlus, FaUserCheck, FaUserClock, FaCheck, FaTimes } from "react-icons/fa";
 import { useSession } from "next-auth/react";
 import Link from "next/link";
+import { useTranslation } from "./I18nProvider";
 
 interface ConnectButtonProps {
   targetUserId: string;
@@ -20,6 +21,7 @@ export default function ConnectButton({
   hasReceivedRequest,
   className = ""
 }: ConnectButtonProps) {
+  const { t } = useTranslation();
   const { data: session } = useSession();
   const [loading, setLoading] = useState(false);
   const [status, setStatus] = useState({
@@ -77,7 +79,7 @@ export default function ConnectButton({
     return (
       <Link href="/api/auth/signin" className={`btn btn-primary btn-sm gap-2 ${className}`}>
         <FaUserPlus className="text-sm" />
-        Connect
+        {t('connect.connect')}
       </Link>
     );
   }
@@ -87,7 +89,7 @@ export default function ConnectButton({
     return (
       <button className={`btn btn-success btn-sm gap-2 ${className}`} disabled>
         <FaUserCheck className="text-sm" />
-        Friends
+        {t('connect.friends')}
       </button>
     );
   }
@@ -100,7 +102,7 @@ export default function ConnectButton({
           onClick={() => handleFriendRequest('accept')}
           disabled={loading}
           className="btn btn-success btn-sm"
-          title="Accept friend request"
+          title={t('connect.acceptRequest')}
         >
           <FaCheck className="text-sm" />
         </button>
@@ -108,7 +110,7 @@ export default function ConnectButton({
           onClick={() => handleFriendRequest('reject')}
           disabled={loading}
           className="btn btn-error btn-sm"
-          title="Reject friend request"
+          title={t('connect.rejectRequest')}
         >
           <FaTimes className="text-sm" />
         </button>
@@ -125,7 +127,7 @@ export default function ConnectButton({
         className={`btn btn-outline btn-sm gap-2 ${className}`}
       >
         <FaUserClock className="text-sm" />
-        Pending
+        {t('connect.pending')}
       </button>
     );
   }
@@ -138,7 +140,7 @@ export default function ConnectButton({
       className={`btn btn-primary btn-sm gap-2 ${className}`}
     >
       <FaUserPlus className="text-sm" />
-      Connect
+      {t('connect.connect')}
     </button>
   );
 } 

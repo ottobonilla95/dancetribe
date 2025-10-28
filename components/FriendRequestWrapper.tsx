@@ -1,6 +1,6 @@
 "use client";
 
-import { useFriendRequestCount } from "@/libs/hooks";
+import { useFriendRequestCount } from "@/contexts/FriendRequestContext";
 import FriendRequestNotification from "./FriendRequestNotification";
 
 export default function FriendRequestWrapper() {

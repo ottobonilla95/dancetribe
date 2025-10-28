@@ -149,7 +149,11 @@
     "moreFilters": "Más Filtros",
     "nearMe": "Cerca de Mí",
     "myCountry": "Mi País",
-    "worldwide": "Mundial",
+    "worldwide": "Todo el Mundo",
+    "autoExpandedToCountry": "Mostrando bailarines en tu país",
+    "autoExpandedToWorldwide": "Mostrando bailarines de todo el mundo",
+    "noDancersInCityYet": "Aún no hay bailarines en tu ciudad. ¡Hemos ampliado tu búsqueda a tu país!",
+    "beFirstInCity": "¡Sé el primer bailarín en tu ciudad! Mostrando bailarines de todo el mundo.",
     "danceStyle": "Estilo de Baile",
     "allStyles": "Todos los Estilos",
     "danceRole": "Rol de Baile",
@@ -163,8 +167,8 @@
     "tryAdjustingFilters": "¡Intenta ajustar tus filtros o vuelve más tarde para nuevos bailarines!",
     "tryExpanding": "Intenta expandir tu búsqueda:",
     "searchMyCountry": "Buscar en Mi País",
-    "goWorldwide": "Buscar Mundialmente",
-    "searchWorldwide": "Buscar Mundialmente",
+    "goWorldwide": "Buscar en Todo el Mundo",
+    "searchWorldwide": "Buscar en Todo el Mundo",
     "showing": "Mostrando",
     "of": "de",
     "loading": "Cargando...",
@@ -212,11 +216,14 @@
     "joinCommunity": "Únete a la Comunidad",
     "viewAllCities": "Ver Todas las Ciudades",
     "hotDanceStyles": "Estilos de Baile Populares 🕺",
-    "trendyMusic": "Música en Tendencia 🎵"
+    "trendyMusic": "Música en Tendencia 🎵",
+    "joinDancersWorldwide": "🌍 Únete a Bailarines de Todo el Mundo",
+    "connectWithDancersInCountries": "Conecta con bailarines en {count} países alrededor del mundo"
   },
   "dashboard": {
     "hottestCities": "Ciudades de Baile Más Populares 🔥",
     "viewAllCities": "Ver Todas las Ciudades",
+    "trendyCountries": "Países en Tendencia",
     "hotDanceStyles": "Estilos de Baile Más Populares 🕺",
     "friendsTrips": "Viajes de tus Amigos ✈️",
     "noTripsYet": "Aún no hay viajes planeados",
@@ -231,7 +238,9 @@
     "dancersNearYou": "Bailarines Cerca de Ti 💃",
     "noDancersFound": "No se encontraron bailarines",
     "tryDifferentFilters": "Intenta cambiar los filtros o buscar en todo el mundo",
-    "viewAllDancers": "Ver Todos los Bailarines"
+    "viewAllDancers": "Ver Todos los Bailarines",
+    "active": "activos",
+    "noTrendyCountries": "No hay países en tendencia en este momento."
   },
   "profile": {
     "myProfile": "Mi Perfil",
@@ -474,6 +483,69 @@
     "mostDancers": "Más Bailarines",
     "popularStyles": "Estilos populares",
     "noCitiesAvailable": "No hay ciudades disponibles en este momento"
+  },
+  "dancer": {
+    "wantToConnect": "¿Quieres conectar con {name}?",
+    "createProfile": "Crea tu perfil de baile ahora"
+  },
+  "connect": {
+    "connect": "Conectar",
+    "friends": "Amigos",
+    "pending": "Pendiente",
+    "acceptRequest": "Aceptar solicitud de amistad",
+    "rejectRequest": "Rechazar solicitud de amistad"
+  },
+  "city": {
+    "population": "Población",
+    "totalDancers": "Total de Bailarines",
+    "dancersLivingHere": "Bailarines que Viven Aquí",
+    "activeCommunity": "Miembros activos de la comunidad de baile",
+    "visitors": "Visitantes",
+    "visitedForDance": "Bailarines que han visitado para bailar",
+    "mostCommonRole": "Rol Más Común",
+    "ofDancers": "de bailarines",
+    "popularDanceStyles": "Estilos de Baile Populares",
+    "teachers": "Profesores de Baile",
+    "djs": "DJs",
+    "photographers": "Fotógrafos",
+    "mostLikedDancers": "Bailarines Más Populares",
+    "communityGroups": "Grupos de la Comunidad",
+    "joinCommunity": "Únete a la comunidad de baile",
+    "dancersIn": "Bailarines en",
+    "joinDanceCommunityIn": "Únete a la Comunidad de Baile en",
+    "signUpToConnect": "Regístrate para conectar con bailarines en",
+    "noDancersFound": "No se encontraron bailarines",
+    "tryAdjusting": "¡Intenta ajustar tus filtros o vuelve más tarde para nuevos bailarines!",
+    "view": "Ver"
+  },
+  "country": {
+    "totalDancers": "Total de Bailarines",
+    "dancersLivingHere": "Bailarines que Viven Aquí",
+    "activeCommunity": "Miembros activos de la comunidad de baile",
+    "visitors": "Visitantes",
+    "visitedForDance": "Bailarines que han visitado para bailar",
+    "mostCommonRole": "Rol Más Común",
+    "ofDancers": "de bailarines",
+    "topCities": "Ciudades Principales",
+    "popularDanceStyles": "Estilos de Baile Populares",
+    "teachers": "Profesores de Baile",
+    "djs": "DJs",
+    "photographers": "Fotógrafos",
+    "mostLikedDancers": "Bailarines Más Populares",
+    "communityGroups": "Grupos de la Comunidad",
+    "joinCommunity": "Únete a la comunidad de baile de {country}",
+    "dancersIn": "Bailarines en",
+    "joinDanceCommunityIn": "Únete a la Comunidad de Baile en",
+    "signUpToConnect": "Regístrate para conectar con bailarines en",
+    "noDancersFound": "No se encontraron bailarines",
+    "tryAdjusting": "¡Intenta ajustar tus filtros o vuelve más tarde para nuevos bailarines!",
+    "view": "Ver"
+  },
+  "filters": {
+    "showMyDancers": "Mostrar solo bailarines que bailan lo que yo bailo",
+    "found": "Encontrados",
+    "of": "de",
+    "dancers": "bailarines"
   }
 }
 

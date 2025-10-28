@@ -28,6 +28,29 @@ const countrySchema = new mongoose.Schema(
       type: Boolean,
       default: true,
     },
+    // Social/messaging group links for country dance communities
+    socialGroups: {
+      whatsapp: {
+        type: String,
+        trim: true,
+      },
+      line: {
+        type: String,
+        trim: true,
+      },
+      telegram: {
+        type: String,
+        trim: true,
+      },
+      facebook: {
+        type: String,
+        trim: true,
+      },
+      instagram: {
+        type: String,
+        trim: true,
+      },
+    },
   },
   {
     timestamps: true,

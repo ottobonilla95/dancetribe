@@ -13,6 +13,7 @@ import Link from "next/link";
 import Pagination from "@/components/Pagination";
 import DancersFilter from "@/components/DancersFilter";
 import Flag from "@/components/Flag";
+import { getMessages, getTranslation } from "@/lib/i18n";
 import {
   FaMapMarkerAlt,
   FaUsers,
@@ -20,7 +21,11 @@ import {
   FaHeart,
   FaMusic,
   FaCity,
+  FaWhatsapp,
+  FaFacebook,
+  FaInstagram,
 } from "react-icons/fa";
+import { SiLine, SiTelegram } from "react-icons/si";
 
 interface Props {
   params: {
@@ -33,6 +38,10 @@ interface Props {
 
 export default async function CountryPage({ params, searchParams }: Props) {
   await connectMongo();
+
+  // Get translations
+  const messages = await getMessages();
+  const t = (key: string) => getTranslation(messages, key);
 
   // Check if the countryId is a valid ObjectId
   if (!isValidObjectId(params.countryId)) {
@@ -310,31 +319,31 @@ export default async function CountryPage({ params, searchParams }: Props) {
             <div className="stat-figure text-primary">
               <FaMusic className="text-3xl" />
             </div>
-            <div className="stat-title">Dancers Living Here</div>
+            <div className="stat-title">{t('country.dancersLivingHere')}</div>
             <div className="stat-value text-primary">{totalDancers}</div>
-            <div className="stat-desc">Active dance community members</div>
+            <div className="stat-desc">{t('country.activeCommunity')}</div>
           </div>
 
           <div className="stat bg-base-200 rounded-lg">
             <div className="stat-figure text-secondary">
               <FaGlobeAmericas className="text-3xl" />
             </div>
-            <div className="stat-title">Visitors</div>
+            <div className="stat-title">{t('country.visitors')}</div>
             <div className="stat-value text-secondary">
               {totalDancersWhoVisited}
             </div>
-            <div className="stat-desc">Dancers who&apos;ve visited for dance</div>
+            <div className="stat-desc">{t('country.visitedForDance')}</div>
           </div>
 
           <div className="stat bg-base-200 rounded-lg">
             <div className="stat-figure text-accent">
               <FaHeart className="text-3xl" />
             </div>
-            <div className="stat-title">Most Common Role</div>
+            <div className="stat-title">{t('country.mostCommonRole')}</div>
             <div className="stat-value text-accent">
               {roleLabel}
             </div>
-            <div className="stat-desc">{rolePercentage}% of dancers</div>
+            <div className="stat-desc">{rolePercentage}% {t('country.ofDancers')}</div>
           </div>
         </div>
 
@@ -346,7 +355,7 @@ export default async function CountryPage({ params, searchParams }: Props) {
               <div className="card bg-base-200 shadow-xl mb-6">
                 <div className="card-body">
                   <h2 className="card-title mb-4 flex items-center gap-2">
-                    <FaCity /> Top Cities
+                    <FaCity /> {t('country.topCities')}
                   </h2>
                   <div className="space-y-3">
                     {topCities.map((city: any, index: number) => (
@@ -385,7 +394,7 @@ export default async function CountryPage({ params, searchParams }: Props) {
             {/* Popular Dance Styles */}
             <div className="card bg-base-200 shadow-xl">
               <div className="card-body">
-                <h2 className="card-title mb-4">Popular Dance Styles</h2>
+                <h2 className="card-title mb-4">{t('country.popularDanceStyles')}</h2>
                 {danceStylesInCountry.length > 0 ? (
                   <div className="space-y-3">
                     {danceStylesInCountry.map((style: any, index: number) => (
@@ -421,7 +430,7 @@ export default async function CountryPage({ params, searchParams }: Props) {
               <div className="card bg-base-200 shadow-xl mt-6">
                 <div className="card-body">
                   <h2 className="card-title mb-4 flex items-center gap-2">
-                    🎓 Dance Teachers
+                    🎓 {t('country.teachers')}
                   </h2>
                   <div className="space-y-3">
                     {teachers.map((teacher: any) => (
@@ -457,7 +466,7 @@ export default async function CountryPage({ params, searchParams }: Props) {
                             </p>
                           )}
                         </div>
-                        <div className="badge badge-primary badge-sm">View</div>
+                        <div className="badge badge-primary badge-sm">{t('country.view')}</div>
                       </Link>
                     ))}
                   </div>
@@ -470,7 +479,7 @@ export default async function CountryPage({ params, searchParams }: Props) {
               <div className="card bg-base-200 shadow-xl mt-6">
                 <div className="card-body">
                   <h2 className="card-title mb-4 flex items-center gap-2">
-                    🎵 DJs
+                    🎵 {t('country.djs')}
                   </h2>
                   <div className="space-y-3">
                     {djs.map((dj: any) => (
@@ -506,7 +515,7 @@ export default async function CountryPage({ params, searchParams }: Props) {
                             </p>
                           )}
                         </div>
-                        <div className="badge badge-secondary badge-sm">View</div>
+                        <div className="badge badge-secondary badge-sm">{t('country.view')}</div>
                       </Link>
                     ))}
                   </div>
@@ -519,7 +528,7 @@ export default async function CountryPage({ params, searchParams }: Props) {
               <div className="card bg-base-200 shadow-xl mt-6">
                 <div className="card-body">
                   <h2 className="card-title mb-4 flex items-center gap-2">
-                    📷 Photographers
+                    📷 {t('country.photographers')}
                   </h2>
                   <div className="space-y-3">
                     {photographers.map((photographer: any) => (
@@ -555,9 +564,81 @@ export default async function CountryPage({ params, searchParams }: Props) {
                             </p>
                           )}
                         </div>
-                        <div className="badge badge-accent badge-sm">View</div>
+                        <div className="badge badge-accent badge-sm">{t('country.view')}</div>
                       </Link>
                     ))}
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {/* Country Dance Groups */}
+            {(country.socialGroups?.whatsapp || country.socialGroups?.line || country.socialGroups?.telegram || country.socialGroups?.facebook || country.socialGroups?.instagram) && (
+              <div className="card bg-base-200 shadow-xl mt-6">
+                <div className="card-body">
+                  <h2 className="card-title mb-4">💬 {t('country.communityGroups')}</h2>
+                  <p className="text-sm text-base-content/70 mb-4">
+                    {t('country.joinCommunity').replace('{country}', country.name)}
+                  </p>
+                  <div className="space-y-2">
+                    {country.socialGroups.whatsapp && (
+                      <a
+                        href={country.socialGroups.whatsapp}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="btn btn-success btn-sm gap-2 w-full"
+                      >
+                        <FaWhatsapp className="text-lg" />
+                        WhatsApp
+                      </a>
+                    )}
+                    {country.socialGroups.telegram && (
+                      <a
+                        href={country.socialGroups.telegram}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="btn btn-info btn-sm gap-2 w-full"
+                      >
+                        <SiTelegram className="text-lg" />
+                        Telegram
+                      </a>
+                    )}
+                    {country.socialGroups.facebook && (
+                      <a
+                        href={country.socialGroups.facebook}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="btn btn-sm gap-2 w-full"
+                        style={{ backgroundColor: '#1877F2', color: 'white' }}
+                      >
+                        <FaFacebook className="text-lg" />
+                        Facebook Group
+                      </a>
+                    )}
+                    {country.socialGroups.instagram && (
+                      <a
+                        href={country.socialGroups.instagram}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="btn btn-sm gap-2 w-full"
+                        style={{ background: 'linear-gradient(45deg, #f09433 0%,#e6683c 25%,#dc2743 50%,#cc2366 75%,#bc1888 100%)', color: 'white' }}
+                      >
+                        <FaInstagram className="text-lg" />
+                        Instagram
+                      </a>
+                    )}
+                    {country.socialGroups.line && (
+                      <a
+                        href={country.socialGroups.line}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="btn btn-sm gap-2 w-full"
+                        style={{ backgroundColor: '#00B900', color: 'white' }}
+                      >
+                        <SiLine className="text-lg" />
+                        LINE
+                      </a>
+                    )}
                   </div>
                 </div>
               </div>
@@ -568,7 +649,7 @@ export default async function CountryPage({ params, searchParams }: Props) {
               <div className="card bg-base-200 shadow-xl mt-6">
                 <div className="card-body">
                   <h2 className="card-title mb-4 flex items-center gap-2">
-                    ❤️ Most Liked Dancers
+                    ❤️ {t('country.mostLikedDancers')}
                   </h2>
                   <div className="space-y-3">
                     {mostLikedDancers.map((dancer: any, index: number) => (
@@ -607,7 +688,7 @@ export default async function CountryPage({ params, searchParams }: Props) {
                             </p>
                           </div>
                         </div>
-                        <div className="badge badge-error badge-sm">View</div>
+                        <div className="badge badge-error badge-sm">{t('country.view')}</div>
                       </Link>
                     ))}
                   </div>
@@ -620,7 +701,7 @@ export default async function CountryPage({ params, searchParams }: Props) {
           <div className="lg:col-span-2">
             <div className="card bg-base-200 shadow-xl">
               <div className="card-body">
-                <h2 className="card-title mb-6">Dancers in {country.name}</h2>
+                <h2 className="card-title mb-6">{t('country.dancersIn')} {country.name}</h2>
 
                 {dancers.length > 0 ? (
                   <DancersFilter

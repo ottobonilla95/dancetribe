@@ -15,6 +15,7 @@ import HotDanceStyles from "@/components/HotDanceStyles";
 import StatsPreview from "@/components/StatsPreview";
 import TrendyMusicPreview from "@/components/TrendyMusicPreview";
 import FriendsTripsPreview from "@/components/FriendsTripsPreview";
+import TrendyCountries from "@/components/TrendyCountries";
 import Link from "next/link";
 import { getMessages, getTranslation } from "@/lib/i18n";
 
@@ -395,6 +396,187 @@ async function getTrendingSongs() {
   }
 }
 
+async function getFriendsTrips(userId: string) {
+  try {
+    await connectMongo();
+
+    const user = await User.findById(userId).select("friends").lean();
+
+    if (!user || !(user as any).friends || (user as any).friends.length === 0) {
+      return [];
+    }
+
+    const now = new Date();
+
+    // Get friends' upcoming trips
+    const friendsWithTrips = await User.find({
+      _id: { $in: (user as any).friends },
+      "trips.0": { $exists: true },
+    })
+      .select("name image username trips")
+      .populate({
+        path: "trips.city",
+        model: City,
+        populate: {
+          path: "country",
+          model: Country,
+          select: "name code",
+        },
+      })
+      .lean();
+
+    // Flatten and filter upcoming trips
+    const allTrips: any[] = [];
+    friendsWithTrips.forEach((friend: any) => {
+      friend.trips?.forEach((trip: any) => {
+        if (new Date(trip.endDate) >= now) {
+          allTrips.push({
+            _id: trip._id.toString(),
+            friend: {
+              _id: friend._id.toString(),
+              name: friend.name,
+              image: friend.image,
+              username: friend.username,
+            },
+            city: trip.city ? {
+              _id: trip.city._id.toString(),
+              name: trip.city.name,
+              image: trip.city.image,
+              country: trip.city.country ? {
+                name: trip.city.country.name,
+                code: trip.city.country.code,
+              } : null,
+            } : null,
+            startDate: trip.startDate,
+            endDate: trip.endDate,
+          });
+        }
+      });
+    });
+
+    // Sort by start date and limit to 4
+    return allTrips
+      .sort((a, b) => new Date(a.startDate).getTime() - new Date(b.startDate).getTime())
+      .slice(0, 4);
+
+  } catch (error) {
+    console.error("Error fetching friends' trips:", error);
+    return [];
+  }
+}
+
+async function getTrendyCountries() {
+  try {
+    await connectMongo();
+
+    // Calculate everything in real-time for accuracy
+    const trendyCountries = await Country.aggregate([
+      // Get all active countries
+      { $match: { isActive: true } },
+      // Lookup ALL users in each country
+      {
+        $lookup: {
+          from: "users",
+          let: { countryId: "$_id" },
+          pipeline: [
+            { $match: { isProfileComplete: true } },
+            // Lookup city
+            {
+              $lookup: {
+                from: "cities",
+                localField: "city",
+                foreignField: "_id",
+                as: "cityData",
+              },
+            },
+            { $unwind: "$cityData" },
+            // Match country
+            {
+              $match: {
+                $expr: { $eq: ["$cityData.country", "$$countryId"] },
+              },
+            },
+            // Project only what we need
+            { $project: { _id: 1, updatedAt: 1 } },
+          ],
+          as: "dancers",
+        },
+      },
+      // Filter out countries with no dancers
+      { $match: { "dancers.0": { $exists: true } } },
+      // Calculate metrics
+      {
+        $addFields: {
+          totalDancers: { $size: "$dancers" },
+          recentlyActive: {
+            $size: {
+              $filter: {
+                input: "$dancers",
+                as: "dancer",
+                cond: {
+                  $gte: [
+                    "$$dancer.updatedAt",
+                    new Date(Date.now() - 30 * 24 * 60 * 60 * 1000),
+                  ],
+                },
+              },
+            },
+          },
+        },
+      },
+      // Calculate trending score: totalDancers + (recentlyActive * 2)
+      {
+        $addFields: {
+          trendingScore: {
+            $add: ["$totalDancers", { $multiply: ["$recentlyActive", 2] }],
+          },
+        },
+      },
+      // Sort by trending score
+      { $sort: { trendingScore: -1 } },
+      // Limit to top 6
+      { $limit: 6 },
+      // Lookup continent
+      {
+        $lookup: {
+          from: "continents",
+          localField: "continent",
+          foreignField: "_id",
+          as: "continentData",
+        },
+      },
+      // Project final structure
+      {
+        $project: {
+          _id: 1,
+          name: 1,
+          code: 1,
+          totalDancers: 1,
+          recentlyActive: 1,
+          trendingScore: 1,
+          continent: {
+            $arrayElemAt: ["$continentData", 0],
+          },
+        },
+      },
+    ]);
+
+    return trendyCountries.map((country: any) => ({
+      ...country,
+      _id: country._id.toString(),
+      continent: country.continent
+        ? {
+            _id: country.continent._id?.toString(),
+            name: country.continent.name || "",
+          }
+        : null,
+    }));
+  } catch (error) {
+    console.error("Error fetching trendy countries:", error);
+    return [];
+  }
+}
+
 async function getCities(): Promise<CityType[]> {
   console.log("🚀 getCities FUNCTION CALLED");
   try {
@@ -444,7 +626,7 @@ export default async function Dashboard() {
   }
 
   // Fetch data in parallel
-  const [initialDancers, danceStyles, cities, hotDanceStyles, communityStats, trendingSongs] =
+  const [initialDancers, danceStyles, cities, hotDanceStyles, communityStats, trendingSongs, trendyCountries, friendsTrips] =
     await Promise.all([
       getInitialDancers(session.user.id),
       getDanceStyles(),
@@ -452,6 +634,8 @@ export default async function Dashboard() {
       getHotDanceStyles(),
       getCommunityStats(),
       getTrendingSongs(),
+      getTrendyCountries(),
+      getFriendsTrips(session.user.id),
     ]);
 
   return (
@@ -471,15 +655,22 @@ export default async function Dashboard() {
           </Link>
         </div>
 
+        {/* Trendy Countries Section */}
+        <div className="mt-12">
+          <TrendyCountries countries={trendyCountries} />
+        </div>
+
         {/* Hot Dance Styles Section */}
         <div className="mt-12">
           <HotDanceStyles danceStyles={hotDanceStyles} />
         </div>
 
         {/* Friends' Trips Preview */}
-        <div className="mt-12">
-          <FriendsTripsPreview />
-        </div>
+        {friendsTrips.length > 0 && (
+          <div className="mt-12">
+            <FriendsTripsPreview trips={friendsTrips} />
+          </div>
+        )}
 
         {/* Trendy Music Section */}
         <TrendyMusicPreview songs={trendingSongs} />

@@ -10,7 +10,7 @@ import ButtonSignin from "./ButtonSignin";
 import SearchBar from "./SearchBar";
 import logo from "@/app/icon.png";
 import config from "@/config";
-import { useFriendRequestCount } from "@/libs/hooks";
+import { useFriendRequestCount } from "@/contexts/FriendRequestContext";
 import { FaUser, FaUserFriends, FaCog, FaSignOutAlt, FaHome, FaUserPlus, FaMusic, FaSearch, FaPlane } from "react-icons/fa";
 import { signOut } from "next-auth/react";
 import { CONTACT } from "@/constants/contact";

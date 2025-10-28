@@ -1,6 +1,5 @@
 "use client";
 
-import { useEffect, useState } from "react";
 import Link from "next/link";
 import { FaPlane, FaCalendar, FaMapMarkerAlt } from "react-icons/fa";
 import { useTranslation } from "./I18nProvider";
@@ -18,7 +17,7 @@ interface FriendTrip {
   };
   startDate: Date;
   endDate: Date;
-  dancer: {
+  friend: {
     _id: string;
     name: string;
     username: string;
@@ -26,28 +25,12 @@ interface FriendTrip {
   };
 }
 
-export default function FriendsTripsPreview() {
-  const [trips, setTrips] = useState<FriendTrip[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
+interface FriendsTripsPreviewProps {
+  trips: FriendTrip[];
+}
+
+export default function FriendsTripsPreview({ trips = [] }: FriendsTripsPreviewProps) {
   const { t } = useTranslation();
-
-  useEffect(() => {
-    fetchTrips();
-  }, []);
-
-  const fetchTrips = async () => {
-    try {
-      const res = await fetch("/api/friends/trips");
-      if (res.ok) {
-        const data = await res.json();
-        setTrips(data.trips.slice(0, 4)); // Show only 4 in preview
-      }
-    } catch (error) {
-      console.error("Error fetching friends' trips:", error);
-    } finally {
-      setIsLoading(false);
-    }
-  };
 
   const formatDate = (date: Date) => {
     return new Date(date).toLocaleDateString("en-US", {
@@ -73,29 +56,6 @@ export default function FriendsTripsPreview() {
     return `in ${months} ${months === 1 ? "month" : "months"}`;
   };
 
-  if (isLoading) {
-    return (
-      <div className="card bg-base-200 shadow-xl">
-        <div className="card-body">
-          <h2 className="card-title">
-            <FaPlane className="text-primary" />
-            {t('dashboard.friendsTrips')}
-          </h2>
-          <div className="space-y-3">
-            {[1, 2, 3].map((i) => (
-              <div key={i} className="skeleton h-20 w-full"></div>
-            ))}
-          </div>
-        </div>
-      </div>
-    );
-  }
-
-  // Hide widget if no trips
-  if (trips.length === 0) {
-    return null;
-  }
-
   return (
     <div className="card bg-base-200 shadow-xl">
       <div className="card-body">
@@ -119,21 +79,21 @@ export default function FriendsTripsPreview() {
               <div className="flex items-start gap-3">
                 {/* Friend Avatar */}
                 <Link
-                  href={`/dancer/${trip.dancer._id}`}
+                  href={`/dancer/${trip.friend._id}`}
                   className="avatar"
                   onClick={(e) => e.stopPropagation()}
                 >
                   <div className="w-10 h-10 rounded-full">
-                    {trip.dancer.image ? (
+                    {trip.friend.image ? (
                       <img
-                        src={trip.dancer.image}
-                        alt={trip.dancer.name}
+                        src={trip.friend.image}
+                        alt={trip.friend.name}
                         className="w-full h-full object-cover rounded-full"
                       />
                     ) : (
                       <div className="bg-primary text-primary-content rounded-full w-full h-full flex items-center justify-center">
                         <span className="text-sm">
-                          {trip.dancer.name.charAt(0).toUpperCase()}
+                          {trip.friend.name.charAt(0).toUpperCase()}
                         </span>
                       </div>
                     )}
@@ -144,7 +104,7 @@ export default function FriendsTripsPreview() {
                 <div className="flex-1 min-w-0">
                   <div className="flex items-center gap-2 mb-1">
                     <span className="font-medium text-sm truncate">
-                      {trip.dancer.name}
+                      {trip.friend.name}
                     </span>
                     <FaPlane className="text-xs text-primary" />
                     <span className="font-semibold text-sm truncate">

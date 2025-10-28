@@ -62,6 +62,14 @@ const citySchema = new mongoose.Schema(
         type: String,
         trim: true,
       },
+      facebook: {
+        type: String,
+        trim: true,
+      },
+      instagram: {
+        type: String,
+        trim: true,
+      },
     },
   },
   {

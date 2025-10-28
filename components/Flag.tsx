@@ -1,19 +1,22 @@
 interface FlagProps {
   countryCode: string;
-  size?: 'sm' | 'md' | 'lg';
+  size?: 'sm' | 'md' | 'lg' | 'xl' | '2xl';
   className?: string;
 }
 
 const Flag = ({ countryCode, size = 'md', className = '' }: FlagProps) => {
   const sizeClasses = {
-    sm: 'w-4 h-3',
-    md: 'w-6 h-4',
-    lg: 'w-8 h-6'
+    sm: 'text-base',
+    md: 'text-2xl',
+    lg: 'text-4xl',
+    xl: 'text-6xl',
+    '2xl': 'text-8xl'
   };
 
   return (
     <span 
-      className={`fi fi-${countryCode.toLowerCase()} ${sizeClasses[size]} ${className}`}
+      className={`fi fi-${countryCode.toLowerCase()} inline-block ${sizeClasses[size]} ${className}`}
+      style={{ fontSize: size === '2xl' ? '5rem' : size === 'xl' ? '3.5rem' : undefined }}
       title={countryCode}
     />
   );

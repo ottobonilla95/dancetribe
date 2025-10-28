@@ -1,10 +1,11 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { User } from "@/types/user";
 import { DanceStyle } from "@/types/dance-style";
 import DancerCard from "./DancerCard";
-import { FaFilter, FaSpinner } from "react-icons/fa";
+import DancersMap from "./DancersMap";
+import { FaFilter, FaSpinner, FaList, FaMap } from "react-icons/fa";
 import { useTranslation } from "./I18nProvider";
 
 interface DiscoveryFeedProps {
@@ -21,6 +22,7 @@ export default function DiscoveryFeed({ initialDancers = [], danceStyles = [], s
   const [loadingMore, setLoadingMore] = useState(false);
   const [hasMore, setHasMore] = useState(true);
   const [total, setTotal] = useState(0);
+  const [viewMode, setViewMode] = useState<'list' | 'map'>('list');
   const [filters, setFilters] = useState({
     danceStyle: "",
     danceRole: "",
@@ -30,7 +32,7 @@ export default function DiscoveryFeed({ initialDancers = [], danceStyles = [], s
   });
   const [showFilters, setShowFilters] = useState(false);
 
-  const fetchDancers = async (skip = 0, append = false) => {
+  const fetchDancers = useCallback(async (skip = 0, append = false) => {
     if (append) {
       setLoadingMore(true);
     } else {
@@ -44,11 +46,19 @@ export default function DiscoveryFeed({ initialDancers = [], danceStyles = [], s
       if (filters.city) params.append("city", filters.city);
       if (filters.nearMe) params.append("nearMe", "true");
       if (filters.inMyCountry) params.append("inMyCountry", "true");
-      params.append("skip", skip.toString());
+      
+      // 🗺️ For map view, load ALL dancers (no pagination)
+      if (viewMode === 'map' && !append) {
+        params.append("limit", "1000"); // Get all (max 1000)
+        params.append("skip", "0");
+      } else {
+        params.append("skip", skip.toString());
+      }
 
       const response = await fetch(`/api/dancers/discover?${params.toString()}`);
       if (response.ok) {
         const data = await response.json();
+        
         if (append) {
           setDancers((prev) => [...prev, ...(data.dancers || [])]);
         } else {
@@ -63,39 +73,61 @@ export default function DiscoveryFeed({ initialDancers = [], danceStyles = [], s
       setLoading(false);
       setLoadingMore(false);
     }
-  };
+  }, [filters, viewMode]);
 
   const loadMore = () => {
     fetchDancers(dancers.length, true);
   };
 
   useEffect(() => {
-    // Always fetch fresh data when any filter changes
+    // Fetch data when filters OR viewMode changes
+    // (viewMode change triggers re-fetch to load all dancers for map)
     fetchDancers(0, false);
-  }, [filters]);
+  }, [fetchDancers]);
 
   const clearFilters = () => {
     setFilters({ danceStyle: "", danceRole: "", city: "", nearMe: false, inMyCountry: false });
   };
 
   return (
-    <div className="space-y-6">
+    <div>
       {/* Header */}
-      <div className="space-y-4">
-        <div className="flex items-center justify-between">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-4 mb-6">
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
           <div>
             <h2 className="text-2xl font-bold">{t('discovery.title')}</h2>
-            <p className="text-base-content/60">
+            <p className="text-base-content/60 text-sm">
               {filters.nearMe ? t('discovery.dancersInYourCity') : 
                filters.inMyCountry ? t('discovery.dancersInYourCountry') :
                t('discovery.dancersAroundTheWorld')}
             </p>
           </div>
-          <div className="flex gap-2">
+          <div className="flex gap-2 flex-wrap">
+            {/* View Mode Toggle - Only show on full page (not preview) */}
+            {!isPreview && (
+              <div className="btn-group">
+                <button
+                  onClick={() => setViewMode('list')}
+                  className={`btn btn-sm gap-1 ${viewMode === 'list' ? 'btn-active' : 'btn-outline'}`}
+                  title="List View"
+                >
+                  <FaList />
+                  <span>List</span>
+                </button>
+                <button
+                  onClick={() => setViewMode('map')}
+                  className={`btn btn-sm gap-1 ${viewMode === 'map' ? 'btn-active' : 'btn-outline'}`}
+                  title="Map View"
+                >
+                  <FaMap />
+                  <span>Map</span>
+                </button>
+              </div>
+            )}
             {showViewAllLink && (
               <a
                 href="/discover"
-                className="btn btn-primary btn-sm gap-2"
+                className="btn btn-primary btn-sm gap-2 hidden sm:flex"
               >
                 {t('discovery.viewAll')}
                 <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -103,13 +135,13 @@ export default function DiscoveryFeed({ initialDancers = [], danceStyles = [], s
                 </svg>
               </a>
             )}
-            {/* Hide More Filters button on mobile when isPreview */}
+            {/* More Filters button */}
             <button
               onClick={() => setShowFilters(!showFilters)}
               className={`btn btn-outline btn-sm gap-2 ${isPreview ? 'hidden md:flex' : ''}`}
             >
               <FaFilter />
-              {t('discovery.moreFilters')}
+              <span className="hidden sm:inline">{t('discovery.moreFilters')}</span>
             </button>
           </div>
         </div>
@@ -139,7 +171,8 @@ export default function DiscoveryFeed({ initialDancers = [], danceStyles = [], s
 
       {/* Filters */}
       {showFilters && (
-        <div className="card bg-base-200 p-4">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mb-6">
+          <div className="card bg-base-200 p-4">
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
             {/* Dance Style Filter */}
@@ -199,12 +232,13 @@ export default function DiscoveryFeed({ initialDancers = [], danceStyles = [], s
               {t('discovery.clearAllFilters')}
             </button>
           )}
+          </div>
         </div>
       )}
 
       {/* Loading State */}
       {loading && (
-        <div className="flex justify-center py-8">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex justify-center py-8">
           <FaSpinner className="animate-spin text-2xl text-primary" />
         </div>
       )}
@@ -213,7 +247,7 @@ export default function DiscoveryFeed({ initialDancers = [], danceStyles = [], s
       {!loading && (
         <>
           {dancers.length === 0 ? (
-            <div className="text-center py-12">
+            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center py-12">
               <div className="text-6xl mb-4">💃</div>
               <h3 className="text-xl font-semibold mb-2">{t('discovery.noDancersFound')}</h3>
               <p className="text-base-content/60 mb-4">
@@ -257,35 +291,51 @@ export default function DiscoveryFeed({ initialDancers = [], danceStyles = [], s
             </div>
           ) : (
             <>
-              <div className="flex items-center justify-between">
-                <p className="text-sm text-base-content/60">
-                  {t('discovery.showing')} {dancers.length} {t('discovery.of')} {total} {total !== 1 ? t('search.dancers').toLowerCase() : t('search.dancers').toLowerCase().replace('s', '')}
-                </p>
-              </div>
-              
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-                {dancers.map((dancer) => (
-                  <DancerCard key={dancer._id} dancer={dancer} />
-                ))}
-              </div>
+              {/* View Mode: Map or List */}
+              {viewMode === 'map' ? (
+                <>
+                  <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mb-4">
+                    <p className="text-sm text-base-content/60">
+                      {t('discovery.showing')} {dancers.length} {total !== 1 ? t('search.dancers').toLowerCase() : t('search.dancers').toLowerCase().replace('s', '')}
+                    </p>
+                  </div>
+                  <DancersMap dancers={dancers} />
+                </>
+              ) : (
+                <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                  <div className="space-y-6">
+                    <div className="flex items-center justify-between">
+                      <p className="text-sm text-base-content/60">
+                        {t('discovery.showing')} {dancers.length} {t('discovery.of')} {total} {total !== 1 ? t('search.dancers').toLowerCase() : t('search.dancers').toLowerCase().replace('s', '')}
+                      </p>
+                    </div>
+                    
+                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+                      {dancers.map((dancer) => (
+                        <DancerCard key={dancer._id} dancer={dancer} />
+                      ))}
+                    </div>
 
-              {/* Load More Button */}
-              {hasMore && (
-                <div className="flex justify-center mt-8">
-                  <button
-                    onClick={loadMore}
-                    disabled={loadingMore}
-                    className="btn btn-outline btn-wide"
-                  >
-                    {loadingMore ? (
-                      <>
-                        <FaSpinner className="animate-spin" />
-                        {t('discovery.loading')}
-                      </>
-                    ) : (
-                      t('discovery.loadMoreDancers')
+                    {/* Load More Button */}
+                    {hasMore && (
+                      <div className="flex justify-center mt-8">
+                        <button
+                          onClick={loadMore}
+                          disabled={loadingMore}
+                          className="btn btn-outline btn-wide"
+                        >
+                          {loadingMore ? (
+                            <>
+                              <FaSpinner className="animate-spin" />
+                              {t('discovery.loading')}
+                            </>
+                          ) : (
+                            t('discovery.loadMoreDancers')
+                          )}
+                        </button>
+                      </div>
                     )}
-                  </button>
+                  </div>
                 </div>
               )}
             </>

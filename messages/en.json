@@ -150,6 +150,10 @@
     "nearMe": "Near Me",
     "myCountry": "My Country",
     "worldwide": "Worldwide",
+    "autoExpandedToCountry": "Showing dancers in your country",
+    "autoExpandedToWorldwide": "Showing worldwide dancers",
+    "noDancersInCityYet": "No dancers in your city yet. We've expanded your search to your country!",
+    "beFirstInCity": "Be the first dancer in your city! Showing the worldwide dance community.",
     "danceStyle": "Dance Style",
     "allStyles": "All Styles",
     "danceRole": "Dance Role",
@@ -212,11 +216,14 @@
     "joinCommunity": "Join the Community",
     "viewAllCities": "View All Cities",
     "hotDanceStyles": "Hot Dance Styles 🕺",
-    "trendyMusic": "Trendy Music 🎵"
+    "trendyMusic": "Trendy Music 🎵",
+    "joinDancersWorldwide": "🌍 Join Dancers Worldwide",
+    "connectWithDancersInCountries": "Connect with dancers in {count} countries across the globe"
   },
   "dashboard": {
     "hottestCities": "Hottest Dance Cities 🔥",
     "viewAllCities": "View All Cities",
+    "trendyCountries": "Trending Countries",
     "hotDanceStyles": "Hottest Dance Styles 🕺",
     "friendsTrips": "Friends' Upcoming Trips ✈️",
     "noTripsYet": "No trips planned yet",
@@ -231,7 +238,9 @@
     "dancersNearYou": "Dancers Near You 💃",
     "noDancersFound": "No dancers found",
     "tryDifferentFilters": "Try adjusting your filters or search worldwide",
-    "viewAllDancers": "View All Dancers"
+    "viewAllDancers": "View All Dancers",
+    "active": "active",
+    "noTrendyCountries": "No trending countries at the moment."
   },
   "profile": {
     "myProfile": "My Profile",
@@ -474,6 +483,69 @@
     "mostDancers": "Most Dancers",
     "popularStyles": "Popular styles",
     "noCitiesAvailable": "No cities available at the moment"
+  },
+  "dancer": {
+    "wantToConnect": "Want to connect with {name}?",
+    "createProfile": "Create your dance profile now"
+  },
+  "connect": {
+    "connect": "Connect",
+    "friends": "Friends",
+    "pending": "Pending",
+    "acceptRequest": "Accept friend request",
+    "rejectRequest": "Reject friend request"
+  },
+  "city": {
+    "population": "Population",
+    "totalDancers": "Total Dancers",
+    "dancersLivingHere": "Dancers Living Here",
+    "activeCommunity": "Active dance community members",
+    "visitors": "Visitors",
+    "visitedForDance": "Dancers who've visited for dance",
+    "mostCommonRole": "Most Common Role",
+    "ofDancers": "of dancers",
+    "popularDanceStyles": "Popular Dance Styles",
+    "teachers": "Dance Teachers",
+    "djs": "DJs",
+    "photographers": "Photographers",
+    "mostLikedDancers": "Most Liked Dancers",
+    "communityGroups": "Community Groups",
+    "joinCommunity": "Join the dance community",
+    "dancersIn": "Dancers in",
+    "joinDanceCommunityIn": "Join the Dance Community in",
+    "signUpToConnect": "Sign up to connect with dancers in",
+    "noDancersFound": "No dancers found",
+    "tryAdjusting": "Try adjusting your filters or check back later for new dancers!",
+    "view": "View"
+  },
+  "country": {
+    "totalDancers": "Total Dancers",
+    "dancersLivingHere": "Dancers Living Here",
+    "activeCommunity": "Active dance community members",
+    "visitors": "Visitors",
+    "visitedForDance": "Dancers who've visited for dance",
+    "mostCommonRole": "Most Common Role",
+    "ofDancers": "of dancers",
+    "topCities": "Top Cities",
+    "popularDanceStyles": "Popular Dance Styles",
+    "teachers": "Dance Teachers",
+    "djs": "DJs",
+    "photographers": "Photographers",
+    "mostLikedDancers": "Most Liked Dancers",
+    "communityGroups": "Community Groups",
+    "joinCommunity": "Join the {country} dance community",
+    "dancersIn": "Dancers in",
+    "joinDanceCommunityIn": "Join the Dance Community in",
+    "signUpToConnect": "Sign up to connect with dancers in",
+    "noDancersFound": "No dancers found",
+    "tryAdjusting": "Try adjusting your filters or check back later for new dancers!",
+    "view": "View"
+  },
+  "filters": {
+    "showMyDancers": "Show only dancers who dance what I dance",
+    "found": "Found",
+    "of": "of",
+    "dancers": "dancers"
   }
 }
 

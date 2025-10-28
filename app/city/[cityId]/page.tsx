@@ -12,6 +12,7 @@ import { authOptions } from "@/libs/next-auth";
 import Link from "next/link";
 import Pagination from "@/components/Pagination";
 import DancersFilter from "@/components/DancersFilter";
+import { getMessages, getTranslation } from "@/lib/i18n";
 import {
   FaMapMarkerAlt,
   FaUsers,
@@ -19,6 +20,8 @@ import {
   FaHeart,
   FaMusic,
   FaWhatsapp,
+  FaFacebook,
+  FaInstagram,
 } from "react-icons/fa";
 import { SiLine, SiTelegram } from "react-icons/si";
 
@@ -33,6 +36,10 @@ interface Props {
 
 export default async function CityPage({ params, searchParams }: Props) {
   await connectMongo();
+
+  // Get translations
+  const messages = await getMessages();
+  const t = (key: string) => getTranslation(messages, key);
 
   // Check if the cityId is a valid ObjectId
   if (!isValidObjectId(params.cityId)) {
@@ -284,31 +291,31 @@ export default async function CityPage({ params, searchParams }: Props) {
             <div className="stat-figure text-primary">
               <FaMusic className="text-3xl" />
             </div>
-            <div className="stat-title">Dancers Living Here</div>
+            <div className="stat-title">{t('city.dancersLivingHere')}</div>
             <div className="stat-value text-primary">{totalDancers}</div>
-            <div className="stat-desc">Active dance community members</div>
+            <div className="stat-desc">{t('city.activeCommunity')}</div>
           </div>
 
           <div className="stat bg-base-200 rounded-lg">
             <div className="stat-figure text-secondary">
               <FaGlobeAmericas className="text-3xl" />
             </div>
-            <div className="stat-title">Visitors</div>
+            <div className="stat-title">{t('city.visitors')}</div>
             <div className="stat-value text-secondary">
               {totalDancersWhoVisited}
             </div>
-            <div className="stat-desc">Dancers who&apos;ve visited for dance</div>
+            <div className="stat-desc">{t('city.visitedForDance')}</div>
           </div>
 
           <div className="stat bg-base-200 rounded-lg">
             <div className="stat-figure text-accent">
               <FaHeart className="text-3xl" />
             </div>
-            <div className="stat-title">Most Common Role</div>
+            <div className="stat-title">{t('city.mostCommonRole')}</div>
             <div className="stat-value text-accent">
               {roleLabel}
             </div>
-            <div className="stat-desc">{rolePercentage}% of dancers</div>
+            <div className="stat-desc">{rolePercentage}% {t('city.ofDancers')}</div>
           </div>
         </div>
 
@@ -317,7 +324,7 @@ export default async function CityPage({ params, searchParams }: Props) {
           <div className="lg:col-span-1">
             <div className="card bg-base-200 shadow-xl">
               <div className="card-body">
-                <h2 className="card-title mb-4">Popular Dance Styles</h2>
+                <h2 className="card-title mb-4">{t('city.popularDanceStyles')}</h2>
                 {danceStylesInCity.length > 0 ? (
                   <div className="space-y-3">
                     {danceStylesInCity.map((style: any, index: number) => (
@@ -353,7 +360,7 @@ export default async function CityPage({ params, searchParams }: Props) {
               <div className="card bg-base-200 shadow-xl mt-6">
                 <div className="card-body">
                   <h2 className="card-title mb-4 flex items-center gap-2">
-                    🎓 Dance Teachers
+                    🎓 {t('city.teachers')}
                   </h2>
                   <div className="space-y-3">
                     {teachers.map((teacher: any) => (
@@ -390,7 +397,7 @@ export default async function CityPage({ params, searchParams }: Props) {
                             </p>
                           )}
                         </div>
-                        <div className="badge badge-primary badge-sm">View</div>
+                        <div className="badge badge-primary badge-sm">{t('city.view')}</div>
                       </Link>
                     ))}
                   </div>
@@ -403,7 +410,7 @@ export default async function CityPage({ params, searchParams }: Props) {
               <div className="card bg-base-200 shadow-xl mt-6">
                 <div className="card-body">
                   <h2 className="card-title mb-4 flex items-center gap-2">
-                    🎵 DJs
+                    🎵 {t('city.djs')}
                   </h2>
                   <div className="space-y-3">
                     {djs.map((dj: any) => (
@@ -439,7 +446,7 @@ export default async function CityPage({ params, searchParams }: Props) {
                             </p>
                           )}
                         </div>
-                        <div className="badge badge-secondary badge-sm">View</div>
+                        <div className="badge badge-secondary badge-sm">{t('city.view')}</div>
                       </Link>
                     ))}
                   </div>
@@ -452,7 +459,7 @@ export default async function CityPage({ params, searchParams }: Props) {
               <div className="card bg-base-200 shadow-xl mt-6">
                 <div className="card-body">
                   <h2 className="card-title mb-4 flex items-center gap-2">
-                    📷 Photographers
+                    📷 {t('city.photographers')}
                   </h2>
                   <div className="space-y-3">
                     {photographers.map((photographer: any) => (
@@ -488,7 +495,7 @@ export default async function CityPage({ params, searchParams }: Props) {
                             </p>
                           )}
                         </div>
-                        <div className="badge badge-accent badge-sm">View</div>
+                        <div className="badge badge-accent badge-sm">{t('city.view')}</div>
                       </Link>
                     ))}
                   </div>
@@ -501,7 +508,7 @@ export default async function CityPage({ params, searchParams }: Props) {
               <div className="card bg-base-200 shadow-xl mt-6">
                 <div className="card-body">
                   <h2 className="card-title mb-4 flex items-center gap-2">
-                    ❤️ Most Liked Dancers
+                    ❤️ {t('city.mostLikedDancers')}
                   </h2>
                   <div className="space-y-3">
                     {mostLikedDancers.map((dancer: any, index: number) => (
@@ -540,7 +547,7 @@ export default async function CityPage({ params, searchParams }: Props) {
                             </p>
                           </div>
                         </div>
-                        <div className="badge badge-error badge-sm">View</div>
+                        <div className="badge badge-error badge-sm">{t('city.view')}</div>
                       </Link>
                     ))}
                   </div>
@@ -549,12 +556,12 @@ export default async function CityPage({ params, searchParams }: Props) {
             )}
 
             {/* City Dance Groups */}
-            {(city.socialGroups?.whatsapp || city.socialGroups?.line || city.socialGroups?.telegram) && (
+            {(city.socialGroups?.whatsapp || city.socialGroups?.line || city.socialGroups?.telegram || city.socialGroups?.facebook || city.socialGroups?.instagram) && (
               <div className="card bg-base-200 shadow-xl mt-6">
                 <div className="card-body">
-                  <h2 className="card-title mb-4">💬 Community Groups</h2>
+                  <h2 className="card-title mb-4">💬 {t('city.communityGroups')}</h2>
                   <p className="text-sm text-base-content/70 mb-4">
-                    Join the dance community
+                    {t('city.joinCommunity')}
                   </p>
                   <div className="space-y-2">
                     {city.socialGroups.whatsapp && (
@@ -566,6 +573,41 @@ export default async function CityPage({ params, searchParams }: Props) {
                       >
                         <FaWhatsapp className="text-lg" />
                         WhatsApp
+                      </a>
+                    )}
+                    {city.socialGroups.telegram && (
+                      <a
+                        href={city.socialGroups.telegram}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="btn btn-info btn-sm gap-2 w-full"
+                      >
+                        <SiTelegram className="text-lg" />
+                        Telegram
+                      </a>
+                    )}
+                    {city.socialGroups.facebook && (
+                      <a
+                        href={city.socialGroups.facebook}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="btn btn-sm gap-2 w-full"
+                        style={{ backgroundColor: '#1877F2', color: 'white' }}
+                      >
+                        <FaFacebook className="text-lg" />
+                        Facebook Group
+                      </a>
+                    )}
+                    {city.socialGroups.instagram && (
+                      <a
+                        href={city.socialGroups.instagram}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="btn btn-sm gap-2 w-full"
+                        style={{ background: 'linear-gradient(45deg, #f09433 0%,#e6683c 25%,#dc2743 50%,#cc2366 75%,#bc1888 100%)', color: 'white' }}
+                      >
+                        <FaInstagram className="text-lg" />
+                        Instagram
                       </a>
                     )}
                     {city.socialGroups.line && (
@@ -580,17 +622,6 @@ export default async function CityPage({ params, searchParams }: Props) {
                         LINE
                       </a>
                     )}
-                    {city.socialGroups.telegram && (
-                      <a
-                        href={city.socialGroups.telegram}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="btn btn-info btn-sm gap-2 w-full"
-                      >
-                        <SiTelegram className="text-lg" />
-                        Telegram
-                      </a>
-                    )}
                   </div>
                 </div>
               </div>
@@ -601,7 +632,7 @@ export default async function CityPage({ params, searchParams }: Props) {
           <div className="lg:col-span-2">
             <div className="card bg-base-200 shadow-xl">
               <div className="card-body">
-                <h2 className="card-title mb-6">Dancers in {city.name}</h2>
+                <h2 className="card-title mb-6">{t('city.dancersIn')} {city.name}</h2>
 
                 {dancers.length > 0 ? (
                   <DancersFilter
@@ -635,7 +666,7 @@ export default async function CityPage({ params, searchParams }: Props) {
             <div className="card bg-gradient-to-r from-purple-500 to-pink-500 text-white shadow-xl">
               <div className="card-body">
                 <h2 className="card-title justify-center text-2xl mb-2">
-                  Join the Dance Community in {city.name}
+                  {t('city.joinDanceCommunityIn')} {city.name}
                 </h2>
                 <p className="mb-4">
                   Connect with {totalDancers} dancers and discover the amazing

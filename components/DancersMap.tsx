@@ -186,6 +186,20 @@ export default function DancersMap({ dancers, mapboxToken }: DancersMapProps) {
         cityTitle.style.marginBottom = '12px';
         cityTitle.style.paddingBottom = '12px';
         cityTitle.style.borderBottom = '2px solid #e5e7eb';
+        cityTitle.style.cursor = 'pointer';
+        cityTitle.style.transition = 'color 0.2s ease';
+        
+        // Make city name clickable
+        cityTitle.addEventListener('mouseenter', () => {
+          cityTitle.style.color = '#667eea';
+        });
+        cityTitle.addEventListener('mouseleave', () => {
+          cityTitle.style.color = 'inherit';
+        });
+        cityTitle.addEventListener('click', () => {
+          window.location.href = `/city/${cityId}`;
+        });
+        
         popupContent.appendChild(cityTitle);
 
         // Add dancers count

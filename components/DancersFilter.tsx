@@ -3,6 +3,7 @@
 import { useState } from "react";
 import Link from "next/link";
 import { FaFilter } from "react-icons/fa";
+import { useTranslation } from "./I18nProvider";
 
 interface Dancer {
   _id: string;
@@ -28,6 +29,7 @@ export default function DancersFilter({
   userDanceStyles,
   locationName,
 }: DancersFilterProps) {
+  const { t } = useTranslation();
   const [showMyStyles, setShowMyStyles] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
   const dancersPerPage = 24;
@@ -68,13 +70,13 @@ export default function DancersFilter({
             />
             <div className="flex items-center gap-2">
               <span className="text-lg">✨</span>
-              <span className="font-medium">Show only dancers who dance what I dance</span>
+              <span className="font-medium">{t('filters.showMyDancers')}</span>
             </div>
           </label>
           
           {showMyStyles && (
             <div className="text-sm text-base-content/60 mt-2">
-              Found {filteredDancers.length} of {dancers.length} dancers
+              {t('filters.found')} {filteredDancers.length} {t('filters.of')} {dancers.length} {t('filters.dancers')}
             </div>
           )}
         </div>

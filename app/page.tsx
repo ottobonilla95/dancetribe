@@ -17,7 +17,10 @@ import DanceStyle from "@/models/DanceStyle";
 import ButtonSignin from "@/components/ButtonSignin";
 import DancerCard from "@/components/DancerCard";
 import TrendyMusicPreview from "@/components/TrendyMusicPreview";
+import DancersMap from "@/components/DancersMap";
 import { getMessages, getTranslation } from "@/lib/i18n";
+
+export const revalidate = 300; // Cache for 5 minutes
 
 async function getHotDanceStyles(): Promise<
   (DanceStyleType & { userCount: number })[]
@@ -263,6 +266,59 @@ async function getRecentDancers() {
   }
 }
 
+async function getCommunityMapData() {
+  try {
+    await connectMongo();
+
+    // 🚀 OPTIMIZED: Run only 2 queries in parallel (down from 4!)
+    const [totalDancers, dancersForMap] = await Promise.all([
+      // Query 1: Fast count
+      User.countDocuments({ isProfileComplete: true }),
+      
+      // Query 2: Get dancers with city data
+      User.find({
+        isProfileComplete: true,
+        city: { $exists: true },
+      })
+        .select("name image username city")
+        .populate({
+          path: "city",
+          select: "name coordinates country",
+        })
+        .limit(500)
+        .lean()
+    ]);
+
+    // Calculate unique cities and countries from already-fetched data (no extra queries!)
+    const uniqueCities = new Set();
+    const uniqueCountries = new Set();
+    
+    dancersForMap.forEach((dancer: any) => {
+      if (dancer.city?._id) {
+        uniqueCities.add(dancer.city._id.toString());
+      }
+      if (dancer.city?.country) {
+        uniqueCountries.add(dancer.city.country.toString());
+      }
+    });
+
+    return {
+      dancersForMap,
+      totalDancers,
+      totalCountries: uniqueCountries.size,
+      totalCities: uniqueCities.size,
+    };
+  } catch (error) {
+    console.error("Error fetching community map data:", error);
+    return {
+      dancersForMap: [],
+      totalDancers: 0,
+      totalCountries: 0,
+      totalCities: 0,
+    };
+  }
+}
+
 export default async function Home() {
   // Check if user is logged in and redirect to dashboard
   const session = await getServerSession(authOptions);
@@ -276,18 +332,70 @@ export default async function Home() {
   const t = (key: string) => getTranslation(messages, key);
 
   // Fetch data in parallel
-  const [cities, hotDanceStyles, recentDancers, trendingSongs, featuredUsers] = await Promise.all([
+  const [cities, hotDanceStyles, recentDancers, trendingSongs, featuredUsers, communityMapData] = await Promise.all([
     getCities(),
     getHotDanceStyles(),
     getRecentDancers(),
     getTrendingSongs(),
     getFeaturedUsers(),
+    getCommunityMapData(),
   ]);
 
   return (
     <>
       <main>
         <Hero featuredUsers={featuredUsers} />
+        
+        {/* Global Community Map Section */}
+        {communityMapData.dancersForMap.length > 0 && (
+          <div className="mt-12 md:mt-16">
+            {/* Stats Bar */}
+            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mb-8">
+              <div className="grid grid-cols-3 gap-4 md:gap-8">
+                <div className="text-center">
+                  <div className="text-3xl md:text-5xl font-extrabold text-primary">
+                    {communityMapData.totalDancers}+
+                  </div>
+                  <div className="text-sm md:text-base text-base-content/70 mt-1">
+                    {t('common.dancers')}
+                  </div>
+                </div>
+                <div className="text-center">
+                  <div className="text-3xl md:text-5xl font-extrabold text-secondary">
+                    {communityMapData.totalCountries}
+                  </div>
+                  <div className="text-sm md:text-base text-base-content/70 mt-1">
+                    {t('common.countries')}
+                  </div>
+                </div>
+                <div className="text-center">
+                  <div className="text-3xl md:text-5xl font-extrabold text-accent">
+                    {communityMapData.totalCities}+
+                  </div>
+                  <div className="text-sm md:text-base text-base-content/70 mt-1">
+                    {t('common.cities')}
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* Interactive 3D Globe Map */}
+            <div className="mb-8">
+              <div className="text-center mb-6 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                <h2 className="text-2xl md:text-3xl font-extrabold tracking-tight">
+                  {t('landing.joinDancersWorldwide')}
+                </h2>
+                <p className="text-base-content/60 mt-2">
+                  {t('landing.connectWithDancersInCountries').replace('{count}', String(communityMapData.totalCountries))}
+                </p>
+              </div>
+              <div className="w-full">
+                <DancersMap dancers={JSON.parse(JSON.stringify(communityMapData.dancersForMap))} />
+              </div>
+            </div>
+          </div>
+        )}
+
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mt-12 md:mt-16">
           <h2 className="max-w-3xl font-extrabold text-xl md:text-2xl tracking-tight mb-2 md:mb-8">
             {t('landing.hottestCities')}

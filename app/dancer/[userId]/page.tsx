@@ -302,7 +302,7 @@ export default async function PublicProfile({ params }: Props) {
                 <FaHeart className="text-lg" />
 
                 <h3 className="font-bold">
-                  Want to connect with {userData.name?.split(" ")[0]}?
+                  {t('dancer.wantToConnect').replace('{name}', userData.name?.split(" ")[0] || '')}
                 </h3>
               </div>
               {/* </div> */}
@@ -311,7 +311,7 @@ export default async function PublicProfile({ params }: Props) {
                   href="/api/auth/signin"
                   className="btn btn-sm btn-primary"
                 >
-                  Create Profile
+                  {t('dancer.createProfile')}
                 </Link>
               </div>
             </div>

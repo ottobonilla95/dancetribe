@@ -12,6 +12,7 @@ import config from "@/config";
 import FriendRequestWrapper from "./FriendRequestWrapper";
 import FacebookPixel from "./FacebookPixel";
 import { I18nProvider } from "./I18nProvider";
+import { FriendRequestProvider } from "@/contexts/FriendRequestContext";
 
 // Crisp customer chat support:
 // This component is separated from ClientLayout because it needs to be wrapped with <SessionProvider> to use useSession() hook
@@ -58,37 +59,39 @@ const ClientLayout = ({ children, initialLocale }: { children: ReactNode; initia
   return (
     <>
       <SessionProvider>
-        <I18nProvider initialLocale={initialLocale}>
-          {/* Show a progress bar at the top when navigating between pages */}
-          <NextTopLoader color={config.colors.main} showSpinner={false} />
+        <FriendRequestProvider>
+          <I18nProvider initialLocale={initialLocale}>
+            {/* Show a progress bar at the top when navigating between pages */}
+            <NextTopLoader color={config.colors.main} showSpinner={false} />
 
-          {/* Content inside app/page.js files  */}
-          {children}
+            {/* Content inside app/page.js files  */}
+            {children}
 
-          {/* Show Success/Error messages anywhere from the app with toast() */}
-          <Toaster
-            toastOptions={{
-              duration: 3000,
-            }}
-          />
+            {/* Show Success/Error messages anywhere from the app with toast() */}
+            <Toaster
+              toastOptions={{
+                duration: 3000,
+              }}
+            />
 
-          {/* Show a tooltip if any JSX element has these 2 attributes: data-tooltip-id="tooltip" data-tooltip-content="" */}
-          <Tooltip
-            id="tooltip"
-            className="z-[60] !opacity-100 max-w-sm shadow-lg"
-          />
+            {/* Show a tooltip if any JSX element has these 2 attributes: data-tooltip-id="tooltip" data-tooltip-content="" */}
+            <Tooltip
+              id="tooltip"
+              className="z-[60] !opacity-100 max-w-sm shadow-lg"
+            />
 
-          {/* Set Crisp customer chat support */}
-          <CrispChat />
-          
-          {/* Friend Request Notifications */}
-          <FriendRequestWrapper />
-          
-          {/* Facebook Pixel - Track page views */}
-          <Suspense fallback={null}>
-            <FacebookPixel />
-          </Suspense>
-        </I18nProvider>
+            {/* Set Crisp customer chat support */}
+            <CrispChat />
+            
+            {/* Friend Request Notifications */}
+            <FriendRequestWrapper />
+            
+            {/* Facebook Pixel - Track page views */}
+            <Suspense fallback={null}>
+              <FacebookPixel />
+            </Suspense>
+          </I18nProvider>
+        </FriendRequestProvider>
       </SessionProvider>
     </>
   );

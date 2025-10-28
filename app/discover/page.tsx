@@ -110,24 +110,12 @@ export default async function DiscoverPage() {
   ]);
 
   return (
-    <div className="min-h-screen bg-base-100">
-      <div className="max-w-7xl mx-auto px-4 py-8">
-        {/* Header */}
-        <div className="mb-8">
-          <h1 className="text-4xl font-bold mb-2">
-            🔍 Discover Dancers
-          </h1>
-          <p className="text-base-content/70 text-lg">
-            Find and connect with dancers from around the world
-          </p>
-        </div>
-
-        {/* Discovery Feed with Filters */}
-        <DiscoveryFeed 
-          initialDancers={initialDancers} 
-          danceStyles={danceStyles}
-        />
-      </div>
+    <div className="min-h-screen bg-base-100 py-8">
+      {/* Discovery Feed with Filters */}
+      <DiscoveryFeed 
+        initialDancers={initialDancers} 
+        danceStyles={danceStyles}
+      />
     </div>
   );
 }
