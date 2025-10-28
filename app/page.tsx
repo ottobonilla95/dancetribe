@@ -18,6 +18,7 @@ import ButtonSignin from "@/components/ButtonSignin";
 import DancerCard from "@/components/DancerCard";
 import TrendyMusicPreview from "@/components/TrendyMusicPreview";
 import DancersMap from "@/components/DancersMap";
+import AnimatedCounter from "@/components/AnimatedCounter";
 import { getMessages, getTranslation } from "@/lib/i18n";
 
 export const revalidate = 300; // Cache for 5 minutes
@@ -348,30 +349,35 @@ export default async function Home() {
         
         {/* Global Community Map Section */}
         {communityMapData.dancersForMap.length > 0 && (
-          <div className="mt-12 md:mt-16">
+          <div className="mt-8 md:mt-12">
             {/* Stats Bar */}
-            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mb-8">
+            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 md:py-10">
               <div className="grid grid-cols-3 gap-4 md:gap-8">
                 <div className="text-center">
-                  <div className="text-3xl md:text-5xl font-extrabold text-primary">
-                    {communityMapData.totalDancers}+
-                  </div>
+                  <AnimatedCounter 
+                    end={communityMapData.totalDancers} 
+                    suffix="+"
+                    className="text-3xl md:text-5xl font-extrabold text-primary"
+                  />
                   <div className="text-sm md:text-base text-base-content/70 mt-1">
                     {t('common.dancers')}
                   </div>
                 </div>
                 <div className="text-center">
-                  <div className="text-3xl md:text-5xl font-extrabold text-secondary">
-                    {communityMapData.totalCountries}
-                  </div>
+                  <AnimatedCounter 
+                    end={communityMapData.totalCountries}
+                    className="text-3xl md:text-5xl font-extrabold text-secondary"
+                  />
                   <div className="text-sm md:text-base text-base-content/70 mt-1">
                     {t('common.countries')}
                   </div>
                 </div>
                 <div className="text-center">
-                  <div className="text-3xl md:text-5xl font-extrabold text-accent">
-                    {communityMapData.totalCities}+
-                  </div>
+                  <AnimatedCounter 
+                    end={communityMapData.totalCities}
+                    suffix="+"
+                    className="text-3xl md:text-5xl font-extrabold text-accent"
+                  />
                   <div className="text-sm md:text-base text-base-content/70 mt-1">
                     {t('common.cities')}
                   </div>
@@ -381,7 +387,7 @@ export default async function Home() {
 
             {/* Interactive 3D Globe Map */}
             <div className="mb-8">
-              <div className="text-center mb-6 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+              <div className="text-center mb-12 sm:mb-20 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                 <h2 className="text-2xl md:text-3xl font-extrabold tracking-tight">
                   {t('landing.joinDancersWorldwide')}
                 </h2>
