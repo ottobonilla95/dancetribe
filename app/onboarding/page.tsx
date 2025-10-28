@@ -13,6 +13,7 @@ import ImageCropPicker from "@/components/ImageCropPicker";
 import CurrentLocationPicker from "@/components/CurrentLocationPicker";
 import { event as fbEvent } from "@/components/FacebookPixel";
 import SupportButton from "@/components/SupportButton";
+import { useTranslation } from "@/components/I18nProvider";
 
 interface OnboardingStep {
   id: string;
@@ -22,6 +23,7 @@ interface OnboardingStep {
 }
 
 export default function Onboarding() {
+  const { t } = useTranslation();
   const { update } = useSession();
   const searchParams = useSearchParams();
 
@@ -96,92 +98,92 @@ export default function Onboarding() {
   const steps: OnboardingStep[] = [
     {
       id: "nameDetails",
-      title: "What's your name?",
-      description: "Tell us your first and last name",
+      title: t('onboarding.nameTitle'),
+      description: t('onboarding.nameDesc'),
       completed: user?.onboardingSteps?.nameDetails || false,
     },
     {
       id: "username",
-      title: "Choose your username",
-      description: "This will be your unique identifier on DanceCircle",
+      title: t('onboarding.usernameTitle'),
+      description: t('onboarding.usernameDesc'),
       completed: user?.onboardingSteps?.username || false,
     },
     {
       id: "profilePic",
-      title: "Add a profile picture",
-      description: "Help other dancers recognize you",
+      title: t('onboarding.profilePicTitle'),
+      description: t('onboarding.profilePicDesc'),
       completed: user?.onboardingSteps?.profilePic || false,
     },
     {
       id: "dateOfBirth",
-      title: "When's your birthday?",
-      description: "Help us personalize your profile",
+      title: t('onboarding.birthdayTitle'),
+      description: t('onboarding.birthdayDesc'),
       completed: user?.onboardingSteps?.dateOfBirth || false,
     },
     {
       id: "dancingStartYear",
-      title: "When did you start dancing?",
-      description: "What year did you begin your dance journey?",
+      title: t('onboarding.dancingStartTitle'),
+      description: t('onboarding.dancingStartDesc'),
       completed: user?.onboardingSteps?.dancingStartYear || false,
     },
     {
       id: "gender",
-      title: "What's your gender?",
-      description: "Help other dancers connect with you",
+      title: t('onboarding.genderTitle'),
+      description: t('onboarding.genderDesc'),
       completed: user?.onboardingSteps?.gender || false,
     },
     {
       id: "nationality",
-      title: "What's your nationality?",
-      description: "Share your cultural background",
+      title: t('onboarding.nationalityTitle'),
+      description: t('onboarding.nationalityDesc'),
       completed: user?.onboardingSteps?.nationality || false,
     },
     {
       id: "relationshipStatus",
-      title: "What's your relationship status?",
-      description: "Optional - share if you're comfortable",
+      title: t('onboarding.relationshipTitle'),
+      description: t('onboarding.relationshipDesc'),
       completed: user?.onboardingSteps?.relationshipStatus || false,
     },
     {
       id: "danceStyles",
-      title: "What do you love to dance?",
-      description: "Select your favorite dance styles",
+      title: t('onboarding.danceStylesTitle'),
+      description: t('onboarding.danceStylesDesc'),
       completed: user?.onboardingSteps?.danceStyles || false,
     },
     {
       id: "danceRole",
-      title: "What's your dance role?",
-      description: "Do you prefer to lead, follow, or both?",
+      title: t('onboarding.danceRoleTitle'),
+      description: t('onboarding.danceRoleDesc'),
       completed: user?.onboardingSteps?.danceRole || false,
     },
     {
       id: "currentLocation",
-      title: "Where do you live?",
-      description: "Find dancers in your area",
+      title: t('onboarding.locationTitle'),
+      description: t('onboarding.locationDesc'),
       completed: user?.onboardingSteps?.currentLocation || false,
     },
     {
       id: "citiesVisited",
-      title: "Where have you danced?",
-      description: "Share your dance travel experiences",
+      title: t('onboarding.citiesVisitedTitle'),
+      description: t('onboarding.citiesVisitedDesc'),
       completed: user?.onboardingSteps?.citiesVisited || false,
     },
     {
       id: "anthem",
-      title: "What's your favorite song? (optional)",
-      description: "Share a song that gets you moving",
+      title: t('onboarding.anthemTitle'),
+      description: t('onboarding.anthemDesc'),
       completed: user?.onboardingSteps?.anthem || false,
     },
     {
       id: "socialMedia",
-      title: "Connect your socials",
-      description: "Let other dancers find you online",
+      title: t('onboarding.socialMediaTitle'),
+      description: t('onboarding.socialMediaDesc'),
       completed: user?.onboardingSteps?.socialMedia || false,
     },
     {
       id: "teacherInfo",
-      title: "Are you a dance professional?",
-      description: "Teacher, DJ, Photographer? Let the community find you!",
+      title: t('onboarding.professionalTitle'),
+      description: t('onboarding.professionalDesc'),
       completed: user?.onboardingSteps?.teacherInfo || false,
     },
   ];
@@ -799,10 +801,10 @@ export default function Onboarding() {
         <div className="mb-8">
           <div className="flex justify-between items-center mb-4">
             <h1 className="text-2xl font-bold">
-              {isEditMode ? "Edit Your Profile" : "Complete Your Profile"}
+              {isEditMode ? t('onboarding.editProfile') : t('onboarding.completeProfile')}
             </h1>
             <span className="text-sm text-base-content/70">
-              {currentStep + 1} of {steps.length}
+              {currentStep + 1} {t('onboarding.of')} {steps.length}
             </span>
           </div>
           <progress
@@ -827,24 +829,24 @@ export default function Onboarding() {
               <div className="form-control space-y-4">
                 <div className="form-control">
                   <label className="label">
-                    <span className="label-text">First Name</span>
+                    <span className="label-text">{t('onboarding.firstName')}</span>
                   </label>
                   <input
                     type="text"
                     className="input input-bordered w-full"
-                    placeholder="e.g., Sarah"
+                    placeholder={t('onboarding.firstNamePlaceholder')}
                     value={firstName}
                     onChange={(e) => setFirstName(e.target.value)}
                   />
                 </div>
                 <div className="form-control">
                   <label className="label">
-                    <span className="label-text">Last Name</span>
+                    <span className="label-text">{t('onboarding.lastName')}</span>
                   </label>
                   <input
                     type="text"
                     className="input input-bordered w-full"
-                    placeholder="e.g., Johnson"
+                    placeholder={t('onboarding.lastNamePlaceholder')}
                     value={lastName}
                     onChange={(e) => setLastName(e.target.value)}
                   />
@@ -1659,7 +1661,7 @@ export default function Onboarding() {
                 onClick={handleBack}
                 disabled={currentStep === 0}
               >
-                Back
+                {t('onboarding.back')}
               </button>
               <button
                 className="btn btn-primary"
@@ -1675,26 +1677,26 @@ export default function Onboarding() {
                 {uploadingProfilePic ? (
                   <>
                     <span className="loading loading-spinner loading-sm"></span>
-                    Uploading...
+                    {t('onboarding.uploading')}
                   </>
                 ) : savingStep ? (
                   <>
                     <span className="loading loading-spinner loading-sm"></span>
-                    Saving...
+                    {t('onboarding.saving')}
                   </>
                 ) : completing ? (
                   <>
                     <span className="loading loading-spinner loading-sm"></span>
-                    Completing...
+                    {t('onboarding.completing')}
                   </>
                 ) : currentStep === steps.length - 1 ? (
                   isEditMode ? (
-                    "Save Changes"
+                    t('onboarding.saveChanges')
                   ) : (
-                    "Complete"
+                    t('onboarding.complete')
                   )
                 ) : (
-                  "Next"
+                  t('onboarding.next')
                 )}
               </button>
             </div>
