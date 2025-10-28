@@ -224,6 +224,20 @@
     "closeMenu": "Cerrar menú",
     "installApp": "Instalar App"
   },
+  "footer": {
+    "company": "COMPAÑÍA",
+    "discoverDancers": "Descubrir Bailarines",
+    "cities": "Ciudades",
+    "countries": "Países",
+    "danceStyles": "Estilos de Baile",
+    "support": "SOPORTE",
+    "contactUs": "Contáctanos",
+    "instagram": "Instagram",
+    "legal": "LEGAL",
+    "termsOfService": "Términos de Servicio",
+    "privacyPolicy": "Política de Privacidad",
+    "allRightsReserved": "Todos los derechos reservados"
+  },
   "installApp": {
     "title": "Instalar DanceCircle",
     "subtitle": "Obtén la experiencia de la app en tu dispositivo",

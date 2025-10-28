@@ -3,11 +3,14 @@ import Image from "next/image";
 import config from "@/config";
 import logo from "@/app/icon.png";
 import { FaInstagram, FaEnvelope } from "react-icons/fa";
+import { getTranslations } from "next-intl/server";
 
 // Add the Footer to the bottom of your landing page and more.
 // The support link is connected to the config.js file. If there's no config.resend.supportEmail, the link won't be displayed.
 
-const Footer = () => {
+const Footer = async () => {
+  const t = await getTranslations('footer');
+  
   return (
     <footer className="bg-base-200 border-t border-base-content/10">
       <div className="max-w-7xl mx-auto px-8 py-24">
@@ -35,7 +38,7 @@ const Footer = () => {
               {config.appDescription}
             </p>
             <p className="mt-3 text-sm text-base-content/60">
-              © {new Date().getFullYear()} {config.companyName || config.appName}. All rights reserved.
+              © {new Date().getFullYear()} {config.companyName || config.appName}. {t('allRightsReserved')}.
             </p>
             
             {/* Social Links */}
@@ -92,28 +95,28 @@ const Footer = () => {
           <div className="flex-grow flex flex-wrap justify-center -mb-10 md:mt-0 mt-10 text-center">
             <div className="lg:w-1/3 md:w-1/2 w-full px-4">
               <div className="footer-title font-semibold text-base-content tracking-widest text-sm md:text-left mb-3">
-                COMPANY
+                {t('company')}
               </div>
 
               <div className="flex flex-col justify-center items-center md:items-start gap-2 mb-10 text-sm">
                 <Link href="/discover" className="link link-hover">
-                  Discover Dancers
+                  {t('discoverDancers')}
                 </Link>
                 <Link href="/cities" className="link link-hover">
-                  Cities
+                  {t('cities')}
                 </Link>
                 <Link href="/countries" className="link link-hover">
-                  Countries
+                  {t('countries')}
                 </Link>
                 <Link href="/dance-style" className="link link-hover">
-                  Dance Styles
+                  {t('danceStyles')}
                 </Link>
               </div>
             </div>
 
             <div className="lg:w-1/3 md:w-1/2 w-full px-4">
               <div className="footer-title font-semibold text-base-content tracking-widest text-sm md:text-left mb-3">
-                SUPPORT
+                {t('support')}
               </div>
 
               <div className="flex flex-col justify-center items-center md:items-start gap-2 mb-10 text-sm">
@@ -124,7 +127,7 @@ const Footer = () => {
                     className="link link-hover"
                     aria-label="Contact Support"
                   >
-                    Contact Us
+                    {t('contactUs')}
                   </a>
                 )}
                 {config.social?.instagram && (
@@ -135,7 +138,7 @@ const Footer = () => {
                     className="link link-hover"
                     aria-label="Instagram"
                   >
-                    Instagram
+                    {t('instagram')}
                   </a>
                 )}
               </div>
@@ -143,15 +146,15 @@ const Footer = () => {
 
             <div className="lg:w-1/3 md:w-1/2 w-full px-4">
               <div className="footer-title font-semibold text-base-content tracking-widest text-sm md:text-left mb-3">
-                LEGAL
+                {t('legal')}
               </div>
 
               <div className="flex flex-col justify-center items-center md:items-start gap-2 mb-10 text-sm">
                 <Link href="/tos" className="link link-hover">
-                  Terms of Service
+                  {t('termsOfService')}
                 </Link>
                 <Link href="/privacy-policy" className="link link-hover">
-                  Privacy Policy
+                  {t('privacyPolicy')}
                 </Link>
               </div>
             </div>
