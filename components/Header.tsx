@@ -17,6 +17,7 @@ import { CONTACT } from "@/constants/contact";
 import InstallAppButton from "./InstallAppButton";
 import SupportModal from "./SupportModal";
 import LanguageSwitcher from "./LanguageSwitcher";
+import { useTranslation } from "./I18nProvider";
 
 const links: {
   href: string;
@@ -35,6 +36,7 @@ const cta: JSX.Element = <ButtonSignin extraStyle="btn-primary" />;
 const Header = () => {
   const searchParams = useSearchParams();
   const { data: session } = useSession();
+  const { t } = useTranslation();
   const [isOpen, setIsOpen] = useState<boolean>(false);
   const [isSearchOpen, setIsSearchOpen] = useState<boolean>(false);
   const [isSupportModalOpen, setIsSupportModalOpen] = useState<boolean>(false);
@@ -49,18 +51,18 @@ const Header = () => {
 
 
   const loggedInNavItems = [
-    { href: "/dashboard", label: "Dashboard", icon: FaHome },
-    { href: "/discover", label: "Discover Dancers", icon: FaUserPlus },
-    { href: "/connect", label: "Travel & Connect", icon: FaPlane },
-    { href: "/profile", label: "My Profile", icon: FaUser },
+    { href: "/dashboard", label: t('nav.dashboard'), icon: FaHome },
+    { href: "/discover", label: t('nav.discoverDancers'), icon: FaUserPlus },
+    { href: "/connect", label: t('nav.travelConnect'), icon: FaPlane },
+    { href: "/profile", label: t('nav.myProfile'), icon: FaUser },
     { 
       href: "/friends", 
-      label: "Friends", 
+      label: t('nav.friends'), 
       icon: FaUserFriends, 
       badge: pendingRequests > 0 ? pendingRequests : undefined 
     },
-    { href: "/music", label: "Trendy Music", icon: FaMusic },
-    { href: "/invite", label: "Invite Friends", icon: FaUserPlus, highlight: true },
+    { href: "/music", label: t('nav.trendyMusic'), icon: FaMusic },
+    { href: "/invite", label: t('nav.inviteFriends'), icon: FaUserPlus, highlight: true },
   ];
 
   const handleSignOut = () => {
@@ -101,7 +103,7 @@ const Header = () => {
               className="-m-2.5 inline-flex items-center justify-center rounded-md p-2.5"
               onClick={() => setIsSearchOpen(true)}
             >
-              <span className="sr-only">Open search</span>
+              <span className="sr-only">{t('nav.openSearch')}</span>
               <FaSearch className="w-5 h-5 text-base-content" />
             </button>
           )}
@@ -112,7 +114,7 @@ const Header = () => {
             className="-m-2.5 inline-flex items-center justify-center rounded-md p-2.5 relative"
             onClick={() => setIsOpen(true)}
           >
-            <span className="sr-only">Open main menu</span>
+            <span className="sr-only">{t('nav.openMenu')}</span>
             <svg
               xmlns="http://www.w3.org/2000/svg"
               fill="none"
@@ -229,7 +231,7 @@ const Header = () => {
                         <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-4 h-4">
                           <path strokeLinecap="round" strokeLinejoin="round" d="M9.879 7.519c1.171-1.025 3.071-1.025 4.242 0 1.172 1.025 1.172 2.687 0 3.712-.203.179-.43.326-.67.442-.745.361-1.45.999-1.45 1.827v.75M21 12a9 9 0 11-18 0 9 9 0 0118 0zm-9 5.25h.008v.008H12v-.008z" />
                         </svg>
-                        Get Support
+                        {t('nav.getSupport')}
                       </button>
                     </li>
                   )}
@@ -237,7 +239,7 @@ const Header = () => {
                   <li>
                     <button onClick={handleSignOut} className="flex items-center gap-2 text-error">
                       <FaSignOutAlt />
-                      Sign Out
+                      {t('nav.signOut')}
                     </button>
                   </li>
                 </ul>
@@ -280,7 +282,7 @@ const Header = () => {
               className="-m-2.5 rounded-md p-2.5"
               onClick={() => setIsOpen(false)}
             >
-              <span className="sr-only">Close menu</span>
+              <span className="sr-only">{t('nav.closeMenu')}</span>
               <svg
                 xmlns="http://www.w3.org/2000/svg"
                 fill="none"
@@ -379,7 +381,7 @@ const Header = () => {
                       <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-5 h-5">
                         <path strokeLinecap="round" strokeLinejoin="round" d="M9.879 7.519c1.171-1.025 3.071-1.025 4.242 0 1.172 1.025 1.172 2.687 0 3.712-.203.179-.43.326-.67.442-.745.361-1.45.999-1.45 1.827v.75M21 12a9 9 0 11-18 0 9 9 0 0118 0zm-9 5.25h.008v.008H12v-.008z" />
                       </svg>
-                      Get Support
+                      {t('nav.getSupport')}
                     </button>
                   </div>
                 )}
@@ -393,7 +395,7 @@ const Header = () => {
                     className="flex items-center gap-3 px-3 py-2 rounded-lg w-full text-left hover:bg-error hover:text-error-content transition-colors"
                   >
                     <FaSignOutAlt className="text-lg" />
-                    <span className="font-medium">Sign Out</span>
+                    <span className="font-medium">{t('nav.signOut')}</span>
                   </button>
                 </div>
               </>

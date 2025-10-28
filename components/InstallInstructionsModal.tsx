@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { FaApple, FaAndroid, FaTimes } from "react-icons/fa";
+import { useTranslation } from "./I18nProvider";
 
 interface InstallInstructionsModalProps {
   isOpen: boolean;
@@ -9,6 +10,7 @@ interface InstallInstructionsModalProps {
 }
 
 export default function InstallInstructionsModal({ isOpen, onClose }: InstallInstructionsModalProps) {
+  const { t } = useTranslation();
   const [isIOS, setIsIOS] = useState(false);
   const [isAndroid, setIsAndroid] = useState(false);
 
@@ -43,9 +45,9 @@ export default function InstallInstructionsModal({ isOpen, onClose }: InstallIns
           {/* Header */}
           <div className="text-center mb-6">
             <div className="text-4xl mb-3">📱</div>
-            <h3 className="text-2xl font-bold mb-2">Install DanceCircle</h3>
+            <h3 className="text-2xl font-bold mb-2">{t('installApp.title')}</h3>
             <p className="text-sm text-base-content/70">
-              Get faster access and a native app experience
+              {t('installApp.subtitleAlt')}
             </p>
           </div>
 
@@ -54,13 +56,13 @@ export default function InstallInstructionsModal({ isOpen, onClose }: InstallIns
             {isIOS && (
               <div className="flex items-center gap-2 bg-primary/10 rounded-lg px-4 py-2">
                 <FaApple className="text-2xl" />
-                <span className="font-semibold">iOS Instructions</span>
+                <span className="font-semibold">{t('installApp.iosInstructions')}</span>
               </div>
             )}
             {isAndroid && (
               <div className="flex items-center gap-2 bg-primary/10 rounded-lg px-4 py-2">
                 <FaAndroid className="text-2xl" />
-                <span className="font-semibold">Android Instructions</span>
+                <span className="font-semibold">{t('installApp.androidInstructions')}</span>
               </div>
             )}
           </div>
@@ -71,19 +73,19 @@ export default function InstallInstructionsModal({ isOpen, onClose }: InstallIns
               <ol className="space-y-3 text-sm">
                 <li className="flex gap-3">
                   <span className="font-bold">1.</span>
-                  <span>Tap the <strong>Share</strong> button <svg className="inline w-4 h-4" fill="currentColor" viewBox="0 0 24 24"><path d="M16 5l-1.42 1.42-1.59-1.59V16h-1.98V4.83L9.42 6.42 8 5l4-4 4 4zm4 5v11c0 1.1-.9 2-2 2H6c-1.11 0-2-.9-2-2V10c0-1.11.89-2 2-2h3v2H6v11h12V10h-3V8h3c1.1 0 2 .89 2 2z"/></svg> at the bottom of Safari</span>
+                  <span dangerouslySetInnerHTML={{ __html: t('installApp.iosStep1') }} />
                 </li>
                 <li className="flex gap-3">
                   <span className="font-bold">2.</span>
-                  <span>Scroll down and tap <strong>&quot;Add to Home Screen&quot;</strong></span>
+                  <span dangerouslySetInnerHTML={{ __html: t('installApp.iosStep2') }} />
                 </li>
                 <li className="flex gap-3">
                   <span className="font-bold">3.</span>
-                  <span>Tap <strong>&quot;Add&quot;</strong> in the top right</span>
+                  <span dangerouslySetInnerHTML={{ __html: t('installApp.iosStep3') }} />
                 </li>
                 <li className="flex gap-3">
                   <span className="font-bold">4.</span>
-                  <span>The DanceCircle app will appear on your home screen! 🎉</span>
+                  <span>{t('installApp.iosStep4')}</span>
                 </li>
               </ol>
             </div>
@@ -94,19 +96,19 @@ export default function InstallInstructionsModal({ isOpen, onClose }: InstallIns
               <ol className="space-y-3 text-sm">
                 <li className="flex gap-3">
                   <span className="font-bold">1.</span>
-                  <span>Tap the <strong>Menu</strong> button (⋮) in Chrome</span>
+                  <span dangerouslySetInnerHTML={{ __html: t('installApp.androidStep1') }} />
                 </li>
                 <li className="flex gap-3">
                   <span className="font-bold">2.</span>
-                  <span>Tap <strong>&quot;Install app&quot;</strong> or <strong>&quot;Add to Home screen&quot;</strong></span>
+                  <span dangerouslySetInnerHTML={{ __html: t('installApp.androidStep2') }} />
                 </li>
                 <li className="flex gap-3">
                   <span className="font-bold">3.</span>
-                  <span>Tap <strong>&quot;Install&quot;</strong></span>
+                  <span dangerouslySetInnerHTML={{ __html: t('installApp.androidStep3') }} />
                 </li>
                 <li className="flex gap-3">
                   <span className="font-bold">4.</span>
-                  <span>The DanceCircle app will appear on your home screen! 🎉</span>
+                  <span>{t('installApp.androidStep4')}</span>
                 </li>
               </ol>
             </div>
@@ -116,11 +118,11 @@ export default function InstallInstructionsModal({ isOpen, onClose }: InstallIns
             <div className="space-y-4">
               <div className="alert alert-info">
                 <div>
-                  <p className="font-semibold">Desktop Instructions</p>
+                  <p className="font-semibold">{t('installApp.desktopInstructions')}</p>
                   <ol className="list-decimal ml-4 mt-2 text-sm">
-                    <li>Look for an install icon in your browser&apos;s address bar</li>
-                    <li>Or check your browser menu for &quot;Install DanceCircle&quot;</li>
-                    <li>Click it to install the app on your computer</li>
+                    <li>{t('installApp.desktopStep1')}</li>
+                    <li>{t('installApp.desktopStep2')}</li>
+                    <li>{t('installApp.desktopStep3')}</li>
                   </ol>
                 </div>
               </div>
@@ -130,7 +132,7 @@ export default function InstallInstructionsModal({ isOpen, onClose }: InstallIns
           {/* Footer */}
           <div className="mt-6 pt-4 border-t border-base-300">
             <p className="text-xs text-center text-base-content/60">
-              ✨ Enjoy offline access and faster loading
+              {t('installApp.footer')}
             </p>
           </div>
         </div>
