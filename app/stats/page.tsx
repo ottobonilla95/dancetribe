@@ -15,6 +15,7 @@ import {
 import WorldMap from "@/components/WorldMap";
 import DancersMap from "@/components/DancersMap";
 import { getCountryCode } from "@/utils/countries";
+import { getMessages, getTranslation } from "@/lib/i18n";
 
 export const dynamic = "force-dynamic";
 
@@ -235,6 +236,10 @@ export default async function StatsPage() {
     redirect("/");
   }
 
+  // Get translations
+  const messages = await getMessages();
+  const t = (key: string) => getTranslation(messages, key);
+
   const stats = await getDetailedStats();
 
   // Convert dancers for map to plain objects
@@ -262,18 +267,18 @@ export default async function StatsPage() {
         <div className="mb-8">
           {/* Back link - above title on mobile, inline on desktop */}
           <div className="mb-4 md:mb-0">
-            <BackButton label="Back" className="md:hidden" />
+            <BackButton label={t('stats.back')} className="md:hidden" />
           </div>
 
           <div className="flex items-center gap-4">
-            <BackButton label="Back" className="hidden md:flex" />
+            <BackButton label={t('stats.back')} className="hidden md:flex" />
             <div>
               <h1 className="text-3xl md:text-4xl font-extrabold tracking-tight gap-2 flex items-center">
                 <span className="text-2xl">🌍</span>
-                Community Analytics
+                {t('stats.communityAnalytics')}
               </h1>
               <p className="hidden sm:block text-base-content/60 mt-2">
-                Comprehensive insights into our global dance community
+                {t('stats.comprehensiveInsights')}
               </p>
             </div>
           </div>
@@ -296,44 +301,44 @@ export default async function StatsPage() {
             <div className="stat-figure text-primary">
               <FaUsers className="text-3xl" />
             </div>
-            <div className="stat-title">Total Dancers</div>
+            <div className="stat-title">{t('stats.totalDancers')}</div>
             <div className="stat-value text-primary text-2xl">
               {formatNumber(stats.totalDancers)}
             </div>
-            <div className="stat-desc">Active community members</div>
+            <div className="stat-desc">{t('stats.activeCommunityMembers')}</div>
           </div>
 
           <div className="stat bg-base-200 rounded-lg p-6">
             <div className="stat-figure text-secondary">
               <FaGlobeAmericas className="text-3xl" />
             </div>
-            <div className="stat-title">Countries</div>
+            <div className="stat-title">{t('stats.countries')}</div>
             <div className="stat-value text-secondary text-2xl">
               {stats.totalCountries}
             </div>
-            <div className="stat-desc">Global presence</div>
+            <div className="stat-desc">{t('stats.globalPresence')}</div>
           </div>
 
           <div className="stat bg-base-200 rounded-lg p-6">
             <div className="stat-figure text-accent">
               <FaMapMarkerAlt className="text-3xl" />
             </div>
-            <div className="stat-title">Cities</div>
+            <div className="stat-title">{t('stats.cities')}</div>
             <div className="stat-value text-accent text-2xl">
               {stats.totalCities}
             </div>
-            <div className="stat-desc">Urban communities</div>
+            <div className="stat-desc">{t('stats.urbanCommunities')}</div>
           </div>
 
           <div className="stat bg-base-200 rounded-lg p-6">
             <div className="stat-figure text-info">
               <FaMusic className="text-3xl" />
             </div>
-            <div className="stat-title">Dance Styles</div>
+            <div className="stat-title">{t('stats.danceStyles')}</div>
             <div className="stat-value text-info text-2xl">
               {stats.danceStyleStats.length}
             </div>
-            <div className="stat-desc">Different styles practiced</div>
+            <div className="stat-desc">{t('stats.differentStylesPracticed')}</div>
           </div>
         </div>
 
@@ -343,12 +348,12 @@ export default async function StatsPage() {
           <div className="bg-base-200 rounded-lg p-6">
             <h2 className="text-xl font-bold mb-4 flex items-center gap-2">
               <span className="text-2xl">💃🕺</span>
-              Role Distribution
+              {t('stats.roleDistribution')}
             </h2>
             {totalRoles > 0 ? (
               <div className="space-y-3">
                 <div className="flex items-center justify-between">
-                  <span className="text-sm font-medium">Leaders</span>
+                  <span className="text-sm font-medium">{t('stats.leaders')}</span>
                   <div className="text-right">
                     <span className="text-lg font-bold text-primary">
                       {getPercentage(stats.roleStats.leaders, totalRoles)}%
@@ -359,7 +364,7 @@ export default async function StatsPage() {
                   </div>
                 </div>
                 <div className="flex items-center justify-between">
-                  <span className="text-sm font-medium">Followers</span>
+                  <span className="text-sm font-medium">{t('stats.followers')}</span>
                   <div className="text-right">
                     <span className="text-lg font-bold text-secondary">
                       {getPercentage(stats.roleStats.followers, totalRoles)}%
@@ -370,7 +375,7 @@ export default async function StatsPage() {
                   </div>
                 </div>
                 <div className="flex items-center justify-between">
-                  <span className="text-sm font-medium">Both</span>
+                  <span className="text-sm font-medium">{t('stats.both')}</span>
                   <div className="text-right">
                     <span className="text-lg font-bold text-accent">
                       {getPercentage(stats.roleStats.both, totalRoles)}%
@@ -383,7 +388,7 @@ export default async function StatsPage() {
               </div>
             ) : (
               <p className="text-center text-base-content/60">
-                No role data available yet
+                {t('stats.noRoleData')}
               </p>
             )}
           </div>
@@ -392,7 +397,7 @@ export default async function StatsPage() {
           <div className="bg-base-200 rounded-lg p-6">
             <h2 className="text-xl font-bold mb-4 flex items-center gap-2">
               <span className="text-2xl">👥</span>
-              Gender Distribution
+              {t('stats.genderDistribution')}
             </h2>
             {stats.genderStats.length > 0 ? (
               <div className="space-y-3">
@@ -402,7 +407,7 @@ export default async function StatsPage() {
                     className="flex items-center justify-between"
                   >
                     <span className="text-sm font-medium capitalize">
-                      {gender._id || "Not specified"}
+                      {gender._id || t('stats.notSpecified')}
                     </span>
                     <div className="text-right">
                       <span className="text-lg font-bold text-primary">
@@ -417,7 +422,7 @@ export default async function StatsPage() {
               </div>
             ) : (
               <p className="text-center text-base-content/60">
-                No gender data available yet
+                {t('stats.noGenderData')}
               </p>
             )}
           </div>
@@ -427,7 +432,7 @@ export default async function StatsPage() {
         <div className="bg-base-200 rounded-lg p-6 mb-8">
           <h2 className="text-xl font-bold mb-4 flex items-center gap-2">
             <FaTrophy className="text-yellow-500" />
-            Most Popular Dance Styles
+            {t('stats.mostPopularDanceStyles')}
           </h2>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
             {stats.danceStyleStats
@@ -449,7 +454,7 @@ export default async function StatsPage() {
                         {style.count}
                       </div>
                       <div className="text-xs text-base-content/60">
-                        dancers
+                        {t('stats.dancers')}
                       </div>
                     </div>
                   </div>
@@ -462,7 +467,7 @@ export default async function StatsPage() {
         <div className="bg-base-200 rounded-lg p-6 mb-8">
           <h2 className="text-xl font-bold mb-4 flex items-center gap-2">
             <FaGlobeAmericas className="text-blue-500" />
-            Dancers by Nationality
+            {t('stats.dancersByNationality')}
           </h2>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
             {stats.nationalityStats.map((country: any, index: number) => {
@@ -511,7 +516,7 @@ export default async function StatsPage() {
         <div className="bg-base-200 rounded-lg p-6 mb-8">
           <h2 className="text-xl font-bold mb-4 flex items-center gap-2">
             <FaMapMarkerAlt className="text-green-500" />
-            Hottest Dance Cities
+            {t('stats.hottestDanceCities')}
           </h2>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             {stats.cityStats.slice(0, 10).map((city: any, index: number) => (
@@ -542,7 +547,7 @@ export default async function StatsPage() {
                     <div className="font-bold text-primary">
                       {city.dancerCount}
                     </div>
-                    <div className="text-xs text-base-content/60">dancers</div>
+                    <div className="text-xs text-base-content/60">{t('stats.dancers')}</div>
                   </div>
                 </div>
               </Link>
@@ -555,7 +560,7 @@ export default async function StatsPage() {
           <div className="mb-8">
             <h2 className="text-xl font-bold mb-4 flex items-center gap-2">
               <FaGlobeAmericas className="text-purple-500" />
-              Global Distribution
+              {t('stats.globalDistribution')}
             </h2>
             <WorldMap countryData={stats.countryStats} />
           </div>

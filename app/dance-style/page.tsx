@@ -16,6 +16,7 @@ import {
   FaMapMarkerAlt,
   FaHeart,
 } from "react-icons/fa";
+import { getMessages, getTranslation } from "@/lib/i18n";
 
 const getCategoryEmoji = (category: string) => {
   switch (category) {
@@ -51,20 +52,20 @@ const getCategoryColor = (category: string) => {
   }
 };
 
-const getCategoryDescription = (category: string) => {
+const getCategoryDescription = (category: string, t: (key: string) => string) => {
   switch (category) {
     case "latin":
-      return "Passionate and rhythmic dances from Latin America";
+      return t('danceStylePage.passionateLatin');
     case "ballroom":
-      return "Elegant and structured partner dances";
+      return t('danceStylePage.elegantBallroom');
     case "street":
-      return "Urban and freestyle dance styles";
+      return t('danceStylePage.urbanStreet');
     case "contemporary":
-      return "Modern and expressive dance forms";
+      return t('danceStylePage.modernContemporary');
     case "traditional":
-      return "Cultural and folk dance traditions";
+      return t('danceStylePage.culturalTraditional');
     default:
-      return "Various dance styles and forms";
+      return t('danceStylePage.variousDance');
   }
 };
 
@@ -145,6 +146,10 @@ async function getCategoryStats() {
 }
 
 export default async function DanceStylesPage() {
+  // Get translations
+  const messages = await getMessages();
+  const t = (key: string) => getTranslation(messages, key);
+
   const [danceStyles, categoryStats] = await Promise.all([
     getAllDanceStyles(),
     getCategoryStats(),
@@ -181,13 +186,13 @@ export default async function DanceStylesPage() {
       <div className="max-w-7xl mx-auto">
         {/* Back Button */}
         <div className="mb-6">
-          <BackButton label="Back" />
+          <BackButton label={t('danceStylePage.back')} />
         </div>
 
         {/* Header */}
         <div className="mb-8 text-center">
           <h1 className="text-4xl md:text-5xl font-bold mb-4 bg-gradient-to-r from-purple-600 via-pink-500 to-orange-400 bg-clip-text text-transparent">
-            All Dance Styles
+            {t('danceStylePage.allDanceStyles')}
           </h1>
           {/* <p className="text-lg text-base-content/70 max-w-2xl mx-auto">
             Discover the incredible variety of dance styles practiced by our community. 
@@ -230,16 +235,16 @@ export default async function DanceStylesPage() {
                         <span className="text-3xl">
                           {getCategoryEmoji(category)}
                         </span>
-                        <span className="capitalize">{category} Dance</span>
+                        <span className="capitalize">{category} {t('danceStylePage.dance')}</span>
                       </h2>
                       <div
                         className={`badge badge-lg ${getCategoryColor(category)} text-white whitespace-nowrap text-xs sm:text-sm`}
                       >
-                        {formatNumber(categoryStat?.userCount || 0)} dancers
+                        {formatNumber(categoryStat?.userCount || 0)} {t('danceStylePage.dancers')}
                       </div>
                     </div>
                     <p className="text-base-content/70 mt-1">
-                      {getCategoryDescription(category)}
+                      {getCategoryDescription(category, t)}
                     </p>
                   </div>
                 </div>
@@ -275,18 +280,18 @@ export default async function DanceStylesPage() {
                             <div className="flex items-center gap-2">
                               <span className="text-xs">
                                 {style.isPartnerDance
-                                  ? "👫 Partner"
-                                  : "🕺 Solo"}
+                                  ? `👫 ${t('danceStylePage.partner')}`
+                                  : `🕺 ${t('danceStylePage.solo')}`}
                               </span>
                               {style.isActive && (
                                 <span className="badge badge-success badge-sm">
-                                  Active
+                                  {t('danceStylePage.active')}
                                 </span>
                               )}
                             </div>
                             <div className="flex items-center gap-1 text-primary">
                               <span className="text-sm font-medium">
-                                Explore
+                                {t('danceStylePage.explore')}
                               </span>
                               <FaHeart className="w-3 h-3" />
                             </div>
@@ -305,10 +310,10 @@ export default async function DanceStylesPage() {
           <div className="text-center py-16">
             <div className="text-6xl mb-4">��</div>
             <h3 className="text-2xl font-bold mb-2">
-              No Dance Styles Available
+              {t('danceStylePage.noDanceStyles')}
             </h3>
             <p className="text-base-content/70">
-              We&apos;re working on adding more dance styles to our platform.
+              {t('danceStylePage.workingOnAdding')}
             </p>
           </div>
         )}

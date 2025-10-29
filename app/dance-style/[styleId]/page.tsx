@@ -20,6 +20,7 @@ import {
   FaSeedling,
   FaGlobeAmericas
 } from "react-icons/fa";
+import { getMessages, getTranslation } from "@/lib/i18n";
 
 interface Props {
   params: {
@@ -63,6 +64,10 @@ const getCategoryColor = (category: string) => {
 };
 
 export default async function DanceStylePage({ params, searchParams }: Props) {
+  // Get translations
+  const messages = await getMessages();
+  const t = (key: string) => getTranslation(messages, key);
+
   await connectMongo();
 
   // Check if the styleId is a valid ObjectId
@@ -198,10 +203,10 @@ export default async function DanceStylePage({ params, searchParams }: Props) {
               <div className="flex items-center gap-4 text-base-content/70">
                 <span className="flex items-center gap-1">
                   <FaUsers />
-                  {formatNumber(totalDancers)} dancers
+                  {formatNumber(totalDancers)} {t('danceStylePage.dancers')}
                 </span>
                 <span className="flex items-center gap-1">
-                  {danceStyle.isPartnerDance ? "👫 Partner Dance" : "🕺 Solo Dance"}
+                  {danceStyle.isPartnerDance ? `👫 ${t('danceStylePage.partnerDance')}` : `🕺 ${t('danceStylePage.soloDance')}`}
                 </span>
               </div>
             </div>
@@ -220,7 +225,7 @@ export default async function DanceStylePage({ params, searchParams }: Props) {
             <div className="stat-figure text-primary">
               <FaUsers className="text-2xl" />
             </div>
-            <div className="stat-title">Total Dancers</div>
+            <div className="stat-title">{t('danceStylePage.totalDancers')}</div>
             <div className="stat-value text-primary text-2xl">{formatNumber(totalDancers)}</div>
           </div>
 
@@ -228,7 +233,7 @@ export default async function DanceStylePage({ params, searchParams }: Props) {
             <div className="stat-figure text-secondary">
               <FaGlobeAmericas className="text-2xl" />
             </div>
-            <div className="stat-title">Cities</div>
+            <div className="stat-title">{t('danceStylePage.cities')}</div>
             <div className="stat-value text-secondary text-2xl">{popularCities.length}</div>
           </div>
 
@@ -236,7 +241,7 @@ export default async function DanceStylePage({ params, searchParams }: Props) {
             <div className="stat-figure text-accent">
               <FaCrown className="text-2xl" />
             </div>
-            <div className="stat-title">Expert Level</div>
+            <div className="stat-title">{t('danceStylePage.expertLevel')}</div>
             <div className="stat-value text-accent text-2xl">{expertDancers.length}</div>
           </div>
 
@@ -244,7 +249,7 @@ export default async function DanceStylePage({ params, searchParams }: Props) {
             <div className="stat-figure text-info">
               <FaHeart className="text-2xl" />
             </div>
-            <div className="stat-title">Category</div>
+            <div className="stat-title">{t('danceStylePage.category')}</div>
             <div className="stat-value text-info text-xl capitalize">{danceStyle.category}</div>
           </div>
         </div>
@@ -254,7 +259,7 @@ export default async function DanceStylePage({ params, searchParams }: Props) {
           <div className="lg:col-span-1">
             <div className="card bg-base-200 shadow-xl mb-6">
               <div className="card-body">
-                <h2 className="card-title mb-4">Skill Level Distribution</h2>
+                <h2 className="card-title mb-4">{t('danceStylePage.skillLevelDistribution')}</h2>
                 {levelDistribution.length > 0 ? (
                   <div className="space-y-3">
                     {DANCE_LEVELS.map(level => {
@@ -285,7 +290,7 @@ export default async function DanceStylePage({ params, searchParams }: Props) {
                   </div>
                 ) : (
                   <p className="text-base-content/60 text-center py-4">
-                    No level data available yet
+                    {t('danceStylePage.noLevelData')}
                   </p>
                 )}
               </div>
@@ -294,7 +299,7 @@ export default async function DanceStylePage({ params, searchParams }: Props) {
             {/* Popular Cities */}
             <div className="card bg-base-200 shadow-xl">
               <div className="card-body">
-                <h2 className="card-title mb-4">Popular Cities</h2>
+                <h2 className="card-title mb-4">{t('danceStylePage.popularCities')}</h2>
                 {popularCities.length > 0 ? (
                   <div className="space-y-2">
                     {popularCities.map((city: any, index: number) => (
@@ -309,14 +314,14 @@ export default async function DanceStylePage({ params, searchParams }: Props) {
                           <span className="text-sm font-medium">{city.name}</span>
                         </div>
                         <span className="text-xs text-base-content/60">
-                          {city.count} dancer{city.count !== 1 ? 's' : ''}
+                          {city.count} {city.count !== 1 ? t('danceStylePage.dancers') : t('musicPage.dancer')}
                         </span>
                       </Link>
                     ))}
                   </div>
                 ) : (
                   <p className="text-base-content/60 text-center py-4">
-                    No city data available yet
+                    {t('danceStylePage.noCityData')}
                   </p>
                 )}
               </div>
@@ -328,9 +333,9 @@ export default async function DanceStylePage({ params, searchParams }: Props) {
             <div className="card bg-base-200 shadow-xl">
               <div className="card-body">
                 <div className="flex justify-between items-center mb-4">
-                  <h2 className="card-title">Dancers Practicing {danceStyle.name}</h2>
+                  <h2 className="card-title">{t('danceStylePage.dancersPracticing')} {danceStyle.name}</h2>
                   <span className="text-sm text-base-content/60">
-                    Page {currentPage} of {totalPages} ({formatNumber(totalDancers)} total)
+                    {t('danceStylePage.pageOf').replace('{current}', currentPage.toString()).replace('{total}', totalPages.toString()).replace('{count}', formatNumber(totalDancers))}
                   </span>
                 </div>
 
@@ -414,12 +419,12 @@ export default async function DanceStylePage({ params, searchParams }: Props) {
                 ) : (
                   <div className="text-center py-8 text-base-content/60">
                     <FaUsers className="mx-auto text-4xl mb-4 opacity-50" />
-                    <p>No dancers practicing {danceStyle.name} yet</p>
+                    <p>{t('danceStylePage.noDancersPracticing')} {danceStyle.name} {t('danceStylePage.yet')}</p>
                     {isLoggedIn && (
                       <p className="text-sm mt-2">
-                        Be the first to{" "}
+                        {t('danceStylePage.beTheFirst')}{" "}
                         <Link href="/profile" className="link link-primary">
-                          add this to your profile
+                          {t('danceStylePage.addThisToProfile')}
                         </Link>
                         !
                       </p>
@@ -437,14 +442,14 @@ export default async function DanceStylePage({ params, searchParams }: Props) {
             <div className="card bg-gradient-to-r from-purple-500 to-pink-500 text-white shadow-xl">
               <div className="card-body">
                 <h2 className="card-title justify-center text-2xl mb-2">
-                  Love {danceStyle.name}?
+                  {t('danceStylePage.love')} {danceStyle.name}?
                 </h2>
                 <p className="mb-4">
-                  Join {formatNumber(totalDancers)} dancers and connect with the {danceStyle.name} community worldwide!
+                  {t('danceStylePage.join')} {formatNumber(totalDancers)} {t('danceStylePage.dancersAndConnect')} {danceStyle.name} {t('danceStylePage.communityWorldwide')}
                 </p>
                 <div className="card-actions justify-center">
                   <Link href="/api/auth/signin" className="btn btn-white">
-                    Join DanceCircle
+                    {t('danceStylePage.joinDanceCircle')}
                   </Link>
                 </div>
               </div>

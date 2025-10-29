@@ -10,6 +10,7 @@ interface User {
   username?: string;
   image?: string;
   sharedOnSocialMedia: boolean;
+  isProfileComplete?: boolean;
   createdAt: string;
 }
 
@@ -18,6 +19,7 @@ export default function AdminUsersPage() {
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState("");
   const [filterShared, setFilterShared] = useState<"all" | "shared" | "not-shared">("all");
+  const [filterProfileComplete, setFilterProfileComplete] = useState(false);
   const [page, setPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
   const [totalUsers, setTotalUsers] = useState(0);
@@ -32,7 +34,7 @@ export default function AdminUsersPage() {
 
   useEffect(() => {
     fetchUsers();
-  }, [page, searchTerm, filterShared]); // eslint-disable-line react-hooks/exhaustive-deps
+  }, [page, searchTerm, filterShared, filterProfileComplete]); // eslint-disable-line react-hooks/exhaustive-deps
 
   const fetchUsers = async () => {
     setLoading(true);
@@ -43,11 +45,16 @@ export default function AdminUsersPage() {
         search: searchTerm,
       });
 
-      // Add filter parameter
+      // Add filter parameter for shared status
       if (filterShared === "shared") {
         params.append("filterShared", "true");
       } else if (filterShared === "not-shared") {
         params.append("filterShared", "false");
+      }
+
+      // Add filter parameter for profile completion
+      if (filterProfileComplete) {
+        params.append("filterProfileComplete", "true");
       }
 
       const res = await fetch(`/api/admin/users?${params}`);
@@ -249,6 +256,24 @@ export default function AdminUsersPage() {
             Not Shared
           </button>
         </div>
+
+        {/* Profile Completion Filter */}
+        <div className="form-control">
+          <label className="label cursor-pointer justify-start gap-3">
+            <input
+              type="checkbox"
+              checked={filterProfileComplete}
+              onChange={(e) => {
+                setFilterProfileComplete(e.target.checked);
+                setPage(1);
+              }}
+              className="checkbox checkbox-primary"
+            />
+            <span className="label-text font-medium">
+              Show only users with completed profiles
+            </span>
+          </label>
+        </div>
       </div>
 
       {/* Users Table */}
@@ -260,6 +285,7 @@ export default function AdminUsersPage() {
                 <th className="w-12">#</th>
                 <th>User</th>
                 <th>Username</th>
+                <th>Profile Status</th>
                 <th>Joined</th>
                 <th>Shared on Social Media</th>
                 <th>Actions</th>
@@ -268,13 +294,13 @@ export default function AdminUsersPage() {
             <tbody>
               {loading ? (
                 <tr>
-                  <td colSpan={6} className="text-center py-8">
+                  <td colSpan={7} className="text-center py-8">
                     <span className="loading loading-spinner loading-lg"></span>
                   </td>
                 </tr>
               ) : users.length === 0 ? (
                 <tr>
-                  <td colSpan={6} className="text-center py-8 text-base-content/60">
+                  <td colSpan={7} className="text-center py-8 text-base-content/60">
                     No users found
                   </td>
                 </tr>
@@ -303,6 +329,17 @@ export default function AdminUsersPage() {
                         <span className="font-mono text-sm">@{user.username}</span>
                       ) : (
                         <span className="text-base-content/50 text-sm italic">No username</span>
+                      )}
+                    </td>
+                    <td>
+                      {user.isProfileComplete ? (
+                        <span className="badge badge-success gap-1">
+                          <FaCheck className="text-xs" /> Complete
+                        </span>
+                      ) : (
+                        <span className="badge badge-warning gap-1">
+                          <FaTimes className="text-xs" /> Incomplete
+                        </span>
                       )}
                     </td>
                     <td className="text-sm">{formatDate(user.createdAt)}</td>

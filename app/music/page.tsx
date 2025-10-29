@@ -1,6 +1,7 @@
 import connectDB from "@/libs/mongoose";
 import User from "@/models/User";
 import { FaMusic, FaSpotify, FaFire, FaUsers, FaYoutube } from "react-icons/fa";
+import { getMessages, getTranslation } from "@/lib/i18n";
 
 export const metadata = {
   title: "Trending Dance Music | DanceCircle",
@@ -36,6 +37,10 @@ function detectPlatform(url: string): "spotify" | "youtube" | null {
 }
 
 export default async function MusicPage() {
+  // Get translations
+  const messages = await getMessages();
+  const t = (key: string) => getTranslation(messages, key);
+
   await connectDB();
 
   // Get all users with anthem URLs
@@ -78,10 +83,10 @@ export default async function MusicPage() {
         <div className="container mx-auto px-4">
           <h1 className="text-4xl md:text-5xl font-bold mb-4 flex items-center gap-3">
             <FaFire className="text-error" />
-            Trending Music
+            {t('musicPage.title')}
           </h1>
           <p className="text-lg text-base-content/80">
-            Top 10 dance anthems from dancers 🎵
+            {t('musicPage.subtitle')} 🎵
           </p>
         </div>
       </div>
@@ -91,7 +96,7 @@ export default async function MusicPage() {
           <div className="text-center py-12">
             <FaMusic className="text-6xl text-base-content/20 mx-auto mb-4" />
             <p className="text-xl text-base-content/60">
-              No trending songs yet. Add your dance anthem to your profile!
+              {t('musicPage.noSongsYet')}
             </p>
           </div>
         ) : (
@@ -105,7 +110,7 @@ export default async function MusicPage() {
                     </div>
                     <div className="badge badge-primary gap-2">
                       <FaUsers className="text-xs" />
-                      {song.count} {song.count === 1 ? "dancer" : "dancers"}
+                      {song.count} {song.count === 1 ? t('musicPage.dancer') : t('musicPage.dancers')}
                     </div>
                   </div>
                 </div>

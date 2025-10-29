@@ -6,8 +6,10 @@ import { FaMapMarkerAlt, FaSearch, FaEdit } from "react-icons/fa";
 import DancerCard from "@/components/DancerCard";
 import CitySelector from "@/components/CitySelector";
 import { City } from "@/types";
+import { useTranslation } from "@/components/I18nProvider";
 
 export default function ConnectPage() {
+  const { t } = useTranslation();
   const { data: session, status } = useSession();
   const [selectedCity, setSelectedCity] = useState<City | null>(null);
   const [userHomeCity, setUserHomeCity] = useState<City | null>(null);
@@ -63,12 +65,12 @@ export default function ConnectPage() {
 
   const searchDancers = async () => {
     if (!selectedCity) {
-      showToast("Please select a city first");
+      showToast(t('connectPage.pleaseSelectCity'));
       return;
     }
 
     if (!userPreferences.openToMeetTravelers && !userPreferences.lookingForPracticePartners) {
-      showToast("Please enable at least one option");
+      showToast(t('connectPage.enableOption'));
       setDancers([]);
       return;
     }
@@ -111,7 +113,7 @@ export default function ConnectPage() {
       setDancers(allDancers);
     } catch (error) {
       console.error("Error searching dancers:", error);
-      showToast("Failed to search dancers. Please try again.");
+      showToast(t('connectPage.failedSearch'));
     } finally {
       setLoading(false);
     }
@@ -143,17 +145,17 @@ export default function ConnectPage() {
         // Show success notification
         const message = preference === "openToMeetTravelers"
           ? newValue 
-            ? "You're now visible to solo dancers! 💃" 
-            : "Solo dancers can't see you anymore"
+            ? `${t('connectPage.visibleToSolo')} 💃` 
+            : t('connectPage.notVisibleToSolo')
           : newValue
-            ? "You're now visible to practice partners! 🤝"
-            : "Practice partners can't see you anymore";
+            ? `${t('connectPage.visibleToPractice')} 🤝`
+            : t('connectPage.notVisibleToPractice');
         
         showToast(message);
       }
     } catch (error) {
       console.error("Error updating preference:", error);
-      showToast("Failed to update preference. Please try again.");
+      showToast(t('connectPage.failedUpdatePreference'));
     }
   };
 
@@ -170,11 +172,11 @@ export default function ConnectPage() {
       if (response.ok) {
         setSelectedCity(city);
         setIsChangingCity(false);
-        showToast(`Location changed to ${city.name}! 📍`);
+        showToast(`${t('connectPage.locationChanged')} ${city.name}! 📍`);
       }
     } catch (error) {
       console.error("Error updating active city:", error);
-      showToast("Failed to update city. Please try again.");
+      showToast(t('connectPage.failedUpdateCity'));
     }
   };
 
@@ -192,10 +194,10 @@ export default function ConnectPage() {
         {/* Header */}
         <div className="mb-8">
           <h1 className="text-3xl md:text-4xl font-extrabold tracking-tight mb-4">
-            Travel & Connect with Dancers 🌍
+            {t('connectPage.title')} 🌍
           </h1>
           <p className="text-base-content/70 text-lg">
-            Traveling to a new city? Find local dancers to connect with. Or find practice partners in your city.
+            {t('connectPage.subtitle')}
           </p>
         </div>
 
@@ -203,7 +205,7 @@ export default function ConnectPage() {
         <div className="bg-base-200 rounded-lg p-6 mb-6">
           <h3 className="font-bold mb-4 flex items-center gap-2">
             <FaMapMarkerAlt className="text-primary" />
-            Your Location
+            {t('connectPage.yourLocation')}
           </h3>
           
           {loadingUserData ? (
@@ -217,12 +219,12 @@ export default function ConnectPage() {
                   <div className="mb-4 p-3 bg-base-100 rounded-lg">
                     <div className="flex items-center justify-between">
                       <div>
-                        <div className="text-xs text-base-content/60 mb-1">Currently in</div>
+                        <div className="text-xs text-base-content/60 mb-1">{t('connectPage.currentlyIn')}</div>
                         <div className="font-semibold text-lg">
                           {selectedCity.name}, {selectedCity.country?.name || 'Unknown'}
                         </div>
                         {userHomeCity && selectedCity.id === userHomeCity.id && (
-                          <div className="badge badge-sm badge-primary mt-1">Home City</div>
+                          <div className="badge badge-sm badge-primary mt-1">{t('connectPage.homeCity')}</div>
                         )}
                       </div>
                       <button
@@ -230,7 +232,7 @@ export default function ConnectPage() {
                         onClick={() => setIsChangingCity(true)}
                       >
                         <FaEdit />
-                        Change
+                        {t('connectPage.change')}
                       </button>
                     </div>
                   </div>
@@ -239,7 +241,7 @@ export default function ConnectPage() {
                 <>
                   <div className="mb-4">
                     <p className="text-sm text-base-content/60 mb-3">
-                      Select the city where you currently are:
+                      {t('connectPage.selectCity')}
                     </p>
                     <CitySelector
                       selectedCities={[]}
@@ -249,14 +251,14 @@ export default function ConnectPage() {
                           updateActiveCity(cities[cities.length - 1]);
                         }
                       }}
-                      placeholder="Search for a city (e.g., Bangkok, Berlin)..."
+                      placeholder={t('connectPage.searchPlaceholder')}
                       label=""
                     />
                     <button
                       className="btn btn-ghost btn-sm mt-2"
                       onClick={() => setIsChangingCity(false)}
                     >
-                      Cancel
+                      {t('connectPage.cancel')}
                     </button>
                   </div>
                 </>
@@ -265,15 +267,15 @@ export default function ConnectPage() {
               <div className="divider"></div>
 
               <h4 className="font-semibold mb-4">
-                Make yourself discoverable in {selectedCity.name}
+                {t('connectPage.makeDiscoverable')} {selectedCity.name}
               </h4>
               
               <div className="space-y-4">
                 <label className="flex items-center justify-between cursor-pointer p-3 bg-base-300 rounded-lg">
                   <div>
-                    <span className="font-medium block">Meet solo dancers</span>
+                    <span className="font-medium block">{t('connectPage.meetSoloDancers')}</span>
                     <p className="text-xs text-base-content/60 mt-1">
-                      Connect with solo dancers visiting {selectedCity.name}
+                      {t('connectPage.meetSoloDancersDesc')} {selectedCity.name}
                     </p>
                   </div>
                   <input
@@ -286,9 +288,9 @@ export default function ConnectPage() {
 
                 <label className="flex items-center justify-between cursor-pointer p-3 bg-base-300 rounded-lg">
                   <div>
-                    <span className="font-medium block">Find practice partners</span>
+                    <span className="font-medium block">{t('connectPage.findPracticePartners')}</span>
                     <p className="text-xs text-base-content/60 mt-1">
-                      Match with dancers for practice sessions in {selectedCity.name}
+                      {t('connectPage.findPracticePartnersDesc')} {selectedCity.name}
                     </p>
                   </div>
                   <input
@@ -309,12 +311,12 @@ export default function ConnectPage() {
                   {loading ? (
                     <>
                       <span className="loading loading-spinner loading-sm"></span>
-                      Searching...
+                      {t('connectPage.searching')}
                     </>
                   ) : (
                     <>
                       <FaSearch className="mr-2" />
-                      Find Dancers in {selectedCity.name}
+                      {t('connectPage.findDancersIn')} {selectedCity.name}
                     </>
                   )}
                 </button>
@@ -325,7 +327,7 @@ export default function ConnectPage() {
               <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" className="stroke-current shrink-0 w-6 h-6">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path>
               </svg>
-              <span>Please set your home city in your profile first!</span>
+              <span>{t('connectPage.setHomeCity')}</span>
             </div>
           )}
         </div>
@@ -334,7 +336,7 @@ export default function ConnectPage() {
         {dancers.length > 0 && (
           <div>
             <h3 className="font-bold text-xl mb-4">
-              Found {dancers.length} dancer{dancers.length !== 1 ? "s" : ""}
+              {t('connectPage.foundDancers')} {dancers.length} {dancers.length !== 1 ? t('connectPage.dancers') : t('connectPage.dancer')}
             </h3>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
               {dancers.map((dancer) => (
@@ -353,12 +355,12 @@ export default function ConnectPage() {
         {!loading && hasSearched && dancers.length === 0 && selectedCity && (
           <div className="text-center py-16">
             <div className="text-6xl mb-4">😔</div>
-            <h3 className="text-2xl font-bold mb-2">No dancers found</h3>
+            <h3 className="text-2xl font-bold mb-2">{t('connectPage.noDancersFound')}</h3>
             <p className="text-base-content/70 mb-4">
-              No dancers matching your criteria in {selectedCity.name} yet.
+              {t('connectPage.noDancersMatching')} {selectedCity.name}.
             </p>
             <p className="text-sm text-base-content/60">
-              Try selecting a different city or check back later!
+              {t('connectPage.tryDifferentCity')}
             </p>
           </div>
         )}
@@ -371,7 +373,7 @@ export default function ConnectPage() {
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
               </svg>
               <span className="text-sm">
-                ✨ You&apos;re now discoverable in {selectedCity.name}! Other dancers can find you.
+                ✨ {t('connectPage.nowDiscoverable')} {selectedCity.name}{t('connectPage.othersDancersCanFind')}
               </span>
             </div>
           </div>
