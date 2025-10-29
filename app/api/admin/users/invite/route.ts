@@ -67,7 +67,8 @@ export async function POST(req: Request) {
     });
 
     // Generate magic link URL (same format as NextAuth email provider)
-    const signInUrl = `https://${config.domainName}/api/auth/callback/email?token=${token}&email=${encodeURIComponent(email)}`;
+    const callbackUrl = `https://${config.domainName}/onboarding`;
+    const signInUrl = `https://${config.domainName}/api/auth/callback/email?callbackUrl=${encodeURIComponent(callbackUrl)}&token=${token}&email=${encodeURIComponent(email)}`;
 
     // Send invite email
     const emailContent = inviteUserEmail(email, signInUrl);
