@@ -99,6 +99,11 @@ const config = {
     // REQUIRED — the path you want to redirect users to after a successful login (i.e. /dashboard, /private). This is normally a private page for users to manage their accounts. It's used in apiClient (/libs/api.js) upon 401 errors from our API & in ButtonSignin.js
     callbackUrl: "/onboarding",
   },
+  // Admin configuration
+  admin: {
+    // Admin email - only this email can access the admin panel
+    email: "mr.bonilla51@gmail.com",
+  },
 } as ConfigProps;
 
 export default config;

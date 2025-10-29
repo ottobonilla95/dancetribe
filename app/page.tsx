@@ -427,7 +427,11 @@ export default async function Home() {
                 </p>
               </div>
               <div className="w-full">
-                <DancersMap dancers={JSON.parse(JSON.stringify(communityMapData.dancersForMap))} />
+                <DancersMap 
+                  dancers={JSON.parse(JSON.stringify(communityMapData.dancersForMap))} 
+                  autoSpin={true}
+                  disableMobileDrag={true}
+                />
               </div>
             </div>
           </div>

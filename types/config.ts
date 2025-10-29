@@ -66,4 +66,7 @@ export interface ConfigProps {
     loginUrl: string;
     callbackUrl: string;
   };
+  admin: {
+    email: string;
+  };
 }

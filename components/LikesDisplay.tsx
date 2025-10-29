@@ -25,6 +25,6 @@ export default function LikesDisplay({
   }, [contextLikesCount, targetUserId]);
 
   return (
-    <span>❤️ {likesCount} {t('profile.likes')}</span>
+    <span className="whitespace-nowrap">❤️ {likesCount} {t('profile.likes')}</span>
   );
 } 

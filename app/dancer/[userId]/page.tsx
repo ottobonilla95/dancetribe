@@ -369,12 +369,12 @@ export default async function PublicProfile({ params }: Props) {
                       )}
 
                       {/* Social Stats */}
-                      <div className="mt-2 flex gap-4 text-sm text-base-content/60">
+                      <div className="mt-2 flex gap-2 sm:gap-4 text-xs sm:text-sm text-base-content/60">
                         <LikesDisplay
                           targetUserId={params.userId}
                           initialLikesCount={likesCount}
                         />
-                        <span>
+                        <span className="whitespace-nowrap">
                           👥 {friendsCount} {t('profile.friends').toLowerCase()}
                         </span>
                       </div>

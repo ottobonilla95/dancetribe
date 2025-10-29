@@ -2,6 +2,7 @@
 
 import { useEffect, useRef, useState } from 'react';
 import mapboxgl from 'mapbox-gl';
+import { FaExpand, FaTimes } from 'react-icons/fa';
 
 interface Dancer {
   _id: string;
@@ -21,14 +22,35 @@ interface Dancer {
 interface DancersMapProps {
   dancers: Dancer[];
   mapboxToken?: string;
+  autoSpin?: boolean; // Auto-rotate the globe
+  disableMobileDrag?: boolean; // Disable one-finger drag on mobile (allows page scroll)
 }
 
-export default function DancersMap({ dancers, mapboxToken }: DancersMapProps) {
+export default function DancersMap({ 
+  dancers, 
+  mapboxToken, 
+  autoSpin = false,
+  disableMobileDrag = false 
+}: DancersMapProps) {
   const mapContainerRef = useRef<HTMLDivElement>(null);
   const mapRef = useRef<mapboxgl.Map | null>(null);
   const markersRef = useRef<mapboxgl.Marker[]>([]);
   const activePopupRef = useRef<mapboxgl.Popup | null>(null);
   const [isLoaded, setIsLoaded] = useState(false);
+  const [showScrollHint, setShowScrollHint] = useState(false);
+  const [isFullscreen, setIsFullscreen] = useState(false);
+  const [isMobile, setIsMobile] = useState(false);
+  const hintTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+
+  // Detect mobile on mount
+  useEffect(() => {
+    const checkMobile = () => {
+      setIsMobile(window.innerWidth < 768 || 'ontouchstart' in window);
+    };
+    checkMobile();
+    window.addEventListener('resize', checkMobile);
+    return () => window.removeEventListener('resize', checkMobile);
+  }, []);
 
   useEffect(() => {
     if (!mapContainerRef.current) return;
@@ -46,15 +68,46 @@ export default function DancersMap({ dancers, mapboxToken }: DancersMapProps) {
       container: mapContainerRef.current,
       style: 'mapbox://styles/mapbox/streets-v12',
       projection: 'globe' as any,
-      center: [0, 20],
+      center: [10, 30], // Start centered on Europe/Mediterranean
       zoom: 1.5,
       attributionControl: false,
+      // Cooperative gestures - require Ctrl/Cmd for scroll zoom on desktop
+      cooperativeGestures: !isMobile,
     });
 
     mapRef.current = map;
 
+    // Disable one-finger drag on mobile if specified (only allow two-finger pinch zoom)
+    if (disableMobileDrag && isMobile && !isFullscreen) {
+      map.dragPan.disable();
+      map.scrollZoom.disable();
+      // Keep two-finger gestures enabled
+      map.touchZoomRotate.enable();
+      map.doubleClickZoom.enable();
+    }
+
     // Add navigation controls
     map.addControl(new mapboxgl.NavigationControl(), 'top-right');
+
+    // Show hint when user tries to scroll without Ctrl/Cmd (desktop only)
+    if (!isMobile) {
+      map.on('wheel', (e) => {
+        // Check if Ctrl/Cmd key is NOT pressed
+        if (!e.originalEvent.ctrlKey && !e.originalEvent.metaKey) {
+          setShowScrollHint(true);
+          
+          // Clear existing timeout
+          if (hintTimeoutRef.current) {
+            clearTimeout(hintTimeoutRef.current);
+          }
+          
+          // Hide hint after 2 seconds
+          hintTimeoutRef.current = setTimeout(() => {
+            setShowScrollHint(false);
+          }, 2000);
+        }
+      });
+    }
 
     map.on('load', () => {
       setIsLoaded(true);
@@ -67,6 +120,49 @@ export default function DancersMap({ dancers, mapboxToken }: DancersMapProps) {
         'space-color': 'rgb(11, 11, 25)',
         'star-intensity': 0.6,
       });
+
+      // Auto-spin the globe if enabled
+      if (autoSpin) {
+        let userInteracting = false;
+        let spinEnabled = true;
+
+        // Disable spin when user interacts
+        const onInteractionStart = () => {
+          userInteracting = true;
+        };
+
+        const onInteractionEnd = () => {
+          userInteracting = false;
+          // Resume spinning after 3 seconds of no interaction
+          setTimeout(() => {
+            if (!userInteracting) {
+              spinEnabled = true;
+            }
+          }, 3000);
+        };
+
+        map.on('mousedown', onInteractionStart);
+        map.on('touchstart', onInteractionStart);
+        map.on('mouseup', onInteractionEnd);
+        map.on('touchend', onInteractionEnd);
+        map.on('wheel', onInteractionStart);
+
+        // Spin the globe
+        const spinGlobe = () => {
+          if (spinEnabled && !userInteracting) {
+            const center = map.getCenter();
+            center.lng += 0.4; // Spin eastward from Europe to Asia (positive = east)
+            map.easeTo({
+              center,
+              duration: 100,
+              easing: (n) => n,
+            });
+          }
+          requestAnimationFrame(spinGlobe);
+        };
+
+        spinGlobe();
+      }
 
       // Group dancers by city
       const dancersByCity = new Map<string, Dancer[]>();
@@ -345,9 +441,16 @@ export default function DancersMap({ dancers, mapboxToken }: DancersMapProps) {
     return () => {
       markersRef.current.forEach(marker => marker.remove());
       markersRef.current = [];
+      if (hintTimeoutRef.current) {
+        clearTimeout(hintTimeoutRef.current);
+      }
       mapRef.current?.remove();
     };
-  }, [dancers, mapboxToken]);
+  }, [dancers, mapboxToken, isMobile, isFullscreen]);
+
+  const toggleFullscreen = () => {
+    setIsFullscreen(!isFullscreen);
+  };
 
   // Filter dancers with valid coordinates
   const dancersWithCoordinates = dancers.filter(
@@ -357,12 +460,39 @@ export default function DancersMap({ dancers, mapboxToken }: DancersMapProps) {
   const hasNoDancers = dancers.length === 0;
 
   return (
-    <div className="relative w-full">
-      <div
-        ref={mapContainerRef}
-        className="w-full md:rounded-lg overflow-hidden shadow-2xl"
-        style={{ height: '600px' }}
-      />
+    <>
+      {/* Fullscreen Modal */}
+      {isFullscreen && (
+        <div className="fixed inset-0 z-50 bg-black/95 flex flex-col">
+          {/* Fullscreen Header */}
+          <div className="flex items-center justify-between p-4 bg-base-100/10 backdrop-blur-sm">
+            <h3 className="text-white text-lg font-semibold">Explore Dancers Worldwide</h3>
+            <button
+              onClick={toggleFullscreen}
+              className="btn btn-sm btn-circle btn-ghost text-white hover:bg-white/20"
+            >
+              <FaTimes className="w-5 h-5" />
+            </button>
+          </div>
+          
+          {/* Fullscreen Map Container */}
+          <div className="flex-1 relative">
+            <div
+              ref={mapContainerRef}
+              className="w-full h-full"
+            />
+          </div>
+        </div>
+      )}
+
+      {/* Normal Map Container */}
+      {!isFullscreen && (
+        <div className="relative w-full">
+          <div
+            ref={mapContainerRef}
+            className="w-full md:rounded-lg overflow-hidden shadow-2xl"
+            style={{ height: '600px' }}
+          />
       
       {!isLoaded && (
         <div className="absolute inset-0 flex items-center justify-center bg-base-200 md:rounded-lg">
@@ -388,23 +518,49 @@ export default function DancersMap({ dancers, mapboxToken }: DancersMapProps) {
         </div>
       )}
 
-      {/* Map Legend */}
-      {dancersWithCoordinates.length > 0 && (
-        <div className="absolute bottom-4 left-4 bg-base-100/90 backdrop-blur-sm rounded-lg p-3 shadow-lg text-xs md:text-sm">
-          <div className="text-xs space-y-1">
-            <div className="flex items-center gap-2">
-              <div className="w-6 h-6 rounded-full bg-gradient-to-br from-purple-500 to-purple-700"></div>
-              <span className="text-base-content/80">
-                {dancersWithCoordinates.length} dancer{dancersWithCoordinates.length !== 1 ? 's' : ''} in {new Set(dancersWithCoordinates.map(d => d.city._id)).size} {new Set(dancersWithCoordinates.map(d => d.city._id)).size !== 1 ? 'cities' : 'city'}
-              </span>
+          {/* Desktop Scroll Hint Overlay */}
+          {!isMobile && showScrollHint && (
+            <div className="absolute inset-0 flex items-center justify-center pointer-events-none z-10">
+              <div className="bg-black/80 text-white px-6 py-3 rounded-lg shadow-2xl animate-fade-in">
+                <div className="flex items-center gap-2 text-sm font-medium">
+                  <span>⌨️</span>
+                  <span>Use <kbd className="kbd kbd-sm">Ctrl</kbd> + scroll to zoom the map</span>
+                </div>
+              </div>
             </div>
-            <div className="text-base-content/60 text-xs">
-              Click markers to explore • Drag to navigate
+          )}
+
+          {/* Expand Button */}
+          <button
+            onClick={toggleFullscreen}
+            className="absolute top-4 right-4 btn btn-sm btn-circle bg-base-100/90 hover:bg-base-100 backdrop-blur-sm shadow-lg border-0 z-10"
+            title="View fullscreen"
+          >
+            <FaExpand className="w-4 h-4" />
+          </button>
+
+          {/* Map Legend */}
+          {dancersWithCoordinates.length > 0 && (
+            <div className="absolute bottom-4 left-4 bg-base-100/90 backdrop-blur-sm rounded-lg p-3 shadow-lg text-xs md:text-sm">
+              <div className="text-xs space-y-1">
+                <div className="flex items-center gap-2">
+                  <div className="w-6 h-6 rounded-full bg-gradient-to-br from-purple-500 to-purple-700"></div>
+                  <span className="text-base-content/80">
+                    {dancersWithCoordinates.length} dancer{dancersWithCoordinates.length !== 1 ? 's' : ''} in {new Set(dancersWithCoordinates.map(d => d.city._id)).size} {new Set(dancersWithCoordinates.map(d => d.city._id)).size !== 1 ? 'cities' : 'city'}
+                  </span>
+                </div>
+                <div className="text-base-content/60 text-xs">
+                  {autoSpin && isMobile ? 'Pinch to zoom • Globe spins automatically' : 
+                   !isMobile ? (
+                    <>Click markers • <kbd className="kbd kbd-xs">Ctrl</kbd> + scroll to zoom</>
+                  ) : 'Drag to explore • Pinch to zoom'}
+                </div>
+              </div>
             </div>
-          </div>
+          )}
         </div>
       )}
-    </div>
+    </>
   );
 }
 
