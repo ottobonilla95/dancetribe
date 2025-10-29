@@ -297,6 +297,11 @@ const userSchema = new mongoose.Schema(
         default: Date.now,
       }
     }],
+    // Admin tracking: whether user profile has been shared on social media
+    sharedOnSocialMedia: {
+      type: Boolean,
+      default: false,
+    },
   },
   {
     timestamps: true,

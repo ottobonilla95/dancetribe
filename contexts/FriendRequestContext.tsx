@@ -17,15 +17,12 @@ export function FriendRequestProvider({ children }: { children: ReactNode }) {
   const { data: session } = useSession();
   const [pendingCount, setPendingCount] = useState(0);
   const isFetchingRef = useRef(false);
-  const intervalRef = useRef<NodeJS.Timeout | null>(null);
 
   const fetchPendingRequests = useCallback(async () => {
     if (isFetchingRef.current || !session?.user?.id) {
-      console.log('⏭️ Skipping fetch - already fetching or no session');
       return;
     }
     
-    console.log('🔄 Fetching friend requests count...');
     isFetchingRef.current = true;
     try {
       const response = await fetch('/api/user/friend-requests-count', {
@@ -33,50 +30,25 @@ export function FriendRequestProvider({ children }: { children: ReactNode }) {
       });
       if (response.ok) {
         const data = await response.json();
-        console.log('✅ Friend requests fetched:', data.count);
         setPendingCount(data.count || 0);
       }
     } catch (error) {
-      console.error('❌ Error fetching friend requests:', error);
+      console.error('Error fetching friend requests:', error);
     } finally {
       isFetchingRef.current = false;
     }
   }, [session?.user?.id]);
 
+  // Fetch once on mount/session change (no polling)
   useEffect(() => {
-    console.log('🔵 FriendRequestContext: useEffect triggered', { userId: session?.user?.id });
-    
-    // Clear any existing interval
-    if (intervalRef.current) {
-      console.log('🧹 Clearing existing interval');
-      clearInterval(intervalRef.current);
-      intervalRef.current = null;
-    }
-
     if (!session?.user?.id) {
-      console.log('⚠️ No session, resetting count');
       setPendingCount(0);
       return;
     }
 
-    console.log('🎯 Setting up friend requests polling');
-    // Initial fetch
+    // Fetch friend requests count once
     fetchPendingRequests();
-    
-    // Poll every 60 seconds (increased from 30s to reduce load)
-    intervalRef.current = setInterval(() => {
-      console.log('⏰ Interval tick - fetching friend requests');
-      fetchPendingRequests();
-    }, 60000);
-    
-    return () => {
-      console.log('🔴 FriendRequestContext: cleanup');
-      if (intervalRef.current) {
-        clearInterval(intervalRef.current);
-        intervalRef.current = null;
-      }
-    };
-  }, [session?.user?.id, fetchPendingRequests]); // Dependencies
+  }, [session?.user?.id, fetchPendingRequests]);
 
   const refreshCount = async () => {
     await fetchPendingRequests();

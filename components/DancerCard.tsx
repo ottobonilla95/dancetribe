@@ -89,8 +89,8 @@ export default function DancerCard({ dancer, showLikeButton = true, showFlag = f
               </div>
               <p className="text-sm text-base-content/60">@{dancer.username}</p>
               
-              {/* Location */}
-              {dancer.city && (
+              {/* Location - Only show if city data is available */}
+              {dancer.city && dancer.city.name && (
                 <div className="flex items-center gap-1 text-sm text-base-content/70 mt-1">
                   <FaMapMarkerAlt className="text-xs" />
                   <span className="truncate">{dancer.city.name}</span>

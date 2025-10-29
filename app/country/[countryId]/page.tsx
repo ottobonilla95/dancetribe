@@ -106,7 +106,7 @@ export default async function CountryPage({ params, searchParams }: Props) {
     city: { $in: cityIds },
     isProfileComplete: true,
   })
-    .select("name username image danceStyles city")
+    .select("name username image danceStyles city dateOfBirth hideAge nationality dancingStartYear danceRole socialMedia likedBy openToMeetTravelers lookingForPracticePartners isTeacher isDJ isPhotographer jackAndJillCompetitions")
     .populate({
       path: "city",
       model: City,

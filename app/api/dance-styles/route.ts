@@ -7,8 +7,8 @@ export async function GET() {
     await connectMongo();
     
     const danceStyles = await DanceStyle.find({ isActive: true })
-      .sort({ name: 1 })
-      .select('name description image category isPartnerDance');
+      .sort({ sequence: 1, name: 1 }) // Sort by sequence first, then name
+      .select('name description image category isPartnerDance sequence');
 
     return NextResponse.json({ danceStyles });
   } catch (error) {

@@ -31,6 +31,11 @@ const danceStyleSchema = new mongoose.Schema(
       type: Boolean,
       default: true,
     },
+    // Sequence for ordering in onboarding and lists
+    sequence: {
+      type: Number,
+      default: 0,
+    },
   },
   {
     timestamps: true,

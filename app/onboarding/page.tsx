@@ -94,6 +94,7 @@ export default function Onboarding() {
     whatsapp: "",
     email: "",
   });
+  const [skipDanceSections, setSkipDanceSections] = useState(false);
 
   const steps: OnboardingStep[] = [
     {
@@ -121,12 +122,6 @@ export default function Onboarding() {
       completed: user?.onboardingSteps?.dateOfBirth || false,
     },
     {
-      id: "dancingStartYear",
-      title: t('onboarding.dancingStartTitle'),
-      description: t('onboarding.dancingStartDesc'),
-      completed: user?.onboardingSteps?.dancingStartYear || false,
-    },
-    {
       id: "gender",
       title: t('onboarding.genderTitle'),
       description: t('onboarding.genderDesc'),
@@ -143,6 +138,12 @@ export default function Onboarding() {
       title: t('onboarding.relationshipTitle'),
       description: t('onboarding.relationshipDesc'),
       completed: user?.onboardingSteps?.relationshipStatus || false,
+    },
+    {
+      id: "dancingStartYear",
+      title: t('onboarding.dancingStartTitle'),
+      description: t('onboarding.dancingStartDesc'),
+      completed: user?.onboardingSteps?.dancingStartYear || false,
     },
     {
       id: "danceStyles",
@@ -281,6 +282,9 @@ export default function Onboarding() {
           })
         );
         setDanceStyles(normalizedDanceStyles);
+      } else if (userData.danceStyles?.length === 0 && (userData.isDJ || userData.isPhotographer)) {
+        // User has explicitly chosen to skip dance sections
+        setSkipDanceSections(true);
       }
       if (userData.username) {
         setUsername(userData.username);
@@ -430,6 +434,25 @@ export default function Onboarding() {
 
   const handleNext = async () => {
     const step = steps[currentStep];
+    
+    // Skip all dance-related steps at once if user is not a dancer
+    if (skipDanceSections && step.id === "dancingStartYear") {
+      // Jump directly to the first non-dance step after danceRole
+      const danceRoleIndex = steps.findIndex(s => s.id === "danceRole");
+      if (danceRoleIndex !== -1 && danceRoleIndex + 1 < steps.length) {
+        setCurrentStep(danceRoleIndex + 1);
+      }
+      return;
+    }
+    
+    // Also skip if somehow they land on danceStyles or danceRole with skipDanceSections enabled
+    if (skipDanceSections && (step.id === "danceStyles" || step.id === "danceRole")) {
+      if (currentStep < steps.length - 1) {
+        setCurrentStep(currentStep + 1);
+      }
+      return;
+    }
+    
     let stepData: any = {};
 
     switch (step.id) {
@@ -857,8 +880,11 @@ export default function Onboarding() {
             {/* Dance Styles */}
             {steps[currentStep].id === "danceStyles" && (
               <div className="form-control space-y-6">
-                {/* Partner Dance Styles */}
-                <div>
+                {/* Show dance styles only if not skipping */}
+                {!skipDanceSections && (
+                  <>
+                    {/* Partner Dance Styles */}
+                    <div>
                   <h3 className="font-semibold text-base-content mb-3">
                     {t('onboarding.partnerDances')}
                   </h3>
@@ -980,6 +1006,8 @@ export default function Onboarding() {
                   <div className="text-center text-base-content/60 py-4">
                     Select at least one dance style to continue
                   </div>
+                )}
+                  </>
                 )}
               </div>
             )}
@@ -1110,25 +1138,53 @@ export default function Onboarding() {
             )}
 
             {steps[currentStep].id === "dancingStartYear" && (
-              <div className="form-control">
-                <label className="label">
-                  <span className="label-text">{t('onboarding.yearStartedDancing')}</span>
-                </label>
-                <input
-                  type="number"
-                  className="input input-bordered"
-                  placeholder={`${t('onboarding.example')} ${new Date().getFullYear() - 5}`}
-                  value={dancingStartYear}
-                  onChange={(e) => setDancingStartYear(e.target.value)}
-                  min="1900"
-                  max={new Date().getFullYear()}
-                />
-                {dancingStartYear && (
-                  <label className="label">
-                    <span className="label-text-alt text-base-content/60">
-                      {t('onboarding.yearsOfDancing').replace('{years}', String(new Date().getFullYear() - parseInt(dancingStartYear)))} 🎉
+              <div className="form-control space-y-6">
+                {/* Skip Dance Sections Option - Compact */}
+                <div className="form-control">
+                  <label className="label cursor-pointer justify-start gap-3 py-3">
+                    <input
+                      type="checkbox"
+                      className="checkbox checkbox-sm"
+                      checked={skipDanceSections}
+                      onChange={(e) => {
+                        setSkipDanceSections(e.target.checked);
+                        // Clear dance data if they're skipping
+                        if (e.target.checked) {
+                          setDanceStyles([]);
+                          setDancingStartYear("");
+                          setDanceRole("both");
+                        }
+                      }}
+                    />
+                    <span className="label-text text-sm opacity-70">
+                      🎧 📸 {t('onboarding.skipDanceSections')}
                     </span>
                   </label>
+                </div>
+
+                {/* Show form only if not skipping */}
+                {!skipDanceSections && (
+                  <>
+                    <label className="label">
+                      <span className="label-text">{t('onboarding.yearStartedDancing')}</span>
+                    </label>
+                    <input
+                      type="number"
+                      className="input input-bordered"
+                      placeholder={`${t('onboarding.example')} ${new Date().getFullYear() - 5}`}
+                      value={dancingStartYear}
+                      onChange={(e) => setDancingStartYear(e.target.value)}
+                      min="1900"
+                      max={new Date().getFullYear()}
+                    />
+                    {dancingStartYear && (
+                      <label className="label">
+                        <span className="label-text-alt text-base-content/60">
+                          {t('onboarding.yearsOfDancing').replace('{years}', String(new Date().getFullYear() - parseInt(dancingStartYear)))} 🎉
+                        </span>
+                      </label>
+                    )}
+                  </>
                 )}
               </div>
             )}
@@ -1158,7 +1214,7 @@ export default function Onboarding() {
                   selectedCities={citiesVisited}
                   onCitiesChange={setCitiesVisited}
                   placeholder={t('onboarding.searchCitiesPlaceholder')}
-                  label={t('onboarding.citiesYouDanced')}
+                  label={skipDanceSections ? "Cities you've visited or worked in (optional)" : t('onboarding.citiesYouDanced')}
                 />
               </div>
             )}
@@ -1289,31 +1345,35 @@ export default function Onboarding() {
 
             {steps[currentStep].id === "danceRole" && (
               <div className="form-control">
-                <label className="label">
-                  <span className="label-text">
-                    {t('onboarding.danceRoleQuestion')}
-                  </span>
-                </label>
-                <div className="flex flex-col gap-3">
-                  {[
-                    { value: "leader", label: t('profile.leader') },
-                    { value: "follower", label: t('profile.follower') },
-                    { value: "both", label: t('common.both') }
-                  ].map((role) => (
-                    <label key={role.value} className="label cursor-pointer">
-                      <span className="label-text">{role.label}</span>
-                      <input
-                        type="radio"
-                        name="danceRole"
-                        className="radio radio-primary"
-                        checked={danceRole === role.value}
-                        onChange={() =>
-                          setDanceRole(role.value as "follower" | "leader" | "both")
-                        }
-                      />
+                {!skipDanceSections && (
+                  <>
+                    <label className="label">
+                      <span className="label-text">
+                        {t('onboarding.danceRoleQuestion')}
+                      </span>
                     </label>
-                  ))}
-                </div>
+                    <div className="flex flex-col gap-3">
+                      {[
+                        { value: "both", label: t('common.both') },
+                        { value: "leader", label: t('profile.leader') },
+                        { value: "follower", label: t('profile.follower') }
+                      ].map((role) => (
+                        <label key={role.value} className="label cursor-pointer">
+                          <span className="label-text">{role.label}</span>
+                          <input
+                            type="radio"
+                            name="danceRole"
+                            className="radio radio-primary"
+                            checked={danceRole === role.value}
+                            onChange={() =>
+                              setDanceRole(role.value as "follower" | "leader" | "both")
+                            }
+                          />
+                        </label>
+                      ))}
+                    </div>
+                  </>
+                )}
               </div>
             )}
 
@@ -1372,9 +1432,6 @@ export default function Onboarding() {
             {/* Relationship Status */}
             {steps[currentStep].id === "relationshipStatus" && (
               <div className="form-control">
-                <div className="alert alert-info mb-4">
-                  <span className="text-sm">{t('onboarding.optionalStep')}</span>
-                </div>
                 <label className="label">
                   <span className="label-text">
                     {t('onboarding.relationshipQuestion')}

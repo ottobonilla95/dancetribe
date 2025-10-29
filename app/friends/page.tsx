@@ -5,6 +5,7 @@ import connectMongo from "@/libs/mongoose";
 import User from "@/models/User";
 import FriendsContent from "./FriendsContent";
 import FriendsMap from "@/components/FriendsMap";
+import { getMessages, getTranslation } from "@/lib/i18n";
 
 export default async function FriendsPage() {
   const session = await getServerSession(authOptions);
@@ -12,6 +13,10 @@ export default async function FriendsPage() {
   if (!session) {
     redirect("/api/auth/signin");
   }
+
+  // Get translations
+  const messages = await getMessages();
+  const t = (key: string) => getTranslation(messages, key);
 
   await connectMongo();
 
@@ -89,24 +94,24 @@ export default async function FriendsPage() {
           {/* Stats Overview */}
           <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-8">
           <div className="stat bg-base-200 rounded-lg">
-            <div className="stat-title">Friends</div>
+            <div className="stat-title">{t('friends.friends')}</div>
             <div className="stat-value text-primary">{userData.friends?.length || 0}</div>
-            <div className="stat-desc">Connected dancers</div>
+            <div className="stat-desc">{t('friends.connectedDancers')}</div>
           </div>
           <div className="stat bg-base-200 rounded-lg">
-            <div className="stat-title">Pending Requests</div>
+            <div className="stat-title">{t('friends.pendingRequests')}</div>
             <div className="stat-value text-warning">{userData.friendRequestsReceived?.length || 0}</div>
-            <div className="stat-desc">Awaiting your response</div>
+            <div className="stat-desc">{t('friends.awaitingResponse')}</div>
           </div>
           <div className="stat bg-base-200 rounded-lg">
-            <div className="stat-title">Sent Requests</div>
+            <div className="stat-title">{t('friends.sentRequests')}</div>
             <div className="stat-value text-info">{userData.friendRequestsSent?.length || 0}</div>
-            <div className="stat-desc">Waiting for response</div>
+            <div className="stat-desc">{t('friends.waitingForResponse')}</div>
           </div>
           <div className="stat bg-base-200 rounded-lg">
-            <div className="stat-title">Profile Likes</div>
+            <div className="stat-title">{t('friends.profileLikes')}</div>
             <div className="stat-value text-secondary">{userData.likedBy?.length || 0}</div>
-            <div className="stat-desc">People who liked you</div>
+            <div className="stat-desc">{t('friends.peopleWhoLikedYou')}</div>
           </div>
         </div>
 

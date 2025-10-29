@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { FaQuestionCircle, FaTimes, FaEnvelope, FaInstagram } from "react-icons/fa";
 import config from "@/config";
+import { useTranslation } from "@/components/I18nProvider";
 
 interface SupportButtonProps {
   variant?: "floating" | "inline";
@@ -10,6 +11,7 @@ interface SupportButtonProps {
 }
 
 export default function SupportButton({ variant = "floating", className = "" }: SupportButtonProps) {
+  const { t } = useTranslation();
   const [showOptions, setShowOptions] = useState(false);
   const supportEmail = config.resend.supportEmail;
   const instagramHandle = config.social?.instagram;
@@ -37,7 +39,7 @@ export default function SupportButton({ variant = "floating", className = "" }: 
         className={`btn btn-outline gap-2 ${className}`}
       >
         <FaQuestionCircle className="text-lg" />
-        Need Help?
+        {t('support.needHelp')}
       </button>
     );
   }
@@ -50,7 +52,7 @@ export default function SupportButton({ variant = "floating", className = "" }: 
         {showOptions && (
           <div className="mb-4 bg-base-100 rounded-lg shadow-2xl border border-base-300 p-4 space-y-2 animate-fade-in">
             <div className="flex items-center justify-between mb-3">
-              <h3 className="font-bold text-sm">Need Help?</h3>
+              <h3 className="font-bold text-sm">{t('support.needHelp')}</h3>
               <button
                 onClick={() => setShowOptions(false)}
                 className="btn btn-ghost btn-xs btn-circle"
@@ -64,7 +66,7 @@ export default function SupportButton({ variant = "floating", className = "" }: 
               className="btn btn-sm btn-outline btn-block gap-2 justify-start"
             >
               <FaEnvelope />
-              Email Support
+              {t('support.emailSupport')}
             </button>
 
             <button
@@ -72,11 +74,11 @@ export default function SupportButton({ variant = "floating", className = "" }: 
               className="btn btn-sm btn-outline btn-secondary btn-block gap-2 justify-start"
             >
               <FaInstagram />
-              Instagram DM
+              {t('support.instagramDM')}
             </button>
 
             <p className="text-xs text-base-content/60 mt-3 pt-2 border-t border-base-300">
-              We typically respond within 24 hours
+              {t('support.responseTime')}
             </p>
           </div>
         )}

@@ -1,15 +1,36 @@
 "use client";
 
 import { useState } from "react";
-import Link from "next/link";
 import { FaFilter } from "react-icons/fa";
 import { useTranslation } from "./I18nProvider";
+import DancerCard from "./DancerCard";
 
 interface Dancer {
   _id: string;
   name: string;
   username?: string;
   image?: string;
+  city?: any;
+  dateOfBirth?: string;
+  hideAge?: boolean;
+  nationality?: string;
+  dancingStartYear?: number;
+  danceRole?: "follower" | "leader" | "both";
+  socialMedia?: {
+    instagram?: string;
+    tiktok?: string;
+    youtube?: string;
+  };
+  likedBy?: string[];
+  openToMeetTravelers?: boolean;
+  lookingForPracticePartners?: boolean;
+  isTeacher?: boolean;
+  isDJ?: boolean;
+  isPhotographer?: boolean;
+  jackAndJillCompetitions?: Array<{
+    placement: string;
+    year: number;
+  }>;
   danceStyles: Array<{
     danceStyle: {
       _id: string;
@@ -31,22 +52,36 @@ export default function DancersFilter({
 }: DancersFilterProps) {
   const { t } = useTranslation();
   const [showMyStyles, setShowMyStyles] = useState(false);
+  const [showOnlyTeachers, setShowOnlyTeachers] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
   const dancersPerPage = 24;
 
-  // Filter dancers based on user's dance styles
+  // Filter dancers based on multiple criteria
   const filteredDancers = dancers.filter((dancer) => {
-    if (!showMyStyles || !userDanceStyles || userDanceStyles.length === 0) {
-      return true; // Show all if filter is off
+    // Dance styles filter
+    if (showMyStyles && userDanceStyles && userDanceStyles.length > 0) {
+      const dancerStyleIds = dancer.danceStyles.map((ds) => ds.danceStyle._id.toString());
+      const hasMatchingStyle = dancerStyleIds.some((id) => userDanceStyles.includes(id));
+      if (!hasMatchingStyle) return false;
     }
 
-    const dancerStyleIds = dancer.danceStyles.map((ds) => ds.danceStyle._id.toString());
-    return dancerStyleIds.some((id) => userDanceStyles.includes(id));
+    // Teachers filter
+    if (showOnlyTeachers && !dancer.isTeacher) {
+      return false;
+    }
+
+    return true;
   });
 
-  // Reset to page 1 when filter changes
-  const toggleFilter = () => {
-    setShowMyStyles(!showMyStyles);
+  // Reset to page 1 when any filter changes
+  const handleFilterChange = () => {
+    setCurrentPage(1);
+  };
+
+  // Clear all filters
+  const clearAllFilters = () => {
+    setShowMyStyles(false);
+    setShowOnlyTeachers(false);
     setCurrentPage(1);
   };
 
@@ -58,14 +93,18 @@ export default function DancersFilter({
 
   return (
     <div>
-      {/* Filter Toggle */}
-      {userDanceStyles && userDanceStyles.length > 0 && (
-        <div className="mb-6">
+      {/* Filters Section */}
+      <div className="mb-6 space-y-4">
+        {/* Dance Styles Filter */}
+        {userDanceStyles && userDanceStyles.length > 0 && (
           <label className="flex items-center gap-3 cursor-pointer">
             <input
               type="checkbox"
               checked={showMyStyles}
-              onChange={toggleFilter}
+              onChange={() => {
+                setShowMyStyles(!showMyStyles);
+                handleFilterChange();
+              }}
               className="toggle toggle-primary"
             />
             <div className="flex items-center gap-2">
@@ -73,77 +112,56 @@ export default function DancersFilter({
               <span className="font-medium">{t('filters.showMyDancers')}</span>
             </div>
           </label>
-          
-          {showMyStyles && (
-            <div className="text-sm text-base-content/60 mt-2">
-              {t('filters.found')} {filteredDancers.length} {t('filters.of')} {dancers.length} {t('filters.dancers')}
-            </div>
-          )}
-        </div>
-      )}
+        )}
 
-      {/* Dancers Grid */}
+        {/* Teachers Filter */}
+        <label className="flex items-center gap-3 cursor-pointer">
+          <input
+            type="checkbox"
+            checked={showOnlyTeachers}
+            onChange={() => {
+              setShowOnlyTeachers(!showOnlyTeachers);
+              handleFilterChange();
+            }}
+            className="toggle toggle-primary"
+          />
+          <div className="flex items-center gap-2">
+            <span className="text-lg">🎓</span>
+            <span className="font-medium">Teachers Only</span>
+          </div>
+        </label>
+
+        {/* Results Count */}
+        {(showMyStyles || showOnlyTeachers) && (
+          <div className="text-sm text-base-content/60">
+            {t('filters.found')} <span className="font-bold text-primary">{filteredDancers.length}</span> {t('filters.of')} {dancers.length} {t('filters.dancers')}
+          </div>
+        )}
+      </div>
+
+      {/* Dancers Grid - Using DancerCard for better UI */}
       {filteredDancers.length > 0 ? (
         <>
-        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 mb-6">
-          {paginatedDancers.map((dancer) => (
-            <Link
-              key={dancer._id}
-              href={`/dancer/${dancer._id}`}
-              className="group"
-            >
-              <div className="card bg-base-100 shadow-sm hover:shadow-md transition-all duration-200 group-hover:scale-105">
-                <div className="card-body p-3">
-                  <div className="flex flex-col items-center text-center">
-                    <div className="avatar mb-2">
-                      <div className="w-12 h-12 rounded-full">
-                        {dancer.image ? (
-                          <img
-                            src={dancer.image}
-                            alt={dancer.name}
-                            className="w-full h-full object-cover rounded-full"
-                          />
-                        ) : (
-                          <div className="bg-primary text-primary-content rounded-full w-full h-full flex items-center justify-center">
-                            <span className="text-sm">
-                              {dancer.name?.charAt(0)?.toUpperCase() || "?"}
-                            </span>
-                          </div>
-                        )}
-                      </div>
-                    </div>
-                    <h3 className="font-medium text-sm truncate w-full">
-                      {dancer.name}
-                    </h3>
-                    {dancer.username && (
-                      <p className="text-xs text-base-content/60 truncate w-full">
-                        @{dancer.username}
-                      </p>
-                    )}
-                    {dancer.danceStyles && dancer.danceStyles.length > 0 && (
-                      <div className="flex flex-wrap gap-1 mt-1 justify-center">
-                        {dancer.danceStyles
-                          .slice(0, 2)
-                          .map((ds, index) => (
-                            <span
-                              key={index}
-                              className="badge badge-xs badge-outline"
-                            >
-                              {ds.danceStyle?.name}
-                            </span>
-                          ))}
-                        {dancer.danceStyles.length > 2 && (
-                          <span className="badge badge-xs badge-outline">
-                            +{dancer.danceStyles.length - 2}
-                          </span>
-                        )}
-                      </div>
-                    )}
-                  </div>
-                </div>
-              </div>
-            </Link>
-          ))}
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6 mb-6">
+          {paginatedDancers.map((dancer) => {
+            // Transform dancer data to include danceStylesPopulated
+            const transformedDancer = {
+              ...dancer,
+              danceStylesPopulated: dancer.danceStyles.map(ds => ({
+                name: ds.danceStyle.name,
+                _id: ds.danceStyle._id,
+              })),
+            };
+            
+            return (
+              <DancerCard
+                key={dancer._id}
+                dancer={transformedDancer as any}
+                showLikeButton={true}
+                showFlag={true}
+              />
+            );
+          })}
         </div>
 
         {/* Pagination Controls */}
@@ -202,7 +220,7 @@ export default function DancersFilter({
             No dancers in {locationName} match your dance styles
           </p>
           <button
-            onClick={toggleFilter}
+            onClick={clearAllFilters}
             className="btn btn-outline btn-sm mt-4"
           >
             Show All Dancers

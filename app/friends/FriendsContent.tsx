@@ -10,12 +10,14 @@ import {
   FaEye,
 } from "react-icons/fa";
 import Link from "next/link";
+import { useTranslation } from "@/components/I18nProvider";
 
 interface FriendsContentProps {
   userData: any;
 }
 
 export default function FriendsContent({ userData }: FriendsContentProps) {
+  const { t } = useTranslation();
   const [activeTab, setActiveTab] = useState("requests");
   const [loading, setLoading] = useState<string | null>(null);
 
@@ -53,9 +55,9 @@ export default function FriendsContent({ userData }: FriendsContentProps) {
       (now.getTime() - sentDate.getTime()) / (1000 * 60)
     );
 
-    if (diffInMinutes < 60) return `${diffInMinutes}m ago`;
-    if (diffInMinutes < 1440) return `${Math.floor(diffInMinutes / 60)}h ago`;
-    return `${Math.floor(diffInMinutes / 1440)}d ago`;
+    if (diffInMinutes < 60) return `${diffInMinutes}m ${t('friends.ago')}`;
+    if (diffInMinutes < 1440) return `${Math.floor(diffInMinutes / 60)}h ${t('friends.ago')}`;
+    return `${Math.floor(diffInMinutes / 1440)}d ${t('friends.ago')}`;
   };
 
   const renderUserCard = (
@@ -124,7 +126,7 @@ export default function FriendsContent({ userData }: FriendsContentProps) {
           className={`tab ${activeTab === "requests" ? "tab-active" : ""}`}
           onClick={() => setActiveTab("requests")}
         >
-          <span className="hidden sm:inline">📥 Requests</span>
+          <span className="hidden sm:inline">📥 {t('friends.requests')}</span>
           <span className="sm:hidden">📥</span>
           <span className="ml-1">
             ({userData.friendRequestsReceived?.length || 0})
@@ -134,7 +136,7 @@ export default function FriendsContent({ userData }: FriendsContentProps) {
           className={`tab ${activeTab === "friends" ? "tab-active" : ""}`}
           onClick={() => setActiveTab("friends")}
         >
-          <span className="hidden sm:inline">👥 Friends</span>
+          <span className="hidden sm:inline">👥 {t('friends.friends')}</span>
           <span className="sm:hidden">👥</span>
           <span className="ml-1">({userData.friends?.length || 0})</span>
         </button>
@@ -142,7 +144,7 @@ export default function FriendsContent({ userData }: FriendsContentProps) {
           className={`tab ${activeTab === "sent" ? "tab-active" : ""}`}
           onClick={() => setActiveTab("sent")}
         >
-          <span className="hidden sm:inline">📤 Sent</span>
+          <span className="hidden sm:inline">📤 {t('friends.sent')}</span>
           <span className="sm:hidden">📤</span>
           <span className="ml-1">
             ({userData.friendRequestsSent?.length || 0})
@@ -152,7 +154,7 @@ export default function FriendsContent({ userData }: FriendsContentProps) {
           className={`tab ${activeTab === "likes" ? "tab-active" : ""}`}
           onClick={() => setActiveTab("likes")}
         >
-          <span className="hidden sm:inline">❤️ Likes</span>
+          <span className="hidden sm:inline">❤️ {t('friends.likes')}</span>
           <span className="sm:hidden">❤️</span>
           <span className="ml-1">({userData.likedBy?.length || 0})</span>
         </button>
@@ -163,12 +165,12 @@ export default function FriendsContent({ userData }: FriendsContentProps) {
         {activeTab === "requests" && (
           <div>
             <h2 className="text-2xl font-bold mb-4">
-              Incoming Friend Requests
+              {t('friends.incomingFriendRequests')}
             </h2>
             {userData.friendRequestsReceived?.length === 0 ? (
               <div className="text-center py-8 text-base-content/60">
                 <FaUserPlus className="mx-auto text-4xl mb-4 opacity-50" />
-                <p>No pending friend requests</p>
+                <p>{t('friends.noPendingRequests')}</p>
               </div>
             ) : (
               <div className="grid gap-4">
@@ -205,13 +207,13 @@ export default function FriendsContent({ userData }: FriendsContentProps) {
 
         {activeTab === "friends" && (
           <div>
-            <h2 className="text-2xl font-bold mb-4">Your Dance Friends</h2>
+            <h2 className="text-2xl font-bold mb-4">{t('friends.yourDanceFriends')}</h2>
             {userData.friends?.length === 0 ? (
               <div className="text-center py-8 text-base-content/60">
                 <FaUserPlus className="mx-auto text-4xl mb-4 opacity-50" />
-                <p>No friends yet. Start connecting with dancers!</p>
+                <p>{t('friends.noFriendsYet')}</p>
                 <Link href="/" className="btn btn-primary btn-sm mt-4">
-                  Discover Dancers
+                  {t('friends.discoverDancers')}
                 </Link>
               </div>
             ) : (
@@ -223,7 +225,7 @@ export default function FriendsContent({ userData }: FriendsContentProps) {
                       href={`/dancer/${friend._id}`}
                       className="btn btn-primary btn-sm"
                     >
-                      <FaEye /> View Profile
+                      <FaEye /> {t('friends.viewProfile')}
                     </Link>
                   )
                 )}
@@ -234,11 +236,11 @@ export default function FriendsContent({ userData }: FriendsContentProps) {
 
         {activeTab === "sent" && (
           <div>
-            <h2 className="text-2xl font-bold mb-4">Sent Friend Requests</h2>
+            <h2 className="text-2xl font-bold mb-4">{t('friends.sentFriendRequests')}</h2>
             {userData.friendRequestsSent?.length === 0 ? (
               <div className="text-center py-8 text-base-content/60">
                 <FaUserPlus className="mx-auto text-4xl mb-4 opacity-50" />
-                <p>No pending sent requests</p>
+                <p>{t('friends.noPendingSent')}</p>
               </div>
             ) : (
               <div className="grid gap-4">
@@ -252,7 +254,7 @@ export default function FriendsContent({ userData }: FriendsContentProps) {
                       disabled={loading === request.user._id}
                       className="btn btn-outline btn-sm"
                     >
-                      <FaUserMinus /> Cancel
+                      <FaUserMinus /> {t('friends.cancel')}
                     </button>,
                     request.sentAt
                   )
@@ -265,12 +267,12 @@ export default function FriendsContent({ userData }: FriendsContentProps) {
         {activeTab === "likes" && (
           <div>
             <h2 className="text-2xl font-bold mb-4">
-              People Who Liked Your Profile
+              {t('friends.peopleWhoLiked')}
             </h2>
             {userData.likedBy?.length === 0 ? (
               <div className="text-center py-8 text-base-content/60">
                 <FaHeart className="mx-auto text-4xl mb-4 opacity-50" />
-                <p>No likes yet. Share your profile to get more likes!</p>
+                <p>{t('friends.noLikesYet')}</p>
               </div>
             ) : (
               <div className="grid gap-4">
@@ -281,7 +283,7 @@ export default function FriendsContent({ userData }: FriendsContentProps) {
                       href={`/dancer/${user._id}`}
                       className="btn btn-secondary btn-sm"
                     >
-                      <FaEye /> View Profile
+                      <FaEye /> {t('friends.viewProfile')}
                     </Link>
                   )
                 )}

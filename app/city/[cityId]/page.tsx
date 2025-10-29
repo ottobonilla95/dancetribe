@@ -99,7 +99,7 @@ export default async function CityPage({ params, searchParams }: Props) {
     city: cityObjectId,
     isProfileComplete: true,
   })
-    .select("name username image danceStyles")
+    .select("name username image danceStyles dateOfBirth hideAge nationality dancingStartYear danceRole socialMedia likedBy openToMeetTravelers lookingForPracticePartners isTeacher isDJ isPhotographer jackAndJillCompetitions")
     .populate({
       path: "danceStyles.danceStyle",
       model: DanceStyle,

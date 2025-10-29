@@ -2,6 +2,7 @@
 
 import { FaEnvelope, FaInstagram, FaTimes } from "react-icons/fa";
 import config from "@/config";
+import { useTranslation } from "@/components/I18nProvider";
 
 interface SupportModalProps {
   isOpen: boolean;
@@ -9,6 +10,7 @@ interface SupportModalProps {
 }
 
 export default function SupportModal({ isOpen, onClose }: SupportModalProps) {
+  const { t } = useTranslation();
   const supportEmail = config.resend.supportEmail;
   const instagramHandle = config.social?.instagram;
 
@@ -43,9 +45,9 @@ export default function SupportModal({ isOpen, onClose }: SupportModalProps) {
           {/* Header */}
           <div className="flex items-center justify-between">
             <div>
-              <h2 className="text-2xl font-bold">Need Help?</h2>
+              <h2 className="text-2xl font-bold">{t('support.needHelp')}</h2>
               <p className="text-sm text-base-content/60 mt-1">
-                Choose how you&apos;d like to contact us
+                {t('support.chooseContact')}
               </p>
             </div>
             <button
@@ -68,7 +70,7 @@ export default function SupportModal({ isOpen, onClose }: SupportModalProps) {
                   <FaEnvelope className="text-xl text-primary" />
                 </div>
                 <div className="text-left">
-                  <div className="font-semibold">Email Support</div>
+                  <div className="font-semibold">{t('support.emailSupport')}</div>
                   <div className="text-xs text-base-content/60">{supportEmail}</div>
                 </div>
               </button>
@@ -83,7 +85,7 @@ export default function SupportModal({ isOpen, onClose }: SupportModalProps) {
                   <FaInstagram className="text-xl text-secondary" />
                 </div>
                 <div className="text-left">
-                  <div className="font-semibold">Instagram DM</div>
+                  <div className="font-semibold">{t('support.instagramDM')}</div>
                   <div className="text-xs text-base-content/60">@{instagramHandle}</div>
                 </div>
               </button>
@@ -93,7 +95,7 @@ export default function SupportModal({ isOpen, onClose }: SupportModalProps) {
           {/* Footer */}
           <div className="pt-4 border-t border-base-300">
             <p className="text-xs text-base-content/60 text-center">
-              We typically respond within 24 hours
+              {t('support.responseTime')}
             </p>
           </div>
         </div>
