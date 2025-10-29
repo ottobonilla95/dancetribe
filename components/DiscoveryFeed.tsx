@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect, useCallback } from "react";
+import { useSearchParams } from "next/navigation";
 import { User } from "@/types/user";
 import { DanceStyle } from "@/types/dance-style";
 import DancerCard from "./DancerCard";
@@ -13,26 +14,64 @@ interface DiscoveryFeedProps {
   danceStyles?: DanceStyle[];
   showViewAllLink?: boolean;
   isPreview?: boolean; // Hide filters when showing as a preview on dashboard
+  initialFilter?: 'nearMe' | 'country' | 'worldwide'; // Initial filter from URL
 }
 
-export default function DiscoveryFeed({ initialDancers = [], danceStyles = [], showViewAllLink = false, isPreview = false }: DiscoveryFeedProps) {
+export default function DiscoveryFeed({ initialDancers = [], danceStyles = [], showViewAllLink = false, isPreview = false, initialFilter }: DiscoveryFeedProps) {
   const { t } = useTranslation();
+  const searchParams = useSearchParams();
+  
+  // Read URL params for state restoration
+  const urlView = searchParams.get('view') as 'list' | 'map' | null;
+  const urlFilter = searchParams.get('filter') as 'nearMe' | 'country' | 'worldwide' | null;
+  const urlLimit = searchParams.get('limit');
+  
   const [dancers, setDancers] = useState(initialDancers);
   const [loading, setLoading] = useState(false);
   const [loadingMore, setLoadingMore] = useState(false);
   const [hasMore, setHasMore] = useState(true);
   const [total, setTotal] = useState(0);
-  const [viewMode, setViewMode] = useState<'list' | 'map'>('list');
-  const [filters, setFilters] = useState({
-    danceStyle: "",
-    danceRole: "",
-    city: "",
-    nearMe: true, // Default to showing local dancers first
-    inMyCountry: false,
-  });
+  const [viewMode, setViewMode] = useState<'list' | 'map'>(urlView || 'list');
+  const [loadedCount, setLoadedCount] = useState(initialDancers.length);
+  
+  // Set initial filter based on URL parameter or default to nearMe
+  const getInitialFilters = () => {
+    const filterParam = urlFilter || initialFilter;
+    if (filterParam === 'country') {
+      return { danceStyle: "", danceRole: "", city: "", nearMe: false, inMyCountry: true };
+    } else if (filterParam === 'worldwide') {
+      return { danceStyle: "", danceRole: "", city: "", nearMe: false, inMyCountry: false };
+    }
+    return { danceStyle: "", danceRole: "", city: "", nearMe: true, inMyCountry: false };
+  };
+  
+  const [filters, setFilters] = useState(getInitialFilters());
   const [showFilters, setShowFilters] = useState(false);
+  
+  // Update URL when state changes (only on full page, not preview)
+  const updateURL = useCallback((newFilters: typeof filters, newViewMode: 'list' | 'map', limit?: number) => {
+    if (isPreview) return; // Don't update URL in preview mode
+    
+    const params = new URLSearchParams();
+    
+    // Add filter param
+    const filterParam = newFilters.nearMe ? 'nearMe' : newFilters.inMyCountry ? 'country' : 'worldwide';
+    params.set('filter', filterParam);
+    
+    // Add view mode
+    params.set('view', newViewMode);
+    
+    // Add limit (how many loaded) for list view
+    if (newViewMode === 'list' && limit && limit > 16) {
+      params.set('limit', limit.toString());
+    }
+    
+    // Update URL without navigation (preserves history)
+    const newUrl = `/discover?${params.toString()}`;
+    window.history.replaceState({ ...window.history.state, as: newUrl, url: newUrl }, '', newUrl);
+  }, [isPreview]);
 
-  const fetchDancers = useCallback(async (skip = 0, append = false) => {
+  const fetchDancers = useCallback(async (skip = 0, append = false, targetLimit?: number) => {
     if (append) {
       setLoadingMore(true);
     } else {
@@ -51,6 +90,10 @@ export default function DiscoveryFeed({ initialDancers = [], danceStyles = [], s
       if (viewMode === 'map' && !append) {
         params.append("limit", "1000"); // Get all (max 1000)
         params.append("skip", "0");
+      } else if (targetLimit) {
+        // Restore state: load up to target limit
+        params.append("limit", targetLimit.toString());
+        params.append("skip", "0");
       } else {
         params.append("skip", skip.toString());
       }
@@ -60,9 +103,12 @@ export default function DiscoveryFeed({ initialDancers = [], danceStyles = [], s
         const data = await response.json();
         
         if (append) {
-          setDancers((prev) => [...prev, ...(data.dancers || [])]);
+          const newDancers = [...dancers, ...(data.dancers || [])];
+          setDancers(newDancers);
+          setLoadedCount(newDancers.length);
         } else {
           setDancers(data.dancers || []);
+          setLoadedCount((data.dancers || []).length);
         }
         setHasMore(data.hasMore || false);
         setTotal(data.total || 0);
@@ -73,17 +119,31 @@ export default function DiscoveryFeed({ initialDancers = [], danceStyles = [], s
       setLoading(false);
       setLoadingMore(false);
     }
-  }, [filters, viewMode]);
+  }, [filters, viewMode, dancers]);
 
   const loadMore = () => {
     fetchDancers(dancers.length, true);
   };
 
   useEffect(() => {
-    // Fetch data when filters OR viewMode changes
-    // (viewMode change triggers re-fetch to load all dancers for map)
-    fetchDancers(0, false);
-  }, [fetchDancers]);
+    // On mount or filter/view change: restore state from URL if available
+    const targetLimit = urlLimit ? parseInt(urlLimit) : undefined;
+    
+    if (targetLimit && targetLimit > 16) {
+      // Restore pagination state
+      fetchDancers(0, false, targetLimit);
+    } else {
+      // Normal fetch
+      fetchDancers(0, false);
+    }
+  }, [filters, viewMode]); // eslint-disable-line react-hooks/exhaustive-deps
+  
+  // Update URL whenever relevant state changes (not on initial mount)
+  useEffect(() => {
+    if (dancers.length > 0 && !loading) {
+      updateURL(filters, viewMode, loadedCount);
+    }
+  }, [filters, viewMode, loadedCount]); // eslint-disable-line react-hooks/exhaustive-deps
 
   const clearFilters = () => {
     setFilters({ danceStyle: "", danceRole: "", city: "", nearMe: false, inMyCountry: false });
@@ -107,7 +167,10 @@ export default function DiscoveryFeed({ initialDancers = [], danceStyles = [], s
             {!isPreview && (
               <div className="btn-group">
                 <button
-                  onClick={() => setViewMode('list')}
+                  onClick={() => {
+                    setViewMode('list');
+                    updateURL(filters, 'list', loadedCount);
+                  }}
                   className={`btn btn-sm gap-1 ${viewMode === 'list' ? 'btn-active' : 'btn-outline'}`}
                   title="List View"
                 >
@@ -115,7 +178,10 @@ export default function DiscoveryFeed({ initialDancers = [], danceStyles = [], s
                   <span>List</span>
                 </button>
                 <button
-                  onClick={() => setViewMode('map')}
+                  onClick={() => {
+                    setViewMode('map');
+                    updateURL(filters, 'map');
+                  }}
                   className={`btn btn-sm gap-1 ${viewMode === 'map' ? 'btn-active' : 'btn-outline'}`}
                   title="Map View"
                 >
@@ -126,7 +192,7 @@ export default function DiscoveryFeed({ initialDancers = [], danceStyles = [], s
             )}
             {showViewAllLink && (
               <a
-                href="/discover"
+                href={`/discover?filter=${filters.nearMe ? 'nearMe' : filters.inMyCountry ? 'country' : 'worldwide'}`}
                 className="btn btn-primary btn-sm gap-2 hidden sm:flex"
               >
                 {t('discovery.viewAll')}
@@ -149,19 +215,31 @@ export default function DiscoveryFeed({ initialDancers = [], danceStyles = [], s
         {/* Location Toggle Buttons - Always show */}
         <div className="flex gap-2 flex-wrap">
           <button
-            onClick={() => setFilters({...filters, nearMe: true, inMyCountry: false})}
+            onClick={() => {
+              const newFilters = {...filters, nearMe: true, inMyCountry: false};
+              setFilters(newFilters);
+              updateURL(newFilters, viewMode, 16); // Reset to default pagination
+            }}
             className={`btn btn-sm ${filters.nearMe ? 'btn-primary' : 'btn-outline'}`}
           >
             📍 {t('discovery.nearMe')}
           </button>
           <button
-            onClick={() => setFilters({...filters, nearMe: false, inMyCountry: true})}
+            onClick={() => {
+              const newFilters = {...filters, nearMe: false, inMyCountry: true};
+              setFilters(newFilters);
+              updateURL(newFilters, viewMode, 16); // Reset to default pagination
+            }}
             className={`btn btn-sm ${filters.inMyCountry ? 'btn-primary' : 'btn-outline'}`}
           >
             🏳️ {t('discovery.myCountry')}
           </button>
           <button
-            onClick={() => setFilters({...filters, nearMe: false, inMyCountry: false})}
+            onClick={() => {
+              const newFilters = {...filters, nearMe: false, inMyCountry: false};
+              setFilters(newFilters);
+              updateURL(newFilters, viewMode, 16); // Reset to default pagination
+            }}
             className={`btn btn-sm ${(!filters.nearMe && !filters.inMyCountry) ? 'btn-primary' : 'btn-outline'}`}
           >
             🌍 {t('discovery.worldwide')}
@@ -346,7 +424,7 @@ export default function DiscoveryFeed({ initialDancers = [], danceStyles = [], s
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
               <div className="flex justify-center mt-6">
                 <a
-                  href="/discover"
+                  href={`/discover?filter=${filters.nearMe ? 'nearMe' : filters.inMyCountry ? 'country' : 'worldwide'}`}
                   className="btn btn-outline btn-sm md:btn-md"
                 >
                   {t('dashboard.viewAllDancers')}

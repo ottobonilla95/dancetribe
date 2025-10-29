@@ -97,7 +97,11 @@ async function getDanceStyles(): Promise<DanceStyleType[]> {
   }
 }
 
-export default async function DiscoverPage() {
+export default async function DiscoverPage({
+  searchParams,
+}: {
+  searchParams: { filter?: string };
+}) {
   const session = await getServerSession(authOptions);
 
   if (!session) {
@@ -109,12 +113,19 @@ export default async function DiscoverPage() {
     getDanceStyles(),
   ]);
 
+  // Parse filter from URL: 'nearMe', 'country', or 'worldwide'
+  const initialFilter = 
+    searchParams.filter === 'country' ? 'country' :
+    searchParams.filter === 'worldwide' ? 'worldwide' :
+    'nearMe'; // Default
+
   return (
     <div className="min-h-screen bg-base-100 py-8">
       {/* Discovery Feed with Filters */}
       <DiscoveryFeed 
         initialDancers={initialDancers} 
         danceStyles={danceStyles}
+        initialFilter={initialFilter as 'nearMe' | 'country' | 'worldwide'}
       />
     </div>
   );

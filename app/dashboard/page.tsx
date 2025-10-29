@@ -16,6 +16,7 @@ import StatsPreview from "@/components/StatsPreview";
 import TrendyMusicPreview from "@/components/TrendyMusicPreview";
 import FriendsTripsPreview from "@/components/FriendsTripsPreview";
 import TrendyCountries from "@/components/TrendyCountries";
+import TripOverlaps from "@/components/TripOverlaps";
 import Link from "next/link";
 import { getMessages, getTranslation } from "@/lib/i18n";
 import { unstable_cache } from "next/cache";
@@ -440,6 +441,151 @@ const getTrendingSongs = unstable_cache(
   { revalidate: 300, tags: ["trending-songs"] } // 5 minutes cache for safety
 );
 
+// Helper to check if two date ranges overlap
+function datesOverlap(
+  start1: Date,
+  end1: Date,
+  start2: Date,
+  end2: Date
+): boolean {
+  return start1 <= end2 && start2 <= end1;
+}
+
+async function getTripOverlaps(userId: string) {
+  try {
+    await connectMongo();
+
+    // Get current user with their trips and friends
+    const user: any = await User.findById(userId)
+      .select("trips friends")
+      .populate({
+        path: "trips.city",
+        model: City,
+        select: "name image",
+        populate: {
+          path: "country",
+          model: Country,
+          select: "name code",
+        },
+      })
+      .lean();
+
+    if (!user || !user.friends || user.friends.length === 0) {
+      return [];
+    }
+
+    // Get friends with their trips
+    const friends: any[] = await User.find({
+      _id: { $in: user.friends },
+      "trips.0": { $exists: true },
+    })
+      .select("name image username trips")
+      .populate({
+        path: "trips.city",
+        model: City,
+        select: "name image",
+        populate: {
+          path: "country",
+          model: Country,
+          select: "name code",
+        },
+      })
+      .lean();
+
+    // Find overlapping trips
+    const overlaps: any[] = [];
+    const now = new Date();
+
+    // Only consider user's future trips
+    const userUpcomingTrips = user.trips?.filter(
+      (trip: any) => new Date(trip.endDate) >= now
+    ) || [];
+
+    userUpcomingTrips.forEach((userTrip: any) => {
+      friends.forEach((friend) => {
+        friend.trips?.forEach((friendTrip: any) => {
+          // Check if it's the same city
+          if (
+            userTrip.city._id.toString() === friendTrip.city._id.toString()
+          ) {
+            // Check if dates overlap
+            if (
+              datesOverlap(
+                new Date(userTrip.startDate),
+                new Date(userTrip.endDate),
+                new Date(friendTrip.startDate),
+                new Date(friendTrip.endDate)
+              )
+            ) {
+              // Calculate overlap period
+              const overlapStart = new Date(
+                Math.max(
+                  new Date(userTrip.startDate).getTime(),
+                  new Date(friendTrip.startDate).getTime()
+                )
+              );
+              const overlapEnd = new Date(
+                Math.min(
+                  new Date(userTrip.endDate).getTime(),
+                  new Date(friendTrip.endDate).getTime()
+                )
+              );
+
+              // Calculate days overlapping
+              const overlapDays =
+                Math.floor(
+                  (overlapEnd.getTime() - overlapStart.getTime()) /
+                    (1000 * 60 * 60 * 24)
+                ) + 1;
+
+              overlaps.push({
+                _id: `${userTrip._id}-${friendTrip._id}`,
+                city: {
+                  _id: userTrip.city._id.toString(),
+                  name: userTrip.city.name,
+                  image: userTrip.city.image,
+                  country: userTrip.city.country,
+                },
+                friend: {
+                  _id: friend._id.toString(),
+                  name: friend.name,
+                  username: friend.username,
+                  image: friend.image,
+                },
+                yourTrip: {
+                  startDate: userTrip.startDate,
+                  endDate: userTrip.endDate,
+                },
+                friendTrip: {
+                  startDate: friendTrip.startDate,
+                  endDate: friendTrip.endDate,
+                },
+                overlap: {
+                  startDate: overlapStart,
+                  endDate: overlapEnd,
+                  days: overlapDays,
+                },
+              });
+            }
+          }
+        });
+      });
+    });
+
+    // Sort by overlap start date (soonest first)
+    overlaps.sort(
+      (a, b) =>
+        new Date(a.overlap.startDate).getTime() -
+        new Date(b.overlap.startDate).getTime()
+    );
+
+    return overlaps;
+  } catch (error) {
+    console.error("Error finding trip overlaps:", error);
+    return [];
+  }
+}
+
 async function getFriendsTrips(userId: string) {
   try {
     await connectMongo();
@@ -712,6 +858,7 @@ export default async function Dashboard() {
     communityStats,
     trendingSongs,
     trendyCountries,
+    tripOverlaps,
     friendsTrips,
   ] = await Promise.all([
     getInitialDancers(session.user.id),
@@ -721,6 +868,7 @@ export default async function Dashboard() {
     getCommunityStats(),
     getTrendingSongs(),
     getTrendyCountries(),
+    getTripOverlaps(session.user.id),
     getFriendsTrips(session.user.id),
   ]);
 
@@ -737,6 +885,9 @@ export default async function Dashboard() {
             {t("dashboard.viewAllCities")}
           </Link>
         </div>
+
+        {/* Trip Overlaps - Meetup Opportunities */}
+        <TripOverlaps overlaps={tripOverlaps} />
 
         {/* Friends' Trips Preview */}
         {friendsTrips.length > 0 && (

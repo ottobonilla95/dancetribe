@@ -243,6 +243,16 @@
     "active": "active",
     "noTrendyCountries": "No trending countries at the moment."
   },
+  "trips": {
+    "meetUpOpportunities": "Meetup Opportunities!",
+    "youAndFriendsSamePlace": "You and your friends will be in the same city!",
+    "youAnd": "You and",
+    "overlap": "Overlap",
+    "yourTrip": "Your trip",
+    "trip": "trip",
+    "viewCity": "View City",
+    "viewProfile": "View Profile"
+  },
   "profile": {
     "myProfile": "My Profile",
     "yourDanceJourney": "Your dance journey details",
@@ -488,7 +498,9 @@
     "mostPopular": "Most Popular",
     "mostDancers": "Most Dancers",
     "popularStyles": "Popular styles",
-    "noCitiesAvailable": "No cities available at the moment"
+    "noCitiesAvailable": "No cities available at the moment",
+    "day": "day",
+    "days": "days"
   },
   "dancer": {
     "wantToConnect": "Want to connect with {name}?",
