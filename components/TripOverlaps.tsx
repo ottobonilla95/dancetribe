@@ -80,8 +80,8 @@ export default function TripOverlaps({ overlaps = [], isPreview = false }: TripO
     <section className="mt-12">
       <div className="flex items-center justify-between mb-6">
         <div>
-          <h2 className="text-2xl font-bold flex items-center gap-2">
-            <span className="text-3xl">🎉</span>
+          <h2 className="text-xl font-bold flex items-center gap-2">
+            <span className="text-xl">🎉</span>
             {t('trips.meetUpOpportunities') || 'Meetup Opportunities!'}
             {overlaps.length > 0 && (
               <span className="badge badge-primary badge-lg">{overlaps.length}</span>

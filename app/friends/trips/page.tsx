@@ -1,8 +1,10 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { useSearchParams } from "next/navigation";
 import Link from "next/link";
 import { FaPlane, FaCalendar, FaMapMarkerAlt, FaArrowLeft } from "react-icons/fa";
+import TripOverlaps from "@/components/TripOverlaps";
 
 interface FriendTrip {
   _id: string;
@@ -25,15 +27,40 @@ interface FriendTrip {
   };
 }
 
+interface TripOverlap {
+  _id: string;
+  city: any;
+  friend: any;
+  yourTrip: any;
+  friendTrip: any;
+  overlap: any;
+}
+
 export default function FriendsTripsPage() {
+  const searchParams = useSearchParams();
+  const filterParam = searchParams.get('filter');
+  
   const [trips, setTrips] = useState<FriendTrip[]>([]);
+  const [overlaps, setOverlaps] = useState<TripOverlap[]>([]);
   const [isLoading, setIsLoading] = useState(true);
+  const [activeFilter, setActiveFilter] = useState<'all' | 'overlaps'>(
+    filterParam === 'overlaps' ? 'overlaps' : 'all'
+  );
 
   useEffect(() => {
-    fetchTrips();
-  }, []);
+    if (activeFilter === 'overlaps') {
+      fetchOverlaps();
+    } else {
+      fetchTrips();
+      // Also fetch overlaps count for badge (without loading spinner)
+      if (overlaps.length === 0) {
+        fetchOverlaps(false);
+      }
+    }
+  }, [activeFilter]); // eslint-disable-line react-hooks/exhaustive-deps
 
   const fetchTrips = async () => {
+    setIsLoading(true);
     try {
       const res = await fetch("/api/friends/trips");
       if (res.ok) {
@@ -44,6 +71,21 @@ export default function FriendsTripsPage() {
       console.error("Error fetching friends' trips:", error);
     } finally {
       setIsLoading(false);
+    }
+  };
+
+  const fetchOverlaps = async (showLoading = true) => {
+    if (showLoading) setIsLoading(true);
+    try {
+      const res = await fetch("/api/friends/overlaps");
+      if (res.ok) {
+        const data = await res.json();
+        setOverlaps(data.overlaps || []);
+      }
+    } catch (error) {
+      console.error("Error fetching overlaps:", error);
+    } finally {
+      if (showLoading) setIsLoading(false);
     }
   };
 
@@ -94,24 +136,59 @@ export default function FriendsTripsPage() {
           </Link>
           
           <h1 className="text-4xl font-bold mb-2 bg-gradient-to-r from-purple-600 via-pink-500 to-orange-400 bg-clip-text text-transparent">
-            Friends&apos; Upcoming Trips ✈️
+            {activeFilter === 'overlaps' ? '🎉 Meetup Opportunities' : "Friends' Upcoming Trips ✈️"}
           </h1>
           <p className="text-base-content/70">
-            See where your dance friends are traveling and plan to meet up!
+            {activeFilter === 'overlaps' 
+              ? 'You and your friends will be in the same city!'
+              : 'See where your dance friends are traveling and plan to meet up!'}
           </p>
+
+          {/* Filter Tabs */}
+          <div className="tabs tabs-boxed mt-4 bg-base-200">
+            <button
+              className={`tab ${activeFilter === 'all' ? 'tab-active' : ''}`}
+              onClick={() => setActiveFilter('all')}
+            >
+              All Trips
+            </button>
+            <button
+              className={`tab ${activeFilter === 'overlaps' ? 'tab-active' : ''}`}
+              onClick={() => setActiveFilter('overlaps')}
+            >
+              🎉 Meetup Opportunities
+              {overlaps.length > 0 && activeFilter !== 'overlaps' && (
+                <span className="badge badge-primary badge-sm ml-2">{overlaps.length}</span>
+              )}
+            </button>
+          </div>
         </div>
 
-        {/* Loading State */}
-        {isLoading && (
-          <div className="space-y-4">
-            {[1, 2, 3, 4, 5].map((i) => (
-              <div key={i} className="skeleton h-32 w-full"></div>
-            ))}
-          </div>
-        )}
+        {/* Show Overlaps or Trips based on active filter */}
+        {activeFilter === 'overlaps' ? (
+          <>
+            {isLoading && (
+              <div className="space-y-4">
+                {[1, 2, 3].map((i) => (
+                  <div key={i} className="skeleton h-32 w-full"></div>
+                ))}
+              </div>
+            )}
+            {!isLoading && <TripOverlaps overlaps={overlaps} isPreview={false} />}
+          </>
+        ) : (
+          <>
+            {/* Loading State */}
+            {isLoading && (
+              <div className="space-y-4">
+                {[1, 2, 3, 4, 5].map((i) => (
+                  <div key={i} className="skeleton h-32 w-full"></div>
+                ))}
+              </div>
+            )}
 
-        {/* Empty State */}
-        {!isLoading && trips.length === 0 && (
+            {/* Empty State */}
+            {!isLoading && trips.length === 0 && (
           <div className="card bg-base-200 shadow-xl">
             <div className="card-body text-center py-16">
               <FaPlane className="mx-auto text-6xl mb-4 text-base-content/30" />
@@ -129,10 +206,10 @@ export default function FriendsTripsPage() {
               </div>
             </div>
           </div>
-        )}
+            )}
 
-        {/* Trips List */}
-        {!isLoading && trips.length > 0 && (
+            {/* Trips List */}
+            {!isLoading && trips.length > 0 && (
           <div className="space-y-4">
             {trips.map((trip) => (
               <div key={trip._id} className="card bg-base-200 shadow-lg hover:shadow-xl transition-shadow">
@@ -229,6 +306,8 @@ export default function FriendsTripsPage() {
               </div>
             ))}
           </div>
+            )}
+          </>
         )}
       </div>
     </div>

@@ -88,15 +88,20 @@ export default function DiscoveryFeed({ initialDancers = [], danceStyles = [], s
       
       // 🗺️ For map view, load ALL dancers (no pagination)
       if (viewMode === 'map' && !append) {
+        console.log('📍 MAP VIEW: Setting limit to 1000');
         params.append("limit", "1000"); // Get all (max 1000)
         params.append("skip", "0");
       } else if (targetLimit) {
         // Restore state: load up to target limit
+        console.log('📄 Restoring pagination:', targetLimit);
         params.append("limit", targetLimit.toString());
         params.append("skip", "0");
       } else {
+        console.log('📄 Normal pagination, skip:', skip);
         params.append("skip", skip.toString());
       }
+      
+      console.log('🔍 Fetch URL:', `/api/dancers/discover?${params.toString()}`);
 
       const response = await fetch(`/api/dancers/discover?${params.toString()}`);
       if (response.ok) {
@@ -125,15 +130,20 @@ export default function DiscoveryFeed({ initialDancers = [], danceStyles = [], s
     fetchDancers(dancers.length, true);
   };
 
+  // Fetch dancers when filters or viewMode change
   useEffect(() => {
     // On mount or filter/view change: restore state from URL if available
     const targetLimit = urlLimit ? parseInt(urlLimit) : undefined;
     
-    if (targetLimit && targetLimit > 16) {
-      // Restore pagination state
+    if (viewMode === 'map') {
+      // Map view: fetch ALL dancers (up to 1000)
+      console.log('🗺️ Fetching all dancers for map view...');
+      fetchDancers(0, false);
+    } else if (targetLimit && targetLimit > 16) {
+      // List view: Restore pagination state
       fetchDancers(0, false, targetLimit);
     } else {
-      // Normal fetch
+      // List view: Normal fetch (16 dancers)
       fetchDancers(0, false);
     }
   }, [filters, viewMode]); // eslint-disable-line react-hooks/exhaustive-deps
@@ -169,7 +179,6 @@ export default function DiscoveryFeed({ initialDancers = [], danceStyles = [], s
                 <button
                   onClick={() => {
                     setViewMode('list');
-                    updateURL(filters, 'list', loadedCount);
                   }}
                   className={`btn btn-sm gap-1 ${viewMode === 'list' ? 'btn-active' : 'btn-outline'}`}
                   title="List View"
@@ -180,7 +189,6 @@ export default function DiscoveryFeed({ initialDancers = [], danceStyles = [], s
                 <button
                   onClick={() => {
                     setViewMode('map');
-                    updateURL(filters, 'map');
                   }}
                   className={`btn btn-sm gap-1 ${viewMode === 'map' ? 'btn-active' : 'btn-outline'}`}
                   title="Map View"
