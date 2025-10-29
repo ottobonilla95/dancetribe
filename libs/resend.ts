@@ -13,15 +13,17 @@ export const sendEmail = async ({
   text,
   html,
   replyTo,
+  from,
 }: {
   to: string | string[];
   subject: string;
   text: string;
   html: string;
   replyTo?: string | string[];
+  from?: string;
 }) => {
   const { data, error } = await resend.emails.send({
-    from: config.resend.fromAdmin,
+    from: from || config.resend.fromAdmin,
     to,
     subject,
     text,

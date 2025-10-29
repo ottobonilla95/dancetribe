@@ -58,6 +58,7 @@ export async function POST(req: Request) {
       subject: emailContent.subject,
       text: emailContent.text,
       html: emailContent.html,
+      from: config.resend.fromNoReply,
     });
 
     return NextResponse.json({
@@ -96,8 +97,6 @@ function inviteUserEmail(email: string, signInUrl: string) {
             .button { display: inline-block; background: #667eea; color: white !important; padding: 16px 40px; text-decoration: none; border-radius: 8px; margin-top: 20px; font-weight: bold; font-size: 16px; }
             .button:hover { background: #5568d3; }
             .footer { text-align: center; padding: 20px; color: #666; font-size: 12px; }
-            .feature { display: inline-block; margin: 10px 20px; text-align: center; }
-            .emoji { font-size: 32px; margin-bottom: 10px; }
           </style>
         </head>
         <body>
@@ -111,25 +110,6 @@ function inviteUserEmail(email: string, signInUrl: string) {
                 <p style="font-size: 16px; color: #666; margin: 20px 0;">
                   You've been invited to join <strong>${config.appName}</strong>, the global platform 
                   connecting dancers worldwide.
-                </p>
-                
-                <div style="margin: 30px 0;">
-                  <div class="feature">
-                    <div class="emoji">🌍</div>
-                    <div style="font-size: 14px; color: #666;">Connect Globally</div>
-                  </div>
-                  <div class="feature">
-                    <div class="emoji">🗺️</div>
-                    <div style="font-size: 14px; color: #666;">Find Dance Partners</div>
-                  </div>
-                  <div class="feature">
-                    <div class="emoji">✈️</div>
-                    <div style="font-size: 14px; color: #666;">Plan Dance Trips</div>
-                  </div>
-                </div>
-
-                <p style="font-size: 16px; color: #666; margin: 20px 0;">
-                  Click the button below to sign in and complete your profile:
                 </p>
                 
                 <a href="${signInUrl}" class="button">Sign In & Get Started</a>
