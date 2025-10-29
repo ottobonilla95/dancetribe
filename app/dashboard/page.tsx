@@ -18,6 +18,7 @@ import FriendsTripsPreview from "@/components/FriendsTripsPreview";
 import TrendyCountries from "@/components/TrendyCountries";
 import Link from "next/link";
 import { getMessages, getTranslation } from "@/lib/i18n";
+import { unstable_cache } from "next/cache";
 
 export const dynamic = "force-dynamic";
 
@@ -90,90 +91,100 @@ async function getInitialDancers(currentUserId: string) {
   }
 }
 
-async function getDanceStyles(): Promise<DanceStyleType[]> {
-  try {
-    await connectMongo();
+// Cached: Dance styles rarely change
+const getDanceStyles = unstable_cache(
+  async (): Promise<DanceStyleType[]> => {
+    try {
+      await connectMongo();
 
-    const danceStyles = await DanceStyle.find({ isActive: true })
-      .sort({ name: 1 })
-      .lean();
+      const danceStyles = await DanceStyle.find({ isActive: true })
+        .sort({ name: 1 })
+        .lean();
 
-    return danceStyles.map((style: any) => ({
-      ...style,
-      _id: style._id.toString(),
-      id: style._id.toString(),
-    }));
-  } catch (error) {
-    console.error("Error fetching dance styles:", error);
-    return [];
-  }
-}
+      return danceStyles.map((style: any) => ({
+        ...style,
+        _id: style._id.toString(),
+        id: style._id.toString(),
+      }));
+    } catch (error) {
+      console.error("Error fetching dance styles:", error);
+      return [];
+    }
+  },
+  ["dance-styles"],
+  { revalidate: 3600, tags: ["dance-styles"] } // 1 hour cache
+);
 
-async function getHotDanceStyles(): Promise<
-  (DanceStyleType & { userCount: number })[]
-> {
-  try {
-    await connectMongo();
+// Cached: Hot styles change when users update their profiles
+const getHotDanceStyles = unstable_cache(
+  async (): Promise<(DanceStyleType & { userCount: number })[]> => {
+    try {
+      await connectMongo();
 
-    // Aggregate to count users per dance style
-    const hotStyles = await User.aggregate([
-      // Only count users with complete profiles
-      { $match: { isProfileComplete: true } },
-      // Unwind the danceStyles array to get individual style documents
-      { $unwind: "$danceStyles" },
-      // Group by dance style and count users
-      {
-        $group: {
-          _id: "$danceStyles.danceStyle",
-          userCount: { $sum: 1 },
+      // Aggregate to count users per dance style
+      const hotStyles = await User.aggregate([
+        // Only count users with complete profiles
+        { $match: { isProfileComplete: true } },
+        // Unwind the danceStyles array to get individual style documents
+        { $unwind: "$danceStyles" },
+        // Group by dance style and count users
+        {
+          $group: {
+            _id: "$danceStyles.danceStyle",
+            userCount: { $sum: 1 },
+          },
         },
-      },
-      // Sort by user count (most popular first)
-      { $sort: { userCount: -1 } },
-      // Limit to top 4
-      { $limit: 4 },
-      // Lookup dance style details
-      {
-        $lookup: {
-          from: "dancestyles",
-          localField: "_id",
-          foreignField: "_id",
-          as: "styleDetails",
+        // Sort by user count (most popular first)
+        { $sort: { userCount: -1 } },
+        // Limit to top 4
+        { $limit: 4 },
+        // Lookup dance style details
+        {
+          $lookup: {
+            from: "dancestyles",
+            localField: "_id",
+            foreignField: "_id",
+            as: "styleDetails",
+          },
         },
-      },
-      // Unwind style details
-      { $unwind: "$styleDetails" },
-      // Only include active styles
-      { $match: { "styleDetails.isActive": true } },
-      // Project final structure
-      {
-        $project: {
-          _id: "$styleDetails._id",
-          name: "$styleDetails.name",
-          category: "$styleDetails.category",
-          isActive: "$styleDetails.isActive",
-          userCount: 1,
+        // Unwind style details
+        { $unwind: "$styleDetails" },
+        // Only include active styles
+        { $match: { "styleDetails.isActive": true } },
+        // Project final structure
+        {
+          $project: {
+            _id: "$styleDetails._id",
+            name: "$styleDetails.name",
+            category: "$styleDetails.category",
+            isActive: "$styleDetails.isActive",
+            userCount: 1,
+          },
         },
-      },
-    ]);
+      ]);
 
-    return hotStyles.map((style: any) => ({
-      ...style,
-      _id: style._id.toString(),
-      id: style._id.toString(),
-    }));
-  } catch (error) {
-    console.error("Error fetching hot dance styles:", error);
-    return [];
-  }
-}
+      return hotStyles.map((style: any) => ({
+        ...style,
+        _id: style._id.toString(),
+        id: style._id.toString(),
+      }));
+    } catch (error) {
+      console.error("Error fetching hot dance styles:", error);
+      return [];
+    }
+  },
+  ["hot-dance-styles"],
+  { revalidate: 900, tags: ["hot-dance-styles"] } // 15 minutes cache
+);
 
-async function getCommunityStats() {
-  try {
-    await connectMongo();
+// Cached: Community stats are expensive aggregations that change slowly
+const getCommunityStats = unstable_cache(
+  async () => {
+    try {
+      await connectMongo();
 
-    // Get total dancers
-    const totalDancers = await User.countDocuments({ isProfileComplete: true });
+      // Get total dancers
+      const totalDancers = await User.countDocuments({ isProfileComplete: true });
 
     // Get unique countries count
     const countries = await User.aggregate([
@@ -324,7 +335,10 @@ async function getCommunityStats() {
       countryData: [],
     };
   }
-}
+},
+["community-stats"],
+{ revalidate: 600, tags: ["community-stats"] } // 10 minutes cache
+);
 
 // Extract Spotify track ID from URL
 function extractSpotifyTrackId(url: string): string | null {
@@ -354,49 +368,54 @@ function detectPlatform(url: string): "spotify" | "youtube" | null {
   return null;
 }
 
-async function getTrendingSongs() {
-  try {
-    await connectMongo();
+// Cached: Trending songs change when users update their anthems
+const getTrendingSongs = unstable_cache(
+  async () => {
+    try {
+      await connectMongo();
 
-    // Get all users with anthem URLs
-    const users = await User.find({
-      "anthem.url": { $exists: true, $ne: "" },
-    })
-      .select("anthem")
-      .lean();
-
-    // Count occurrences of each song
-    const songCounts: { [key: string]: number } = {};
-    users.forEach((user: any) => {
-      if (user.anthem?.url) {
-        songCounts[user.anthem.url] = (songCounts[user.anthem.url] || 0) + 1;
-      }
-    });
-
-    // Convert to array and sort by count
-    const trendingSongs = Object.entries(songCounts)
-      .map(([url, count]) => {
-        const platform = detectPlatform(url);
-        return {
-          url,
-          count,
-          platform,
-          spotifyTrackId:
-            platform === "spotify" ? extractSpotifyTrackId(url) : null,
-          youtubeVideoId:
-            platform === "youtube" ? extractYouTubeVideoId(url) : null,
-        };
+      // Get all users with anthem URLs
+      const users = await User.find({
+        "anthem.url": { $exists: true, $ne: "" },
       })
-      .filter((song) => song.spotifyTrackId || song.youtubeVideoId) // Only valid URLs
-      .sort((a, b) => b.count - a.count)
-      .slice(0, 10); // Top 10
+        .select("anthem")
+        .lean();
 
-    return trendingSongs;
-  } catch (error) {
-    console.error("Error fetching trending songs:", error);
-    return [];
-  }
-}
+      // Count occurrences of each song
+      const songCounts: { [key: string]: number } = {};
+      users.forEach((user: any) => {
+        if (user.anthem?.url) {
+          songCounts[user.anthem.url] = (songCounts[user.anthem.url] || 0) + 1;
+        }
+      });
+
+      // Convert to array and sort by count
+      const trendingSongs = Object.entries(songCounts)
+        .map(([url, count]) => {
+          const platform = detectPlatform(url);
+          return {
+            url,
+            count,
+            platform,
+            spotifyTrackId:
+              platform === "spotify" ? extractSpotifyTrackId(url) : null,
+            youtubeVideoId:
+              platform === "youtube" ? extractYouTubeVideoId(url) : null,
+          };
+        })
+        .filter((song) => song.spotifyTrackId || song.youtubeVideoId) // Only valid URLs
+        .sort((a, b) => b.count - a.count)
+        .slice(0, 10); // Top 10
+
+      return trendingSongs;
+    } catch (error) {
+      console.error("Error fetching trending songs:", error);
+      return [];
+    }
+  },
+  ["trending-songs"],
+  { revalidate: 900, tags: ["trending-songs"] } // 15 minutes cache
+);
 
 async function getFriendsTrips(userId: string) {
   try {
@@ -473,12 +492,14 @@ async function getFriendsTrips(userId: string) {
   }
 }
 
-async function getTrendyCountries() {
-  try {
-    await connectMongo();
+// Cached: Trendy countries - expensive aggregation
+const getTrendyCountries = unstable_cache(
+  async () => {
+    try {
+      await connectMongo();
 
-    // Calculate everything in real-time for accuracy
-    const trendyCountries = await Country.aggregate([
+      // Calculate everything in real-time for accuracy
+      const trendyCountries = await Country.aggregate([
       // Get all active countries
       { $match: { isActive: true } },
       // Lookup ALL users in each country
@@ -583,32 +604,40 @@ async function getTrendyCountries() {
     console.error("Error fetching trendy countries:", error);
     return [];
   }
-}
+},
+["trendy-countries"],
+{ revalidate: 600, tags: ["trendy-countries"] } // 10 minutes cache
+);
 
-async function getCities(): Promise<CityType[]> {
-  console.log("🚀 getCities FUNCTION CALLED");
-  try {
-    await connectMongo();
+// Cached: Cities list changes when dancer counts change
+const getCities = unstable_cache(
+  async (): Promise<CityType[]> => {
+    console.log("🚀 getCities FUNCTION CALLED");
+    try {
+      await connectMongo();
 
-    const cities = await City.find({ totalDancers: { $gt: 0 } })
-      .populate({ path: "country", model: Country, select: "name code" })
-      .populate({ path: "continent", model: Continent, select: "name" })
-      .sort({ totalDancers: -1 })
-      .limit(6) // Reduced to show fewer cities since we have the discovery feed
-      .lean();
+      const cities = await City.find({ totalDancers: { $gt: 0 } })
+        .populate({ path: "country", model: Country, select: "name code" })
+        .populate({ path: "continent", model: Continent, select: "name" })
+        .sort({ totalDancers: -1 })
+        .limit(6) // Reduced to show fewer cities since we have the discovery feed
+        .lean();
 
-    const result = cities.map((doc: any) => ({
-      ...doc,
-      _id: doc._id.toString(),
-      country: { name: doc.country?.name || "", code: doc.country?.code || "" },
-      continent: { name: doc.continent?.name || "" },
-    }));
+      const result = cities.map((doc: any) => ({
+        ...doc,
+        _id: doc._id.toString(),
+        country: { name: doc.country?.name || "", code: doc.country?.code || "" },
+        continent: { name: doc.continent?.name || "" },
+      }));
 
-    return result;
-  } catch (error) {
-    return [];
-  }
-}
+      return result;
+    } catch (error) {
+      return [];
+    }
+  },
+  ["hot-cities"],
+  { revalidate: 300, tags: ["hot-cities"] } // 5 minutes cache
+);
 
 // This is a private page: It's protected by the layout.js component which ensures the user is authenticated.
 // It's a server compoment which means you can fetch data (like the user profile) before the page is rendered.
