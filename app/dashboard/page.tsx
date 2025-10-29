@@ -101,18 +101,25 @@ const getDanceStyles = unstable_cache(
         .sort({ name: 1 })
         .lean();
 
-      return danceStyles.map((style: any) => ({
+      const result = danceStyles.map((style: any) => ({
         ...style,
         _id: style._id.toString(),
         id: style._id.toString(),
       }));
+
+      // Log warning if empty - but still cache it (will revalidate and fix itself)
+      if (result.length === 0) {
+        console.warn("⚠️ getDanceStyles returned empty - check database");
+      }
+
+      return result;
     } catch (error) {
       console.error("Error fetching dance styles:", error);
       return [];
     }
   },
   ["dance-styles"],
-  { revalidate: 3600, tags: ["dance-styles"] } // 1 hour cache
+  { revalidate: 60, tags: ["dance-styles"] } // Reduced to 1 minute for safety
 );
 
 // Cached: Hot styles change when users update their profiles
@@ -163,18 +170,24 @@ const getHotDanceStyles = unstable_cache(
         },
       ]);
 
-      return hotStyles.map((style: any) => ({
+      const result = hotStyles.map((style: any) => ({
         ...style,
         _id: style._id.toString(),
         id: style._id.toString(),
       }));
+
+      if (result.length === 0) {
+        console.warn("⚠️ getHotDanceStyles returned empty - check database");
+      }
+
+      return result;
     } catch (error) {
       console.error("Error fetching hot dance styles:", error);
       return [];
     }
   },
   ["hot-dance-styles"],
-  { revalidate: 900, tags: ["hot-dance-styles"] } // 15 minutes cache
+  { revalidate: 300, tags: ["hot-dance-styles"] } // Reduced to 5 minutes for safety
 );
 
 // Cached: Community stats are expensive aggregations that change slowly
@@ -312,7 +325,7 @@ const getCommunityStats = unstable_cache(
       { $sort: { dancerCount: -1 } },
     ]);
 
-    return {
+    const stats = {
       totalDancers,
       totalCountries: countries[0]?.totalCountries || 0,
       totalCities: cities[0]?.totalCities || 0,
@@ -324,6 +337,12 @@ const getCommunityStats = unstable_cache(
       leaderFollowerRatio: roleData,
       countryData: countryBreakdown,
     };
+
+    if (stats.totalDancers === 0) {
+      console.warn("⚠️ getCommunityStats returned 0 dancers - check database");
+    }
+
+    return stats;
   } catch (error) {
     console.error("Error fetching community stats:", error);
     return {
@@ -336,8 +355,8 @@ const getCommunityStats = unstable_cache(
     };
   }
 },
-["community-stats"],
-{ revalidate: 600, tags: ["community-stats"] } // 10 minutes cache
+  ["community-stats"],
+{ revalidate: 120, tags: ["community-stats"] } // 2 minutes cache for safety
 );
 
 // Extract Spotify track ID from URL
@@ -407,6 +426,10 @@ const getTrendingSongs = unstable_cache(
         .sort((a, b) => b.count - a.count)
         .slice(0, 10); // Top 10
 
+      if (trendingSongs.length === 0) {
+        console.warn("⚠️ getTrendingSongs returned empty - users may not have anthems set");
+      }
+
       return trendingSongs;
     } catch (error) {
       console.error("Error fetching trending songs:", error);
@@ -414,7 +437,7 @@ const getTrendingSongs = unstable_cache(
     }
   },
   ["trending-songs"],
-  { revalidate: 900, tags: ["trending-songs"] } // 15 minutes cache
+  { revalidate: 300, tags: ["trending-songs"] } // 5 minutes cache for safety
 );
 
 async function getFriendsTrips(userId: string) {
@@ -590,7 +613,7 @@ const getTrendyCountries = unstable_cache(
       },
     ]);
 
-    return trendyCountries.map((country: any) => ({
+    const result = trendyCountries.map((country: any) => ({
       ...country,
       _id: country._id.toString(),
       continent: country.continent
@@ -600,13 +623,19 @@ const getTrendyCountries = unstable_cache(
           }
         : null,
     }));
+
+    if (result.length === 0) {
+      console.warn("⚠️ getTrendyCountries returned empty - check database");
+    }
+
+    return result;
   } catch (error) {
     console.error("Error fetching trendy countries:", error);
     return [];
   }
 },
 ["trendy-countries"],
-{ revalidate: 600, tags: ["trendy-countries"] } // 10 minutes cache
+{ revalidate: 120, tags: ["trendy-countries"] } // 2 minutes cache for safety
 );
 
 // Cached: Cities list changes when dancer counts change
@@ -630,13 +659,18 @@ const getCities = unstable_cache(
         continent: { name: doc.continent?.name || "" },
       }));
 
+      if (result.length === 0) {
+        console.warn("⚠️ getCities returned empty - check database");
+      }
+
       return result;
     } catch (error) {
+      console.error("Error fetching cities:", error);
       return [];
     }
   },
   ["hot-cities"],
-  { revalidate: 300, tags: ["hot-cities"] } // 5 minutes cache
+  { revalidate: 60, tags: ["hot-cities"] } // Reduced to 1 minute for safety
 );
 
 // This is a private page: It's protected by the layout.js component which ensures the user is authenticated.
