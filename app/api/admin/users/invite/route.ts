@@ -2,9 +2,11 @@ import { NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/libs/next-auth";
 import connectMongo from "@/libs/mongoose";
+import clientPromise from "@/libs/mongo";
 import User from "@/models/User";
 import config from "@/config";
 import { sendEmail } from "@/libs/resend";
+import crypto from "crypto";
 
 // POST: Create new user and send invite email
 export async function POST(req: Request) {
@@ -41,14 +43,31 @@ export async function POST(req: Request) {
       );
     }
 
-    // Create new user with minimal data
-    const newUser = await User.create({
-      email: email.toLowerCase(),
-      hasAccess: false,
+    // Don't create the user yet - NextAuth will do it automatically on sign-in
+    // This matches how normal email sign-in works
+    
+    // Generate verification token (same as NextAuth does for magic links)
+    const token = crypto.randomBytes(32).toString("hex");
+    const expires = new Date();
+    expires.setHours(expires.getHours() + 24); // Token valid for 24 hours
+
+    // Hash the token before storing (NextAuth uses SHA-256)
+    const hashedToken = crypto
+      .createHash("sha256")
+      .update(token)
+      .digest("hex");
+
+    // Store verification token in database (NextAuth's verification_tokens collection)
+    const client = await clientPromise;
+    const db = client.db();
+    await db.collection("verification_tokens").insertOne({
+      identifier: email.toLowerCase(),
+      token: hashedToken,
+      expires: expires,
     });
 
-    // Generate sign-in URL (magic link)
-    const signInUrl = `https://${config.domainName}/api/auth/signin?email=${encodeURIComponent(email)}`;
+    // Generate magic link URL (same format as NextAuth email provider)
+    const signInUrl = `https://${config.domainName}/api/auth/callback/email?token=${token}&email=${encodeURIComponent(email)}`;
 
     // Send invite email
     const emailContent = inviteUserEmail(email, signInUrl);
@@ -63,11 +82,8 @@ export async function POST(req: Request) {
 
     return NextResponse.json({
       success: true,
-      message: "User created and invite email sent",
-      user: {
-        _id: newUser._id,
-        email: newUser.email,
-      },
+      message: "Invite email sent",
+      email: email.toLowerCase(),
     });
   } catch (error) {
     console.error("Error inviting user:", error);
