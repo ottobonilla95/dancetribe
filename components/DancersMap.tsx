@@ -40,7 +40,7 @@ export default function DancersMap({
   const [showScrollHint, setShowScrollHint] = useState(false);
   const [isFullscreen, setIsFullscreen] = useState(false);
   const [isMobile, setIsMobile] = useState(false);
-  const hintTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+  const hintTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   // Detect mobile on mount
   useEffect(() => {

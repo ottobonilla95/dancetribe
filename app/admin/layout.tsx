@@ -3,7 +3,7 @@ import { getServerSession } from "next-auth";
 import { authOptions } from "@/libs/next-auth";
 import config from "@/config";
 import Link from "next/link";
-import { FaCog, FaDatabase, FaChartLine, FaUsers } from "react-icons/fa";
+import { FaDatabase, FaChartLine, FaUsers } from "react-icons/fa";
 
 export default async function AdminLayout({
   children,

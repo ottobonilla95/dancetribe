@@ -11,13 +11,14 @@ import SearchBar from "./SearchBar";
 import logo from "@/app/icon.png";
 import config from "@/config";
 import { useFriendRequestCount } from "@/contexts/FriendRequestContext";
-import { FaUser, FaUserFriends, FaCog, FaSignOutAlt, FaHome, FaUserPlus, FaMusic, FaSearch, FaPlane } from "react-icons/fa";
+import { FaUser, FaUserFriends, FaCog, FaSignOutAlt, FaHome, FaUserPlus, FaMusic, FaSearch, FaPlane, FaShieldAlt } from "react-icons/fa";
 import { signOut } from "next-auth/react";
 import { CONTACT } from "@/constants/contact";
 import InstallAppButton from "./InstallAppButton";
 import SupportModal from "./SupportModal";
 import LanguageSwitcher from "./LanguageSwitcher";
 import { useTranslation } from "./I18nProvider";
+import DeleteAccountButton from "./DeleteAccountButton";
 
 const links: {
   href: string;
@@ -50,6 +51,9 @@ const Header = () => {
 
 
 
+  // Check if user is admin
+  const isAdmin = session?.user?.email === config.admin.email;
+
   const loggedInNavItems = [
     { href: "/dashboard", label: t('nav.dashboard'), icon: FaHome },
     { href: "/discover", label: t('nav.discoverDancers'), icon: FaUserPlus },
@@ -63,6 +67,8 @@ const Header = () => {
     },
     { href: "/music", label: t('nav.trendyMusic'), icon: FaMusic },
     { href: "/invite", label: t('nav.inviteFriends'), icon: FaUserPlus, highlight: true },
+    // Admin link - only visible to admin
+    ...(isAdmin ? [{ href: "/admin", label: "Admin", icon: FaShieldAlt, highlight: true }] : []),
   ];
 
   const handleSignOut = () => {
@@ -237,6 +243,12 @@ const Header = () => {
                   )}
                   <li><hr /></li>
                   <li>
+                    <div className="px-2 py-1">
+                      <DeleteAccountButton />
+                    </div>
+                  </li>
+                  <li><hr /></li>
+                  <li>
                     <button onClick={handleSignOut} className="flex items-center gap-2 text-error">
                       <FaSignOutAlt />
                       {t('nav.signOut')}
@@ -385,6 +397,13 @@ const Header = () => {
                     </button>
                   </div>
                 )}
+
+                <div className="divider"></div>
+                
+                {/* Delete Account */}
+                <div className="py-2">
+                  <DeleteAccountButton />
+                </div>
 
                 <div className="divider"></div>
                 

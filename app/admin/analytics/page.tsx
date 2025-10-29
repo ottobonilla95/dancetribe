@@ -18,7 +18,7 @@ export default function AnalyticsPage() {
           <FaChartLine className="text-6xl text-base-content/20 mb-4" />
           <h2 className="card-title text-2xl mb-2">Analytics Dashboard</h2>
           <p className="text-base-content/60 max-w-md">
-            This feature is coming soon. You'll be able to view user growth, 
+            This feature is coming soon. You&apos;ll be able to view user growth, 
             engagement metrics, popular cities, and more.
           </p>
         </div>

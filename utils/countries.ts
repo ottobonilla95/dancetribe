@@ -7,7 +7,7 @@ export const getCountryCode = (countryName: string): string => {
     "South Korea": "kr", "Netherlands": "nl", "Sweden": "se", "Norway": "no",
     "Denmark": "dk", "Finland": "fi", "Poland": "pl", "Turkey": "tr",
     "South Africa": "za", "Argentina": "ar", "Chile": "cl", "Colombia": "co",
-    "Peru": "pe", "Venezuela": "ve", "Ecuador": "ec", "Bolivia": "bo",
+    "Costa Rica": "cr", "Peru": "pe", "Venezuela": "ve", "Ecuador": "ec", "Bolivia": "bo",
     "Uruguay": "uy", "Paraguay": "py", "Ireland": "ie", "Portugal": "pt",
     "Greece": "gr", "Austria": "at", "Switzerland": "ch", "Belgium": "be",
     "Czech Republic": "cz", "Hungary": "hu", "Romania": "ro", "Bulgaria": "bg",
@@ -29,7 +29,17 @@ export const getCountryCode = (countryName: string): string => {
     "Albania": "al", "Armenia": "am", "Azerbaijan": "az", "Belarus": "by",
     "Bosnia and Herzegovina": "ba", "Georgia": "ge", "Kazakhstan": "kz",
     "Kyrgyzstan": "kg", "Moldova": "md", "Montenegro": "me", "North Macedonia": "mk",
-    "Tajikistan": "tj", "Turkmenistan": "tm", "Uzbekistan": "uz"
+    "Tajikistan": "tj", "Turkmenistan": "tm", "Uzbekistan": "uz",
+    // Central America & Caribbean (common in dance community)
+    "Cuba": "cu", "Dominican Republic": "do", "El Salvador": "sv", "Guatemala": "gt",
+    "Haiti": "ht", "Honduras": "hn", "Jamaica": "jm", "Nicaragua": "ni", "Panama": "pa",
+    "Trinidad and Tobago": "tt", "Belize": "bz", "Bahamas": "bs", "Barbados": "bb",
+    // Other common countries
+    "Iceland": "is", "Luxembourg": "lu", "Malta": "mt", "Cyprus": "cy",
+    "Taiwan": "tw", "Sri Lanka": "lk", "Nepal": "np", "Mongolia": "mn",
+    "South Sudan": "ss", "Mozambique": "mz", "Zambia": "zm", "Zimbabwe": "zw",
+    "Namibia": "na", "Botswana": "bw", "Angola": "ao", "Cameroon": "cm",
+    "Ivory Coast": "ci", "Benin": "bj", "Togo": "tg", "Gabon": "ga"
   };
   
   return countryMap[countryName] || countryName.toLowerCase().replace(/\s+/g, '').slice(0, 2);
