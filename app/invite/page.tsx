@@ -5,6 +5,7 @@ import InviteFriends from "@/components/InviteFriends";
 import BackButton from "@/components/BackButton";
 import connectMongo from "@/libs/mongoose";
 import User from "@/models/User";
+import { getMessages, getTranslation } from "@/lib/i18n";
 
 export const metadata = {
   title: "Invite Friends | DanceCircle",
@@ -13,6 +14,10 @@ export const metadata = {
 };
 
 export default async function InvitePage() {
+  // Get translations
+  const messages = await getMessages();
+  const t = (key: string) => getTranslation(messages, key);
+
   // Session is already validated in layout
   const session = await getServerSession(authOptions);
 
@@ -32,7 +37,7 @@ export default async function InvitePage() {
       <div className="max-w-3xl mx-auto">
         {/* Back Button */}
         <div className="mb-6">
-          <BackButton label="Back" href="/dashboard" />
+          <BackButton label={t('invitePage.back')} href="/dashboard" />
         </div>
 
         {/* Main Content */}
@@ -44,23 +49,20 @@ export default async function InvitePage() {
           <div className="card bg-gradient-to-br from-purple-500/20 to-pink-500/20 border-2 border-purple-500/30">
             <div className="card-body">
               <h3 className="card-title justify-center text-2xl mb-2">
-                🌍 Building Something Special
+                🌍 {t('invitePage.buildingSomethingSpecial')}
               </h3>
               <p className="text-base-content/80 mb-4">
-                Imagine a world where any dancer can land in ANY city and
-                instantly connect with the local dance scene. Where language and
-                borders don&apos;t matter because dance is our universal
-                language. That&apos;s what we&apos;re building together! 🔥
+                {t('invitePage.imagineWorld')} 🔥
               </p>
               <div className="flex flex-wrap gap-2 justify-center text-sm">
                 <div className="badge badge-lg badge-primary gap-2">
-                  🕺 Connect Globally
+                  🕺 {t('invitePage.connectGlobally')}
                 </div>
                 <div className="badge badge-lg badge-secondary gap-2">
-                  🌎 Dance Locally
+                  🌎 {t('invitePage.danceLocally')}
                 </div>
                 <div className="badge badge-lg badge-accent gap-2">
-                  💃 Unite Dancers
+                  💃 {t('invitePage.uniteDancers')}
                 </div>
               </div>
             </div>
@@ -71,27 +73,27 @@ export default async function InvitePage() {
             <div className="card bg-base-200">
               <div className="card-body items-center text-center">
                 <div className="text-4xl mb-2">💬</div>
-                <h4 className="font-bold">Share Daily</h4>
+                <h4 className="font-bold">{t('invitePage.shareDaily')}</h4>
                 <p className="text-sm text-base-content/70">
-                  Post about DanceCircle in your dance groups
+                  {t('invitePage.postAbout')}
                 </p>
               </div>
             </div>
             <div className="card bg-base-200">
               <div className="card-body items-center text-center">
                 <div className="text-4xl mb-2">🎪</div>
-                <h4 className="font-bold">Invite In Person</h4>
+                <h4 className="font-bold">{t('invitePage.inviteInPerson')}</h4>
                 <p className="text-sm text-base-content/70">
-                  Tell dancers you meet at events & socials
+                  {t('invitePage.tellDancers')}
                 </p>
               </div>
             </div>
             <div className="card bg-base-200">
               <div className="card-body items-center text-center">
                 <div className="text-4xl mb-2">📱</div>
-                <h4 className="font-bold">Share Your Profile</h4>
+                <h4 className="font-bold">{t('invitePage.shareYourProfile')}</h4>
                 <p className="text-sm text-base-content/70">
-                  Post your profile card to Instagram Stories
+                  {t('invitePage.postProfileCard')}
                 </p>
               </div>
             </div>
