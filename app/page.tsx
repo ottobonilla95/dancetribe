@@ -20,14 +20,16 @@ import TrendyMusicPreview from "@/components/TrendyMusicPreview";
 import DancersMap from "@/components/DancersMap";
 import AnimatedCounter from "@/components/AnimatedCounter";
 import { getMessages, getTranslation } from "@/lib/i18n";
+import { unstable_cache } from "next/cache";
 
-export const revalidate = 300; // Cache for 5 minutes
+// Note: Using data-level caching via unstable_cache instead of page-level revalidate
+// This gives us more granular control over cache times per data source
 
-async function getHotDanceStyles(): Promise<
-  (DanceStyleType & { userCount: number })[]
-> {
-  try {
-    await connectMongo();
+// Cached: Hot dance styles - expensive aggregation
+const getHotDanceStyles = unstable_cache(
+  async (): Promise<(DanceStyleType & { userCount: number })[]> => {
+    try {
+      await connectMongo();
 
     // Aggregate to count users per dance style
     const hotStyles = await User.aggregate([
@@ -80,8 +82,14 @@ async function getHotDanceStyles(): Promise<
     console.error("Error fetching hot dance styles:", error);
     return [];
   }
-}
-async function getCities(): Promise<CityType[]> {
+},
+["landing-hot-dance-styles"],
+{ revalidate: 900, tags: ["landing-hot-dance-styles"] } // 15 minutes
+);
+
+// Cached: Cities for landing page
+const getCities = unstable_cache(
+  async (): Promise<CityType[]> => {
   console.log("🚀 getCities FUNCTION CALLED");
   try {
     await connectMongo();
@@ -104,7 +112,10 @@ async function getCities(): Promise<CityType[]> {
   } catch (error) {
     return [];
   }
-}
+},
+["landing-hot-cities"],
+{ revalidate: 300, tags: ["landing-hot-cities"] } // 5 minutes
+);
 
 // Extract Spotify track ID from URL
 function extractSpotifyTrackId(url: string): string | null {
@@ -134,9 +145,11 @@ function detectPlatform(url: string): 'spotify' | 'youtube' | null {
   return null;
 }
 
-async function getTrendingSongs() {
-  try {
-    await connectMongo();
+// Cached: Trending songs
+const getTrendingSongs = unstable_cache(
+  async () => {
+    try {
+      await connectMongo();
 
     // Get all users with anthem URLs
     const users = await User.find({ 
@@ -174,9 +187,14 @@ async function getTrendingSongs() {
     console.error("Error fetching trending songs:", error);
     return [];
   }
-}
+},
+["landing-trending-songs"],
+{ revalidate: 900, tags: ["landing-trending-songs"] } // 15 minutes
+);
 
-async function getFeaturedUsers() {
+// Cached: Featured users for hero section
+const getFeaturedUsers = unstable_cache(
+  async () => {
   try {
     await connectMongo();
 
@@ -203,9 +221,14 @@ async function getFeaturedUsers() {
     console.error("Error fetching featured users:", error);
     return [];
   }
-}
+},
+["landing-featured-users"],
+{ revalidate: 600, tags: ["landing-featured-users"] } // 10 minutes
+);
 
-async function getRecentDancers() {
+// Cached: Recent dancers for landing page
+const getRecentDancers = unstable_cache(
+  async () => {
   try {
     await connectMongo();
 
@@ -265,9 +288,14 @@ async function getRecentDancers() {
     console.error("Error fetching recent dancers:", error);
     return [];
   }
-}
+},
+["landing-recent-dancers"],
+{ revalidate: 300, tags: ["landing-recent-dancers"] } // 5 minutes
+);
 
-async function getCommunityMapData() {
+// Cached: Community map data - most expensive query
+const getCommunityMapData = unstable_cache(
+  async () => {
   try {
     await connectMongo();
 
@@ -318,7 +346,10 @@ async function getCommunityMapData() {
       totalCities: 0,
     };
   }
-}
+},
+["landing-community-map"],
+{ revalidate: 600, tags: ["landing-community-map"] } // 10 minutes - expensive query
+);
 
 export default async function Home() {
   // Check if user is logged in and redirect to dashboard
