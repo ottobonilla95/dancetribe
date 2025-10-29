@@ -4,11 +4,12 @@ import { authOptions } from "@/libs/next-auth";
 import config from "@/config";
 import Link from "next/link";
 import { FaDatabase, FaChartLine, FaUsers } from "react-icons/fa";
+import { ReactNode } from "react";
 
 export default async function AdminLayout({
   children,
 }: {
-  children: React.ReactNode;
+  children: ReactNode;
 }) {
   const session = await getServerSession(authOptions);
 
