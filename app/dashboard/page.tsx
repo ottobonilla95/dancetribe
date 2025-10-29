@@ -887,7 +887,7 @@ export default async function Dashboard() {
         </div>
 
         {/* Trip Overlaps - Meetup Opportunities */}
-        <TripOverlaps overlaps={tripOverlaps} />
+        <TripOverlaps overlaps={tripOverlaps} isPreview={true} />
 
         {/* Friends' Trips Preview */}
         {friendsTrips.length > 0 && (

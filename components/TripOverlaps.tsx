@@ -38,10 +38,15 @@ interface TripOverlap {
 
 interface TripOverlapsProps {
   overlaps: TripOverlap[];
+  isPreview?: boolean; // If true, show only first 3 with "View All" link
 }
 
-export default function TripOverlaps({ overlaps = [] }: TripOverlapsProps) {
+export default function TripOverlaps({ overlaps = [], isPreview = false }: TripOverlapsProps) {
   const { t } = useTranslation();
+  
+  // Limit to 3 on dashboard preview
+  const displayOverlaps = isPreview ? overlaps.slice(0, 3) : overlaps;
+  const hasMore = isPreview && overlaps.length > 3;
 
   const formatDate = (date: Date) => {
     return new Date(date).toLocaleDateString("en-US", {
@@ -78,6 +83,9 @@ export default function TripOverlaps({ overlaps = [] }: TripOverlapsProps) {
           <h2 className="text-2xl font-bold flex items-center gap-2">
             <span className="text-3xl">🎉</span>
             {t('trips.meetUpOpportunities') || 'Meetup Opportunities!'}
+            {overlaps.length > 0 && (
+              <span className="badge badge-primary badge-lg">{overlaps.length}</span>
+            )}
           </h2>
           <p className="text-base-content/60 text-sm mt-1">
             {t('trips.youAndFriendsSamePlace') || 'You and your friends will be in the same city!'}
@@ -86,7 +94,7 @@ export default function TripOverlaps({ overlaps = [] }: TripOverlapsProps) {
       </div>
 
       <div className="space-y-3">
-        {overlaps.map((overlap) => (
+        {displayOverlaps.map((overlap) => (
           <div
             key={overlap._id}
             className="bg-gradient-to-br from-primary/10 via-secondary/10 to-accent/10 border-2 border-primary/30 rounded-lg hover:shadow-lg transition-all duration-300"
@@ -155,6 +163,21 @@ export default function TripOverlaps({ overlaps = [] }: TripOverlapsProps) {
           </div>
         ))}
       </div>
+
+      {/* View All Button */}
+      {hasMore && (
+        <div className="flex justify-center mt-6">
+          <Link
+            href="/friends/trips?filter=overlaps"
+            className="btn btn-outline btn-sm md:btn-md gap-2"
+          >
+            {t('common.viewAll') || 'View All'} ({overlaps.length})
+            <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7l5 5m0 0l-5 5m5-5H6" />
+            </svg>
+          </Link>
+        </div>
+      )}
     </section>
   );
 }
