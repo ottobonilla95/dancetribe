@@ -13,14 +13,17 @@ export async function POST() {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
-    // Revalidate all dashboard cache tags
+    // Revalidate all cache tags (shared between landing + dashboard)
     const tags = [
       "dance-styles",
-      "hot-dance-styles", 
-      "hot-cities",
+      "hot-dance-styles",      // Shared: landing + dashboard
+      "hot-cities",            // Shared: landing + dashboard  
       "community-stats",
       "trending-songs",
       "trendy-countries",
+      "landing-community-map", // Landing only
+      "landing-featured-users", // Landing only
+      "landing-recent-dancers", // Landing only
     ];
 
     for (const tag of tags) {

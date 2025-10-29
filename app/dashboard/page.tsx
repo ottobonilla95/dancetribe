@@ -639,7 +639,8 @@ const getTrendyCountries = unstable_cache(
 );
 
 // Cached: Cities list changes when dancer counts change
-const getCities = unstable_cache(
+// Note: Shared with landing page - we cache top 10, dashboard uses first 6
+const getCitiesCached = unstable_cache(
   async (): Promise<CityType[]> => {
     console.log("🚀 getCities FUNCTION CALLED");
     try {
@@ -649,7 +650,7 @@ const getCities = unstable_cache(
         .populate({ path: "country", model: Country, select: "name code" })
         .populate({ path: "continent", model: Continent, select: "name" })
         .sort({ totalDancers: -1 })
-        .limit(6) // Reduced to show fewer cities since we have the discovery feed
+        .limit(10) // Cache top 10 (landing uses 10, dashboard uses 6)
         .lean();
 
       const result = cities.map((doc: any) => ({
@@ -670,8 +671,14 @@ const getCities = unstable_cache(
     }
   },
   ["hot-cities"],
-  { revalidate: 60, tags: ["hot-cities"] } // Reduced to 1 minute for safety
+  { revalidate: 60, tags: ["hot-cities"] } // Shared cache with landing page
 );
+
+// Dashboard wrapper - returns only first 6 cities
+async function getCities(): Promise<CityType[]> {
+  const cities = await getCitiesCached();
+  return cities.slice(0, 6);
+}
 
 // This is a private page: It's protected by the layout.js component which ensures the user is authenticated.
 // It's a server compoment which means you can fetch data (like the user profile) before the page is rendered.

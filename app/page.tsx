@@ -83,8 +83,8 @@ const getHotDanceStyles = unstable_cache(
     return [];
   }
 },
-["landing-hot-dance-styles"],
-{ revalidate: 900, tags: ["landing-hot-dance-styles"] } // 15 minutes
+["hot-dance-styles"],
+{ revalidate: 300, tags: ["hot-dance-styles"] } // 5 minutes - shared with dashboard
 );
 
 // Cached: Cities for landing page
@@ -113,8 +113,8 @@ const getCities = unstable_cache(
     return [];
   }
 },
-["landing-hot-cities"],
-{ revalidate: 300, tags: ["landing-hot-cities"] } // 5 minutes
+["hot-cities"],
+{ revalidate: 60, tags: ["hot-cities"] } // 1 minute - shared with dashboard
 );
 
 // Extract Spotify track ID from URL
