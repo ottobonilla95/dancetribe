@@ -1871,17 +1871,27 @@ export default function Onboarding() {
               >
                 {t("onboarding.back")}
               </button>
-              <button
-                className="btn btn-primary"
-                onClick={handleNext}
-                disabled={
-                  uploadingProfilePic ||
-                  completing ||
-                  savingStep ||
-                  (steps[currentStep].id === "username" &&
-                    usernameStatus.checking)
-                }
-              >
+              <div className="flex gap-2">
+                {steps[currentStep].id === "bio" && (
+                  <button
+                    className="btn btn-ghost"
+                    onClick={handleNext}
+                    disabled={savingStep || completing}
+                  >
+                    {t("common.skip")}
+                  </button>
+                )}
+                <button
+                  className="btn btn-primary"
+                  onClick={handleNext}
+                  disabled={
+                    uploadingProfilePic ||
+                    completing ||
+                    savingStep ||
+                    (steps[currentStep].id === "username" &&
+                      usernameStatus.checking)
+                  }
+                >
                 {uploadingProfilePic ? (
                   <>
                     <span className="loading loading-spinner loading-sm"></span>
@@ -1907,6 +1917,7 @@ export default function Onboarding() {
                   t("onboarding.next")
                 )}
               </button>
+              </div>
             </div>
           </div>
         </div>
