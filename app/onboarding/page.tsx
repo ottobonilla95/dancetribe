@@ -1200,7 +1200,7 @@ export default function Onboarding() {
                 <label className="label">
                   <span className="label-text">{t("onboarding.bioLabel")}</span>
                   <span className="label-text-alt text-base-content/50">
-                    {bio.length}/150
+                    {bio.length}/80
                   </span>
                 </label>
                 <textarea
@@ -1208,11 +1208,11 @@ export default function Onboarding() {
                   placeholder={t("onboarding.bioPlaceholder")}
                   value={bio}
                   onChange={(e) => {
-                    if (e.target.value.length <= 150) {
+                    if (e.target.value.length <= 80) {
                       setBio(e.target.value);
                     }
                   }}
-                  maxLength={150}
+                  maxLength={80}
                 />
               </div>
             )}

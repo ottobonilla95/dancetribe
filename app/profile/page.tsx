@@ -315,15 +315,6 @@ export default async function Profile({ searchParams }: ProfileProps) {
                         <span className="">{zodiac.sign}</span>
                       </div>
                     )}
-
-                    {/* Bio */}
-                    {userData.bio && (
-                      <div className="mt-2">
-                        <p className="text-base italic text-base-content/80">
-                          &ldquo;{userData.bio}&rdquo;
-                        </p>
-                      </div>
-                    )}
                     {/* Current Location */}
                     {userData.city && typeof userData.city === "object" && (
                       <div className="mt-1">
@@ -570,6 +561,15 @@ export default async function Profile({ searchParams }: ProfileProps) {
                 <h3 className="card-title text-xl mb-4">
                   {t("profile.danceProfile")}
                 </h3>
+
+                {/* Bio */}
+                {userData.bio && (
+                  <div className="mb-4">
+                    <p className="text-base italic text-base-content/80">
+                      &ldquo;{userData.bio}&rdquo;
+                    </p>
+                  </div>
+                )}
 
                 {/* Dance Role */}
                 {userData.danceRole && (

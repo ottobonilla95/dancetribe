@@ -367,15 +367,6 @@ export default async function PublicProfile({ params }: Props) {
                           <span className="">{zodiac.sign}</span>
                         </div>
                       )}
-                      
-                      {/* Bio */}
-                      {userData.bio && (
-                        <div className="mt-2">
-                          <p className="text-base italic text-base-content/80">
-                            &ldquo;{userData.bio}&rdquo;
-                          </p>
-                        </div>
-                      )}
 
                       {/* Social Stats */}
                       <div className="mt-2 flex gap-2 sm:gap-4 text-xs sm:text-sm text-base-content/60">
@@ -586,6 +577,15 @@ export default async function PublicProfile({ params }: Props) {
               <div className="card bg-base-200 shadow-xl">
                 <div className="card-body">
                   <h3 className="card-title text-xl mb-4">{t('profile.danceProfile')}</h3>
+
+                  {/* Bio */}
+                  {userData.bio && (
+                    <div className="mb-4">
+                      <p className="text-base italic text-base-content/80">
+                        &ldquo;{userData.bio}&rdquo;
+                      </p>
+                    </div>
+                  )}
 
                   {/* Dance Role */}
                   {userData.danceRole && (

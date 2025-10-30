@@ -50,7 +50,7 @@
     "bioDesc": "Agrega una frase corta o bio (Opcional)",
     "bioPlaceholder": "Bachatero/a | Bailar es vida 💃 | Viajando por el mundo ✈️",
     "bioLabel": "Tu Bio",
-    "bioCharCount": "{count}/150 caracteres",
+    "bioCharCount": "{count}/80 caracteres",
     "dancingStartTitle": "¿Cuándo empezaste a bailar?",
     "dancingStartDesc": "¿Desde qué año bailas?",
     "yearStartedDancing": "¿En qué año empezaste a bailar?",
