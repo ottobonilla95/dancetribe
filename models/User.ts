@@ -179,6 +179,7 @@ const userSchema = new mongoose.Schema(
       username: { type: Boolean, default: false },
       profilePic: { type: Boolean, default: false },
       dateOfBirth: { type: Boolean, default: false },
+      bio: { type: Boolean, default: false },
       dancingStartYear: { type: Boolean, default: false },
       currentLocation: { type: Boolean, default: false },
       citiesVisited: { type: Boolean, default: false },
