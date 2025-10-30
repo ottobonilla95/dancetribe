@@ -11,6 +11,7 @@ interface Dancer {
   username?: string;
   image?: string;
   city?: any;
+  activeCity?: any;
   dateOfBirth?: string;
   hideAge?: boolean;
   nationality?: string;
@@ -43,16 +44,20 @@ interface DancersFilterProps {
   dancers: Dancer[];
   userDanceStyles?: string[]; // IDs of user's dance styles
   locationName: string; // Can be city, country, or continent name
+  currentCityId?: string; // Current city ID to distinguish travelers from locals
 }
 
 export default function DancersFilter({
   dancers,
   userDanceStyles,
   locationName,
+  currentCityId,
 }: DancersFilterProps) {
   const { t } = useTranslation();
   const [showMyStyles, setShowMyStyles] = useState(false);
   const [showOnlyTeachers, setShowOnlyTeachers] = useState(false);
+  const [showOpenToPractice, setShowOpenToPractice] = useState(false);
+  const [showTravelers, setShowTravelers] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
   const dancersPerPage = 24;
 
@@ -70,6 +75,23 @@ export default function DancersFilter({
       return false;
     }
 
+    // Open to Practice filter
+    if (showOpenToPractice && !dancer.lookingForPracticePartners) {
+      return false;
+    }
+
+    // Travelers filter - only show if they're actually traveling (activeCity !== home city)
+    if (showTravelers) {
+      const isActuallyTraveling = dancer.openToMeetTravelers && 
+        dancer.activeCity && 
+        dancer.city && 
+        dancer.activeCity.toString() !== dancer.city.toString();
+      
+      if (!isActuallyTraveling) {
+        return false;
+      }
+    }
+
     return true;
   });
 
@@ -82,6 +104,8 @@ export default function DancersFilter({
   const clearAllFilters = () => {
     setShowMyStyles(false);
     setShowOnlyTeachers(false);
+    setShowOpenToPractice(false);
+    setShowTravelers(false);
     setCurrentPage(1);
   };
 
@@ -109,7 +133,7 @@ export default function DancersFilter({
             />
             <div className="flex items-center gap-2">
               <span className="text-lg">✨</span>
-              <span className="font-medium">{t('filters.showMyDancers')}</span>
+              <span className="font-medium">My Dance Styles</span>
             </div>
           </label>
         )}
@@ -131,8 +155,42 @@ export default function DancersFilter({
           </div>
         </label>
 
+        {/* Open to Practice Filter */}
+        <label className="flex items-center gap-3 cursor-pointer">
+          <input
+            type="checkbox"
+            checked={showOpenToPractice}
+            onChange={() => {
+              setShowOpenToPractice(!showOpenToPractice);
+              handleFilterChange();
+            }}
+            className="toggle toggle-primary"
+          />
+          <div className="flex items-center gap-2">
+            <span className="text-lg">🤝</span>
+            <span className="font-medium">Open to Practice</span>
+          </div>
+        </label>
+
+        {/* Travelers Filter */}
+        <label className="flex items-center gap-3 cursor-pointer">
+          <input
+            type="checkbox"
+            checked={showTravelers}
+            onChange={() => {
+              setShowTravelers(!showTravelers);
+              handleFilterChange();
+            }}
+            className="toggle toggle-primary"
+          />
+          <div className="flex items-center gap-2">
+            <span className="text-lg">✈️</span>
+            <span className="font-medium">Travelers</span>
+          </div>
+        </label>
+
         {/* Results Count */}
-        {(showMyStyles || showOnlyTeachers) && (
+        {(showMyStyles || showOnlyTeachers || showOpenToPractice || showTravelers) && (
           <div className="text-sm text-base-content/60">
             {t('filters.found')} <span className="font-bold text-primary">{filteredDancers.length}</span> {t('filters.of')} {dancers.length} {t('filters.dancers')}
           </div>

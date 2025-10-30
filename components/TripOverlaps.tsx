@@ -77,7 +77,7 @@ export default function TripOverlaps({ overlaps = [], isPreview = false }: TripO
   }
 
   return (
-    <section className="mt-12">
+    <section className="mt-8">
       <div className="flex items-center justify-between mb-6">
         <div>
           <h2 className="text-xl font-bold flex items-center gap-2">

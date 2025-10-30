@@ -247,7 +247,16 @@
     "tryDifferentFilters": "Intenta cambiar los filtros o buscar en todo el mundo",
     "viewAllDancers": "Ver Todos los Bailarines",
     "active": "activos",
-    "noTrendyCountries": "No hay países en tendencia en este momento."
+    "noTrendyCountries": "No hay países en tendencia en este momento.",
+    "discoverySettings": "Configuración de Descubrimiento",
+    "travelMode": "Modo Viajero",
+    "discoverableIn": "Activo en",
+    "changeCity": "Cambiar",
+    "selectYourCity": "Selecciona dónde estás ahora",
+    "cancel": "Cancelar",
+    "searchCity": "Buscar ciudad...",
+    "openToPractice": "Abierto a Practicar",
+    "openToPracticeDesc": "Aparece en búsquedas de compañeros de práctica"
   },
   "trips": {
     "meetUpOpportunities": "¡Oportunidades de Encuentro!",
@@ -437,7 +446,6 @@
   "nav": {
     "dashboard": "Inicio",
     "discoverDancers": "Descubrir Bailarines",
-    "travelConnect": "Viajar y Conectar",
     "myProfile": "Mi Perfil",
     "friends": "Amigos",
     "trendyMusic": "Música en Tendencia",
@@ -631,43 +639,6 @@
     "hottestDanceCities": "Ciudades de Baile Más Populares",
     "globalDistribution": "Distribución Global"
   },
-  "connectPage": {
-    "title": "Viaja y Conecta con Bailarines",
-    "subtitle": "¿Viajas a una ciudad nueva? Encuentra bailarines locales para conectar. O encuentra compañeros de práctica en tu ciudad.",
-    "yourLocation": "Tu Ubicación",
-    "currentlyIn": "Actualmente en",
-    "homeCity": "Ciudad de Origen",
-    "change": "Cambiar",
-    "selectCity": "Selecciona la ciudad donde te encuentras actualmente:",
-    "searchPlaceholder": "Busca una ciudad (ej., Bangkok, Berlín)...",
-    "cancel": "Cancelar",
-    "makeDiscoverable": "Hazte visible en",
-    "meetSoloDancers": "Conocer bailarines que viajan solos",
-    "meetSoloDancersDesc": "Conecta con bailarines que visitan",
-    "findPracticePartners": "Encontrar compañeros de práctica",
-    "findPracticePartnersDesc": "Encuentra bailarines para sesiones de práctica en",
-    "searching": "Buscando...",
-    "findDancersIn": "Buscar Bailarines en",
-    "pleaseSelectCity": "Por favor selecciona una ciudad primero",
-    "enableOption": "Por favor activa al menos una opción",
-    "setHomeCity": "¡Por favor establece tu ciudad de origen en tu perfil primero!",
-    "foundDancers": "Se encontraron",
-    "dancer": "bailarín",
-    "dancers": "bailarines",
-    "noDancersFound": "No se encontraron bailarines",
-    "noDancersMatching": "No se encontraron bailarines que coincidan con tus criterios en",
-    "tryDifferentCity": "¡Intenta seleccionar otra ciudad o vuelve más tarde!",
-    "nowDiscoverable": "¡Ahora eres visible en",
-    "othersDancersCanFind": "! Otros bailarines pueden encontrarte.",
-    "visibleToSolo": "¡Ahora eres visible para bailarines que viajan solos!",
-    "notVisibleToSolo": "Los bailarines que viajan solos ya no pueden verte",
-    "visibleToPractice": "¡Ahora eres visible para compañeros de práctica!",
-    "notVisibleToPractice": "Los compañeros de práctica ya no pueden verte",
-    "locationChanged": "Ubicación cambiada a",
-    "failedUpdateCity": "Error al actualizar la ciudad. Por favor intenta de nuevo.",
-    "failedUpdatePreference": "Error al actualizar la preferencia. Por favor intenta de nuevo.",
-    "failedSearch": "Error al buscar bailarines. Por favor intenta de nuevo."
-  },
   "musicPage": {
     "title": "Música en Tendencia",
     "subtitle": "Top 10 de canciones de baile de bailarines",
@@ -754,6 +725,10 @@
     "afterSocials": "Después de sociales - \"¡Agrégame en DanceCircle!\"",
     "instagramTip": "Consejo: Usa \"Compartir mi perfil\" desde tu página de perfil para copiar tu enlace, luego agrégalo a tu bio de Instagram o compártelo con amigos!",
     "instagramCopied": "¡Mensaje copiado! Pégalo en tu Instagram Story o publicación!"
+  },
+  "dancerCard": {
+    "traveler": "Viajero",
+    "openToPractice": "Abierto a practicar"
   }
 }
 

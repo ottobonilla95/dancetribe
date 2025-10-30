@@ -247,7 +247,16 @@
     "tryDifferentFilters": "Try adjusting your filters or search worldwide",
     "viewAllDancers": "View All Dancers",
     "active": "active",
-    "noTrendyCountries": "No trending countries at the moment."
+    "noTrendyCountries": "No trending countries at the moment.",
+    "discoverySettings": "Discovery Settings",
+    "travelMode": "Travel Mode",
+    "discoverableIn": "Active in",
+    "changeCity": "Change",
+    "selectYourCity": "Select where you are now",
+    "cancel": "Cancel",
+    "searchCity": "Search for a city...",
+    "openToPractice": "Open to Practice",
+    "openToPracticeDesc": "Show up in searches for practice partners"
   },
   "trips": {
     "meetUpOpportunities": "Meetup Opportunities!",
@@ -437,7 +446,6 @@
   "nav": {
     "dashboard": "Dashboard",
     "discoverDancers": "Discover Dancers",
-    "travelConnect": "Travel & Connect",
     "myProfile": "My Profile",
     "friends": "Friends",
     "trendyMusic": "Trendy Music",
@@ -631,43 +639,6 @@
     "hottestDanceCities": "Hottest Dance Cities",
     "globalDistribution": "Global Distribution"
   },
-  "connectPage": {
-    "title": "Travel & Connect with Dancers",
-    "subtitle": "Traveling to a new city? Find local dancers to connect with. Or find practice partners in your city.",
-    "yourLocation": "Your Location",
-    "currentlyIn": "Currently in",
-    "homeCity": "Home City",
-    "change": "Change",
-    "selectCity": "Select the city where you currently are:",
-    "searchPlaceholder": "Search for a city (e.g., Bangkok, Berlin)...",
-    "cancel": "Cancel",
-    "makeDiscoverable": "Make yourself discoverable in",
-    "meetSoloDancers": "Meet solo dancers",
-    "meetSoloDancersDesc": "Connect with solo dancers visiting",
-    "findPracticePartners": "Find practice partners",
-    "findPracticePartnersDesc": "Match with dancers for practice sessions in",
-    "searching": "Searching...",
-    "findDancersIn": "Find Dancers in",
-    "pleaseSelectCity": "Please select a city first",
-    "enableOption": "Please enable at least one option",
-    "setHomeCity": "Please set your home city in your profile first!",
-    "foundDancers": "Found",
-    "dancer": "dancer",
-    "dancers": "dancers",
-    "noDancersFound": "No dancers found",
-    "noDancersMatching": "No dancers matching your criteria in",
-    "tryDifferentCity": "Try selecting a different city or check back later!",
-    "nowDiscoverable": "You're now discoverable in",
-    "othersDancersCanFind": "! Other dancers can find you.",
-    "visibleToSolo": "You're now visible to solo dancers!",
-    "notVisibleToSolo": "Solo dancers can't see you anymore",
-    "visibleToPractice": "You're now visible to practice partners!",
-    "notVisibleToPractice": "Practice partners can't see you anymore",
-    "locationChanged": "Location changed to",
-    "failedUpdateCity": "Failed to update city. Please try again.",
-    "failedUpdatePreference": "Failed to update preference. Please try again.",
-    "failedSearch": "Failed to search dancers. Please try again."
-  },
   "musicPage": {
     "title": "Trending Music",
     "subtitle": "Top 10 dance anthems from dancers",
@@ -754,6 +725,10 @@
     "afterSocials": "After socials - \"Add me on DanceCircle!\"",
     "instagramTip": "Tip: Use \"Share my profile\" from your profile page to copy your link, then add it to your Instagram bio or share with friends!",
     "instagramCopied": "Message copied! Paste it in your Instagram Story or post!"
+  },
+  "dancerCard": {
+    "traveler": "Traveler",
+    "openToPractice": "Open to practice"
   }
 }
 

@@ -6,6 +6,7 @@ import { User } from "@/types/user";
 import { FaMapMarkerAlt, FaHeart, FaInstagram, FaTiktok, FaYoutube, FaGraduationCap, FaHeadphones, FaCamera } from "react-icons/fa";
 import { getZodiacSign } from "@/utils/zodiac";
 import { getCountryCode } from "@/utils/countries";
+import { useTranslation } from "@/components/I18nProvider";
 
 interface DancerCardProps {
   dancer: User & { 
@@ -13,6 +14,7 @@ interface DancerCardProps {
     danceStylesPopulated?: Array<{ name: string; _id: string }>;
     openToMeetTravelers?: boolean;
     lookingForPracticePartners?: boolean;
+    activeCity?: any;
     isTeacher?: boolean;
     isDJ?: boolean;
     isPhotographer?: boolean;
@@ -23,9 +25,11 @@ interface DancerCardProps {
   };
   showLikeButton?: boolean;
   showFlag?: boolean;
+  showHomeCity?: boolean; // Show home city for travelers
 }
 
 export default function DancerCard({ dancer, showLikeButton = true, showFlag = false }: DancerCardProps) {
+  const { t } = useTranslation();
   const zodiacInfo = dancer.dateOfBirth ? getZodiacSign(new Date(dancer.dateOfBirth)) : null;
   
   // Generate flag emoji from country code
@@ -184,12 +188,12 @@ export default function DancerCard({ dancer, showLikeButton = true, showFlag = f
             <div className="flex flex-wrap gap-2">
               {dancer.openToMeetTravelers && (
                 <span className="badge badge-sm badge-info gap-1">
-                  ✈️ Solo Traveler
+                  ✈️ {t('dancerCard.traveler')}
                 </span>
               )}
               {dancer.lookingForPracticePartners && (
                 <span className="badge badge-sm badge-success gap-1">
-                  🤝 Open to practice
+                  🤝 {t('dancerCard.openToPractice')}
                 </span>
               )}
             </div>

@@ -57,7 +57,6 @@ const Header = () => {
   const loggedInNavItems = [
     { href: "/dashboard", label: t('nav.dashboard'), icon: FaHome },
     { href: "/discover", label: t('nav.discoverDancers'), icon: FaUserPlus },
-    { href: "/connect", label: t('nav.travelConnect'), icon: FaPlane },
     { href: "/profile", label: t('nav.myProfile'), icon: FaUser },
     { 
       href: "/friends", 

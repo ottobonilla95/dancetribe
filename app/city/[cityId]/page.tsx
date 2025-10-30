@@ -94,12 +94,17 @@ export default async function CityPage({ params, searchParams }: Props) {
   // Convert cityId to ObjectId for MongoDB queries
   const cityObjectId = new mongoose.Types.ObjectId(params.cityId);
 
-  // Get ALL dancers in this city (for client-side filtering)
+  // Get ALL dancers in this city (locals + travelers)
+  // Locals: home city matches
+  // Travelers: activeCity matches AND openToMeetTravelers = true
   const dancers: any[] = await User.find({
-    city: cityObjectId,
     isProfileComplete: true,
+    $or: [
+      { city: cityObjectId }, // Locals
+      { activeCity: cityObjectId, openToMeetTravelers: true }, // Travelers
+    ],
   })
-    .select("name username image danceStyles dateOfBirth hideAge nationality dancingStartYear danceRole socialMedia likedBy openToMeetTravelers lookingForPracticePartners isTeacher isDJ isPhotographer jackAndJillCompetitions")
+    .select("name username image danceStyles dateOfBirth hideAge nationality dancingStartYear danceRole socialMedia likedBy openToMeetTravelers lookingForPracticePartners activeCity city isTeacher isDJ isPhotographer jackAndJillCompetitions")
     .populate({
       path: "danceStyles.danceStyle",
       model: DanceStyle,
@@ -639,6 +644,7 @@ export default async function CityPage({ params, searchParams }: Props) {
                     dancers={dancers}
                     userDanceStyles={userDanceStyles}
                     locationName={city.name}
+                    currentCityId={params.cityId}
                   />
                 ) : (
                   <div className="text-center py-8 text-base-content/60">

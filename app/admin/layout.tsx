@@ -3,7 +3,7 @@ import { getServerSession } from "next-auth";
 import { authOptions } from "@/libs/next-auth";
 import config from "@/config";
 import Link from "next/link";
-import { FaDatabase, FaChartLine, FaUsers, FaGlobeAmericas, FaMusic } from "react-icons/fa";
+import { FaDatabase, FaChartLine, FaUsers, FaGlobeAmericas, FaMusic, FaGlobe } from "react-icons/fa";
 import { ReactNode } from "react";
 
 export default async function AdminLayout({
@@ -33,6 +33,11 @@ export default async function AdminLayout({
       name: "Cities",
       href: "/admin/cities",
       icon: FaGlobeAmericas,
+    },
+    {
+      name: "Countries",
+      href: "/admin/countries",
+      icon: FaGlobe,
     },
     {
       name: "Dance Styles",

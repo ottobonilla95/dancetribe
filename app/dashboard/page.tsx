@@ -17,6 +17,7 @@ import TrendyMusicPreview from "@/components/TrendyMusicPreview";
 import FriendsTripsPreview from "@/components/FriendsTripsPreview";
 import TrendyCountries from "@/components/TrendyCountries";
 import TripOverlaps from "@/components/TripOverlaps";
+import DiscoverySettings from "@/components/DiscoverySettings";
 import Link from "next/link";
 import { getMessages, getTranslation } from "@/lib/i18n";
 import { unstable_cache } from "next/cache";
@@ -826,6 +827,40 @@ async function getCities(): Promise<CityType[]> {
   return cities.slice(0, 6);
 }
 
+// Get user preferences for discovery settings
+async function getUserPreferences(userId: string) {
+  try {
+    await connectMongo();
+    const user: any = await User.findById(userId)
+      .populate({ path: "activeCity", model: City, populate: { path: "country", model: Country, select: "name code" } })
+      .populate({ path: "city", model: City, populate: { path: "country", model: Country, select: "name code" } })
+      .select("activeCity city openToMeetTravelers lookingForPracticePartners")
+      .lean();
+
+    if (!user) return null;
+
+    // Transform to plain object with serializable data
+    const activeCity = user.activeCity || user.city;
+    
+    return {
+      activeCity: activeCity ? {
+        _id: activeCity._id.toString(),
+        id: activeCity._id.toString(),
+        name: activeCity.name,
+        country: activeCity.country ? {
+          name: activeCity.country.name,
+          code: activeCity.country.code,
+        } : null,
+      } : null,
+      openToMeetTravelers: user.openToMeetTravelers || false,
+      lookingForPracticePartners: user.lookingForPracticePartners || false,
+    };
+  } catch (error) {
+    console.error("Error fetching user preferences:", error);
+    return null;
+  }
+}
+
 // This is a private page: It's protected by the layout.js component which ensures the user is authenticated.
 // It's a server compoment which means you can fetch data (like the user profile) before the page is rendered.
 // See https://shipfa.st/docs/tutorials/private-page
@@ -860,6 +895,7 @@ export default async function Dashboard() {
     trendyCountries,
     tripOverlaps,
     friendsTrips,
+    userPreferences,
   ] = await Promise.all([
     getInitialDancers(session.user.id),
     getDanceStyles(),
@@ -870,6 +906,7 @@ export default async function Dashboard() {
     getTrendyCountries(),
     getTripOverlaps(session.user.id),
     getFriendsTrips(session.user.id),
+    getUserPreferences(session.user.id),
   ]);
 
   return (
@@ -884,6 +921,15 @@ export default async function Dashboard() {
           <Link href="/cities" className="btn btn-outline btn-sm md:btn-md">
             {t("dashboard.viewAllCities")}
           </Link>
+        </div>
+
+        {/* Discovery Settings */}
+        <div className="mt-8">
+          <DiscoverySettings
+            initialActiveCity={userPreferences?.activeCity}
+            initialTravelMode={userPreferences?.openToMeetTravelers || false}
+            initialOpenToPractice={userPreferences?.lookingForPracticePartners || false}
+          />
         </div>
 
         {/* Trip Overlaps - Meetup Opportunities */}
