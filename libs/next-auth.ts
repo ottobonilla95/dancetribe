@@ -102,51 +102,27 @@ export const authOptions: NextAuthOptionsExtended = {
   },
   callbacks: {
     jwt: async ({ token, user, trigger, account }) => {
-      // ALWAYS check the database for profile completion status to avoid stale JWT tokens
-      // This ensures the middleware gets the most up-to-date profile status
       try {
-        // Use mongoose for database operations
         const connectMongoose = (await import('@/libs/mongoose')).default;
         await connectMongoose();
         
         const User = (await import('@/models/User')).default;
-        const userData = await User.findById(token.sub || user?.id).select('isProfileComplete onboardingSteps image name preferredLanguage');
+        const userId = token.sub || user?.id;
         
-        console.log('🔍 JWT Callback - User data:', {
-          userId: token.sub || user?.id,
-          isProfileComplete: userData?.isProfileComplete,
-          hasCustomImage: !!userData?.image,
-          trigger,
-          tokenWas: token.isProfileComplete
-        });
-        
-        // If user exists but doesn't have isProfileComplete field, they need onboarding
-        if (userData && userData.isProfileComplete === undefined) {
-          token.isProfileComplete = false;
-        } else {
-          token.isProfileComplete = userData?.isProfileComplete || false;
+        // If this is a new user sign-in, wait for createUser event to complete
+        if (user) {
+          await new Promise(resolve => setTimeout(resolve, 200));
         }
         
+        const userData = await User.findById(userId).select('isProfileComplete image name preferredLanguage email');
         
-        // Update token with current user image, name, and language preference
-        if (userData?.image) {
-          token.picture = userData.image;
-        }
-        if (userData?.name) {
-          token.name = userData.name;
-        }
-        if (userData?.preferredLanguage) {
-          token.preferredLanguage = userData.preferredLanguage;
-        }
+        token.isProfileComplete = userData?.isProfileComplete === true ? true : false;
         
-        console.log('🔍 JWT Callback - Token updated:', {
-          isProfileComplete: token.isProfileComplete,
-          picture: token.picture,
-          preferredLanguage: token.preferredLanguage,
-          changed: token.isProfileComplete !== (userData?.isProfileComplete || false)
-        });
+        if (userData?.image) token.picture = userData.image;
+        if (userData?.name) token.name = userData.name;
+        if (userData?.preferredLanguage) token.preferredLanguage = userData.preferredLanguage;
       } catch (error) {
-        console.error('Error fetching user profile in JWT callback:', error);
+        console.error('JWT callback error:', error);
         token.isProfileComplete = false;
       }
       

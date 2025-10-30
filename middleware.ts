@@ -128,22 +128,13 @@ export async function middleware(request: NextRequest) {
     })
   }
 
-  // Check if user has completed onboarding
-  console.log('🔍 Middleware - Checking onboarding status:', {
-    pathname,
-    userId: token.sub,
-    isProfileComplete: token.isProfileComplete
-  })
-
-  // If user hasn't completed profile, redirect to onboarding
-  if (token.isProfileComplete === false) {
-    console.log('🔄 Middleware - Redirecting to onboarding (profile incomplete)')
+  // If profile incomplete, redirect to onboarding
+  if (token.isProfileComplete !== true) {
     return NextResponse.redirect(new URL('/onboarding', request.url))
   }
 
-  // If user has completed profile but tries to access onboarding, redirect to dashboard
-  if (pathname === '/onboarding' && token.isProfileComplete === true) {
-    console.log('🔄 Middleware - Redirecting to dashboard (profile complete)')
+  // If profile complete but accessing onboarding, redirect to dashboard
+  if (pathname === '/onboarding') {
     return NextResponse.redirect(new URL('/dashboard', request.url))
   }
 

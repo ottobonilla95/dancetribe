@@ -8,7 +8,7 @@ import config from "@/config";
 import { sendEmail } from "@/libs/resend";
 import crypto from "crypto";
 
-// POST: Create new user and send invite email
+// POST: Send invite email with magic link
 export async function POST(req: Request) {
   try {
     const session = await getServerSession(authOptions);
@@ -43,19 +43,24 @@ export async function POST(req: Request) {
       );
     }
 
-    // Generate verification token (same as NextAuth)
+    // Get host from request
+    const host = req.headers.get('host') || config.domainName;
+    const protocol = host.includes('localhost') ? 'http' : 'https';
+    const baseUrl = `${protocol}://${host}`;
+    
+    // Generate verification token (exactly like NextAuth does)
     const token = crypto.randomBytes(32).toString("hex");
     const expires = new Date();
-    expires.setDate(expires.getDate() + 1);
+    expires.setDate(expires.getDate() + 1); // 1 day
 
-    // Hash token with secret (NextAuth requirement)
+    // Hash token with secret
     const secret = process.env.NEXTAUTH_SECRET || "";
     const hashedToken = crypto
       .createHash("sha256")
       .update(`${token}${secret}`)
       .digest("hex");
 
-    // Store in database
+    // Store in verification_tokens collection
     const client = await clientPromise;
     const db = client.db();
     
@@ -69,19 +74,65 @@ export async function POST(req: Request) {
       expires: expires,
     });
 
-    // Generate magic link with onboarding callback
-    const callbackUrl = `https://${config.domainName}/onboarding`;
-    const signInUrl = `https://${config.domainName}/api/auth/callback/email?callbackUrl=${encodeURIComponent(callbackUrl)}&token=${token}&email=${encodeURIComponent(email)}`;
+    // Generate magic link
+    const callbackUrl = `${baseUrl}/onboarding`;
+    const magicLink = `${baseUrl}/api/auth/callback/email?callbackUrl=${encodeURIComponent(callbackUrl)}&token=${token}&email=${encodeURIComponent(email)}`;
 
-    // Send invite email
-    const emailContent = inviteUserEmail(email, signInUrl);
-    
+    // Send email using Resend
     await sendEmail({
       to: email,
-      subject: emailContent.subject,
-      text: emailContent.text,
-      html: emailContent.html,
       from: config.resend.fromNoReply,
+      subject: `Sign in to ${config.appName}`,
+      text: `Sign in to ${config.appName}\n\n${magicLink}\n\n`,
+      html: `
+        <!DOCTYPE html>
+        <html>
+          <head>
+            <meta charset="utf-8">
+            <style>
+              body { font-family: Arial, sans-serif; line-height: 1.6; color: #333; margin: 0; padding: 0; }
+              .container { max-width: 600px; margin: 0 auto; }
+              .header { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 40px 30px; text-align: center; }
+              .content { background: #f9f9f9; padding: 40px 30px; }
+              .box { background: white; padding: 30px; margin: 20px 0; border-radius: 10px; text-align: center; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
+              .button { display: inline-block; background: #667eea; color: white !important; padding: 16px 40px; text-decoration: none; border-radius: 8px; margin-top: 20px; font-weight: bold; font-size: 16px; }
+              .button:hover { background: #5568d3; }
+              .footer { text-align: center; padding: 20px; color: #666; font-size: 12px; }
+            </style>
+          </head>
+          <body>
+            <div class="container">
+              <div class="header">
+                <h1 style="margin: 0; font-size: 32px;">💃 Welcome to ${config.appName}! 🕺</h1>
+              </div>
+              <div class="content">
+                <div class="box">
+                  <h2 style="color: #333; margin-top: 0;">You're Invited!</h2>
+                  <p style="font-size: 16px; color: #666; margin: 20px 0;">
+                    Click the button below to sign in and complete your profile.
+                  </p>
+                  
+                  <a href="${magicLink}" class="button">Sign In & Get Started</a>
+                  
+                  <p style="font-size: 12px; color: #999; margin-top: 30px;">
+                    This link will expire in 24 hours.
+                  </p>
+                </div>
+
+                <p style="color: #666; font-size: 14px; text-align: center; margin-top: 30px;">
+                  Join thousands of dancers around the world! 🌎
+                </p>
+              </div>
+              <div class="footer">
+                <p>You received this email because you were invited to ${config.appName}.</p>
+                <p style="margin-top: 10px;">
+                  <a href="${baseUrl}" style="color: #667eea;">Visit ${config.appName}</a>
+                </p>
+              </div>
+            </div>
+          </body>
+        </html>
+      `,
     });
 
     return NextResponse.json({
@@ -96,62 +147,4 @@ export async function POST(req: Request) {
       { status: 500 }
     );
   }
-}
-
-// Email template for user invite
-function inviteUserEmail(email: string, signInUrl: string) {
-  return {
-    subject: `You're invited to join ${config.appName}! 💃🕺`,
-    text: `Welcome to ${config.appName}! You've been invited to join our dance community. Click here to sign in and complete your profile: ${signInUrl}`,
-    html: `
-      <!DOCTYPE html>
-      <html>
-        <head>
-          <meta charset="utf-8">
-          <style>
-            body { font-family: Arial, sans-serif; line-height: 1.6; color: #333; margin: 0; padding: 0; }
-            .container { max-width: 600px; margin: 0 auto; }
-            .header { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 40px 30px; text-align: center; }
-            .content { background: #f9f9f9; padding: 40px 30px; }
-            .welcome-box { background: white; padding: 30px; margin: 20px 0; border-radius: 10px; text-align: center; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
-            .button { display: inline-block; background: #667eea; color: white !important; padding: 16px 40px; text-decoration: none; border-radius: 8px; margin-top: 20px; font-weight: bold; font-size: 16px; }
-            .button:hover { background: #5568d3; }
-            .footer { text-align: center; padding: 20px; color: #666; font-size: 12px; }
-          </style>
-        </head>
-        <body>
-          <div class="container">
-            <div class="header">
-              <h1 style="margin: 0; font-size: 32px;">💃 Welcome to ${config.appName}! 🕺</h1>
-            </div>
-            <div class="content">
-              <div class="welcome-box">
-                <h2 style="color: #333; margin-top: 0;">You're Invited!</h2>
-                <p style="font-size: 16px; color: #666; margin: 20px 0;">
-                  You've been invited to join <strong>${config.appName}</strong>, the global platform 
-                  connecting dancers worldwide.
-                </p>
-                
-                <a href="${signInUrl}" class="button">Sign In & Get Started</a>
-                
-                <p style="font-size: 12px; color: #999; margin-top: 30px;">
-                  This link will take you to our secure sign-in page.
-                </p>
-              </div>
-
-              <p style="color: #666; font-size: 14px; text-align: center; margin-top: 30px;">
-                Join thousands of dancers around the world! 🌎
-              </p>
-            </div>
-            <div class="footer">
-              <p>You received this email because you were invited to ${config.appName}.</p>
-              <p style="margin-top: 10px;">
-                <a href="https://${config.domainName}" style="color: #667eea;">Visit ${config.appName}</a>
-              </p>
-            </div>
-          </div>
-        </body>
-      </html>
-    `
-  };
 }
