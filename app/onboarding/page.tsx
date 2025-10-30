@@ -1214,11 +1214,6 @@ export default function Onboarding() {
                   }}
                   maxLength={150}
                 />
-                <label className="label">
-                  <span className="label-text-alt text-base-content/50">
-                    {t("onboarding.bioDesc")}
-                  </span>
-                </label>
               </div>
             )}
 
@@ -1869,15 +1864,6 @@ export default function Onboarding() {
                 {t("onboarding.back")}
               </button>
               <div className="flex gap-2">
-                {steps[currentStep].id === "bio" && (
-                  <button
-                    className="btn btn-ghost"
-                    onClick={handleNext}
-                    disabled={savingStep || completing}
-                  >
-                    {t("common.skip")}
-                  </button>
-                )}
                 <button
                   className="btn btn-primary"
                   onClick={handleNext}

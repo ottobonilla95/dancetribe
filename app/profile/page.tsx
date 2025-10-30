@@ -12,7 +12,13 @@ import { getZodiacSign } from "@/utils/zodiac";
 import { getCountryCode } from "@/utils/countries";
 import { DANCE_LEVELS } from "@/constants/dance-levels";
 import ShareToStory from "@/components/ShareToStory";
-import { FaInstagram, FaTiktok, FaYoutube, FaWhatsapp, FaEnvelope } from "react-icons/fa";
+import {
+  FaInstagram,
+  FaTiktok,
+  FaYoutube,
+  FaWhatsapp,
+  FaEnvelope,
+} from "react-icons/fa";
 import Flag from "@/components/Flag";
 import DanceStyleCard from "@/components/DanceStyleCard";
 import CopyProfileLink from "@/components/CopyProfileLink";
@@ -44,7 +50,7 @@ export default async function Profile({ searchParams }: ProfileProps) {
 
   const user = await User.findById(session.user.id)
     .select(
-      "name firstName lastName username email image dateOfBirth hideAge dancingStartYear city citiesVisited trips danceStyles anthem socialMedia danceRole gender nationality relationshipStatus isTeacher isDJ isPhotographer teacherProfile djProfile photographerProfile professionalContact friends likedBy jackAndJillCompetitions createdAt"
+      "name firstName lastName username email image dateOfBirth hideAge bio dancingStartYear city citiesVisited trips danceStyles anthem socialMedia danceRole gender nationality relationshipStatus isTeacher isDJ isPhotographer teacherProfile djProfile photographerProfile professionalContact friends likedBy jackAndJillCompetitions createdAt"
     )
     .populate({
       path: "city",
@@ -54,14 +60,14 @@ export default async function Profile({ searchParams }: ProfileProps) {
         {
           path: "country",
           model: Country,
-          select: "name code"
+          select: "name code",
         },
         {
           path: "continent",
           model: Continent,
-          select: "name code"
-        }
-      ]
+          select: "name code",
+        },
+      ],
     })
     .populate({
       path: "citiesVisited",
@@ -71,14 +77,14 @@ export default async function Profile({ searchParams }: ProfileProps) {
         {
           path: "country",
           model: Country,
-          select: "name code"
+          select: "name code",
         },
         {
           path: "continent",
           model: Continent,
-          select: "name code"
-        }
-      ]
+          select: "name code",
+        },
+      ],
     })
     .populate({
       path: "danceStyles.danceStyle",
@@ -156,9 +162,10 @@ export default async function Profile({ searchParams }: ProfileProps) {
         levelLabel: levelInfo?.label || "Beginner",
         levelEmoji: levelInfo?.emoji || "🌱",
         description: styleDescription,
-        id: typeof userStyle.danceStyle === "object" 
-          ? userStyle.danceStyle._id || userStyle.danceStyle.id
-          : userStyle.danceStyle,
+        id:
+          typeof userStyle.danceStyle === "object"
+            ? userStyle.danceStyle._id || userStyle.danceStyle.id
+            : userStyle.danceStyle,
       };
     });
   };
@@ -188,18 +195,18 @@ export default async function Profile({ searchParams }: ProfileProps) {
 
   const getRoleDisplay = (role: string) => {
     const roleMap: Record<string, string> = {
-      leader: `${t('profile.leader')} 🕺`,
-      follower: `${t('profile.follower')} 💃`,
-      both: `${t('common.both')} (${t('profile.leader')} & ${t('profile.follower')})`,
+      leader: `${t("profile.leader")} 🕺`,
+      follower: `${t("profile.follower")} 💃`,
+      both: `${t("common.both")} (${t("profile.leader")} & ${t("profile.follower")})`,
     };
     return roleMap[role] || role;
   };
 
   const getRelationshipStatusDisplay = (status: string) => {
     const statusMap: Record<string, string> = {
-      single: `${t('profile.single')} 💙`,
-      in_a_relationship: `${t('profile.relationship')} 💕`,
-      married: `${t('profile.married')} 💍`,
+      single: `${t("profile.single")} 💙`,
+      in_a_relationship: `${t("profile.relationship")} 💕`,
+      married: `${t("profile.married")} 💍`,
       its_complicated: "It's complicated 🤷",
       prefer_not_to_say: "Prefer not to say",
     };
@@ -216,7 +223,7 @@ export default async function Profile({ searchParams }: ProfileProps) {
   return (
     <div className="min-h-screen p-4 bg-base-100">
       {/* Welcome Modal */}
-      <WelcomeModal 
+      <WelcomeModal
         userName={userData.name || userData.username}
         userUsername={userData.username}
         userImage={userData.image}
@@ -230,15 +237,19 @@ export default async function Profile({ searchParams }: ProfileProps) {
           bio: userData.bio,
           nationality: userData.nationality,
           danceRole: userData.danceRole,
-          city: userData.city ? {
-            name: userData.city.name,
-            country: { name: userData.city.country?.name || "" },
-            image: userData.city.image
-          } : { name: "", country: { name: "" } },
-          danceStyles: getDanceStylesWithLevels(userData.danceStyles || []).map(s => ({
-            name: s.name,
-            level: s.levelLabel || s.level
-          }))
+          city: userData.city
+            ? {
+                name: userData.city.name,
+                country: { name: userData.city.country?.name || "" },
+                image: userData.city.image,
+              }
+            : { name: "", country: { name: "" } },
+          danceStyles: getDanceStylesWithLevels(userData.danceStyles || []).map(
+            (s) => ({
+              name: s.name,
+              level: s.levelLabel || s.level,
+            })
+          ),
         }}
         showWelcome={searchParams?.welcome === "true"}
       />
@@ -246,8 +257,10 @@ export default async function Profile({ searchParams }: ProfileProps) {
       <div className="max-w-4xl mx-auto">
         {/* Header */}
         <div className="mb-8 text-center">
-          <h1 className="text-4xl font-bold mb-2">{t('profile.myProfile')}</h1>
-          <p className="text-base-content/70">{t('profile.yourDanceJourney')}</p>
+          <h1 className="text-4xl font-bold mb-2">{t("profile.myProfile")}</h1>
+          <p className="text-base-content/70">
+            {t("profile.yourDanceJourney")}
+          </p>
         </div>
 
         {/* Profile Grid */}
@@ -277,24 +290,23 @@ export default async function Profile({ searchParams }: ProfileProps) {
                   <div>
                     <div className="flex items-center gap-2 flex-wrap">
                       <h2 className="card-title text-2xl mb-1">
-                        {userData.firstName && userData.lastName 
+                        {userData.firstName && userData.lastName
                           ? `${userData.firstName} ${userData.lastName}, ${age}`
-                          : `${userData.name?.charAt(0)?.toUpperCase() + userData.name?.slice(1)}, ${age}`
-                        }
+                          : `${userData.name?.charAt(0)?.toUpperCase() + userData.name?.slice(1)}, ${age}`}
                       </h2>
                       {userData.isTeacher && (
                         <div className="badge badge-primary badge-lg gap-1">
-                          🎓 {t('profile.teacher')}
+                          🎓 {t("profile.teacher")}
                         </div>
                       )}
                       {userData.isDJ && (
                         <div className="badge badge-secondary badge-lg gap-1">
-                          🎵 {t('profile.dj')}
+                          🎵 {t("profile.dj")}
                         </div>
                       )}
                       {userData.isPhotographer && (
                         <div className="badge badge-accent badge-lg gap-1">
-                          📷 {t('profile.photographer')}
+                          📷 {t("profile.photographer")}
                         </div>
                       )}
                     </div>
@@ -303,6 +315,7 @@ export default async function Profile({ searchParams }: ProfileProps) {
                         <span className="">{zodiac.sign}</span>
                       </div>
                     )}
+
                     {/* Bio */}
                     {userData.bio && (
                       <div className="mt-2">
@@ -315,7 +328,7 @@ export default async function Profile({ searchParams }: ProfileProps) {
                     {userData.city && typeof userData.city === "object" && (
                       <div className="mt-1">
                         <span>📍 </span>
-                        <Link 
+                        <Link
                           href={`/city/${userData.city._id || userData.city.id}`}
                           className="link link-primary hover:link-accent"
                         >
@@ -324,7 +337,7 @@ export default async function Profile({ searchParams }: ProfileProps) {
                         {userData.city.country && (
                           <>
                             <span>, </span>
-                            <Link 
+                            <Link
                               href={`/country/${userData.city.country._id || userData.city.country.id}`}
                               className="link link-primary hover:link-accent"
                             >
@@ -338,7 +351,7 @@ export default async function Profile({ searchParams }: ProfileProps) {
                     {userData.nationality && (
                       <div className="mt-4">
                         <div className="text-sm font-medium text-base-content/60">
-                          {t('profile.nationality')}
+                          {t("profile.nationality")}
                         </div>
                         <div className="text-md flex items-center gap-2">
                           <Flag
@@ -357,16 +370,23 @@ export default async function Profile({ searchParams }: ProfileProps) {
                   <div className="mt-6 -mx-8 sm:mx-0 px-8 py-4 sm:px-6 bg-gradient-to-br from-primary/20 to-secondary/20 sm:rounded-lg border-y-2 sm:border-2 border-primary/40">
                     <div className="flex items-center gap-2 mb-3">
                       <span className="text-2xl">🎓</span>
-                      <h3 className="font-bold text-lg">{t('profile.danceTeacher')}</h3>
+                      <h3 className="font-bold text-lg">
+                        {t("profile.danceTeacher")}
+                      </h3>
                     </div>
 
-                    {userData.teacherProfile.yearsOfExperience !== undefined && (
+                    {userData.teacherProfile.yearsOfExperience !==
+                      undefined && (
                       <div className="mb-3">
                         <div className="text-sm text-base-content/70">
                           <span className="font-semibold text-primary">
                             {userData.teacherProfile.yearsOfExperience}
                           </span>{" "}
-                          year{userData.teacherProfile.yearsOfExperience !== 1 ? "s" : ""} of teaching experience
+                          year
+                          {userData.teacherProfile.yearsOfExperience !== 1
+                            ? "s"
+                            : ""}{" "}
+                          of teaching experience
                         </div>
                       </div>
                     )}
@@ -386,13 +406,18 @@ export default async function Profile({ searchParams }: ProfileProps) {
                   <div className="mt-6 -mx-8 sm:mx-0 px-8 py-4 sm:px-6 bg-gradient-to-br from-secondary/20 to-accent/20 sm:rounded-lg border-y-2 sm:border-2 border-secondary/40">
                     <div className="flex items-center gap-2 mb-3">
                       <span className="text-2xl">🎵</span>
-                      <h3 className="font-bold text-lg">{t('profile.djProfile')}</h3>
+                      <h3 className="font-bold text-lg">
+                        {t("profile.djProfile")}
+                      </h3>
                     </div>
 
                     {userData.djProfile.djName && (
                       <div className="mb-3">
                         <div className="text-sm text-base-content/70">
-                          Known as: <span className="font-semibold text-secondary">{userData.djProfile.djName}</span>
+                          Known as:{" "}
+                          <span className="font-semibold text-secondary">
+                            {userData.djProfile.djName}
+                          </span>
                         </div>
                       </div>
                     )}
@@ -400,7 +425,10 @@ export default async function Profile({ searchParams }: ProfileProps) {
                     {userData.djProfile.genres && (
                       <div className="mb-3">
                         <div className="text-sm text-base-content/70">
-                          Genres: <span className="font-medium">{userData.djProfile.genres}</span>
+                          Genres:{" "}
+                          <span className="font-medium">
+                            {userData.djProfile.genres}
+                          </span>
                         </div>
                       </div>
                     )}
@@ -420,13 +448,18 @@ export default async function Profile({ searchParams }: ProfileProps) {
                   <div className="mt-6 -mx-8 sm:mx-0 px-8 py-4 sm:px-6 bg-gradient-to-br from-accent/20 to-info/20 sm:rounded-lg border-y-2 sm:border-2 border-accent/40">
                     <div className="flex items-center gap-2 mb-3">
                       <span className="text-2xl">📷</span>
-                      <h3 className="font-bold text-lg">{t('profile.photographer')}</h3>
+                      <h3 className="font-bold text-lg">
+                        {t("profile.photographer")}
+                      </h3>
                     </div>
 
                     {userData.photographerProfile.specialties && (
                       <div className="mb-3">
                         <div className="text-sm text-base-content/70">
-                          Specialties: <span className="font-medium">{userData.photographerProfile.specialties}</span>
+                          Specialties:{" "}
+                          <span className="font-medium">
+                            {userData.photographerProfile.specialties}
+                          </span>
                         </div>
                       </div>
                     )}
@@ -434,9 +467,13 @@ export default async function Profile({ searchParams }: ProfileProps) {
                     {userData.photographerProfile.portfolioLink && (
                       <div className="mb-3">
                         <a
-                          href={userData.photographerProfile.portfolioLink.startsWith('http')
-                            ? userData.photographerProfile.portfolioLink
-                            : `https://${userData.photographerProfile.portfolioLink}`}
+                          href={
+                            userData.photographerProfile.portfolioLink.startsWith(
+                              "http"
+                            )
+                              ? userData.photographerProfile.portfolioLink
+                              : `https://${userData.photographerProfile.portfolioLink}`
+                          }
                           target="_blank"
                           rel="noopener noreferrer"
                           className="text-sm link link-accent"
@@ -457,35 +494,41 @@ export default async function Profile({ searchParams }: ProfileProps) {
                 )}
 
                 {/* Shared Professional Contact */}
-                {(userData.isTeacher || userData.isDJ || userData.isPhotographer) && userData.professionalContact && (
-                  <div className="mt-6 flex flex-wrap gap-2 px-0">
-                    {userData.professionalContact.whatsapp && (
-                      <a
-                        href={`https://wa.me/${userData.professionalContact.whatsapp.replace(/\D/g, "")}`}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="btn btn-success btn-sm gap-2 flex-1"
-                      >
-                        <FaWhatsapp />
-                        WhatsApp
-                      </a>
-                    )}
-                    {userData.professionalContact.email && (
-                      <a
-                        href={`mailto:${userData.professionalContact.email}`}
-                        className="btn btn-outline btn-sm gap-2 flex-1"
-                      >
-                        <FaEnvelope />
-                        Email
-                      </a>
-                    )}
-                  </div>
-                )}
-                
+                {(userData.isTeacher ||
+                  userData.isDJ ||
+                  userData.isPhotographer) &&
+                  userData.professionalContact && (
+                    <div className="mt-6 flex flex-wrap gap-2 px-0">
+                      {userData.professionalContact.whatsapp && (
+                        <a
+                          href={`https://wa.me/${userData.professionalContact.whatsapp.replace(/\D/g, "")}`}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="btn btn-success btn-sm gap-2 flex-1"
+                        >
+                          <FaWhatsapp />
+                          WhatsApp
+                        </a>
+                      )}
+                      {userData.professionalContact.email && (
+                        <a
+                          href={`mailto:${userData.professionalContact.email}`}
+                          className="btn btn-outline btn-sm gap-2 flex-1"
+                        >
+                          <FaEnvelope />
+                          Email
+                        </a>
+                      )}
+                    </div>
+                  )}
+
                 {/* Profile Actions */}
                 <div className="mt-6 space-y-3">
-                  <Link href="/onboarding?mode=edit" className="btn btn-secondary btn-sm w-full">
-                    ✏️ {t('profile.editProfile')}
+                  <Link
+                    href="/onboarding?mode=edit"
+                    className="btn btn-secondary btn-sm w-full"
+                  >
+                    ✏️ {t("profile.editProfile")}
                   </Link>
                   <CopyProfileLink username={userData.username} />
                   <div className="w-full">
@@ -502,10 +545,14 @@ export default async function Profile({ searchParams }: ProfileProps) {
                         city: userData.city,
                         danceStyles:
                           userData.danceStyles?.map((userStyle: any) => ({
-                            name: userStyle.danceStyle?.name || userStyle.danceStyle,
+                            name:
+                              userStyle.danceStyle?.name ||
+                              userStyle.danceStyle,
                             level: userStyle.level || "beginner",
                           })) || [],
-                        yearsDancing: userData.dancingStartYear ? new Date().getFullYear() - userData.dancingStartYear : undefined,
+                        yearsDancing: userData.dancingStartYear
+                          ? new Date().getFullYear() - userData.dancingStartYear
+                          : undefined,
                         citiesVisited: userData.citiesVisited?.length || 0,
                       }}
                     />
@@ -520,13 +567,15 @@ export default async function Profile({ searchParams }: ProfileProps) {
             {/* Dance Information */}
             <div className="card bg-base-200 shadow-xl">
               <div className="card-body">
-                <h3 className="card-title text-xl mb-4">{t('profile.danceProfile')}</h3>
+                <h3 className="card-title text-xl mb-4">
+                  {t("profile.danceProfile")}
+                </h3>
 
                 {/* Dance Role */}
                 {userData.danceRole && (
                   <div className="mb-4">
                     <div className="text-sm font-medium text-base-content/60 mb-1">
-                      {t('profile.danceRole')}
+                      {t("profile.danceRole")}
                     </div>
                     <div className="text-lg">
                       {getRoleDisplay(userData.danceRole)}
@@ -538,10 +587,12 @@ export default async function Profile({ searchParams }: ProfileProps) {
                 {userData.relationshipStatus && (
                   <div className="mb-4">
                     <div className="text-sm font-medium text-base-content/60 mb-1">
-                      {t('profile.relationshipStatus')}
+                      {t("profile.relationshipStatus")}
                     </div>
                     <div className="text-lg">
-                      {getRelationshipStatusDisplay(userData.relationshipStatus)}
+                      {getRelationshipStatusDisplay(
+                        userData.relationshipStatus
+                      )}
                     </div>
                   </div>
                 )}
@@ -550,19 +601,21 @@ export default async function Profile({ searchParams }: ProfileProps) {
                 {userData.dancingStartYear && (
                   <div className="mb-4">
                     <div className="text-sm font-medium text-base-content/60 mb-1">
-                      {t('profile.dancingExperience')}
+                      {t("profile.dancingExperience")}
                     </div>
                     <div className="text-lg">
-                      {new Date().getFullYear() - userData.dancingStartYear} {t('profile.years')} ({t('profile.since')} {userData.dancingStartYear})
+                      {new Date().getFullYear() - userData.dancingStartYear}{" "}
+                      {t("profile.years")} ({t("profile.since")}{" "}
+                      {userData.dancingStartYear})
                     </div>
                   </div>
                 )}
 
                 {/* Dance Styles */}
                 {userData.danceStyles && userData.danceStyles.length > 0 && (
-                  <DanceStyleCard 
-                    danceStyles={getDanceStylesWithLevels(userData.danceStyles)} 
-                    title={t('profile.danceStylesLevels')}
+                  <DanceStyleCard
+                    danceStyles={getDanceStylesWithLevels(userData.danceStyles)}
+                    title={t("profile.danceStylesLevels")}
                   />
                 )}
 
@@ -574,18 +627,33 @@ export default async function Profile({ searchParams }: ProfileProps) {
             {/* Achievement Badges */}
             <div className="card bg-base-200 shadow-xl">
               <div className="card-body">
-                <h3 className="card-title text-xl mb-4">🏆 {t('profile.achievementBadges')}</h3>
-                <AchievementBadges badges={calculateUserBadges(userData)} maxDisplay={6} />
+                <h3 className="card-title text-xl mb-4">
+                  🏆 {t("profile.achievementBadges")}
+                </h3>
+                <AchievementBadges
+                  badges={calculateUserBadges(userData)}
+                  maxDisplay={6}
+                />
               </div>
             </div>
 
             {/* Jack & Jill Competitions */}
             <JackAndJillManager
               competitions={userData.jackAndJillCompetitions || []}
-              danceStyles={userData.danceStyles?.map((ds: any) => ({
-                _id: typeof ds.danceStyle === 'object' ? ds.danceStyle._id : ds.danceStyle,
-                name: typeof ds.danceStyle === 'object' ? ds.danceStyle.name : danceStyles.find((style: any) => style._id === ds.danceStyle)?.name || ''
-              })) || []}
+              danceStyles={
+                userData.danceStyles?.map((ds: any) => ({
+                  _id:
+                    typeof ds.danceStyle === "object"
+                      ? ds.danceStyle._id
+                      : ds.danceStyle,
+                  name:
+                    typeof ds.danceStyle === "object"
+                      ? ds.danceStyle.name
+                      : danceStyles.find(
+                          (style: any) => style._id === ds.danceStyle
+                        )?.name || "",
+                })) || []
+              }
               isOwnProfile={true}
             />
 
@@ -611,7 +679,9 @@ export default async function Profile({ searchParams }: ProfileProps) {
                 userData.socialMedia.youtube) && (
                 <div className="card bg-base-200 shadow-xl">
                   <div className="card-body">
-                    <h3 className="card-title text-xl mb-4">🌐 {t('profile.socialMedia')}</h3>
+                    <h3 className="card-title text-xl mb-4">
+                      🌐 {t("profile.socialMedia")}
+                    </h3>
                     <div className="flex gap-3">
                       {userData.socialMedia.instagram && (
                         <a
@@ -671,7 +741,9 @@ export default async function Profile({ searchParams }: ProfileProps) {
             {userData.anthem && userData.anthem.url && (
               <div className="card bg-base-200 shadow-xl">
                 <div className="card-body">
-                  <h3 className="card-title text-xl mb-4">🎵 {t('profile.danceAnthem')}</h3>
+                  <h3 className="card-title text-xl mb-4">
+                    🎵 {t("profile.danceAnthem")}
+                  </h3>
                   <div className="rounded-lg">
                     {/* Iframe for Spotify/YouTube */}
                     {(() => {
