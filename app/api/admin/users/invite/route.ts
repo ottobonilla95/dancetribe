@@ -43,30 +43,33 @@ export async function POST(req: Request) {
       );
     }
 
-    // Don't create the user yet - NextAuth will do it automatically on sign-in
-    // This matches how normal email sign-in works
-    
-    // Generate verification token (same as NextAuth does for magic links)
+    // Generate verification token (same as NextAuth)
     const token = crypto.randomBytes(32).toString("hex");
     const expires = new Date();
-    expires.setHours(expires.getHours() + 24); // Token valid for 24 hours
+    expires.setDate(expires.getDate() + 1);
 
-    // Hash the token before storing (NextAuth uses SHA-256)
+    // Hash token with secret (NextAuth requirement)
+    const secret = process.env.NEXTAUTH_SECRET || "";
     const hashedToken = crypto
       .createHash("sha256")
-      .update(token)
+      .update(`${token}${secret}`)
       .digest("hex");
 
-    // Store verification token in database (NextAuth's verification_tokens collection)
+    // Store in database
     const client = await clientPromise;
     const db = client.db();
+    
+    await db.collection("verification_tokens").deleteMany({
+      identifier: email.toLowerCase(),
+    });
+    
     await db.collection("verification_tokens").insertOne({
       identifier: email.toLowerCase(),
       token: hashedToken,
       expires: expires,
     });
 
-    // Generate magic link URL (same format as NextAuth email provider)
+    // Generate magic link with onboarding callback
     const callbackUrl = `https://${config.domainName}/onboarding`;
     const signInUrl = `https://${config.domainName}/api/auth/callback/email?callbackUrl=${encodeURIComponent(callbackUrl)}&token=${token}&email=${encodeURIComponent(email)}`;
 
@@ -152,4 +155,3 @@ function inviteUserEmail(email: string, signInUrl: string) {
     `
   };
 }
-
