@@ -28,9 +28,15 @@ interface DancerCardProps {
   showHomeCity?: boolean; // Show home city for travelers
 }
 
-export default function DancerCard({ dancer, showLikeButton = true, showFlag = false }: DancerCardProps) {
+export default function DancerCard({ dancer, showLikeButton = true, showFlag = false, showHomeCity = false }: DancerCardProps) {
   const { t } = useTranslation();
   const zodiacInfo = dancer.dateOfBirth ? getZodiacSign(new Date(dancer.dateOfBirth)) : null;
+  
+  // Check if dancer is traveling (activeCity different from home city)
+  const isTraveling = dancer.openToMeetTravelers && 
+    dancer.activeCity && 
+    dancer.city && 
+    dancer.activeCity._id !== dancer.city._id;
   
   // Generate flag emoji from country code
   const getFlagEmoji = (countryCode: string) => {
@@ -93,10 +99,11 @@ export default function DancerCard({ dancer, showLikeButton = true, showFlag = f
               </div>
               <p className="text-sm text-base-content/60">@{dancer.username}</p>
               
-              {/* Location - Only show if city data is available */}
-              {dancer.city && dancer.city.name && (
+              {/* Location - Show home city for travelers, otherwise show city */}
+              {dancer.city && dancer.city.name && (showHomeCity || !isTraveling) && (
                 <div className="flex items-center gap-1 text-sm text-base-content/70 mt-1">
                   <FaMapMarkerAlt className="text-xs" />
+                  {isTraveling && showHomeCity && <span className="text-xs opacity-70">From: </span>}
                   <span className="truncate">{dancer.city.name}</span>
                 </div>
               )}

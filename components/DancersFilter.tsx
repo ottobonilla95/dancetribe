@@ -217,6 +217,7 @@ export default function DancersFilter({
                 dancer={transformedDancer as any}
                 showLikeButton={true}
                 showFlag={true}
+                showHomeCity={true}
               />
             );
           })}
