@@ -131,8 +131,8 @@ export default function Onboarding() {
     },
     {
       id: "bio",
-      title: t("onboarding.bioTitle"),
-      description: t("onboarding.bioDesc"),
+      title: "Tell us about yourself",
+      description: "Share a bit about your dance journey (optional)",
       completed: user?.onboardingSteps?.bio || false,
     },
     {
@@ -1198,17 +1198,14 @@ export default function Onboarding() {
             {steps[currentStep].id === "bio" && (
               <div className="form-control">
                 <label className="label">
-                  <span className="label-text">{t("onboarding.bioLabel")}</span>
+                  <span className="label-text">Tell us about yourself</span>
                   <span className="label-text-alt text-base-content/50">
-                    {t("onboarding.bioCharCount").replace(
-                      "{count}",
-                      bio.length.toString()
-                    )}
+                    {bio.length}/150
                   </span>
                 </label>
                 <textarea
                   className="textarea textarea-bordered h-24"
-                  placeholder={t("onboarding.bioPlaceholder")}
+                  placeholder="Share a bit about your dance journey, what you love about dancing, or what makes you unique..."
                   value={bio}
                   onChange={(e) => {
                     if (e.target.value.length <= 150) {
@@ -1219,7 +1216,7 @@ export default function Onboarding() {
                 />
                 <label className="label">
                   <span className="label-text-alt text-base-content/50">
-                    {t("onboarding.bioDesc")}
+                    Optional - This will appear on your profile
                   </span>
                 </label>
               </div>
