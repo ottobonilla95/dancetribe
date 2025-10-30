@@ -297,7 +297,7 @@ export default async function Profile({ searchParams }: ProfileProps) {
                         </div>
                       )}
                     </div>
-                    {zodiac && (
+                    {zodiac && !userData.hideAge && (
                       <div className="mt-1 text-small">
                         <span className="">{zodiac.sign}</span>
                       </div>

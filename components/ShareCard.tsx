@@ -182,20 +182,22 @@ const ShareCard = forwardRef<HTMLDivElement, ShareCardProps>(
               </h1>
 
               {/* Zodiac */}
-              <div
-                style={{
-                  fontSize: "24px",
-                  fontWeight: "600",
-                  display: "flex",
-                  alignItems: "center",
-                  gap: "8px",
-                  marginBottom: "10px",
-                  color: "#e5e7eb",
-                }}
-              >
-                <span>{zodiac.emoji}</span>
-                {zodiac.name}
-              </div>
+              {!userData.hideAge && (
+                <div
+                  style={{
+                    fontSize: "24px",
+                    fontWeight: "600",
+                    display: "flex",
+                    alignItems: "center",
+                    gap: "8px",
+                    marginBottom: "10px",
+                    color: "#e5e7eb",
+                  }}
+                >
+                  <span>{zodiac.emoji}</span>
+                  {zodiac.name}
+                </div>
+              )}
 
               {/* Location */}
               <div

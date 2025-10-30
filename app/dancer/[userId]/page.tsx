@@ -362,7 +362,7 @@ export default async function PublicProfile({ params }: Props) {
                           </div>
                         )}
                       </div>
-                      {zodiac && (
+                      {zodiac && !userData.hideAge && (
                         <div className="mt-1 text-small">
                           <span className="">{zodiac.sign}</span>
                         </div>
