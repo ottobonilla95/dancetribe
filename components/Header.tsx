@@ -11,7 +11,7 @@ import SearchBar from "./SearchBar";
 import logo from "@/app/icon.png";
 import config from "@/config";
 import { useFriendRequestCount } from "@/contexts/FriendRequestContext";
-import { FaUser, FaUserFriends, FaCog, FaSignOutAlt, FaHome, FaUserPlus, FaMusic, FaSearch, FaPlane, FaShieldAlt } from "react-icons/fa";
+import { FaUser, FaUserFriends, FaCog, FaSignOutAlt, FaHome, FaUserPlus, FaMusic, FaSearch, FaPlane, FaShieldAlt, FaTrophy } from "react-icons/fa";
 import { signOut } from "next-auth/react";
 import { CONTACT } from "@/constants/contact";
 import InstallAppButton from "./InstallAppButton";
@@ -19,6 +19,7 @@ import SupportModal from "./SupportModal";
 import LanguageSwitcher from "./LanguageSwitcher";
 import { useTranslation } from "./I18nProvider";
 import DeleteAccountButton from "./DeleteAccountButton";
+import ActiveUsersCounter from "./ActiveUsersCounter";
 
 const links: {
   href: string;
@@ -57,6 +58,7 @@ const Header = () => {
   const loggedInNavItems = [
     { href: "/dashboard", label: t('nav.dashboard'), icon: FaHome },
     { href: "/discover", label: t('nav.discoverDancers'), icon: FaUserPlus },
+    { href: "/leaderboards", label: t('nav.leaderboards'), icon: FaTrophy },
     { href: "/profile", label: t('nav.myProfile'), icon: FaUser },
     { 
       href: "/friends", 
@@ -81,7 +83,7 @@ const Header = () => {
         aria-label="Global"
       >
         {/* Your logo/name on large screens */}
-        <div className="flex lg:flex-1">
+        <div className="flex lg:flex-1 items-center gap-4">
           <Link
             className="flex items-center gap-2 shrink-0 "
             href="/"
@@ -98,6 +100,13 @@ const Header = () => {
             />
             <span className="font-extrabold text-lg">{config.appName}</span>
           </Link>
+          
+          {/* Active Users Counter - Admin Only */}
+          {isAdmin && session && (
+            <div className="hidden lg:block">
+              <ActiveUsersCounter />
+            </div>
+          )}
         </div>
         {/* Search and Burger buttons on mobile */}
         <div className="flex lg:hidden gap-2">

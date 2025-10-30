@@ -456,6 +456,7 @@
   "nav": {
     "dashboard": "Inicio",
     "discoverDancers": "Descubrir Bailarines",
+    "leaderboards": "Clasificaciones",
     "myProfile": "Mi Perfil",
     "friends": "Amigos",
     "trendyMusic": "Música en Tendencia",
@@ -538,6 +539,18 @@
     "pending": "Pendiente",
     "acceptRequest": "Aceptar solicitud de amistad",
     "rejectRequest": "Rechazar solicitud de amistad"
+  },
+  "leaderboards": {
+    "title": "Clasificaciones",
+    "subtitle": "Celebra a los mejores bailarines de nuestra comunidad global",
+    "mostLiked": "Más Queridos",
+    "jjChampions": "Campeones J&J",
+    "jjPodium": "Podio J&J",
+    "jjCompetitors": "Competidores J&J",
+    "likes": "me gusta",
+    "wins": "victorias",
+    "podiums": "podios",
+    "competitions": "competiciones"
   },
   "city": {
     "population": "Población",

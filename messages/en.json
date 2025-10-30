@@ -456,6 +456,7 @@
   "nav": {
     "dashboard": "Dashboard",
     "discoverDancers": "Discover Dancers",
+    "leaderboards": "Leaderboards",
     "myProfile": "My Profile",
     "friends": "Friends",
     "trendyMusic": "Trendy Music",
@@ -538,6 +539,18 @@
     "pending": "Pending",
     "acceptRequest": "Accept friend request",
     "rejectRequest": "Reject friend request"
+  },
+  "leaderboards": {
+    "title": "Leaderboards",
+    "subtitle": "Celebrate the top dancers in our global community",
+    "mostLiked": "Most Liked",
+    "jjChampions": "J&J Champions",
+    "jjPodium": "Podium Finishers",
+    "jjCompetitors": "J&J Competitors",
+    "likes": "likes",
+    "wins": "wins",
+    "podiums": "podium finishes",
+    "competitions": "competitions"
   },
   "city": {
     "population": "Population",

@@ -307,7 +307,7 @@ export default async function Profile({ searchParams }: ProfileProps) {
                     {userData.bio && (
                       <div className="mt-2">
                         <p className="text-base italic text-base-content/80">
-                          "{userData.bio}"
+                          &ldquo;{userData.bio}&rdquo;
                         </p>
                       </div>
                     )}

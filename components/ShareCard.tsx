@@ -206,14 +206,14 @@ const ShareCard = forwardRef<HTMLDivElement, ShareCardProps>(
                   style={{
                     fontSize: "20px",
                     fontStyle: "italic",
-                    color: "#d1d5db",
-                    marginBottom: "10px",
-                    lineHeight: "1.4",
-                  }}
-                >
-                  "{userData.bio}"
-                </div>
-              )}
+                  color: "#d1d5db",
+                  marginBottom: "10px",
+                  lineHeight: "1.4",
+                }}
+              >
+                &ldquo;{userData.bio}&rdquo;
+              </div>
+            )}
 
               {/* Location */}
               <div

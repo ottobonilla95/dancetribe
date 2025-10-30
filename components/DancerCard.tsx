@@ -126,7 +126,7 @@ export default function DancerCard({ dancer, showLikeButton = true, showFlag = f
           {/* Bio */}
           {dancer.bio && (
             <p className="text-sm text-base-content/80 italic line-clamp-2 mb-2">
-              "{dancer.bio}"
+              &ldquo;{dancer.bio}&rdquo;
             </p>
           )}
 
