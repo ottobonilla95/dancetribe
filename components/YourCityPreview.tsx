@@ -1,5 +1,4 @@
 import Link from "next/link";
-import Image from "next/image";
 import { FaMapMarkerAlt, FaUsers, FaPlane } from "react-icons/fa";
 import { getMessages, getTranslation } from "@/lib/i18n";
 
@@ -44,11 +43,10 @@ export default async function YourCityPreview({ cityStats }: YourCityPreviewProp
       {/* Header with City Image */}
       <div className="relative h-32">
         {cityStats.cityImage ? (
-          <Image
+          <img
             src={cityStats.cityImage}
             alt={cityStats.cityName}
-            fill
-            className="object-cover"
+            className="w-full h-full object-cover"
           />
         ) : (
           <div className="w-full h-full bg-gradient-to-r from-primary to-secondary" />
