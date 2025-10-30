@@ -74,62 +74,56 @@ export async function GET() {
       }
     ]);
 
-    // 3. J&J Podium Kings/Queens (Most podium finishes) - Exclude current user
-    const jjPodiumFinishers = await User.aggregate([
-      { $match: { 
-        isProfileComplete: true, 
-        jackAndJillCompetitions: { $exists: true, $ne: [] },
-        ...(currentUserId ? { _id: { $ne: currentUserId } } : {})
-      } },
+    // 3. Top Teachers (Most liked teachers) - Exclude current user
+    const topTeachers = await User.aggregate([
+      { 
+        $match: { 
+          isProfileComplete: true,
+          isTeacher: true,
+          ...(currentUserId ? { _id: { $ne: currentUserId } } : {})
+        } 
+      },
       {
         $addFields: {
-          podiumFinishes: {
-            $size: {
-              $filter: {
-                input: "$jackAndJillCompetitions",
-                as: "comp",
-                cond: { 
-                  $in: ["$$comp.placement", ["1st", "2nd", "3rd"]] 
-                }
-              }
-            }
-          }
+          likesCount: { $size: { $ifNull: ["$likedBy", []] } }
         }
       },
-      { $match: { podiumFinishes: { $gt: 0 } } },
-      { $sort: { podiumFinishes: -1 } },
+      { $match: { likesCount: { $gt: 0 } } },
+      { $sort: { likesCount: -1 } },
       { $limit: 50 },
       {
         $project: {
           name: 1,
           username: 1,
           image: 1,
-          podiumFinishes: 1
+          likesCount: 1
         }
       }
     ]);
 
-    // 4. J&J Competitors (Most competitions) - Exclude current user
-    const jjCompetitors = await User.aggregate([
-      { $match: { 
-        isProfileComplete: true, 
-        jackAndJillCompetitions: { $exists: true, $ne: [] },
-        ...(currentUserId ? { _id: { $ne: currentUserId } } : {})
-      } },
+    // 4. Top DJs (Most liked DJs) - Exclude current user
+    const topDJs = await User.aggregate([
+      { 
+        $match: { 
+          isProfileComplete: true,
+          isDJ: true,
+          ...(currentUserId ? { _id: { $ne: currentUserId } } : {})
+        } 
+      },
       {
         $addFields: {
-          competitionsCount: { $size: "$jackAndJillCompetitions" }
+          likesCount: { $size: { $ifNull: ["$likedBy", []] } }
         }
       },
-      { $match: { competitionsCount: { $gt: 0 } } },
-      { $sort: { competitionsCount: -1 } },
+      { $match: { likesCount: { $gt: 0 } } },
+      { $sort: { likesCount: -1 } },
       { $limit: 50 },
       {
         $project: {
           name: 1,
           username: 1,
           image: 1,
-          competitionsCount: 1
+          likesCount: 1
         }
       }
     ]);
@@ -137,8 +131,8 @@ export async function GET() {
     return NextResponse.json({
       mostLiked: mostLikedDancers,
       jjChampions,
-      jjPodiumFinishers,
-      jjCompetitors,
+      topTeachers,
+      topDJs,
     });
   } catch (error) {
     console.error('Error fetching leaderboards:', error);

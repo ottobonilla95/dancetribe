@@ -546,12 +546,10 @@
     "subtitle": "Celebra a los mejores bailarines de nuestra comunidad global",
     "mostLiked": "Más Queridos",
     "jjChampions": "Campeones J&J",
-    "jjPodium": "Podio J&J",
-    "jjCompetitors": "Competidores J&J",
+    "topTeachers": "Mejores Profesores",
+    "topDJs": "Mejores DJs",
     "likes": "me gusta",
-    "wins": "victorias",
-    "podiums": "podios",
-    "competitions": "competiciones"
+    "wins": "victorias"
   },
   "city": {
     "population": "Población",

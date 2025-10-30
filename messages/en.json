@@ -546,12 +546,10 @@
     "subtitle": "Celebrate the top dancers in our global community",
     "mostLiked": "Most Liked",
     "jjChampions": "J&J Champions",
-    "jjPodium": "Podium Finishers",
-    "jjCompetitors": "J&J Competitors",
+    "topTeachers": "Top Teachers",
+    "topDJs": "Top DJs",
     "likes": "likes",
-    "wins": "wins",
-    "podiums": "podium finishes",
-    "competitions": "competitions"
+    "wins": "wins"
   },
   "city": {
     "population": "Population",
