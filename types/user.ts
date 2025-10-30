@@ -11,6 +11,7 @@ export type User = {
   username?: string;
   dateOfBirth?: Date;
   hideAge?: boolean;
+  bio?: string;
   dancingStartYear?: number;
   city?: City;
   activeCity?: City;
@@ -71,6 +72,7 @@ export interface OnboardingSteps {
   username: boolean;
   profilePic: boolean;
   dateOfBirth: boolean;
+  bio: boolean;
   dancingStartYear: boolean;
   currentLocation: boolean;
   citiesVisited: boolean;

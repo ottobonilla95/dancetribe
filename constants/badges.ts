@@ -3,7 +3,7 @@ export interface Badge {
   name: string;
   description: string;
   icon: string;
-  category: "experience" | "travel" | "continents" | "styles" | "social" | "teacher";
+  category: "experience" | "travel" | "continents" | "styles" | "social" | "teacher" | "competition";
   tier: "bronze" | "silver" | "gold" | "platinum" | "diamond";
   requirement: {
     type: string;
@@ -11,53 +11,34 @@ export interface Badge {
   };
 }
 
-// Category images - one per category
-export const CATEGORY_IMAGES: Record<string, string> = {
-  experience: "/img/badges/experience.png", // placeholder - add later
-  travel: "/img/badges/travel.png", // placeholder - add later
-  continents: "/img/badges/globe.png",
-  styles: "/img/badges/styles.png", // placeholder - add later
-  social: "/img/badges/friends.png", // placeholder - add later
-  teacher: "/img/badges/teacher.png", // placeholder - add later
-};
-
 export const BADGES: Badge[] = [
-  // Experience Badges
-  {
-    id: "new_dancer",
-    name: "New Dancer",
-    description: "Just started your dance journey",
-    icon: "🌱",
-    category: "experience",
-    tier: "bronze",
-    requirement: { type: "yearsOfDancing", value: 0 },
-  },
-  {
-    id: "growing_dancer",
-    name: "Growing",
-    description: "1 year of dancing experience",
-    icon: "🌿",
-    category: "experience",
-    tier: "bronze",
-    requirement: { type: "yearsOfDancing", value: 1 },
-  },
+  // Experience Badges - Earned achievements only!
   {
     id: "dedicated_dancer",
     name: "Dedicated",
-    description: "3 years of dancing experience",
+    description: "2+ years of dancing experience",
     icon: "🌳",
     category: "experience",
+    tier: "bronze",
+    requirement: { type: "yearsOfDancing", value: 2 },
+  },
+  {
+    id: "experienced_dancer",
+    name: "Experienced",
+    description: "4+ years of dancing experience",
+    icon: "⭐",
+    category: "experience",
     tier: "silver",
-    requirement: { type: "yearsOfDancing", value: 3 },
+    requirement: { type: "yearsOfDancing", value: 4 },
   },
   {
     id: "veteran_dancer",
     name: "Veteran",
-    description: "5 years of dancing experience",
-    icon: "⭐",
+    description: "7+ years of dancing experience",
+    icon: "🌟",
     category: "experience",
     tier: "gold",
-    requirement: { type: "yearsOfDancing", value: 5 },
+    requirement: { type: "yearsOfDancing", value: 7 },
   },
   {
     id: "legend_dancer",
@@ -78,42 +59,42 @@ export const BADGES: Badge[] = [
     requirement: { type: "yearsOfDancing", value: 20 },
   },
 
-  // City Travel Badges
-  {
-    id: "first_city",
-    name: "First Steps Abroad",
-    description: "Visited your first city",
-    icon: "✈️",
-    category: "travel",
-    tier: "bronze",
-    requirement: { type: "citiesVisited", value: 1 },
-  },
+  // City Travel Badges - Must have real travel experience
   {
     id: "city_explorer",
     name: "City Explorer",
-    description: "Visited 3 cities",
+    description: "Danced in 3+ cities",
     icon: "🗺️",
     category: "travel",
-    tier: "silver",
+    tier: "bronze",
     requirement: { type: "citiesVisited", value: 3 },
   },
   {
-    id: "globe_trotter",
+    id: "globe_trotter_starter",
     name: "Globe Trotter",
-    description: "Visited 5 cities",
+    description: "Danced in 5+ cities",
     icon: "🌍",
     category: "travel",
-    tier: "gold",
+    tier: "silver",
     requirement: { type: "citiesVisited", value: 5 },
   },
   {
     id: "world_dancer",
     name: "World Dancer",
-    description: "Visited 10 cities",
+    description: "Danced in 8+ cities",
     icon: "🌏",
     category: "travel",
+    tier: "gold",
+    requirement: { type: "citiesVisited", value: 8 },
+  },
+  {
+    id: "global_dancer",
+    name: "Global Dancer",
+    description: "Danced in 12+ cities",
+    icon: "🗺️",
+    category: "travel",
     tier: "platinum",
-    requirement: { type: "citiesVisited", value: 10 },
+    requirement: { type: "citiesVisited", value: 12 },
   },
   {
     id: "nomad",
@@ -125,32 +106,23 @@ export const BADGES: Badge[] = [
     requirement: { type: "citiesVisited", value: 20 },
   },
 
-  // Continent Travel Badges
-  {
-    id: "continental_starter",
-    name: "Continental Starter",
-    description: "Danced in 1 continent",
-    icon: "🗾",
-    category: "continents",
-    tier: "bronze",
-    requirement: { type: "continentsVisited", value: 1 },
-  },
+  // Continent Travel Badges - Serious travelers only
   {
     id: "continental_explorer",
     name: "Continental Explorer",
-    description: "Danced in 2 continents",
+    description: "Danced in 2+ continents",
     icon: "🌎",
     category: "continents",
-    tier: "silver",
+    tier: "bronze",
     requirement: { type: "continentsVisited", value: 2 },
   },
   {
     id: "continental_master",
     name: "Continental Master",
-    description: "Danced in 3 continents",
+    description: "Danced in 3+ continents",
     icon: "🌍",
     category: "continents",
-    tier: "gold",
+    tier: "silver",
     requirement: { type: "continentsVisited", value: 3 },
   },
   {
@@ -159,7 +131,7 @@ export const BADGES: Badge[] = [
     description: "Danced in 4+ continents",
     icon: "🗺️",
     category: "continents",
-    tier: "platinum",
+    tier: "gold",
     requirement: { type: "continentsVisited", value: 4 },
   },
   {
@@ -172,42 +144,42 @@ export const BADGES: Badge[] = [
     requirement: { type: "continentsVisited", value: 5 },
   },
 
-  // Dance Style Badges
-  {
-    id: "style_specialist",
-    name: "Specialist",
-    description: "Practicing 1 dance style",
-    icon: "💃",
-    category: "styles",
-    tier: "bronze",
-    requirement: { type: "danceStyles", value: 1 },
-  },
+  // Dance Style Badges - Multi-style dancers only
   {
     id: "style_versatile",
     name: "Versatile",
-    description: "Practicing 2 dance styles",
+    description: "Practicing 2+ dance styles",
     icon: "🕺",
     category: "styles",
-    tier: "silver",
+    tier: "bronze",
     requirement: { type: "danceStyles", value: 2 },
   },
   {
     id: "style_multitalented",
     name: "Multi-talented",
-    description: "Practicing 3 dance styles",
+    description: "Practicing 3+ dance styles",
     icon: "🎭",
     category: "styles",
-    tier: "gold",
+    tier: "silver",
     requirement: { type: "danceStyles", value: 3 },
   },
   {
     id: "style_polyglot",
     name: "Dance Polyglot",
-    description: "Practicing 5+ dance styles",
+    description: "Practicing 4+ dance styles",
     icon: "🎪",
     category: "styles",
+    tier: "gold",
+    requirement: { type: "danceStyles", value: 4 },
+  },
+  {
+    id: "style_omnidancer",
+    name: "Omni-Dancer",
+    description: "Practicing 6+ dance styles",
+    icon: "🌟",
+    category: "styles",
     tier: "platinum",
-    requirement: { type: "danceStyles", value: 5 },
+    requirement: { type: "danceStyles", value: 6 },
   },
   {
     id: "style_master",
@@ -228,39 +200,39 @@ export const BADGES: Badge[] = [
     requirement: { type: "expertStyles", value: 3 },
   },
 
-  // Social Badges
-  {
-    id: "social_newbie",
-    name: "Making Friends",
-    description: "Made 5 dance friends",
-    icon: "👥",
-    category: "social",
-    tier: "bronze",
-    requirement: { type: "friends", value: 5 },
-  },
+  // Social Badges - Build meaningful connections
   {
     id: "social_connector",
     name: "Connector",
-    description: "Made 10 dance friends",
+    description: "Made 10+ dance friends",
     icon: "🤝",
     category: "social",
-    tier: "silver",
+    tier: "bronze",
     requirement: { type: "friends", value: 10 },
+  },
+  {
+    id: "social_networker",
+    name: "Networker",
+    description: "Made 20+ dance friends",
+    icon: "💫",
+    category: "social",
+    tier: "silver",
+    requirement: { type: "friends", value: 20 },
   },
   {
     id: "social_builder",
     name: "Community Builder",
-    description: "Made 25 dance friends",
-    icon: "💫",
+    description: "Made 35+ dance friends",
+    icon: "🌟",
     category: "social",
     tier: "gold",
-    requirement: { type: "friends", value: 25 },
+    requirement: { type: "friends", value: 35 },
   },
   {
     id: "social_hub",
     name: "Social Hub",
     description: "Made 50+ dance friends",
-    icon: "🌟",
+    icon: "✨",
     category: "social",
     tier: "platinum",
     requirement: { type: "friends", value: 50 },
@@ -268,29 +240,38 @@ export const BADGES: Badge[] = [
   {
     id: "popular_profile",
     name: "Popular",
-    description: "Received 50 profile likes",
+    description: "Received 100+ profile likes",
     icon: "❤️",
     category: "social",
     tier: "silver",
-    requirement: { type: "likes", value: 50 },
+    requirement: { type: "likes", value: 100 },
   },
   {
     id: "viral_profile",
     name: "Viral",
-    description: "Received 100+ profile likes",
+    description: "Received 250+ profile likes",
     icon: "🔥",
     category: "social",
     tier: "gold",
-    requirement: { type: "likes", value: 100 },
+    requirement: { type: "likes", value: 250 },
   },
   {
     id: "celebrity_profile",
     name: "Celebrity",
     description: "Received 500+ profile likes",
+    icon: "⭐",
+    category: "social",
+    tier: "platinum",
+    requirement: { type: "likes", value: 500 },
+  },
+  {
+    id: "superstar_profile",
+    name: "Superstar",
+    description: "Received 1000+ profile likes",
     icon: "✨",
     category: "social",
     tier: "diamond",
-    requirement: { type: "likes", value: 500 },
+    requirement: { type: "likes", value: 1000 },
   },
 
   // Teacher Badges
@@ -320,6 +301,53 @@ export const BADGES: Badge[] = [
     category: "teacher",
     tier: "diamond",
     requirement: { type: "teachingYears", value: 10 },
+  },
+
+  // Jack & Jill Competition Badges
+  {
+    id: "jj_competitor",
+    name: "J&J Competitor",
+    description: "Competed in 3+ Jack & Jill competitions",
+    icon: "🎲",
+    category: "competition",
+    tier: "bronze",
+    requirement: { type: "jjCompetitions", value: 3 },
+  },
+  {
+    id: "jj_podium",
+    name: "Podium Finisher",
+    description: "Placed in the top 3 at a J&J competition",
+    icon: "🥉",
+    category: "competition",
+    tier: "silver",
+    requirement: { type: "jjPodiumFinishes", value: 1 },
+  },
+  {
+    id: "jj_competitive",
+    name: "Competitive Dancer",
+    description: "Placed in the top 3 at 3+ J&J competitions",
+    icon: "🏅",
+    category: "competition",
+    tier: "gold",
+    requirement: { type: "jjPodiumFinishes", value: 3 },
+  },
+  {
+    id: "jj_champion",
+    name: "J&J Champion",
+    description: "Won 2+ Jack & Jill competitions",
+    icon: "🥇",
+    category: "competition",
+    tier: "platinum",
+    requirement: { type: "jjFirstPlaces", value: 2 },
+  },
+  {
+    id: "jj_master",
+    name: "J&J Master",
+    description: "Won 5+ Jack & Jill competitions",
+    icon: "👑",
+    category: "competition",
+    tier: "diamond",
+    requirement: { type: "jjFirstPlaces", value: 5 },
   },
 ];
 

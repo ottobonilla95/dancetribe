@@ -10,6 +10,9 @@ interface UserBadgeData {
   teacherProfile?: {
     yearsOfExperience?: number;
   };
+  jackAndJillCompetitions?: Array<{
+    placement: "participated" | "1st" | "2nd" | "3rd";
+  }>;
 }
 
 export function calculateUserBadges(userData: UserBadgeData): Badge[] {
@@ -53,6 +56,15 @@ export function calculateUserBadges(userData: UserBadgeData): Badge[] {
   const friendsCount = userData.friends?.length || 0;
   const likesCount = userData.likedBy?.length || 0;
   const teachingYears = userData.teacherProfile?.yearsOfExperience || 0;
+  
+  // Calculate J&J competition metrics
+  const jjCompetitions = userData.jackAndJillCompetitions?.length || 0;
+  const jjPodiumFinishes = userData.jackAndJillCompetitions?.filter(
+    (comp) => comp.placement === "1st" || comp.placement === "2nd" || comp.placement === "3rd"
+  ).length || 0;
+  const jjFirstPlaces = userData.jackAndJillCompetitions?.filter(
+    (comp) => comp.placement === "1st"
+  ).length || 0;
 
   // Check each badge
   for (const badge of BADGES) {
@@ -93,6 +105,18 @@ export function calculateUserBadges(userData: UserBadgeData): Badge[] {
 
       case "teachingYears":
         earned = userData.isTeacher === true && teachingYears >= badge.requirement.value;
+        break;
+
+      case "jjCompetitions":
+        earned = jjCompetitions >= badge.requirement.value;
+        break;
+
+      case "jjPodiumFinishes":
+        earned = jjPodiumFinishes >= badge.requirement.value;
+        break;
+
+      case "jjFirstPlaces":
+        earned = jjFirstPlaces >= badge.requirement.value;
         break;
 
       default:
@@ -155,6 +179,15 @@ export function getNextBadges(userData: UserBadgeData, limit: number = 3): Array
   const friendsCount = userData.friends?.length || 0;
   const likesCount = userData.likedBy?.length || 0;
   const teachingYears = userData.teacherProfile?.yearsOfExperience || 0;
+  
+  // Calculate J&J competition metrics
+  const jjCompetitions = userData.jackAndJillCompetitions?.length || 0;
+  const jjPodiumFinishes = userData.jackAndJillCompetitions?.filter(
+    (comp) => comp.placement === "1st" || comp.placement === "2nd" || comp.placement === "3rd"
+  ).length || 0;
+  const jjFirstPlaces = userData.jackAndJillCompetitions?.filter(
+    (comp) => comp.placement === "1st"
+  ).length || 0;
 
   const nextBadges = BADGES
     .filter(badge => !earnedBadgeIds.has(badge.id))
@@ -189,6 +222,15 @@ export function getNextBadges(userData: UserBadgeData, limit: number = 3): Array
           break;
         case "teachingYears":
           currentValue = teachingYears;
+          break;
+        case "jjCompetitions":
+          currentValue = jjCompetitions;
+          break;
+        case "jjPodiumFinishes":
+          currentValue = jjPodiumFinishes;
+          break;
+        case "jjFirstPlaces":
+          currentValue = jjFirstPlaces;
           break;
       }
 

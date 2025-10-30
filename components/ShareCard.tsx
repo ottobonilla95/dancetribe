@@ -11,6 +11,7 @@ interface ShareCardProps {
     profilePicture: string;
     dateOfBirth: string;
     hideAge?: boolean;
+    bio?: string;
     nationality?: string;
     danceRole?: string;
     city: {
@@ -196,6 +197,21 @@ const ShareCard = forwardRef<HTMLDivElement, ShareCardProps>(
                 >
                   <span>{zodiac.emoji}</span>
                   {zodiac.name}
+                </div>
+              )}
+
+              {/* Bio */}
+              {userData.bio && (
+                <div
+                  style={{
+                    fontSize: "20px",
+                    fontStyle: "italic",
+                    color: "#d1d5db",
+                    marginBottom: "10px",
+                    lineHeight: "1.4",
+                  }}
+                >
+                  "{userData.bio}"
                 </div>
               )}
 

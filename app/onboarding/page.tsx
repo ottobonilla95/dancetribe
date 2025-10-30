@@ -79,6 +79,7 @@ export default function Onboarding() {
   const [firstName, setFirstName] = useState("");
   const [lastName, setLastName] = useState("");
   const [hideAge, setHideAge] = useState(false);
+  const [bio, setBio] = useState("");
   const [isTeacher, setIsTeacher] = useState(false);
   const [isDJ, setIsDJ] = useState(false);
   const [isPhotographer, setIsPhotographer] = useState(false);
@@ -120,6 +121,12 @@ export default function Onboarding() {
       title: t('onboarding.birthdayTitle'),
       description: t('onboarding.birthdayDesc'),
       completed: user?.onboardingSteps?.dateOfBirth || false,
+    },
+    {
+      id: "bio",
+      title: t('onboarding.bioTitle'),
+      description: t('onboarding.bioDesc'),
+      completed: user?.onboardingSteps?.bio || false,
     },
     {
       id: "gender",
@@ -302,6 +309,9 @@ export default function Onboarding() {
       }
       if (userData.hideAge !== undefined) {
         setHideAge(userData.hideAge);
+      }
+      if (userData.bio) {
+        setBio(userData.bio);
       }
       if (userData.dancingStartYear) {
         setDancingStartYear(userData.dancingStartYear.toString());
@@ -507,6 +517,10 @@ export default function Onboarding() {
           return;
         }
         stepData = { dateOfBirth, hideAge };
+        break;
+      case "bio":
+        // Bio is optional, no validation needed
+        stepData = { bio };
         break;
       case "dancingStartYear": {
         if (!dancingStartYear) {
@@ -1134,6 +1148,34 @@ export default function Onboarding() {
                     </div>
                   </label>
                 </div>
+              </div>
+            )}
+
+            {/* Bio */}
+            {steps[currentStep].id === "bio" && (
+              <div className="form-control">
+                <label className="label">
+                  <span className="label-text">{t('onboarding.bioLabel')}</span>
+                  <span className="label-text-alt text-base-content/50">
+                    {t('onboarding.bioCharCount').replace('{count}', bio.length.toString())}
+                  </span>
+                </label>
+                <textarea
+                  className="textarea textarea-bordered h-24"
+                  placeholder={t('onboarding.bioPlaceholder')}
+                  value={bio}
+                  onChange={(e) => {
+                    if (e.target.value.length <= 150) {
+                      setBio(e.target.value);
+                    }
+                  }}
+                  maxLength={150}
+                />
+                <label className="label">
+                  <span className="label-text-alt text-base-content/50">
+                    {t('onboarding.bioDesc')}
+                  </span>
+                </label>
               </div>
             )}
 

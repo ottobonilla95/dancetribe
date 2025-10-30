@@ -1,6 +1,6 @@
 "use client";
 
-import { Badge, CATEGORY_IMAGES } from "@/constants/badges";
+import { Badge } from "@/constants/badges";
 import Image from "next/image";
 import { useTranslation } from "./I18nProvider";
 
@@ -64,53 +64,17 @@ export default function AchievementBadges({
           return (
             <div
               key={badge.id}
-              className="flex flex-col items-center group w-[120px] md:w-[130px]"
+              className="flex flex-col items-center group w-[100px] md:w-[110px]"
             >
-              {/* Clean Circle Badge */}
+              {/* Medal Badge Only */}
               <div className="relative mb-3">
-                {/* Main Circle Container */}
-                <div
-                  className={`
-                    w-24 h-24 md:w-28 md:h-28 lg:w-32 lg:h-32
-                    rounded-full
-                    bg-gradient-to-br from-gray-100 to-gray-200
-                    ring-[3px] ${tierStyle.ring}
-                    flex items-center justify-center
-                    transform transition-all duration-300
-                    active:scale-95 md:hover:scale-105
-                    cursor-pointer
-                    shadow-lg
-                    relative
-                    overflow-hidden
-                  `}
-                >
-                  {/* Category Image or Icon */}
-                  {CATEGORY_IMAGES[badge.category] ? (
-                    <Image
-                      src={CATEGORY_IMAGES[badge.category]}
-                      alt={badge.category}
-                      width={96}
-                      height={96}
-                      className="w-14 h-14 md:w-16 md:h-16 lg:w-20 lg:h-20 object-contain"
-                    />
-                  ) : (
-                    // Fallback to emoji icon if no image
-                    <div className="text-3xl md:text-4xl lg:text-5xl">
-                      {badge.icon}
-                    </div>
-                  )}
-                </div>
-
-                {/* Tier Medal Badge - Larger and more prominent */}
-                <div className="absolute -top-1 -right-1 md:-top-2 md:-right-2 z-10">
-                  <Image
-                    src={tierStyle.medal}
-                    alt={`${badge.tier} medal`}
-                    width={40}
-                    height={40}
-                    className="w-8 h-8 md:w-9 md:h-9 lg:w-11 lg:h-11 drop-shadow-xl"
-                  />
-                </div>
+                <Image
+                  src={tierStyle.medal}
+                  alt={`${badge.tier} medal`}
+                  width={96}
+                  height={96}
+                  className="w-20 h-20 md:w-24 md:h-24 lg:w-28 lg:h-28 drop-shadow-2xl transform transition-all duration-300 active:scale-95 md:hover:scale-110 cursor-pointer"
+                />
               </div>
 
               {/* Badge Info */}

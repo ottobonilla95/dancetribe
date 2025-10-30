@@ -2,11 +2,12 @@
 
 import { useTranslation } from './I18nProvider';
 import { FaGlobe } from 'react-icons/fa';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 
 export default function LanguageSwitcher() {
   const { locale, setLocale } = useTranslation();
   const [mounted, setMounted] = useState(false);
+  const dropdownRef = useRef<HTMLDetailsElement>(null);
 
   // Avoid hydration mismatch by only showing locale text after mount
   useEffect(() => {
@@ -15,13 +16,21 @@ export default function LanguageSwitcher() {
 
   const handleChange = (newLocale: 'en' | 'es') => {
     if (newLocale !== locale) {
+      // Close dropdown immediately
+      if (dropdownRef.current) {
+        dropdownRef.current.removeAttribute('open');
+      }
+      // Blur to close dropdown
+      if (document.activeElement instanceof HTMLElement) {
+        document.activeElement.blur();
+      }
       setLocale(newLocale);
     }
   };
 
   return (
-    <div className="dropdown dropdown-end w-full">
-      <label tabIndex={0} className="btn btn-ghost btn-sm gap-2 w-full justify-start">
+    <details ref={dropdownRef} className="dropdown dropdown-end w-full">
+      <summary className="btn btn-ghost btn-sm gap-2 w-full justify-start">
         <FaGlobe className="text-lg" />
         {mounted && (
           <>
@@ -29,8 +38,8 @@ export default function LanguageSwitcher() {
             <span className="sm:hidden">{locale.toUpperCase()}</span>
           </>
         )}
-      </label>
-      <ul tabIndex={0} className="dropdown-content menu p-2 shadow bg-base-200 rounded-box w-full mt-2 z-50 border border-base-300">
+      </summary>
+      <ul className="dropdown-content menu p-2 shadow bg-base-200 rounded-box w-full mt-2 z-50 border border-base-300">
         <li>
           <button
             onClick={() => handleChange('en')}
@@ -48,7 +57,7 @@ export default function LanguageSwitcher() {
           </button>
         </li>
       </ul>
-    </div>
+    </details>
   );
 }
 

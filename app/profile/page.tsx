@@ -227,6 +227,7 @@ export default async function Profile({ searchParams }: ProfileProps) {
           profilePicture: userData.image || "/default-avatar.png",
           dateOfBirth: userData.dateOfBirth,
           hideAge: userData.hideAge,
+          bio: userData.bio,
           nationality: userData.nationality,
           danceRole: userData.danceRole,
           city: userData.city ? {
@@ -300,6 +301,14 @@ export default async function Profile({ searchParams }: ProfileProps) {
                     {zodiac && !userData.hideAge && (
                       <div className="mt-1 text-small">
                         <span className="">{zodiac.sign}</span>
+                      </div>
+                    )}
+                    {/* Bio */}
+                    {userData.bio && (
+                      <div className="mt-2">
+                        <p className="text-base italic text-base-content/80">
+                          "{userData.bio}"
+                        </p>
                       </div>
                     )}
                     {/* Current Location */}

@@ -123,6 +123,13 @@ export default function DancerCard({ dancer, showLikeButton = true, showFlag = f
             </div>
           </div>
 
+          {/* Bio */}
+          {dancer.bio && (
+            <p className="text-sm text-base-content/80 italic line-clamp-2 mb-2">
+              "{dancer.bio}"
+            </p>
+          )}
+
           {/* Dance Role Badge */}
           {dancer.danceRole && (
             <div className="">
