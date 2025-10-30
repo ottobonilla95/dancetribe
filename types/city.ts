@@ -18,5 +18,5 @@ export type City = {
     lat: number;
     lng: number;
   };
-  danceStyles: { style: string }[];
+  danceStyles?: { style: string }[];
 };

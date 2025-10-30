@@ -47,6 +47,7 @@ export default async function YourCityPreview({ cityStats }: YourCityPreviewProp
             src={cityStats.cityImage}
             alt={cityStats.cityName}
             className="w-full h-full object-cover"
+            loading="lazy"
           />
         ) : (
           <div className="w-full h-full bg-gradient-to-r from-primary to-secondary" />

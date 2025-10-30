@@ -51,7 +51,7 @@ const CityCard = ({ city, index }: CityCardProps) => {
                   </span>
                 )}
               </div>
-              {city.danceStyles.length > 0 && (
+              {city.danceStyles && city.danceStyles.length > 0 && (
                 <div className="flex items-center gap-1">
                   <span className="font-bold text-sm">{t('common.popularStyles')}:</span>
                   <span className="text-sm">
