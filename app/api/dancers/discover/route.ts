@@ -98,7 +98,7 @@ export async function GET(req: NextRequest) {
       sortCriteria = { createdAt: -1 };
     }
 
-    // Base query to get users
+    // Base query to get users (fetch more than needed for sorting professionals)
     let usersQuery = User.find(query)
       .populate({
         path: "city",
@@ -110,11 +110,28 @@ export async function GET(req: NextRequest) {
         }
       })
       .select("-email -friendRequestsSent -friendRequestsReceived -friends")
-      .sort(sortCriteria)
-      .skip(skip)
-      .limit(limit);
+      .sort(sortCriteria);
 
     let users = await usersQuery.lean();
+
+    // Sort: professionals (teachers, DJs, photographers) by likes first, then regular dancers
+    users.sort((a: any, b: any) => {
+      const aIsProfessional = a.isTeacher || a.isDJ || a.isPhotographer;
+      const bIsProfessional = b.isTeacher || b.isDJ || b.isPhotographer;
+      const aLikes = a.likedBy?.length || 0;
+      const bLikes = b.likedBy?.length || 0;
+
+      // If both are professionals or both are not, sort by likes
+      if (aIsProfessional === bIsProfessional) {
+        return bLikes - aLikes; // Descending order (most likes first)
+      }
+      
+      // Professionals come first
+      return aIsProfessional ? -1 : 1;
+    });
+
+    // Apply pagination after sorting
+    users = users.slice(skip, skip + limit);
 
     // Filter by dance style if specified
     if (danceStyle && danceStyle !== "all") {

@@ -75,7 +75,14 @@ export default function Onboarding() {
   );
   const [gender, setGender] = useState<"male" | "female" | "other" | "">("");
   const [nationality, setNationality] = useState("");
-  const [relationshipStatus, setRelationshipStatus] = useState<"single" | "in_a_relationship" | "married" | "its_complicated" | "prefer_not_to_say" | "">("");
+  const [relationshipStatus, setRelationshipStatus] = useState<
+    | "single"
+    | "in_a_relationship"
+    | "married"
+    | "its_complicated"
+    | "prefer_not_to_say"
+    | ""
+  >("");
   const [firstName, setFirstName] = useState("");
   const [lastName, setLastName] = useState("");
   const [hideAge, setHideAge] = useState(false);
@@ -100,98 +107,98 @@ export default function Onboarding() {
   const steps: OnboardingStep[] = [
     {
       id: "nameDetails",
-      title: t('onboarding.nameTitle'),
-      description: t('onboarding.nameDesc'),
+      title: t("onboarding.nameTitle"),
+      description: t("onboarding.nameDesc"),
       completed: user?.onboardingSteps?.nameDetails || false,
     },
     {
       id: "username",
-      title: t('onboarding.usernameTitle'),
-      description: t('onboarding.usernameDesc'),
+      title: t("onboarding.usernameTitle"),
+      description: t("onboarding.usernameDesc"),
       completed: user?.onboardingSteps?.username || false,
     },
     {
       id: "profilePic",
-      title: t('onboarding.profilePicTitle'),
-      description: t('onboarding.profilePicDesc'),
+      title: t("onboarding.profilePicTitle"),
+      description: t("onboarding.profilePicDesc"),
       completed: user?.onboardingSteps?.profilePic || false,
     },
     {
       id: "dateOfBirth",
-      title: t('onboarding.birthdayTitle'),
-      description: t('onboarding.birthdayDesc'),
+      title: t("onboarding.birthdayTitle"),
+      description: t("onboarding.birthdayDesc"),
       completed: user?.onboardingSteps?.dateOfBirth || false,
     },
     {
       id: "bio",
-      title: t('onboarding.bioTitle'),
-      description: t('onboarding.bioDesc'),
+      title: t("onboarding.bioTitle"),
+      description: t("onboarding.bioDesc"),
       completed: user?.onboardingSteps?.bio || false,
     },
     {
       id: "gender",
-      title: t('onboarding.genderTitle'),
-      description: t('onboarding.genderDesc'),
+      title: t("onboarding.genderTitle"),
+      description: t("onboarding.genderDesc"),
       completed: user?.onboardingSteps?.gender || false,
     },
     {
       id: "nationality",
-      title: t('onboarding.nationalityTitle'),
-      description: t('onboarding.nationalityDesc'),
+      title: t("onboarding.nationalityTitle"),
+      description: t("onboarding.nationalityDesc"),
       completed: user?.onboardingSteps?.nationality || false,
     },
     {
       id: "relationshipStatus",
-      title: t('onboarding.relationshipTitle'),
-      description: t('onboarding.relationshipDesc'),
+      title: t("onboarding.relationshipTitle"),
+      description: t("onboarding.relationshipDesc"),
       completed: user?.onboardingSteps?.relationshipStatus || false,
     },
     {
       id: "dancingStartYear",
-      title: t('onboarding.dancingStartTitle'),
-      description: t('onboarding.dancingStartDesc'),
+      title: t("onboarding.dancingStartTitle"),
+      description: t("onboarding.dancingStartDesc"),
       completed: user?.onboardingSteps?.dancingStartYear || false,
     },
     {
       id: "danceStyles",
-      title: t('onboarding.danceStylesTitle'),
-      description: t('onboarding.danceStylesDesc'),
+      title: t("onboarding.danceStylesTitle"),
+      description: t("onboarding.danceStylesDesc"),
       completed: user?.onboardingSteps?.danceStyles || false,
     },
     {
       id: "danceRole",
-      title: t('onboarding.danceRoleTitle'),
-      description: t('onboarding.danceRoleDesc'),
+      title: t("onboarding.danceRoleTitle"),
+      description: t("onboarding.danceRoleDesc"),
       completed: user?.onboardingSteps?.danceRole || false,
     },
     {
       id: "currentLocation",
-      title: t('onboarding.locationTitle'),
-      description: t('onboarding.locationDesc'),
+      title: t("onboarding.locationTitle"),
+      description: t("onboarding.locationDesc"),
       completed: user?.onboardingSteps?.currentLocation || false,
     },
     {
       id: "citiesVisited",
-      title: t('onboarding.citiesVisitedTitle'),
-      description: t('onboarding.citiesVisitedDesc'),
+      title: t("onboarding.citiesVisitedTitle"),
+      description: t("onboarding.citiesVisitedDesc"),
       completed: user?.onboardingSteps?.citiesVisited || false,
     },
     {
       id: "anthem",
-      title: t('onboarding.anthemTitle'),
-      description: t('onboarding.anthemDesc'),
+      title: t("onboarding.anthemTitle"),
+      description: t("onboarding.anthemDesc"),
       completed: user?.onboardingSteps?.anthem || false,
     },
     {
       id: "socialMedia",
-      title: t('onboarding.socialMediaTitle'),
-      description: t('onboarding.socialMediaDesc'),
+      title: t("onboarding.socialMediaTitle"),
+      description: t("onboarding.socialMediaDesc"),
       completed: user?.onboardingSteps?.socialMedia || false,
     },
     {
       id: "teacherInfo",
-      title: t('onboarding.professionalTitle'),
-      description: t('onboarding.professionalDesc'),
+      title: t("onboarding.professionalTitle"),
+      description: t("onboarding.professionalDesc"),
       completed: user?.onboardingSteps?.teacherInfo || false,
     },
   ];
@@ -289,7 +296,10 @@ export default function Onboarding() {
           })
         );
         setDanceStyles(normalizedDanceStyles);
-      } else if (userData.danceStyles?.length === 0 && (userData.isDJ || userData.isPhotographer)) {
+      } else if (
+        userData.danceStyles?.length === 0 &&
+        (userData.isDJ || userData.isPhotographer)
+      ) {
         // User has explicitly chosen to skip dance sections
         setSkipDanceSections(true);
       }
@@ -389,8 +399,12 @@ export default function Onboarding() {
       if (userData.isPhotographer) {
         setIsPhotographer(userData.isPhotographer);
         if (userData.photographerProfile) {
-          setPhotographerPortfolio(userData.photographerProfile.portfolioLink || "");
-          setPhotographerSpecialties(userData.photographerProfile.specialties || "");
+          setPhotographerPortfolio(
+            userData.photographerProfile.portfolioLink || ""
+          );
+          setPhotographerSpecialties(
+            userData.photographerProfile.specialties || ""
+          );
           setPhotographerBio(userData.photographerProfile.bio || "");
         }
       }
@@ -444,25 +458,30 @@ export default function Onboarding() {
 
   const handleNext = async () => {
     const step = steps[currentStep];
-    
+
     // Skip all dance-related steps at once if user is not a dancer
     if (skipDanceSections && step.id === "dancingStartYear") {
       // Jump directly to the first non-dance step after danceRole
-      const danceRoleIndex = steps.findIndex(s => s.id === "danceRole");
+      const danceRoleIndex = steps.findIndex((s) => s.id === "danceRole");
       if (danceRoleIndex !== -1 && danceRoleIndex + 1 < steps.length) {
         setCurrentStep(danceRoleIndex + 1);
       }
       return;
     }
-    
-    // Also skip if somehow they land on danceStyles or danceRole with skipDanceSections enabled
-    if (skipDanceSections && (step.id === "danceStyles" || step.id === "danceRole")) {
+
+    // Also skip dance-related steps if skipDanceSections is enabled
+    if (
+      skipDanceSections &&
+      (step.id === "danceStyles" ||
+        step.id === "danceRole" ||
+        step.id === "citiesVisited")
+    ) {
       if (currentStep < steps.length - 1) {
         setCurrentStep(currentStep + 1);
       }
       return;
     }
-    
+
     let stepData: any = {};
 
     switch (step.id) {
@@ -598,8 +617,14 @@ export default function Onboarding() {
       case "teacherInfo": {
         // Validate at least one contact method if any professional role is selected
         const hasAnyProfessionalRole = isTeacher || isDJ || isPhotographer;
-        if (hasAnyProfessionalRole && !professionalContact.whatsapp && !professionalContact.email) {
-          alert("Please provide at least one contact method (WhatsApp or Email)");
+        if (
+          hasAnyProfessionalRole &&
+          !professionalContact.whatsapp &&
+          !professionalContact.email
+        ) {
+          alert(
+            "Please provide at least one contact method (WhatsApp or Email)"
+          );
           return;
         }
         stepData = {
@@ -807,14 +832,14 @@ export default function Onboarding() {
   // Auto-add current location to visited cities when they reach that step
   useEffect(() => {
     const currentStepId = steps[currentStep]?.id;
-    
+
     if (currentStepId === "citiesVisited" && currentLocation) {
       // Check if current location is already in visited cities
       const cityId = currentLocation._id || (currentLocation as any).id;
       const isAlreadyAdded = citiesVisited.some(
         (city) => (city._id || (city as any).id) === cityId
       );
-      
+
       // If not already added, add it to the beginning of the array
       if (!isAlreadyAdded) {
         setCitiesVisited((prev) => [currentLocation, ...prev]);
@@ -838,10 +863,12 @@ export default function Onboarding() {
         <div className="mb-8">
           <div className="flex justify-between items-center mb-4">
             <h1 className="text-2xl font-bold">
-              {isEditMode ? t('onboarding.editProfile') : t('onboarding.completeProfile')}
+              {isEditMode
+                ? t("onboarding.editProfile")
+                : t("onboarding.completeProfile")}
             </h1>
             <span className="text-sm text-base-content/70">
-              {currentStep + 1} {t('onboarding.of')} {steps.length}
+              {currentStep + 1} {t("onboarding.of")} {steps.length}
             </span>
           </div>
           <progress
@@ -866,24 +893,28 @@ export default function Onboarding() {
               <div className="form-control space-y-4">
                 <div className="form-control">
                   <label className="label">
-                    <span className="label-text">{t('onboarding.firstName')}</span>
+                    <span className="label-text">
+                      {t("onboarding.firstName")}
+                    </span>
                   </label>
                   <input
                     type="text"
                     className="input input-bordered w-full"
-                    placeholder={t('onboarding.firstNamePlaceholder')}
+                    placeholder={t("onboarding.firstNamePlaceholder")}
                     value={firstName}
                     onChange={(e) => setFirstName(e.target.value)}
                   />
                 </div>
                 <div className="form-control">
                   <label className="label">
-                    <span className="label-text">{t('onboarding.lastName')}</span>
+                    <span className="label-text">
+                      {t("onboarding.lastName")}
+                    </span>
                   </label>
                   <input
                     type="text"
                     className="input input-bordered w-full"
-                    placeholder={t('onboarding.lastNamePlaceholder')}
+                    placeholder={t("onboarding.lastNamePlaceholder")}
                     value={lastName}
                     onChange={(e) => setLastName(e.target.value)}
                   />
@@ -899,128 +930,132 @@ export default function Onboarding() {
                   <>
                     {/* Partner Dance Styles */}
                     <div>
-                  <h3 className="font-semibold text-base-content mb-3">
-                    {t('onboarding.partnerDances')}
-                  </h3>
-                  <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
-                    {danceStylesOptions
-                      .filter((style) => style.isPartnerDance)
-                      .map((style) => (
-                        <div
-                          key={style._id}
-                          className={`cursor-pointer flex-col gap-2 rounded-lg p-4 border transition-colors text-center ${
-                            isDanceStyleSelected(style._id || style.id)
-                              ? "bg-primary text-primary-content border-primary shadow-lg"
-                              : "bg-base-100 border-base-300 hover:bg-base-200"
-                          }`}
-                          onClick={() => {
-                            if (isDanceStyleSelected(style._id || style.id)) {
-                              removeDanceStyle(style._id || style.id);
-                            } else {
-                              addDanceStyle(style._id || style.id);
-                            }
-                          }}
-                        >
-                          <span className="font-medium">{style.name}</span>
-                        </div>
-                      ))}
-                  </div>
-                </div>
-
-                {/* Solo/Non-Partner Dance Styles */}
-                <div>
-                  <h3 className="font-semibold text-base-content mb-3">
-                    {t('onboarding.soloDances')}
-                  </h3>
-                  <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
-                    {danceStylesOptions
-                      .filter((style) => !style.isPartnerDance)
-                      .map((style) => (
-                        <div
-                          key={style._id}
-                          className={`cursor-pointer flex-col gap-2 rounded-lg p-4 border transition-colors text-center ${
-                            isDanceStyleSelected(style._id || style.id)
-                              ? "bg-primary text-primary-content border-primary shadow-lg"
-                              : "bg-base-100 border-base-300 hover:bg-base-200"
-                          }`}
-                          onClick={() => {
-                            if (isDanceStyleSelected(style._id || style.id)) {
-                              removeDanceStyle(style._id || style.id);
-                            } else {
-                              addDanceStyle(style._id || style.id);
-                            }
-                          }}
-                        >
-                          <span className="font-medium">{style.name}</span>
-                        </div>
-                      ))}
-                  </div>
-                </div>
-
-                {/* Level Selection for Selected Styles */}
-                {danceStyles.length > 0 && (
-                  <div className="space-y-4">
-                    <h3 className="font-medium text-base-content">
-                      {t('onboarding.setSkillLevels')}
-                    </h3>
-                    {danceStyles.map((userStyle) => (
-                      <div
-                        key={userStyle.danceStyle}
-                        className="bg-base-200 rounded-lg p-4"
-                      >
-                        <div className="flex items-center justify-between mb-3">
-                          <span className="font-medium">
-                            {getStyleNameById(userStyle.danceStyle)}
-                          </span>
-                          <button
-                            type="button"
-                            className="btn btn-ghost btn-xs text-error"
-                            onClick={() =>
-                              removeDanceStyle(userStyle.danceStyle)
-                            }
-                          >
-                            {t('onboarding.remove')}
-                          </button>
-                        </div>
-                        <div className="grid grid-cols-2 md:grid-cols-4 gap-2">
-                          {DANCE_LEVELS.map((level) => (
-                            <label
-                              key={level.value}
-                              className={`label cursor-pointer flex-col gap-1 rounded-lg p-2 border transition-colors ${
-                                userStyle.level === level.value
-                                  ? "bg-primary text-primary-content border-primary"
+                      <h3 className="font-semibold text-base-content mb-3">
+                        {t("onboarding.partnerDances")}
+                      </h3>
+                      <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
+                        {danceStylesOptions
+                          .filter((style) => style.isPartnerDance)
+                          .map((style) => (
+                            <div
+                              key={style._id}
+                              className={`cursor-pointer flex-col gap-2 rounded-lg p-4 border transition-colors text-center ${
+                                isDanceStyleSelected(style._id || style.id)
+                                  ? "bg-primary text-primary-content border-primary shadow-lg"
                                   : "bg-base-100 border-base-300 hover:bg-base-200"
                               }`}
-                            >
-                              <span className="text-lg">{level.emoji}</span>
-                              <span className="text-xs text-center">
-                                {level.label}
-                              </span>
-                              <input
-                                type="radio"
-                                name={`level-${userStyle.danceStyle}`}
-                                className="radio radio-primary radio-xs"
-                                checked={userStyle.level === level.value}
-                                onChange={() =>
-                                  updateDanceStyleLevel(
-                                    userStyle.danceStyle,
-                                    level.value
-                                  )
+                              onClick={() => {
+                                if (
+                                  isDanceStyleSelected(style._id || style.id)
+                                ) {
+                                  removeDanceStyle(style._id || style.id);
+                                } else {
+                                  addDanceStyle(style._id || style.id);
                                 }
-                              />
-                            </label>
+                              }}
+                            >
+                              <span className="font-medium">{style.name}</span>
+                            </div>
                           ))}
-                        </div>
                       </div>
-                    ))}
-                  </div>
-                )}
+                    </div>
 
-                {danceStyles.length === 0 && (
-                  <div className="text-center text-base-content/60 py-4">
-                    Select at least one dance style to continue
-                  </div>
-                )}
+                    {/* Solo/Non-Partner Dance Styles */}
+                    <div>
+                      <h3 className="font-semibold text-base-content mb-3">
+                        {t("onboarding.soloDances")}
+                      </h3>
+                      <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
+                        {danceStylesOptions
+                          .filter((style) => !style.isPartnerDance)
+                          .map((style) => (
+                            <div
+                              key={style._id}
+                              className={`cursor-pointer flex-col gap-2 rounded-lg p-4 border transition-colors text-center ${
+                                isDanceStyleSelected(style._id || style.id)
+                                  ? "bg-primary text-primary-content border-primary shadow-lg"
+                                  : "bg-base-100 border-base-300 hover:bg-base-200"
+                              }`}
+                              onClick={() => {
+                                if (
+                                  isDanceStyleSelected(style._id || style.id)
+                                ) {
+                                  removeDanceStyle(style._id || style.id);
+                                } else {
+                                  addDanceStyle(style._id || style.id);
+                                }
+                              }}
+                            >
+                              <span className="font-medium">{style.name}</span>
+                            </div>
+                          ))}
+                      </div>
+                    </div>
+
+                    {/* Level Selection for Selected Styles */}
+                    {danceStyles.length > 0 && (
+                      <div className="space-y-4">
+                        <h3 className="font-medium text-base-content">
+                          {t("onboarding.setSkillLevels")}
+                        </h3>
+                        {danceStyles.map((userStyle) => (
+                          <div
+                            key={userStyle.danceStyle}
+                            className="bg-base-200 rounded-lg p-4"
+                          >
+                            <div className="flex items-center justify-between mb-3">
+                              <span className="font-medium">
+                                {getStyleNameById(userStyle.danceStyle)}
+                              </span>
+                              <button
+                                type="button"
+                                className="btn btn-ghost btn-xs text-error"
+                                onClick={() =>
+                                  removeDanceStyle(userStyle.danceStyle)
+                                }
+                              >
+                                {t("onboarding.remove")}
+                              </button>
+                            </div>
+                            <div className="grid grid-cols-2 md:grid-cols-4 gap-2">
+                              {DANCE_LEVELS.map((level) => (
+                                <label
+                                  key={level.value}
+                                  className={`label cursor-pointer flex-col gap-1 rounded-lg p-2 border transition-colors ${
+                                    userStyle.level === level.value
+                                      ? "bg-primary text-primary-content border-primary"
+                                      : "bg-base-100 border-base-300 hover:bg-base-200"
+                                  }`}
+                                >
+                                  <span className="text-lg">{level.emoji}</span>
+                                  <span className="text-xs text-center">
+                                    {level.label}
+                                  </span>
+                                  <input
+                                    type="radio"
+                                    name={`level-${userStyle.danceStyle}`}
+                                    className="radio radio-primary radio-xs"
+                                    checked={userStyle.level === level.value}
+                                    onChange={() =>
+                                      updateDanceStyleLevel(
+                                        userStyle.danceStyle,
+                                        level.value
+                                      )
+                                    }
+                                  />
+                                </label>
+                              ))}
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    )}
+
+                    {danceStyles.length === 0 && (
+                      <div className="text-center text-base-content/60 py-4">
+                        Select at least one dance style to continue
+                      </div>
+                    )}
                   </>
                 )}
               </div>
@@ -1030,7 +1065,9 @@ export default function Onboarding() {
             {steps[currentStep].id === "username" && (
               <div className="form-control">
                 <label className="label">
-                  <span className="label-text">{t('onboarding.usernameLabel')}</span>
+                  <span className="label-text">
+                    {t("onboarding.usernameLabel")}
+                  </span>
                 </label>
                 <div className="relative">
                   <input
@@ -1042,7 +1079,7 @@ export default function Onboarding() {
                           ? "input-success"
                           : ""
                     }`}
-                    placeholder={t('onboarding.usernamePlaceholder')}
+                    placeholder={t("onboarding.usernamePlaceholder")}
                     value={username}
                     onChange={(e) => handleUsernameChange(e.target.value)}
                   />
@@ -1074,7 +1111,7 @@ export default function Onboarding() {
                 {usernameStatus.available === true && !usernameStatus.error && (
                   <div className="label">
                     <span className="label-text-alt text-success">
-                      {t('onboarding.usernameAvailable')}
+                      {t("onboarding.usernameAvailable")}
                     </span>
                   </div>
                 )}
@@ -1083,7 +1120,7 @@ export default function Onboarding() {
                 {usernameStatus.suggestions.length > 0 && (
                   <div className="mt-3">
                     <span className="text-sm text-base-content/70">
-                      {t('onboarding.suggestions')}:
+                      {t("onboarding.suggestions")}:
                     </span>
                     <div className="flex flex-wrap gap-2 mt-2">
                       {usernameStatus.suggestions.map((suggestion) => (
@@ -1104,7 +1141,7 @@ export default function Onboarding() {
 
                 <div className="label">
                   <span className="label-text-alt">
-                    {t('onboarding.profileUrl')}: DanceCircle.co/
+                    {t("onboarding.profileUrl")}: DanceCircle.co/
                     {username || "username"}
                   </span>
                 </div>
@@ -1124,7 +1161,9 @@ export default function Onboarding() {
               <div className="form-control space-y-4">
                 <div>
                   <label className="label">
-                    <span className="label-text">{t('onboarding.dateOfBirth')}</span>
+                    <span className="label-text">
+                      {t("onboarding.dateOfBirth")}
+                    </span>
                   </label>
                   <input
                     type="date"
@@ -1143,8 +1182,12 @@ export default function Onboarding() {
                       onChange={(e) => setHideAge(e.target.checked)}
                     />
                     <div>
-                      <span className="label-text font-medium">{t('onboarding.hideAgeLabel')}</span>
-                      <p className="text-sm text-base-content/60 mt-1">{t('onboarding.hideAgeDesc')}</p>
+                      <span className="label-text font-medium">
+                        {t("onboarding.hideAgeLabel")}
+                      </span>
+                      <p className="text-sm text-base-content/60 mt-1">
+                        {t("onboarding.hideAgeDesc")}
+                      </p>
                     </div>
                   </label>
                 </div>
@@ -1155,14 +1198,17 @@ export default function Onboarding() {
             {steps[currentStep].id === "bio" && (
               <div className="form-control">
                 <label className="label">
-                  <span className="label-text">{t('onboarding.bioLabel')}</span>
+                  <span className="label-text">{t("onboarding.bioLabel")}</span>
                   <span className="label-text-alt text-base-content/50">
-                    {t('onboarding.bioCharCount').replace('{count}', bio.length.toString())}
+                    {t("onboarding.bioCharCount").replace(
+                      "{count}",
+                      bio.length.toString()
+                    )}
                   </span>
                 </label>
                 <textarea
                   className="textarea textarea-bordered h-24"
-                  placeholder={t('onboarding.bioPlaceholder')}
+                  placeholder={t("onboarding.bioPlaceholder")}
                   value={bio}
                   onChange={(e) => {
                     if (e.target.value.length <= 150) {
@@ -1173,7 +1219,7 @@ export default function Onboarding() {
                 />
                 <label className="label">
                   <span className="label-text-alt text-base-content/50">
-                    {t('onboarding.bioDesc')}
+                    {t("onboarding.bioDesc")}
                   </span>
                 </label>
               </div>
@@ -1199,7 +1245,7 @@ export default function Onboarding() {
                       }}
                     />
                     <span className="label-text text-sm opacity-70">
-                      🎧 📸 {t('onboarding.skipDanceSections')}
+                      🎧 📸 {t("onboarding.skipDanceSections")}
                     </span>
                   </label>
                 </div>
@@ -1208,12 +1254,14 @@ export default function Onboarding() {
                 {!skipDanceSections && (
                   <>
                     <label className="label">
-                      <span className="label-text">{t('onboarding.yearStartedDancing')}</span>
+                      <span className="label-text">
+                        {t("onboarding.yearStartedDancing")}
+                      </span>
                     </label>
                     <input
                       type="number"
                       className="input input-bordered"
-                      placeholder={`${t('onboarding.example')} ${new Date().getFullYear() - 5}`}
+                      placeholder={`${t("onboarding.example")} ${new Date().getFullYear() - 5}`}
                       value={dancingStartYear}
                       onChange={(e) => setDancingStartYear(e.target.value)}
                       min="1900"
@@ -1222,7 +1270,14 @@ export default function Onboarding() {
                     {dancingStartYear && (
                       <label className="label">
                         <span className="label-text-alt text-base-content/60">
-                          {t('onboarding.yearsOfDancing').replace('{years}', String(new Date().getFullYear() - parseInt(dancingStartYear)))} 🎉
+                          {t("onboarding.yearsOfDancing").replace(
+                            "{years}",
+                            String(
+                              new Date().getFullYear() -
+                                parseInt(dancingStartYear)
+                            )
+                          )}{" "}
+                          🎉
                         </span>
                       </label>
                     )}
@@ -1235,45 +1290,70 @@ export default function Onboarding() {
               <CurrentLocationPicker
                 selectedCity={currentLocation}
                 onCitySelect={setCurrentLocation}
-                label={t('onboarding.currentLocationLabel')}
-                placeholder={t('onboarding.currentLocationPlaceholder')}
+                label={t("onboarding.currentLocationLabel")}
+                placeholder={t("onboarding.currentLocationPlaceholder")}
               />
             )}
 
-            {steps[currentStep].id === "citiesVisited" && (
-              <div className="space-y-3">
-                {currentLocation && citiesVisited.some(city => 
-                  (city._id || (city as any).id) === (currentLocation._id || (currentLocation as any).id)
-                ) && (
-                  <div className="alert alert-info">
-                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" className="stroke-current shrink-0 w-6 h-6">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
-                    </svg>
-                    <span className="text-sm">{t('onboarding.cityAdded').replace('{city}', currentLocation.name)}</span>
-                  </div>
-                )}
-                <CitySelector
-                  selectedCities={citiesVisited}
-                  onCitiesChange={setCitiesVisited}
-                  placeholder={t('onboarding.searchCitiesPlaceholder')}
-                  label={skipDanceSections ? "Cities you've visited or worked in (optional)" : t('onboarding.citiesYouDanced')}
-                />
-              </div>
-            )}
+            {!skipDanceSections &&
+              steps[currentStep].id === "citiesVisited" && (
+                <div className="space-y-3">
+                  {currentLocation &&
+                    citiesVisited.some(
+                      (city) =>
+                        (city._id || (city as any).id) ===
+                        (currentLocation._id || (currentLocation as any).id)
+                    ) && (
+                      <div className="alert alert-info">
+                        <svg
+                          xmlns="http://www.w3.org/2000/svg"
+                          fill="none"
+                          viewBox="0 0 24 24"
+                          className="stroke-current shrink-0 w-6 h-6"
+                        >
+                          <path
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            strokeWidth="2"
+                            d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+                          ></path>
+                        </svg>
+                        <span className="text-sm">
+                          {t("onboarding.cityAdded").replace(
+                            "{city}",
+                            currentLocation.name
+                          )}
+                        </span>
+                      </div>
+                    )}
+                  <CitySelector
+                    selectedCities={citiesVisited}
+                    onCitiesChange={setCitiesVisited}
+                    placeholder={t("onboarding.searchCitiesPlaceholder")}
+                    label={
+                      skipDanceSections
+                        ? "Cities you've visited or worked in (optional)"
+                        : t("onboarding.citiesYouDanced")
+                    }
+                  />
+                </div>
+              )}
 
             {/* Rest of the existing form steps remain the same... */}
             {/* I'll continue with the rest but keeping it shorter for readability */}
 
-            {steps[currentStep].id === "anthem" && (
+            {!skipDanceSections && steps[currentStep].id === "anthem" && (
               <div className="space-y-4">
                 <div className="form-control">
                   <label className="label">
-                    <span className="label-text">{t('onboarding.spotifySongUrl')}</span>
+                    <span className="label-text">
+                      {t("onboarding.spotifySongUrl")}
+                    </span>
                   </label>
                   <input
                     type="url"
                     className="input input-bordered"
-                    placeholder={t('onboarding.pasteSpotifyLink')}
+                    placeholder={t("onboarding.pasteSpotifyLink")}
                     value={anthem.url}
                     onChange={(e) => {
                       const url = e.target.value;
@@ -1290,25 +1370,23 @@ export default function Onboarding() {
                   />
                   <label className="label">
                     <span className="label-text-alt text-base-content/60">
-                      {t('onboarding.spotifyExample')}
+                      {t("onboarding.spotifyExample")}
                     </span>
                   </label>
                 </div>
 
                 {!mediaInfo && anthem.url && (
                   <div className="alert alert-warning">
-                    <span>{t('onboarding.validSpotifyUrl')}</span>
+                    <span>{t("onboarding.validSpotifyUrl")}</span>
                   </div>
                 )}
 
                 {mediaInfo && (
                   <div className="space-y-2">
                     <div className="flex items-center gap-2">
-                      <span className="badge badge-primary">
-                        Spotify
-                      </span>
+                      <span className="badge badge-primary">Spotify</span>
                       <span className="text-sm text-base-content/70">
-                        {t('onboarding.previewSong')}
+                        {t("onboarding.previewSong")}
                       </span>
                     </div>
                     <div className="flex justify-center mt-4">
@@ -1391,16 +1469,19 @@ export default function Onboarding() {
                   <>
                     <label className="label">
                       <span className="label-text">
-                        {t('onboarding.danceRoleQuestion')}
+                        {t("onboarding.danceRoleQuestion")}
                       </span>
                     </label>
                     <div className="flex flex-col gap-3">
                       {[
-                        { value: "both", label: t('common.both') },
-                        { value: "leader", label: t('profile.leader') },
-                        { value: "follower", label: t('profile.follower') }
+                        { value: "both", label: t("common.both") },
+                        { value: "leader", label: t("profile.leader") },
+                        { value: "follower", label: t("profile.follower") },
                       ].map((role) => (
-                        <label key={role.value} className="label cursor-pointer">
+                        <label
+                          key={role.value}
+                          className="label cursor-pointer"
+                        >
                           <span className="label-text">{role.label}</span>
                           <input
                             type="radio"
@@ -1408,7 +1489,9 @@ export default function Onboarding() {
                             className="radio radio-primary"
                             checked={danceRole === role.value}
                             onChange={() =>
-                              setDanceRole(role.value as "follower" | "leader" | "both")
+                              setDanceRole(
+                                role.value as "follower" | "leader" | "both"
+                              )
                             }
                           />
                         </label>
@@ -1423,13 +1506,15 @@ export default function Onboarding() {
             {steps[currentStep].id === "gender" && (
               <div className="form-control">
                 <label className="label">
-                  <span className="label-text">{t('onboarding.genderQuestion')}</span>
+                  <span className="label-text">
+                    {t("onboarding.genderQuestion")}
+                  </span>
                 </label>
                 <div className="flex flex-col gap-3">
                   {[
-                    { value: "male", label: t('onboarding.male') },
-                    { value: "female", label: t('onboarding.female') },
-                    { value: "other", label: t('onboarding.other') },
+                    { value: "male", label: t("onboarding.male") },
+                    { value: "female", label: t("onboarding.female") },
+                    { value: "other", label: t("onboarding.other") },
                   ].map((option) => (
                     <label key={option.value} className="label cursor-pointer">
                       <span className="label-text">{option.label}</span>
@@ -1453,7 +1538,7 @@ export default function Onboarding() {
               <div className="form-control">
                 <label className="label">
                   <span className="label-text">
-                    {t('onboarding.nationalityQuestion')}
+                    {t("onboarding.nationalityQuestion")}
                   </span>
                 </label>
                 <select
@@ -1461,7 +1546,7 @@ export default function Onboarding() {
                   value={nationality}
                   onChange={(e) => setNationality(e.target.value)}
                 >
-                  <option value="">{t('onboarding.selectCountry')}</option>
+                  <option value="">{t("onboarding.selectCountry")}</option>
                   {COUNTRIES.map((country) => (
                     <option key={country} value={country}>
                       {country}
@@ -1476,16 +1561,22 @@ export default function Onboarding() {
               <div className="form-control">
                 <label className="label">
                   <span className="label-text">
-                    {t('onboarding.relationshipQuestion')}
+                    {t("onboarding.relationshipQuestion")}
                   </span>
                 </label>
                 <div className="flex flex-col gap-3">
                   {[
-                    { value: "", label: t('onboarding.preferNotToSay') },
-                    { value: "single", label: `${t('profile.single')} 💙` },
-                    { value: "in_a_relationship", label: `${t('profile.inRelationship')} 💕` },
-                    { value: "married", label: `${t('profile.married')} 💍` },
-                    { value: "its_complicated", label: `${t('profile.itsComplicated')} 🤷` },
+                    { value: "", label: t("onboarding.preferNotToSay") },
+                    { value: "single", label: `${t("profile.single")} 💙` },
+                    {
+                      value: "in_a_relationship",
+                      label: `${t("profile.inRelationship")} 💕`,
+                    },
+                    { value: "married", label: `${t("profile.married")} 💍` },
+                    {
+                      value: "its_complicated",
+                      label: `${t("profile.itsComplicated")} 🤷`,
+                    },
                   ].map((option) => (
                     <label key={option.value} className="label cursor-pointer">
                       <span className="label-text">{option.label}</span>
@@ -1495,7 +1586,9 @@ export default function Onboarding() {
                         className="radio radio-primary"
                         checked={relationshipStatus === option.value}
                         onChange={() =>
-                          setRelationshipStatus(option.value as typeof relationshipStatus)
+                          setRelationshipStatus(
+                            option.value as typeof relationshipStatus
+                          )
                         }
                       />
                     </label>
@@ -1508,7 +1601,7 @@ export default function Onboarding() {
             {steps[currentStep].id === "teacherInfo" && (
               <div className="space-y-6">
                 <div className="text-sm text-base-content/70 mb-4">
-                  {t('onboarding.selectAllThatApply')}
+                  {t("onboarding.selectAllThatApply")}
                 </div>
 
                 {/* Dance Teacher */}
@@ -1522,10 +1615,10 @@ export default function Onboarding() {
                     />
                     <div>
                       <span className="label-text font-semibold">
-                        🎓 {t('onboarding.danceTeacher')}
+                        🎓 {t("onboarding.danceTeacher")}
                       </span>
                       <p className="text-sm text-base-content/60">
-                        {t('onboarding.danceTeacherDesc')}
+                        {t("onboarding.danceTeacherDesc")}
                       </p>
                     </div>
                   </label>
@@ -1575,10 +1668,10 @@ export default function Onboarding() {
                     />
                     <div>
                       <span className="label-text font-semibold">
-                        🎵 {t('onboarding.dj')}
+                        🎵 {t("onboarding.dj")}
                       </span>
                       <p className="text-sm text-base-content/60">
-                        {t('onboarding.djDesc')}
+                        {t("onboarding.djDesc")}
                       </p>
                     </div>
                   </label>
@@ -1588,7 +1681,9 @@ export default function Onboarding() {
                   <div className="space-y-4 border-l-4 border-primary pl-4 ml-2">
                     <div className="form-control">
                       <label className="label">
-                        <span className="label-text">DJ Name/Alias (optional)</span>
+                        <span className="label-text">
+                          DJ Name/Alias (optional)
+                        </span>
                       </label>
                       <input
                         type="text"
@@ -1601,7 +1696,9 @@ export default function Onboarding() {
 
                     <div className="form-control">
                       <label className="label">
-                        <span className="label-text">Music Genres (optional)</span>
+                        <span className="label-text">
+                          Music Genres (optional)
+                        </span>
                       </label>
                       <input
                         type="text"
@@ -1637,10 +1734,10 @@ export default function Onboarding() {
                     />
                     <div>
                       <span className="label-text font-semibold">
-                        📷 {t('onboarding.photographer')}
+                        📷 {t("onboarding.photographer")}
                       </span>
                       <p className="text-sm text-base-content/60">
-                        {t('onboarding.photographerDesc')}
+                        {t("onboarding.photographerDesc")}
                       </p>
                     </div>
                   </label>
@@ -1650,27 +1747,35 @@ export default function Onboarding() {
                   <div className="space-y-4 border-l-4 border-primary pl-4 ml-2">
                     <div className="form-control">
                       <label className="label">
-                        <span className="label-text">Portfolio Link (optional)</span>
+                        <span className="label-text">
+                          Portfolio Link (optional)
+                        </span>
                       </label>
                       <input
                         type="url"
                         className="input input-bordered"
                         placeholder="Instagram, website, or portfolio link"
                         value={photographerPortfolio}
-                        onChange={(e) => setPhotographerPortfolio(e.target.value)}
+                        onChange={(e) =>
+                          setPhotographerPortfolio(e.target.value)
+                        }
                       />
                     </div>
 
                     <div className="form-control">
                       <label className="label">
-                        <span className="label-text">Specialties (optional)</span>
+                        <span className="label-text">
+                          Specialties (optional)
+                        </span>
                       </label>
                       <input
                         type="text"
                         className="input input-bordered"
                         placeholder="e.g., Events, Portraits, Social Dancing"
                         value={photographerSpecialties}
-                        onChange={(e) => setPhotographerSpecialties(e.target.value)}
+                        onChange={(e) =>
+                          setPhotographerSpecialties(e.target.value)
+                        }
                       />
                     </div>
 
@@ -1764,7 +1869,7 @@ export default function Onboarding() {
                 onClick={handleBack}
                 disabled={currentStep === 0}
               >
-                {t('onboarding.back')}
+                {t("onboarding.back")}
               </button>
               <button
                 className="btn btn-primary"
@@ -1780,26 +1885,26 @@ export default function Onboarding() {
                 {uploadingProfilePic ? (
                   <>
                     <span className="loading loading-spinner loading-sm"></span>
-                    {t('onboarding.uploading')}
+                    {t("onboarding.uploading")}
                   </>
                 ) : savingStep ? (
                   <>
                     <span className="loading loading-spinner loading-sm"></span>
-                    {t('onboarding.saving')}
+                    {t("onboarding.saving")}
                   </>
                 ) : completing ? (
                   <>
                     <span className="loading loading-spinner loading-sm"></span>
-                    {t('onboarding.completing')}
+                    {t("onboarding.completing")}
                   </>
                 ) : currentStep === steps.length - 1 ? (
                   isEditMode ? (
-                    t('onboarding.saveChanges')
+                    t("onboarding.saveChanges")
                   ) : (
-                    t('onboarding.complete')
+                    t("onboarding.complete")
                   )
                 ) : (
-                  t('onboarding.next')
+                  t("onboarding.next")
                 )}
               </button>
             </div>

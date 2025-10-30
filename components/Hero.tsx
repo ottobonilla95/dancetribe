@@ -74,21 +74,21 @@ const Hero = ({ featuredUsers = [] }: HeroProps) => {
       {/* Content */}
       <div className="relative z-20 max-w-4xl mx-auto px-4 sm:px-6 py-6 sm:py-8 text-center">
         {/* Main Heading */}
-        <h1 className="text-4xl sm:text-5xl md:text-6xl font-extrabold tracking-tight mb-4 sm:mb-6 mt-4">
+        <h1 className="text-[32px] sm:text-5xl md:text-6xl font-extrabold tracking-tight mb-5 sm:mb-6 mt-4 sm:mt-6 leading-tight">
           💃 {t('hero.title')}
         </h1>
         
-        <p className="text-lg sm:text-xl md:text-2xl mb-6 sm:mb-8 text-white/95 max-w-3xl mx-auto leading-relaxed">
+        <p className="text-[15px] sm:text-xl md:text-2xl mb-6 sm:mb-8 text-white/95 max-w-3xl mx-auto leading-relaxed px-2">
           {t('hero.subtitle')}
         </p>
 
         {/* User Avatars */}
         {featuredUsers.length > 0 && (
-          <div className="flex justify-center mb-6 sm:mb-8 -space-x-2 sm:-space-x-3">
+          <div className="flex justify-center mb-5 sm:mb-7 -space-x-2 sm:-space-x-3">
             {featuredUsers.slice(0, 8).map((user) => (
               <div
                 key={user._id}
-                className="w-10 h-10 sm:w-12 sm:h-12 rounded-full border-2 border-white overflow-hidden bg-base-200"
+                className="w-11 h-11 sm:w-12 sm:h-12 md:w-14 md:h-14 rounded-full border-2 border-white overflow-hidden bg-base-200"
                 title={user.name}
               >
                 {user.image ? (
@@ -110,22 +110,22 @@ const Hero = ({ featuredUsers = [] }: HeroProps) => {
         )}
 
         {/* Key Features */}
-        <div className="space-y-3 sm:space-y-4 mb-8 sm:mb-10 text-left md:text-center max-w-2xl mx-auto">
-          <div className="flex items-start md:items-center gap-2 sm:gap-3 text-base sm:text-lg md:text-xl">
+        <div className="space-y-3 sm:space-y-4 mb-7 sm:mb-9 text-left md:text-center max-w-2xl mx-auto">
+          <div className="flex items-start md:items-center gap-2 text-[15px] sm:text-lg md:text-xl">
             <span className="text-2xl sm:text-3xl flex-shrink-0">✨</span>
-            <span><strong>{t('hero.feature1')}</strong> {t('hero.feature1b')}</span>
+            <span className="leading-snug"><strong>{t('hero.feature1')}</strong> {t('hero.feature1b')}</span>
           </div>
-          <div className="flex items-start md:items-center gap-2 sm:gap-3 text-base sm:text-lg md:text-xl">
+          <div className="flex items-start md:items-center gap-2 text-[15px] sm:text-lg md:text-xl">
             <span className="text-2xl sm:text-3xl flex-shrink-0">🌍</span>
-            <span><strong>{t('hero.feature2')}</strong> {t('hero.feature2b')}</span>
+            <span className="leading-snug"><strong>{t('hero.feature2')}</strong> {t('hero.feature2b')}</span>
           </div>
-          <div className="flex items-start md:items-center gap-2 sm:gap-3 text-base sm:text-lg md:text-xl">
+          <div className="flex items-start md:items-center gap-2 text-[15px] sm:text-lg md:text-xl">
             <span className="text-2xl sm:text-3xl flex-shrink-0">👯</span>
-            <span><strong>{t('hero.feature3')}</strong></span>
+            <span className="leading-snug"><strong>{t('hero.feature3')}</strong></span>
           </div>
-          <div className="flex items-start md:items-center gap-2 sm:gap-3 text-base sm:text-lg md:text-xl">
+          <div className="flex items-start md:items-center gap-2 text-[15px] sm:text-lg md:text-xl">
             <span className="text-2xl sm:text-3xl flex-shrink-0">🔥</span>
-            <span><strong>{t('hero.feature4')}</strong></span>
+            <span className="leading-snug"><strong>{t('hero.feature4')}</strong></span>
           </div>
         </div>
 
@@ -133,7 +133,7 @@ const Hero = ({ featuredUsers = [] }: HeroProps) => {
         <div className="flex flex-col items-center gap-3 sm:gap-4">
           <ButtonSignin
             text={t('hero.ctaButton')}
-            extraStyle="btn-primary btn-md sm:btn-lg text-base sm:text-lg px-8 sm:px-12"
+            extraStyle="btn-primary btn-lg text-base sm:text-lg px-8 sm:px-12"
           />
           <p className="text-sm sm:text-base text-white/80">
             {t('hero.alreadyMember')}
@@ -141,18 +141,18 @@ const Hero = ({ featuredUsers = [] }: HeroProps) => {
         </div>
 
         {/* Scroll indicator */}
-        <div className="flex flex-col items-center gap-1 sm:gap-2 mt-8 sm:mt-12 animate-bounce">
-          <span className="text-xs sm:text-sm text-white/70">{t('hero.exploreMore')}</span>
+        <div className="flex flex-col items-center gap-1 mt-8 sm:mt-10 md:mt-12 animate-bounce pb-2">
+          <span className="text-sm sm:text-base text-white font-medium">{t('hero.exploreMore')}</span>
           <svg 
-            className="w-5 h-5 sm:w-6 sm:h-6 text-white/60" 
+            className="w-7 h-7 sm:w-8 sm:h-8 text-white drop-shadow-lg" 
             fill="none" 
             stroke="currentColor" 
             viewBox="0 0 24 24"
+            strokeWidth={3}
           >
             <path 
               strokeLinecap="round" 
               strokeLinejoin="round" 
-              strokeWidth={2} 
               d="M19 14l-7 7m0 0l-7-7m7 7V3" 
             />
           </svg>

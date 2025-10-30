@@ -102,11 +102,11 @@ export default async function CountryPage({ params, searchParams }: Props) {
   const cityIds = citiesInCountry.map((city: any) => city._id);
 
   // Get ALL dancers in this country (for client-side filtering)
-  const dancers: any[] = await User.find({
+  let dancers: any[] = await User.find({
     city: { $in: cityIds },
     isProfileComplete: true,
   })
-    .select("name username image danceStyles city dateOfBirth hideAge nationality dancingStartYear danceRole socialMedia likedBy openToMeetTravelers lookingForPracticePartners isTeacher isDJ isPhotographer jackAndJillCompetitions")
+    .select("name username image danceStyles city dateOfBirth hideAge nationality dancingStartYear danceRole socialMedia likedBy openToMeetTravelers lookingForPracticePartners isTeacher isDJ isPhotographer jackAndJillCompetitions bio")
     .populate({
       path: "city",
       model: City,
@@ -118,6 +118,22 @@ export default async function CountryPage({ params, searchParams }: Props) {
       select: "name",
     })
     .lean();
+
+  // Sort dancers: professionals (teachers, DJs, photographers) by likes, then regular dancers
+  dancers.sort((a, b) => {
+    const aIsProfessional = a.isTeacher || a.isDJ || a.isPhotographer;
+    const bIsProfessional = b.isTeacher || b.isDJ || b.isPhotographer;
+    const aLikes = a.likedBy?.length || 0;
+    const bLikes = b.likedBy?.length || 0;
+
+    // If both are professionals or both are not, sort by likes
+    if (aIsProfessional === bIsProfessional) {
+      return bLikes - aLikes; // Descending order (most likes first)
+    }
+    
+    // Professionals come first
+    return aIsProfessional ? -1 : 1;
+  });
 
   // Get dancers count for this country
   const totalDancers = await User.countDocuments({
