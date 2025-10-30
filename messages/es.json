@@ -256,7 +256,12 @@
     "cancel": "Cancelar",
     "searchCity": "Buscar ciudad...",
     "openToPractice": "Abierto a Practicar",
-    "openToPracticeDesc": "Aparece en búsquedas de compañeros de práctica"
+    "openToPracticeDesc": "Aparece en búsquedas de compañeros de práctica",
+    "yourCity": "Tu Ciudad",
+    "dancersInCity": "bailarines",
+    "topStylesInCity": "Estilos Principales",
+    "exploreYourCity": "Explorar",
+    "travelers": "viajeros"
   },
   "trips": {
     "meetUpOpportunities": "¡Oportunidades de Encuentro!",

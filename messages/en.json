@@ -256,7 +256,12 @@
     "cancel": "Cancel",
     "searchCity": "Search for a city...",
     "openToPractice": "Open to Practice",
-    "openToPracticeDesc": "Show up in searches for practice partners"
+    "openToPracticeDesc": "Show up in searches for practice partners",
+    "yourCity": "Your City",
+    "dancersInCity": "dancers",
+    "topStylesInCity": "Top Styles",
+    "exploreYourCity": "Explore",
+    "travelers": "travelers"
   },
   "trips": {
     "meetUpOpportunities": "Meetup Opportunities!",

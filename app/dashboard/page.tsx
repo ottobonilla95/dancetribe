@@ -18,6 +18,7 @@ import FriendsTripsPreview from "@/components/FriendsTripsPreview";
 import TrendyCountries from "@/components/TrendyCountries";
 import TripOverlaps from "@/components/TripOverlaps";
 import DiscoverySettings from "@/components/DiscoverySettings";
+import YourCityPreview from "@/components/YourCityPreview";
 import Link from "next/link";
 import { getMessages, getTranslation } from "@/lib/i18n";
 import { unstable_cache } from "next/cache";
@@ -861,6 +862,86 @@ async function getUserPreferences(userId: string) {
   }
 }
 
+// Get stats about the user's home city
+async function getUserCityStats(userId: string) {
+  try {
+    await connectMongo();
+    
+    // Get user's city
+    const user: any = await User.findById(userId)
+      .populate({ 
+        path: "city", 
+        model: City,
+        populate: { 
+          path: "country", 
+          model: Country, 
+          select: "name code" 
+        }
+      })
+      .select("city")
+      .lean();
+
+    if (!user || !user.city) return null;
+
+    const cityId = user.city._id;
+
+    // Count total dancers in this city (home city)
+    const totalDancers = await User.countDocuments({
+      city: cityId,
+      isProfileComplete: true,
+    });
+
+    // Count travelers (people visiting this city - activeCity is this city, but home city is different)
+    const travelers = await User.countDocuments({
+      activeCity: cityId,
+      openToMeetTravelers: true,
+      isProfileComplete: true,
+      city: { $ne: cityId }, // Home city is NOT this city
+    });
+
+    // Get top 3 dance styles in this city
+    const topStyles = await User.aggregate([
+      { $match: { city: cityId, isProfileComplete: true } },
+      { $unwind: "$danceStyles" },
+      { $group: { _id: "$danceStyles.danceStyle", count: { $sum: 1 } } },
+      { $sort: { count: -1 } },
+      { $limit: 3 },
+      {
+        $lookup: {
+          from: "dancestyles",
+          localField: "_id",
+          foreignField: "_id",
+          as: "styleDetails",
+        },
+      },
+      { $unwind: "$styleDetails" },
+      {
+        $project: {
+          name: "$styleDetails.name",
+          count: 1,
+        },
+      },
+    ]);
+
+    return {
+      cityId: cityId.toString(),
+      cityName: user.city.name,
+      cityImage: user.city.image || null,
+      countryCode: user.city.country?.code || "",
+      countryName: user.city.country?.name || "",
+      totalDancers,
+      travelers,
+      topStyles: topStyles.map((style: any) => ({
+        name: style.name,
+        count: style.count,
+      })),
+    };
+  } catch (error) {
+    console.error("Error fetching user city stats:", error);
+    return null;
+  }
+}
+
 // This is a private page: It's protected by the layout.js component which ensures the user is authenticated.
 // It's a server compoment which means you can fetch data (like the user profile) before the page is rendered.
 // See https://shipfa.st/docs/tutorials/private-page
@@ -896,6 +977,7 @@ export default async function Dashboard() {
     tripOverlaps,
     friendsTrips,
     userPreferences,
+    userCityStats,
   ] = await Promise.all([
     getInitialDancers(session.user.id),
     getDanceStyles(),
@@ -907,6 +989,7 @@ export default async function Dashboard() {
     getTripOverlaps(session.user.id),
     getFriendsTrips(session.user.id),
     getUserPreferences(session.user.id),
+    getUserCityStats(session.user.id),
   ]);
 
   return (
@@ -921,7 +1004,13 @@ export default async function Dashboard() {
           <Link href="/cities" className="btn btn-outline btn-sm md:btn-md">
             {t("dashboard.viewAllCities")}
           </Link>
+        </div>   
+        
+        {/* Your City Preview */}
+        <div className="mt-8">
+          <YourCityPreview cityStats={userCityStats} />
         </div>
+
 
         {/* Discovery Settings */}
         <div className="mt-8">
@@ -932,6 +1021,7 @@ export default async function Dashboard() {
           />
         </div>
 
+     
         {/* Trip Overlaps - Meetup Opportunities */}
         <TripOverlaps overlaps={tripOverlaps} isPreview={true} />
 

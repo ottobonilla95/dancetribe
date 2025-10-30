@@ -25,6 +25,10 @@ const nextConfig = {
         protocol: "https",
         hostname: "res.cloudinary.com",
       },
+      {
+        protocol: "https",
+        hostname: "media.digitalnomads.world",
+      },
     ],
   },
   async rewrites() {
