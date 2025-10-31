@@ -29,6 +29,7 @@ export async function GET(req: Request) {
     const search = searchParams.get("search") || "";
     const filterShared = searchParams.get("filterShared"); // "true", "false", or null (all)
     const filterProfileComplete = searchParams.get("filterProfileComplete"); // "true", "false", or null (all)
+    const filterCity = searchParams.get("filterCity"); // City ID or null (all)
 
     // Build search query
     const query: any = {};
@@ -53,6 +54,11 @@ export async function GET(req: Request) {
       query.isProfileComplete = true;
     } else if (filterProfileComplete === "false") {
       query.isProfileComplete = { $ne: true }; // false or undefined
+    }
+
+    // Filter by city
+    if (filterCity) {
+      query.city = filterCity;
     }
 
     const [users, total] = await Promise.all([

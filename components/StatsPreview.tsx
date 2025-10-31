@@ -87,7 +87,7 @@ export default async function StatsPreview({
             <FaMusic className="text-2xl" />
           </div>
           <div className="stat-title text-xs">{t('dashboard.topStyle')}</div>
-          <div className="stat-value text-accent text-lg">
+          <div className="stat-value text-accent text-lg leading-tight !whitespace-normal break-words max-w-full">
             {stats.topDanceStyle.emoji} {stats.topDanceStyle.name}
           </div>
           <div className="stat-desc text-xs">

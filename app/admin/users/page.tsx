@@ -42,6 +42,15 @@ interface User {
   };
 }
 
+interface City {
+  _id: string;
+  name: string;
+  country?: {
+    name: string;
+    code: string;
+  };
+}
+
 export default function AdminUsersPage() {
   const [users, setUsers] = useState<User[]>([]);
   const [loading, setLoading] = useState(true);
@@ -49,6 +58,8 @@ export default function AdminUsersPage() {
   const [filterShared, setFilterShared] = useState<"all" | "shared" | "not-shared">("all");
   const [showOnlyIncomplete, setShowOnlyIncomplete] = useState(false);
   const [showOnlyComplete, setShowOnlyComplete] = useState(false);
+  const [filterCity, setFilterCity] = useState<string>(""); // City ID filter
+  const [cities, setCities] = useState<City[]>([]);
   const [page, setPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
   const [totalUsers, setTotalUsers] = useState(0);
@@ -71,9 +82,26 @@ export default function AdminUsersPage() {
   const [inviteSuccess, setInviteSuccess] = useState(false);
   const [inviteError, setInviteError] = useState("");
 
+  // Fetch cities on mount
+  useEffect(() => {
+    fetchCities();
+  }, []);
+
+  const fetchCities = async () => {
+    try {
+      const res = await fetch("/api/admin/cities?limit=1000");
+      if (res.ok) {
+        const data = await res.json();
+        setCities(data.cities);
+      }
+    } catch (error) {
+      console.error("Error fetching cities:", error);
+    }
+  };
+
   useEffect(() => {
     fetchUsers();
-  }, [page, searchTerm, filterShared, showOnlyIncomplete, showOnlyComplete]); // eslint-disable-line react-hooks/exhaustive-deps
+  }, [page, searchTerm, filterShared, showOnlyIncomplete, showOnlyComplete, filterCity]); // eslint-disable-line react-hooks/exhaustive-deps
 
   const fetchUsers = async () => {
     setLoading(true);
@@ -96,6 +124,11 @@ export default function AdminUsersPage() {
         params.append("filterProfileComplete", "false");
       } else if (showOnlyComplete) {
         params.append("filterProfileComplete", "true");
+      }
+
+      // Add city filter
+      if (filterCity) {
+        params.append("filterCity", filterCity);
       }
 
       const res = await fetch(`/api/admin/users?${params}`);
@@ -455,6 +488,28 @@ export default function AdminUsersPage() {
                 Show only users with incomplete profiles
               </span>
             </label>
+          </div>
+
+          {/* City Filter */}
+          <div className="form-control">
+            <label className="label">
+              <span className="label-text font-medium">Filter by City</span>
+            </label>
+            <select
+              value={filterCity}
+              onChange={(e) => {
+                setFilterCity(e.target.value);
+                setPage(1);
+              }}
+              className="select select-bordered w-full"
+            >
+              <option value="">All Cities</option>
+              {cities.map((city) => (
+                <option key={city._id} value={city._id}>
+                  {city.name}{city.country ? `, ${city.country.name}` : ""}
+                </option>
+              ))}
+            </select>
           </div>
         </div>
       </div>
