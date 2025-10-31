@@ -3,6 +3,8 @@ import { getServerSession } from "next-auth";
 import { authOptions } from "@/libs/next-auth";
 import connectMongo from "@/libs/mongoose";
 import User from "@/models/User";
+import City from "@/models/City";
+import Country from "@/models/Country";
 import config from "@/config";
 
 // GET: Fetch all users with pagination
@@ -55,7 +57,15 @@ export async function GET(req: Request) {
 
     const [users, total] = await Promise.all([
       User.find(query)
-        .select("_id name username image sharedOnSocialMedia isProfileComplete createdAt")
+        .select("_id name username image sharedOnSocialMedia isProfileComplete createdAt city")
+        .populate({
+          path: "city",
+          select: "name country",
+          populate: {
+            path: "country",
+            select: "name code",
+          },
+        })
         .sort({ createdAt: -1 }) // Newest users first
         .skip(skip)
         .limit(limit)

@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { FaCity, FaPlus, FaEdit, FaSearch, FaGlobe, FaMapMarkerAlt, FaCheck, FaTimes } from "react-icons/fa";
+import { FaCity, FaPlus, FaEdit, FaSearch, FaGlobe, FaMapMarkerAlt, FaCheck, FaTimes, FaTrash } from "react-icons/fa";
 
 interface City {
   _id: string;
@@ -58,6 +58,10 @@ export default function AdminCitiesPage() {
   const [showModal, setShowModal] = useState(false);
   const [editingCity, setEditingCity] = useState<City | null>(null);
   const [saving, setSaving] = useState(false);
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
+  const [cityToDelete, setCityToDelete] = useState<City | null>(null);
+  const [deleteConfirmText, setDeleteConfirmText] = useState("");
+  const [deleting, setDeleting] = useState(false);
 
   // Form state
   const [formData, setFormData] = useState<Partial<City>>({
@@ -205,6 +209,38 @@ export default function AdminCitiesPage() {
     }
   };
 
+  const handleDeleteClick = (city: City) => {
+    setCityToDelete(city);
+    setDeleteConfirmText("");
+    setShowDeleteModal(true);
+  };
+
+  const handleDeleteConfirm = async () => {
+    if (!cityToDelete || deleteConfirmText !== "delete") return;
+
+    setDeleting(true);
+    try {
+      const res = await fetch(`/api/admin/cities/${cityToDelete._id}`, {
+        method: "DELETE",
+      });
+
+      if (res.ok) {
+        setShowDeleteModal(false);
+        setCityToDelete(null);
+        setDeleteConfirmText("");
+        fetchCities();
+      } else {
+        const data = await res.json();
+        alert(data.error || "Failed to delete city");
+      }
+    } catch (error) {
+      console.error("Error deleting city:", error);
+      alert("Error deleting city");
+    } finally {
+      setDeleting(false);
+    }
+  };
+
   return (
     <div className="p-6">
       {/* Header */}
@@ -306,12 +342,20 @@ export default function AdminCitiesPage() {
                       )}
                     </td>
                     <td>
-                      <button
-                        onClick={() => handleEditCity(city)}
-                        className="btn btn-ghost btn-sm gap-1"
-                      >
-                        <FaEdit /> Edit
-                      </button>
+                      <div className="flex gap-2">
+                        <button
+                          onClick={() => handleEditCity(city)}
+                          className="btn btn-ghost btn-sm gap-1"
+                        >
+                          <FaEdit /> Edit
+                        </button>
+                        <button
+                          onClick={() => handleDeleteClick(city)}
+                          className="btn btn-ghost btn-sm gap-1 text-error hover:bg-error hover:text-error-content"
+                        >
+                          <FaTrash /> Delete
+                        </button>
+                      </div>
                     </td>
                   </tr>
                 ))
@@ -661,6 +705,93 @@ export default function AdminCitiesPage() {
             </div>
           </div>
           <div className="modal-backdrop" onClick={() => setShowModal(false)} />
+        </div>
+      )}
+
+      {/* Delete Confirmation Modal */}
+      {showDeleteModal && cityToDelete && (
+        <div className="modal modal-open">
+          <div className="modal-box">
+            <h3 className="font-bold text-lg mb-4 text-error">
+              Delete City: {cityToDelete.name}
+            </h3>
+            
+            <div className="space-y-4">
+              <div className="alert alert-warning">
+                <FaTrash />
+                <div>
+                  <p className="font-semibold">This action cannot be undone!</p>
+                  <p className="text-sm">
+                    This will permanently delete {cityToDelete.name} and all associated data.
+                  </p>
+                </div>
+              </div>
+
+              <div className="bg-base-200 p-4 rounded-lg">
+                <p className="text-sm mb-2">
+                  <strong>City Details:</strong>
+                </p>
+                <ul className="text-sm space-y-1">
+                  <li>• Total Dancers: {cityToDelete.totalDancers}</li>
+                  <li>• Country: {cityToDelete.country.name}</li>
+                  <li>• Continent: {cityToDelete.continent.name}</li>
+                </ul>
+              </div>
+
+              <div className="form-control">
+                <label className="label">
+                  <span className="label-text font-semibold">
+                    Type <code className="bg-base-300 px-2 py-1 rounded">delete</code> to confirm:
+                  </span>
+                </label>
+                <input
+                  type="text"
+                  placeholder="Type 'delete' here"
+                  value={deleteConfirmText}
+                  onChange={(e) => setDeleteConfirmText(e.target.value)}
+                  className="input input-bordered"
+                  autoFocus
+                />
+              </div>
+            </div>
+
+            <div className="modal-action">
+              <button
+                onClick={() => {
+                  setShowDeleteModal(false);
+                  setCityToDelete(null);
+                  setDeleteConfirmText("");
+                }}
+                className="btn btn-ghost"
+                disabled={deleting}
+              >
+                Cancel
+              </button>
+              <button
+                onClick={handleDeleteConfirm}
+                className="btn btn-error"
+                disabled={deleteConfirmText !== "delete" || deleting}
+              >
+                {deleting ? (
+                  <span className="loading loading-spinner"></span>
+                ) : (
+                  <>
+                    <FaTrash /> Delete City
+                  </>
+                )}
+              </button>
+            </div>
+          </div>
+          <div
+            className="modal-backdrop"
+            onClick={() => {
+              if (!deleting) {
+                setShowDeleteModal(false);
+                setCityToDelete(null);
+                setDeleteConfirmText("");
+              }
+            }}
+          />
         </div>
       )}
     </div>

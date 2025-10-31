@@ -116,3 +116,46 @@ export async function PUT(
   }
 }
 
+// DELETE: Delete city
+export async function DELETE(
+  req: Request,
+  { params }: { params: { cityId: string } }
+) {
+  try {
+    const session = await getServerSession(authOptions);
+    
+    // Check if user is admin
+    if (!session?.user?.email || session.user.email !== config.admin.email) {
+      return NextResponse.json(
+        { error: "Unauthorized" },
+        { status: 401 }
+      );
+    }
+
+    await connectMongo();
+
+    // Check if city exists
+    const city = await City.findById(params.cityId);
+    if (!city) {
+      return NextResponse.json(
+        { error: "City not found" },
+        { status: 404 }
+      );
+    }
+
+    // Delete the city
+    await City.findByIdAndDelete(params.cityId);
+
+    return NextResponse.json({
+      success: true,
+      message: "City deleted successfully",
+    });
+  } catch (error) {
+    console.error("Error deleting city:", error);
+    return NextResponse.json(
+      { error: "Failed to delete city" },
+      { status: 500 }
+    );
+  }
+}
+

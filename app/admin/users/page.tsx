@@ -2,7 +2,6 @@
 
 import { useState, useEffect } from "react";
 import { FaUsers, FaSearch, FaCheck, FaTimes, FaInstagram, FaFacebook, FaTwitter, FaUserPlus, FaEnvelope } from "react-icons/fa";
-import Link from "next/link";
 
 interface User {
   _id: string;
@@ -12,6 +11,15 @@ interface User {
   sharedOnSocialMedia: boolean;
   isProfileComplete?: boolean;
   createdAt: string;
+  city?: {
+    _id: string;
+    name: string;
+    country?: {
+      _id: string;
+      name: string;
+      code: string;
+    };
+  };
 }
 
 export default function AdminUsersPage() {
@@ -19,7 +27,8 @@ export default function AdminUsersPage() {
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState("");
   const [filterShared, setFilterShared] = useState<"all" | "shared" | "not-shared">("all");
-  const [filterProfileComplete, setFilterProfileComplete] = useState(false);
+  const [showOnlyNotShared, setShowOnlyNotShared] = useState(false);
+  const [showOnlyIncomplete, setShowOnlyIncomplete] = useState(false);
   const [page, setPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
   const [totalUsers, setTotalUsers] = useState(0);
@@ -34,7 +43,7 @@ export default function AdminUsersPage() {
 
   useEffect(() => {
     fetchUsers();
-  }, [page, searchTerm, filterShared, filterProfileComplete]); // eslint-disable-line react-hooks/exhaustive-deps
+  }, [page, searchTerm, filterShared, showOnlyNotShared, showOnlyIncomplete]); // eslint-disable-line react-hooks/exhaustive-deps
 
   const fetchUsers = async () => {
     setLoading(true);
@@ -46,15 +55,17 @@ export default function AdminUsersPage() {
       });
 
       // Add filter parameter for shared status
-      if (filterShared === "shared") {
+      if (showOnlyNotShared) {
+        params.append("filterShared", "false");
+      } else if (filterShared === "shared") {
         params.append("filterShared", "true");
       } else if (filterShared === "not-shared") {
         params.append("filterShared", "false");
       }
 
       // Add filter parameter for profile completion
-      if (filterProfileComplete) {
-        params.append("filterProfileComplete", "true");
+      if (showOnlyIncomplete) {
+        params.append("filterProfileComplete", "false");
       }
 
       const res = await fetch(`/api/admin/users?${params}`);
@@ -257,22 +268,41 @@ export default function AdminUsersPage() {
           </button>
         </div>
 
-        {/* Profile Completion Filter */}
-        <div className="form-control">
-          <label className="label cursor-pointer justify-start gap-3">
-            <input
-              type="checkbox"
-              checked={filterProfileComplete}
-              onChange={(e) => {
-                setFilterProfileComplete(e.target.checked);
-                setPage(1);
-              }}
-              className="checkbox checkbox-primary"
-            />
-            <span className="label-text font-medium">
-              Show only users with completed profiles
-            </span>
-          </label>
+        {/* Filter Checkboxes */}
+        <div className="space-y-2">
+          <div className="form-control">
+            <label className="label cursor-pointer justify-start gap-3">
+              <input
+                type="checkbox"
+                checked={showOnlyNotShared}
+                onChange={(e) => {
+                  setShowOnlyNotShared(e.target.checked);
+                  setPage(1);
+                }}
+                className="checkbox checkbox-warning"
+              />
+              <span className="label-text font-medium">
+                Show only users NOT shared on social media
+              </span>
+            </label>
+          </div>
+          
+          <div className="form-control">
+            <label className="label cursor-pointer justify-start gap-3">
+              <input
+                type="checkbox"
+                checked={showOnlyIncomplete}
+                onChange={(e) => {
+                  setShowOnlyIncomplete(e.target.checked);
+                  setPage(1);
+                }}
+                className="checkbox checkbox-error"
+              />
+              <span className="label-text font-medium">
+                Show only users with incomplete profiles
+              </span>
+            </label>
+          </div>
         </div>
       </div>
 
@@ -285,10 +315,10 @@ export default function AdminUsersPage() {
                 <th className="w-12">#</th>
                 <th>User</th>
                 <th>Username</th>
+                <th>Location</th>
                 <th>Profile Status</th>
                 <th>Joined</th>
                 <th>Shared on Social Media</th>
-                <th>Actions</th>
               </tr>
             </thead>
             <tbody>
@@ -306,7 +336,11 @@ export default function AdminUsersPage() {
                 </tr>
               ) : (
                 users.map((user, index) => (
-                  <tr key={user._id}>
+                  <tr 
+                    key={user._id} 
+                    className="cursor-pointer hover:bg-base-300 transition-colors"
+                    onClick={() => window.open(`/dancer/${user._id}`, '_blank')}
+                  >
                     <td>{(page - 1) * 100 + index + 1}</td>
                     <td>
                       <div className="flex items-center gap-3">
@@ -332,6 +366,20 @@ export default function AdminUsersPage() {
                       )}
                     </td>
                     <td>
+                      {user.city ? (
+                        <div className="text-sm">
+                          <div className="font-medium">{user.city.name}</div>
+                          {user.city.country && (
+                            <div className="text-base-content/60 text-xs">
+                              {user.city.country.name}
+                            </div>
+                          )}
+                        </div>
+                      ) : (
+                        <span className="text-base-content/50 text-sm italic">No location</span>
+                      )}
+                    </td>
+                    <td>
                       {user.isProfileComplete ? (
                         <span className="badge badge-success gap-1">
                           <FaCheck className="text-xs" /> Complete
@@ -343,7 +391,7 @@ export default function AdminUsersPage() {
                       )}
                     </td>
                     <td className="text-sm">{formatDate(user.createdAt)}</td>
-                    <td>
+                    <td onClick={(e) => e.stopPropagation()}>
                       <div className="form-control">
                         <label className="label cursor-pointer justify-start gap-2">
                           <input
@@ -366,15 +414,6 @@ export default function AdminUsersPage() {
                           )}
                         </label>
                       </div>
-                    </td>
-                    <td>
-                      <Link
-                        href={`/dancer/${user._id}`}
-                        target="_blank"
-                        className="btn btn-ghost btn-sm"
-                      >
-                        View Profile
-                      </Link>
                     </td>
                   </tr>
                 ))
