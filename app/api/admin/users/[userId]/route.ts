@@ -5,7 +5,46 @@ import connectMongo from "@/libs/mongoose";
 import User from "@/models/User";
 import config from "@/config";
 
-// PATCH: Update user's sharedOnSocialMedia status
+// GET: Fetch single user details
+export async function GET(
+  req: Request,
+  { params }: { params: { userId: string } }
+) {
+  try {
+    const session = await getServerSession(authOptions);
+    
+    // Check if user is admin
+    if (!session?.user?.email || session.user.email !== config.admin.email) {
+      return NextResponse.json(
+        { error: "Unauthorized" },
+        { status: 401 }
+      );
+    }
+
+    await connectMongo();
+
+    const user = await User.findById(params.userId)
+      .populate("city")
+      .populate("country");
+
+    if (!user) {
+      return NextResponse.json(
+        { error: "User not found" },
+        { status: 404 }
+      );
+    }
+
+    return NextResponse.json({ user });
+  } catch (error) {
+    console.error("Error fetching user:", error);
+    return NextResponse.json(
+      { error: "Failed to fetch user" },
+      { status: 500 }
+    );
+  }
+}
+
+// PATCH: Update user details
 export async function PATCH(
   req: Request,
   { params }: { params: { userId: string } }
@@ -24,15 +63,20 @@ export async function PATCH(
     await connectMongo();
 
     const body = await req.json();
-    
-    // Update only the sharedOnSocialMedia field
+    const { name, email, username, bio, preferredLanguage } = body;
+
+    // Update user
     const user = await User.findByIdAndUpdate(
       params.userId,
-      { sharedOnSocialMedia: body.sharedOnSocialMedia },
+      {
+        ...(name && { name }),
+        ...(email && { email }),
+        ...(username && { username }),
+        ...(bio !== undefined && { bio }),
+        ...(preferredLanguage && { preferredLanguage }),
+      },
       { new: true }
-    )
-      .select("_id name username image sharedOnSocialMedia")
-      .lean();
+    );
 
     if (!user) {
       return NextResponse.json(
@@ -43,6 +87,7 @@ export async function PATCH(
 
     return NextResponse.json({
       success: true,
+      message: "User updated successfully",
       user,
     });
   } catch (error) {
@@ -53,4 +98,3 @@ export async function PATCH(
     );
   }
 }
-

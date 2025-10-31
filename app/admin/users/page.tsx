@@ -466,24 +466,26 @@ export default function AdminUsersPage() {
             <thead>
               <tr>
                 <th className="w-12">#</th>
-                <th>User</th>
+                <th className="max-w-[150px]">User</th>
                 <th>Username</th>
                 <th>Location</th>
                 <th>Profile Status</th>
+                <th>Reminder</th>
                 <th>Joined</th>
                 <th>Shared on Social Media</th>
+                <th>Actions</th>
               </tr>
             </thead>
             <tbody>
               {loading ? (
                 <tr>
-                  <td colSpan={7} className="text-center py-8">
+                  <td colSpan={9} className="text-center py-8">
                     <span className="loading loading-spinner loading-lg"></span>
                   </td>
                 </tr>
               ) : users.length === 0 ? (
                 <tr>
-                  <td colSpan={7} className="text-center py-8 text-base-content/60">
+                  <td colSpan={9} className="text-center py-8 text-base-content/60">
                     No users found
                   </td>
                 </tr>
@@ -550,25 +552,27 @@ export default function AdminUsersPage() {
                             >
                               <FaInfoCircle /> Details
                             </button>
-                            {user.reminderSent ? (
-                              <div className="text-xs text-base-content/60 flex flex-col items-start">
-                                <span className="flex items-center gap-1">
-                                  <FaEnvelope className="text-success" /> Reminder Sent ✓
-                                </span>
-                                <span className="text-[10px]">{user.reminderSentAt ? formatDate(user.reminderSentAt) : ''}</span>
-                              </div>
-                            ) : (
-                              <button
-                                onClick={() => handleSendReminderClick(user)}
-                                className="btn btn-primary btn-xs gap-1"
-                                title="Send reminder email"
-                              >
-                                <FaEnvelope /> Remind
-                              </button>
-                            )}
                           </>
                         )}
                       </div>
+                    </td>
+                    <td className="text-xs">
+                      {!user.isProfileComplete && (
+                        user.reminderSent ? (
+                          <div className="flex flex-col items-start">
+                            <span className="badge badge-success badge-xs gap-1">
+                              <FaCheck className="text-[8px]" /> Sent
+                            </span>
+                            <span className="text-[10px] text-base-content/60 mt-0.5">
+                              {user.reminderSentAt ? formatDate(user.reminderSentAt) : ''}
+                            </span>
+                          </div>
+                        ) : (
+                          <span className="badge badge-ghost badge-xs gap-1">
+                            <FaTimes className="text-[8px]" /> Not sent
+                          </span>
+                        )
+                      )}
                     </td>
                     <td className="text-sm">{formatDate(user.createdAt)}</td>
                     <td onClick={(e) => e.stopPropagation()}>
@@ -594,6 +598,14 @@ export default function AdminUsersPage() {
                           )}
                         </label>
                       </div>
+                    </td>
+                    <td onClick={(e) => e.stopPropagation()}>
+                      <a
+                        href={`/admin/users/${user._id}/edit`}
+                        className="btn btn-warning btn-xs gap-1"
+                      >
+                        Edit
+                      </a>
                     </td>
                   </tr>
                 ))
@@ -744,6 +756,32 @@ export default function AdminUsersPage() {
                     </div>
                   </div>
 
+                  {/* Reminder Status */}
+                  {!selectedUser.isProfileComplete && (
+                    <div className="mb-6 p-4 rounded-lg bg-base-300">
+                      <div className="flex items-center gap-2 mb-2">
+                        <FaEnvelope className={selectedUser.reminderSent ? "text-success" : "text-base-content/60"} />
+                        <span className="font-semibold">Reminder Status</span>
+                      </div>
+                      {selectedUser.reminderSent ? (
+                        <div className="flex items-center gap-2 text-sm">
+                          <span className="badge badge-success gap-1">
+                            <FaCheck className="text-xs" /> Reminder Sent
+                          </span>
+                          <span className="text-base-content/70">
+                            on {selectedUser.reminderSentAt ? formatDate(selectedUser.reminderSentAt) : 'N/A'}
+                          </span>
+                        </div>
+                      ) : (
+                        <div className="text-sm text-base-content/70">
+                          <span className="badge badge-ghost gap-1">
+                            <FaTimes className="text-xs" /> No reminder sent yet
+                          </span>
+                        </div>
+                      )}
+                    </div>
+                  )}
+
                   {/* Missing Steps */}
                   {missing.length > 0 && (
                     <div className="mb-4">
@@ -789,21 +827,34 @@ export default function AdminUsersPage() {
                 Close
               </button>
               {!selectedUser.isProfileComplete && (
-                <button
-                  onClick={() => {
-                    setShowDetailsModal(false);
-                    handleMarkCompleteClick(selectedUser);
-                  }}
-                  className="btn btn-success"
-                >
-                  <FaCheck /> Mark as Complete
-                </button>
+                <>
+                  {!selectedUser.reminderSent && (
+                    <button
+                      onClick={() => {
+                        setShowDetailsModal(false);
+                        handleSendReminderClick(selectedUser);
+                      }}
+                      className="btn btn-primary gap-1"
+                    >
+                      <FaEnvelope /> Send Reminder
+                    </button>
+                  )}
+                  <button
+                    onClick={() => {
+                      setShowDetailsModal(false);
+                      handleMarkCompleteClick(selectedUser);
+                    }}
+                    className="btn btn-success gap-1"
+                  >
+                    <FaCheck /> Mark as Complete
+                  </button>
+                </>
               )}
               <a
                 href={`/dancer/${selectedUser._id}`}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="btn btn-primary"
+                className="btn btn-info gap-1"
               >
                 View Profile
               </a>
