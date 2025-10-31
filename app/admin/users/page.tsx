@@ -462,18 +462,18 @@ export default function AdminUsersPage() {
       {/* Users Table */}
       <div className="bg-base-200 rounded-lg overflow-hidden">
         <div className="overflow-x-auto">
-          <table className="table table-zebra w-full">
+          <table className="table table-zebra table-compact w-full text-sm">
             <thead>
               <tr>
-                <th className="w-12">#</th>
-                <th className="max-w-[150px]">User</th>
-                <th>Username</th>
-                <th>Location</th>
-                <th>Profile Status</th>
-                <th>Reminder</th>
-                <th>Joined</th>
-                <th>Shared on Social Media</th>
-                <th>Actions</th>
+                <th className="w-8 text-xs">#</th>
+                <th className="min-w-[120px] max-w-[150px]">User</th>
+                <th className="min-w-[100px]">Username</th>
+                <th className="min-w-[100px]">Location</th>
+                <th className="min-w-[120px]">Status</th>
+                <th className="min-w-[80px] text-xs">Reminder</th>
+                <th className="min-w-[80px] text-xs">Joined</th>
+                <th className="min-w-[100px] text-xs">Social</th>
+                <th className="w-16 text-xs">Edit</th>
               </tr>
             </thead>
             <tbody>
@@ -574,35 +574,29 @@ export default function AdminUsersPage() {
                         )
                       )}
                     </td>
-                    <td className="text-sm">{formatDate(user.createdAt)}</td>
+                    <td className="text-xs">{formatDate(user.createdAt)}</td>
                     <td onClick={(e) => e.stopPropagation()}>
-                      <div className="form-control">
-                        <label className="label cursor-pointer justify-start gap-2">
-                          <input
-                            type="checkbox"
-                            checked={user.sharedOnSocialMedia}
-                            onChange={() => toggleSharedStatus(user._id, user.sharedOnSocialMedia)}
-                            disabled={updatingUsers.has(user._id)}
-                            className="checkbox checkbox-success"
-                          />
-                          {updatingUsers.has(user._id) ? (
-                            <span className="loading loading-spinner loading-sm"></span>
-                          ) : user.sharedOnSocialMedia ? (
-                            <span className="badge badge-success gap-1">
-                              <FaCheck className="text-xs" /> Shared
-                            </span>
-                          ) : (
-                            <span className="badge badge-ghost gap-1">
-                              <FaTimes className="text-xs" /> Not shared
-                            </span>
-                          )}
-                        </label>
+                      <div className="flex items-center gap-1">
+                        <input
+                          type="checkbox"
+                          checked={user.sharedOnSocialMedia}
+                          onChange={() => toggleSharedStatus(user._id, user.sharedOnSocialMedia)}
+                          disabled={updatingUsers.has(user._id)}
+                          className="checkbox checkbox-xs checkbox-success"
+                        />
+                        {updatingUsers.has(user._id) ? (
+                          <span className="loading loading-spinner loading-xs"></span>
+                        ) : user.sharedOnSocialMedia ? (
+                          <FaCheck className="text-success text-xs" />
+                        ) : (
+                          <FaTimes className="text-base-content/30 text-xs" />
+                        )}
                       </div>
                     </td>
                     <td onClick={(e) => e.stopPropagation()}>
                       <a
                         href={`/admin/users/${user._id}/edit`}
-                        className="btn btn-warning btn-xs gap-1"
+                        className="btn btn-warning btn-xs"
                       >
                         Edit
                       </a>
