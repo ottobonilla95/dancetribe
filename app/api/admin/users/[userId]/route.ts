@@ -69,17 +69,15 @@ export async function PATCH(
 
     const { userId } = await params;
     const body = await req.json();
-    const { name, email, username, bio, preferredLanguage } = body;
+    const { bio, anthem, socialMedia } = body;
 
     // Update user
     const user = await User.findByIdAndUpdate(
       userId,
       {
-        ...(name && { name }),
-        ...(email && { email }),
-        ...(username && { username }),
         ...(bio !== undefined && { bio }),
-        ...(preferredLanguage && { preferredLanguage }),
+        ...(anthem !== undefined && { anthem }),
+        ...(socialMedia && { socialMedia }),
       },
       { new: true }
     );

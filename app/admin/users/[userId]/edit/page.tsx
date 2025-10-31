@@ -12,6 +12,18 @@ interface User {
   bio?: string;
   isProfileComplete?: boolean;
   preferredLanguage?: string;
+  anthem?: {
+    url?: string;
+    platform?: string;
+    title?: string;
+    artist?: string;
+  };
+  socialMedia?: {
+    instagram?: string;
+    tiktok?: string;
+    twitter?: string;
+    youtube?: string;
+  };
 }
 
 export default function EditUserPage({ params }: { params: Promise<{ userId: string }> }) {
@@ -26,6 +38,18 @@ export default function EditUserPage({ params }: { params: Promise<{ userId: str
     username: "",
     bio: "",
     preferredLanguage: "en",
+    anthem: {
+      url: "",
+      platform: "spotify",
+      title: "",
+      artist: "",
+    },
+    socialMedia: {
+      instagram: "",
+      tiktok: "",
+      twitter: "",
+      youtube: "",
+    },
   });
 
   useEffect(() => {
@@ -54,6 +78,18 @@ export default function EditUserPage({ params }: { params: Promise<{ userId: str
           username: data.user.username || "",
           bio: data.user.bio || "",
           preferredLanguage: data.user.preferredLanguage || "en",
+          anthem: {
+            url: data.user.anthem?.url || "",
+            platform: data.user.anthem?.platform || "spotify",
+            title: data.user.anthem?.title || "",
+            artist: data.user.anthem?.artist || "",
+          },
+          socialMedia: {
+            instagram: data.user.socialMedia?.instagram || "",
+            tiktok: data.user.socialMedia?.tiktok || "",
+            twitter: data.user.socialMedia?.twitter || "",
+            youtube: data.user.socialMedia?.youtube || "",
+          },
         });
       }
     } catch (error) {
@@ -120,48 +156,6 @@ export default function EditUserPage({ params }: { params: Promise<{ userId: str
       <div className="card bg-base-200 shadow-xl">
         <div className="card-body">
           <div className="space-y-4">
-            {/* Name */}
-            <div className="form-control">
-              <label className="label">
-                <span className="label-text font-semibold">Full Name</span>
-              </label>
-              <input
-                type="text"
-                value={formData.name}
-                onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                className="input input-bordered"
-                placeholder="Full name"
-              />
-            </div>
-
-            {/* Email */}
-            <div className="form-control">
-              <label className="label">
-                <span className="label-text font-semibold">Email</span>
-              </label>
-              <input
-                type="email"
-                value={formData.email}
-                onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-                className="input input-bordered"
-                placeholder="Email address"
-              />
-            </div>
-
-            {/* Username */}
-            <div className="form-control">
-              <label className="label">
-                <span className="label-text font-semibold">Username</span>
-              </label>
-              <input
-                type="text"
-                value={formData.username}
-                onChange={(e) => setFormData({ ...formData, username: e.target.value })}
-                className="input input-bordered"
-                placeholder="@username"
-              />
-            </div>
-
             {/* Bio */}
             <div className="form-control">
               <label className="label">
@@ -175,19 +169,127 @@ export default function EditUserPage({ params }: { params: Promise<{ userId: str
               />
             </div>
 
-            {/* Language */}
+            {/* Favorite Song (Anthem) */}
+            <div className="divider">Favorite Song / Anthem</div>
+
+            <div className="grid grid-cols-2 gap-4">
+              {/* Song Title */}
+              <div className="form-control">
+                <label className="label">
+                  <span className="label-text font-semibold">Song Title</span>
+                </label>
+                <input
+                  type="text"
+                  value={formData.anthem.title}
+                  onChange={(e) => setFormData({ ...formData, anthem: { ...formData.anthem, title: e.target.value } })}
+                  className="input input-bordered"
+                  placeholder="Song title"
+                />
+              </div>
+
+              {/* Artist */}
+              <div className="form-control">
+                <label className="label">
+                  <span className="label-text font-semibold">Artist</span>
+                </label>
+                <input
+                  type="text"
+                  value={formData.anthem.artist}
+                  onChange={(e) => setFormData({ ...formData, anthem: { ...formData.anthem, artist: e.target.value } })}
+                  className="input input-bordered"
+                  placeholder="Artist name"
+                />
+              </div>
+            </div>
+
+            <div className="grid grid-cols-2 gap-4">
+              {/* Platform */}
+              <div className="form-control">
+                <label className="label">
+                  <span className="label-text font-semibold">Platform</span>
+                </label>
+                <select
+                  value={formData.anthem.platform}
+                  onChange={(e) => setFormData({ ...formData, anthem: { ...formData.anthem, platform: e.target.value } })}
+                  className="select select-bordered"
+                >
+                  <option value="spotify">Spotify</option>
+                  <option value="youtube">YouTube</option>
+                </select>
+              </div>
+
+              {/* URL */}
+              <div className="form-control">
+                <label className="label">
+                  <span className="label-text font-semibold">Song URL</span>
+                </label>
+                <input
+                  type="url"
+                  value={formData.anthem.url}
+                  onChange={(e) => setFormData({ ...formData, anthem: { ...formData.anthem, url: e.target.value } })}
+                  className="input input-bordered"
+                  placeholder="https://..."
+                />
+              </div>
+            </div>
+
+            {/* Social Media Section */}
+            <div className="divider">Social Media</div>
+
+            {/* Instagram */}
             <div className="form-control">
               <label className="label">
-                <span className="label-text font-semibold">Preferred Language</span>
+                <span className="label-text font-semibold">Instagram</span>
               </label>
-              <select
-                value={formData.preferredLanguage}
-                onChange={(e) => setFormData({ ...formData, preferredLanguage: e.target.value })}
-                className="select select-bordered"
-              >
-                <option value="en">English</option>
-                <option value="es">Español</option>
-              </select>
+              <input
+                type="text"
+                value={formData.socialMedia.instagram}
+                onChange={(e) => setFormData({ ...formData, socialMedia: { ...formData.socialMedia, instagram: e.target.value } })}
+                className="input input-bordered"
+                placeholder="@username"
+              />
+            </div>
+
+            {/* TikTok */}
+            <div className="form-control">
+              <label className="label">
+                <span className="label-text font-semibold">TikTok</span>
+              </label>
+              <input
+                type="text"
+                value={formData.socialMedia.tiktok}
+                onChange={(e) => setFormData({ ...formData, socialMedia: { ...formData.socialMedia, tiktok: e.target.value } })}
+                className="input input-bordered"
+                placeholder="@username"
+              />
+            </div>
+
+            {/* Twitter */}
+            <div className="form-control">
+              <label className="label">
+                <span className="label-text font-semibold">Twitter / X</span>
+              </label>
+              <input
+                type="text"
+                value={formData.socialMedia.twitter}
+                onChange={(e) => setFormData({ ...formData, socialMedia: { ...formData.socialMedia, twitter: e.target.value } })}
+                className="input input-bordered"
+                placeholder="@username"
+              />
+            </div>
+
+            {/* YouTube */}
+            <div className="form-control">
+              <label className="label">
+                <span className="label-text font-semibold">YouTube</span>
+              </label>
+              <input
+                type="text"
+                value={formData.socialMedia.youtube}
+                onChange={(e) => setFormData({ ...formData, socialMedia: { ...formData.socialMedia, youtube: e.target.value } })}
+                className="input input-bordered"
+                placeholder="Channel name or handle"
+              />
             </div>
           </div>
 
