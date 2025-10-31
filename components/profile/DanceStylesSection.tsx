@@ -20,7 +20,6 @@ interface DanceStyleOption {
 
 interface DanceStylesSectionProps {
   initialDanceStyles: DanceStyle[];
-  onEditClick?: () => void;
 }
 
 const DANCE_LEVELS = [
@@ -30,7 +29,7 @@ const DANCE_LEVELS = [
   { value: "professional", label: "Professional", emoji: "🏆" },
 ];
 
-export default function DanceStylesSection({ initialDanceStyles, onEditClick }: DanceStylesSectionProps) {
+export default function DanceStylesSection({ initialDanceStyles }: DanceStylesSectionProps) {
   const router = useRouter();
   const [isEditing, setIsEditing] = useState(false);
   const [danceStyles, setDanceStyles] = useState<any[]>([]);

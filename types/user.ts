@@ -37,9 +37,11 @@ export type User = {
   isTeacher?: boolean;
   isDJ?: boolean;
   isPhotographer?: boolean;
+  isEventOrganizer?: boolean;
   teacherProfile?: TeacherProfile;
   djProfile?: DJProfile;
   photographerProfile?: PhotographerProfile;
+  eventOrganizerProfile?: EventOrganizerProfile;
   professionalContact?: ProfessionalContact;
   trips?: Trip[];
   openToMeetTravelers?: boolean;
@@ -113,6 +115,12 @@ export interface DJProfile {
 export interface PhotographerProfile {
   portfolioLink?: string;
   specialties?: string;
+  bio?: string;
+}
+
+export interface EventOrganizerProfile {
+  organizationName?: string;
+  eventTypes?: string;
   bio?: string;
 }
 
