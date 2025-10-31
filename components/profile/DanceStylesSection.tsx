@@ -129,7 +129,7 @@ export default function DanceStylesSection({ initialDanceStyles }: DanceStylesSe
                   >
                     <option value="" disabled>Select dance style</option>
                     {availableStyles.map((ds) => {
-                      const optionValue = String(ds._id || ds.id);
+                      const optionValue = String(ds._id);
                       return (
                         <option key={optionValue} value={optionValue}>
                           {ds.name}
