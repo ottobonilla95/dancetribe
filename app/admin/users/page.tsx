@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { FaUsers, FaSearch, FaCheck, FaTimes, FaInstagram, FaFacebook, FaTwitter, FaUserPlus, FaEnvelope } from "react-icons/fa";
+import { FaUsers, FaSearch, FaCheck, FaTimes, FaInstagram, FaFacebook, FaTwitter, FaUserPlus, FaEnvelope, FaInfoCircle } from "react-icons/fa";
 
 interface User {
   _id: string;
@@ -20,6 +20,24 @@ interface User {
       code: string;
     };
   };
+  onboardingSteps?: {
+    nameDetails?: boolean;
+    danceStyles?: boolean;
+    username?: boolean;
+    profilePic?: boolean;
+    dateOfBirth?: boolean;
+    bio?: boolean;
+    dancingStartYear?: boolean;
+    currentLocation?: boolean;
+    citiesVisited?: boolean;
+    anthem?: boolean;
+    socialMedia?: boolean;
+    danceRole?: boolean;
+    gender?: boolean;
+    nationality?: boolean;
+    relationshipStatus?: boolean;
+    teacherInfo?: boolean;
+  };
 }
 
 export default function AdminUsersPage() {
@@ -27,12 +45,17 @@ export default function AdminUsersPage() {
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState("");
   const [filterShared, setFilterShared] = useState<"all" | "shared" | "not-shared">("all");
-  const [showOnlyNotShared, setShowOnlyNotShared] = useState(false);
   const [showOnlyIncomplete, setShowOnlyIncomplete] = useState(false);
+  const [showOnlyComplete, setShowOnlyComplete] = useState(false);
   const [page, setPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
   const [totalUsers, setTotalUsers] = useState(0);
   const [updatingUsers, setUpdatingUsers] = useState<Set<string>>(new Set());
+  const [showDetailsModal, setShowDetailsModal] = useState(false);
+  const [selectedUser, setSelectedUser] = useState<User | null>(null);
+  const [showMarkCompleteModal, setShowMarkCompleteModal] = useState(false);
+  const [userToMarkComplete, setUserToMarkComplete] = useState<User | null>(null);
+  const [markingComplete, setMarkingComplete] = useState(false);
   
   // Invite modal state
   const [showInviteModal, setShowInviteModal] = useState(false);
@@ -43,7 +66,7 @@ export default function AdminUsersPage() {
 
   useEffect(() => {
     fetchUsers();
-  }, [page, searchTerm, filterShared, showOnlyNotShared, showOnlyIncomplete]); // eslint-disable-line react-hooks/exhaustive-deps
+  }, [page, searchTerm, filterShared, showOnlyIncomplete, showOnlyComplete]); // eslint-disable-line react-hooks/exhaustive-deps
 
   const fetchUsers = async () => {
     setLoading(true);
@@ -55,9 +78,7 @@ export default function AdminUsersPage() {
       });
 
       // Add filter parameter for shared status
-      if (showOnlyNotShared) {
-        params.append("filterShared", "false");
-      } else if (filterShared === "shared") {
+      if (filterShared === "shared") {
         params.append("filterShared", "true");
       } else if (filterShared === "not-shared") {
         params.append("filterShared", "false");
@@ -66,6 +87,8 @@ export default function AdminUsersPage() {
       // Add filter parameter for profile completion
       if (showOnlyIncomplete) {
         params.append("filterProfileComplete", "false");
+      } else if (showOnlyComplete) {
+        params.append("filterProfileComplete", "true");
       }
 
       const res = await fetch(`/api/admin/users?${params}`);
@@ -124,6 +147,88 @@ export default function AdminUsersPage() {
       month: "short",
       day: "numeric",
     });
+  };
+
+  const getMissingSteps = (user: User) => {
+    const stepLabels: Record<string, string> = {
+      nameDetails: "Name & Details",
+      danceStyles: "Dance Styles",
+      username: "Username",
+      profilePic: "Profile Picture",
+      dateOfBirth: "Date of Birth",
+      bio: "Bio",
+      dancingStartYear: "Dancing Start Year",
+      currentLocation: "Current Location",
+      citiesVisited: "Cities Visited",
+      anthem: "Dance Anthem",
+      socialMedia: "Social Media",
+      danceRole: "Dance Role",
+      gender: "Gender",
+      nationality: "Nationality",
+      relationshipStatus: "Relationship Status",
+      teacherInfo: "Teacher Info",
+    };
+
+    const missing: string[] = [];
+    const completed: string[] = [];
+
+    if (user.onboardingSteps) {
+      Object.entries(stepLabels).forEach(([key, label]) => {
+        if (user.onboardingSteps?.[key as keyof typeof user.onboardingSteps]) {
+          completed.push(label);
+        } else {
+          missing.push(label);
+        }
+      });
+    } else {
+      // If no onboarding steps data, consider all as missing
+      return { missing: Object.values(stepLabels), completed: [] };
+    }
+
+    return { missing, completed };
+  };
+
+  const handleShowDetails = (user: User) => {
+    setSelectedUser(user);
+    setShowDetailsModal(true);
+  };
+
+  const handleMarkCompleteClick = (user: User) => {
+    setUserToMarkComplete(user);
+    setShowMarkCompleteModal(true);
+  };
+
+  const handleMarkCompleteConfirm = async () => {
+    if (!userToMarkComplete) return;
+
+    setMarkingComplete(true);
+    try {
+      const res = await fetch(`/api/admin/users/${userToMarkComplete._id}/mark-complete`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+      });
+
+      if (res.ok) {
+        // Update local state
+        setUsers(prev =>
+          prev.map(user =>
+            user._id === userToMarkComplete._id
+              ? { ...user, isProfileComplete: true }
+              : user
+          )
+        );
+        setShowMarkCompleteModal(false);
+        setUserToMarkComplete(null);
+      } else {
+        const data = await res.json();
+        alert(data.error || "Failed to mark profile as complete");
+      }
+    } catch (error) {
+      console.error("Error marking profile complete:", error);
+      alert("Error marking profile as complete");
+    } finally {
+      setMarkingComplete(false);
+    }
   };
 
   const handleInviteUser = async () => {
@@ -274,15 +379,16 @@ export default function AdminUsersPage() {
             <label className="label cursor-pointer justify-start gap-3">
               <input
                 type="checkbox"
-                checked={showOnlyNotShared}
+                checked={showOnlyComplete}
                 onChange={(e) => {
-                  setShowOnlyNotShared(e.target.checked);
+                  setShowOnlyComplete(e.target.checked);
+                  if (e.target.checked) setShowOnlyIncomplete(false); // Uncheck incomplete
                   setPage(1);
                 }}
-                className="checkbox checkbox-warning"
+                className="checkbox checkbox-success"
               />
               <span className="label-text font-medium">
-                Show only users NOT shared on social media
+                Show only users with complete profiles
               </span>
             </label>
           </div>
@@ -294,6 +400,7 @@ export default function AdminUsersPage() {
                 checked={showOnlyIncomplete}
                 onChange={(e) => {
                   setShowOnlyIncomplete(e.target.checked);
+                  if (e.target.checked) setShowOnlyComplete(false); // Uncheck complete
                   setPage(1);
                 }}
                 className="checkbox checkbox-error"
@@ -379,16 +486,27 @@ export default function AdminUsersPage() {
                         <span className="text-base-content/50 text-sm italic">No location</span>
                       )}
                     </td>
-                    <td>
-                      {user.isProfileComplete ? (
-                        <span className="badge badge-success gap-1">
-                          <FaCheck className="text-xs" /> Complete
-                        </span>
-                      ) : (
-                        <span className="badge badge-warning gap-1">
-                          <FaTimes className="text-xs" /> Incomplete
-                        </span>
-                      )}
+                    <td onClick={(e) => e.stopPropagation()}>
+                      <div className="flex items-center gap-2">
+                        {user.isProfileComplete ? (
+                          <span className="badge badge-success gap-1">
+                            <FaCheck className="text-xs" /> Complete
+                          </span>
+                        ) : (
+                          <>
+                            <span className="badge badge-warning gap-1">
+                              <FaTimes className="text-xs" /> Incomplete
+                            </span>
+                            <button
+                              onClick={() => handleShowDetails(user)}
+                              className="btn btn-ghost btn-xs gap-1 text-info"
+                              title="View missing steps"
+                            >
+                              <FaInfoCircle /> Details
+                            </button>
+                          </>
+                        )}
+                      </div>
                     </td>
                     <td className="text-sm">{formatDate(user.createdAt)}</td>
                     <td onClick={(e) => e.stopPropagation()}>
@@ -531,6 +649,172 @@ export default function AdminUsersPage() {
             </div>
           </div>
           <div className="modal-backdrop" onClick={() => !inviting && setShowInviteModal(false)} />
+        </div>
+      )}
+
+      {/* Profile Details Modal */}
+      {showDetailsModal && selectedUser && (
+        <div className="modal modal-open">
+          <div className="modal-box max-w-2xl">
+            <h3 className="font-bold text-lg mb-4">
+              Profile Completion Details: {selectedUser.name}
+            </h3>
+
+            {(() => {
+              const { missing, completed } = getMissingSteps(selectedUser);
+              const completionPercentage = Math.round((completed.length / (completed.length + missing.length)) * 100);
+
+              return (
+                <>
+                  {/* Progress Bar */}
+                  <div className="mb-6">
+                    <div className="flex justify-between text-sm mb-2">
+                      <span className="font-medium">Profile Completion</span>
+                      <span className="font-bold">{completionPercentage}%</span>
+                    </div>
+                    <progress 
+                      className="progress progress-primary w-full" 
+                      value={completionPercentage} 
+                      max="100"
+                    ></progress>
+                    <div className="text-xs text-base-content/60 mt-1">
+                      {completed.length} of {completed.length + missing.length} steps completed
+                    </div>
+                  </div>
+
+                  {/* Missing Steps */}
+                  {missing.length > 0 && (
+                    <div className="mb-4">
+                      <h4 className="font-semibold text-error mb-2 flex items-center gap-2">
+                        <FaTimes /> Missing Steps ({missing.length})
+                      </h4>
+                      <div className="space-y-1">
+                        {missing.map((step, index) => (
+                          <div key={index} className="flex items-center gap-2 text-sm">
+                            <FaTimes className="text-error text-xs" />
+                            <span>{step}</span>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+
+                  {/* Completed Steps */}
+                  {completed.length > 0 && (
+                    <div>
+                      <h4 className="font-semibold text-success mb-2 flex items-center gap-2">
+                        <FaCheck /> Completed Steps ({completed.length})
+                      </h4>
+                      <div className="space-y-1">
+                        {completed.map((step, index) => (
+                          <div key={index} className="flex items-center gap-2 text-sm text-base-content/70">
+                            <FaCheck className="text-success text-xs" />
+                            <span>{step}</span>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+                </>
+              );
+            })()}
+
+            <div className="modal-action">
+              <button
+                onClick={() => setShowDetailsModal(false)}
+                className="btn btn-ghost"
+              >
+                Close
+              </button>
+              {!selectedUser.isProfileComplete && (
+                <button
+                  onClick={() => {
+                    setShowDetailsModal(false);
+                    handleMarkCompleteClick(selectedUser);
+                  }}
+                  className="btn btn-success"
+                >
+                  <FaCheck /> Mark as Complete
+                </button>
+              )}
+              <a
+                href={`/dancer/${selectedUser._id}`}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="btn btn-primary"
+              >
+                View Profile
+              </a>
+            </div>
+          </div>
+          
+          <div className="modal-backdrop" onClick={() => setShowDetailsModal(false)} />
+        </div>
+      )}
+
+      {/* Mark Complete Confirmation Modal */}
+      {showMarkCompleteModal && userToMarkComplete && (
+        <div className="modal modal-open">
+          <div className="modal-box">
+            <h3 className="font-bold text-lg mb-4">
+              Mark Profile as Complete?
+            </h3>
+            
+            <div className="space-y-4">
+              <div className="alert alert-info">
+                <FaCheck />
+                <div>
+                  <p className="font-semibold">Confirm Action</p>
+                  <p className="text-sm">
+                    Are you sure you want to mark <strong>{userToMarkComplete.name}</strong>&apos;s profile as complete?
+                  </p>
+                </div>
+              </div>
+
+              <p className="text-sm text-base-content/70">
+                This will set <code className="bg-base-300 px-1 rounded">isProfileComplete = true</code> for this user, even if they haven&apos;t completed all onboarding steps.
+              </p>
+            </div>
+
+            <div className="modal-action">
+              <button
+                onClick={() => {
+                  setShowMarkCompleteModal(false);
+                  setUserToMarkComplete(null);
+                }}
+                className="btn btn-ghost"
+                disabled={markingComplete}
+              >
+                Cancel
+              </button>
+              <button
+                onClick={handleMarkCompleteConfirm}
+                className="btn btn-success"
+                disabled={markingComplete}
+              >
+                {markingComplete ? (
+                  <>
+                    <span className="loading loading-spinner loading-sm"></span>
+                    Marking...
+                  </>
+                ) : (
+                  <>
+                    <FaCheck /> Confirm
+                  </>
+                )}
+              </button>
+            </div>
+          </div>
+          
+          <div 
+            className="modal-backdrop" 
+            onClick={() => {
+              if (!markingComplete) {
+                setShowMarkCompleteModal(false);
+                setUserToMarkComplete(null);
+              }
+            }}
+          />
         </div>
       )}
     </div>

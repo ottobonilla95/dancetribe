@@ -57,7 +57,7 @@ export async function GET(req: Request) {
 
     const [users, total] = await Promise.all([
       User.find(query)
-        .select("_id name username image sharedOnSocialMedia isProfileComplete createdAt city")
+        .select("_id name username image sharedOnSocialMedia isProfileComplete createdAt city onboardingSteps")
         .populate({
           path: "city",
           select: "name country",
