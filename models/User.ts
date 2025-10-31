@@ -325,8 +325,9 @@ const userSchema = new mongoose.Schema(
 );
 
 // Pre-remove middleware to handle totalDancers cleanup when user is deleted
+// Only decrement if user had a completed profile
 userSchema.pre('deleteOne', { document: true, query: false }, async function() {
-  if (this.city) {
+  if (this.city && this.isProfileComplete) {
     const City = mongoose.model('City');
     await City.findByIdAndUpdate(this.city, { 
       $inc: { totalDancers: -1 } 
@@ -336,7 +337,7 @@ userSchema.pre('deleteOne', { document: true, query: false }, async function() {
 
 userSchema.pre('findOneAndDelete', async function() {
   const user = await this.model.findOne(this.getQuery());
-  if (user && user.city) {
+  if (user && user.city && user.isProfileComplete) {
     const City = mongoose.model('City');
     await City.findByIdAndUpdate(user.city, { 
       $inc: { totalDancers: -1 } 

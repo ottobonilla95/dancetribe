@@ -3,6 +3,7 @@ import { getServerSession } from "next-auth";
 import { authOptions } from "@/libs/next-auth";
 import connectMongo from "@/libs/mongoose";
 import User from "@/models/User";
+import City from "@/models/City";
 import config from "@/config";
 import { sendEmail } from "@/libs/resend";
 
@@ -26,6 +27,18 @@ export async function PATCH(
 
     const { userId } = await params;
     
+    // Get user before updating to check if they were already complete
+    const userBefore = await User.findById(userId);
+    
+    if (!userBefore) {
+      return NextResponse.json(
+        { error: "User not found" },
+        { status: 404 }
+      );
+    }
+
+    const wasAlreadyComplete = userBefore.isProfileComplete;
+    
     // Update user's profile completion status
     const user = await User.findByIdAndUpdate(
       userId,
@@ -33,11 +46,11 @@ export async function PATCH(
       { new: true }
     );
 
-    if (!user) {
-      return NextResponse.json(
-        { error: "User not found" },
-        { status: 404 }
-      );
+    // If user just became complete and has a city, increment city's totalDancers
+    if (!wasAlreadyComplete && user && user.city) {
+      await City.findByIdAndUpdate(user.city, {
+        $inc: { totalDancers: 1 },
+      });
     }
 
     // Get translations based on user's language preference

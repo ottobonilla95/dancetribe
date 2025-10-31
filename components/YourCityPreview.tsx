@@ -39,41 +39,36 @@ export default async function YourCityPreview({ cityStats }: YourCityPreviewProp
   const flagEmoji = getFlagEmoji(cityStats.countryCode);
 
   return (
-    <div className="bg-gradient-to-br from-primary/10 to-secondary/10 rounded-lg overflow-hidden border border-primary/20 shadow-lg">
+    <Link 
+      href={`/city/${cityStats.cityId}`}
+      className="block bg-gradient-to-br from-primary/10 to-secondary/10 rounded-lg overflow-hidden border border-primary/20 shadow-lg hover:shadow-xl hover:border-primary/40 transition-all duration-300 cursor-pointer group"
+    >
       {/* Header with City Image */}
-      <div className="relative h-32">
+      <div className="relative h-32 overflow-hidden">
         {cityStats.cityImage ? (
           <img
             src={cityStats.cityImage}
             alt={cityStats.cityName}
-            className="w-full h-full object-cover"
+            className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-300"
             loading="lazy"
           />
         ) : (
-          <div className="w-full h-full bg-gradient-to-r from-primary to-secondary" />
+          <div className="w-full h-full bg-gradient-to-r from-primary to-secondary group-hover:scale-110 transition-transform duration-300" />
         )}
         
         {/* Overlay */}
         <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" />
         
         {/* City Info */}
-        <div className="absolute bottom-2 left-4 right-4 flex items-end justify-between">
-          <div>
-            <div className="flex items-center gap-2 mb-1">
-              <FaMapMarkerAlt className="text-white text-sm" />
-              <span className="text-xs text-white/80">{t('dashboard.yourCity')}</span>
-            </div>
-            <div className="flex items-center gap-2">
-              <span className="text-2xl">{flagEmoji}</span>
-              <h4 className="text-xl font-bold text-white">{cityStats.cityName}</h4>
-            </div>
+        <div className="absolute bottom-2 left-4 right-4">
+          <div className="flex items-center gap-2 mb-1">
+            <FaMapMarkerAlt className="text-white text-sm" />
+            <span className="text-xs text-white/80">{t('dashboard.yourCity')}</span>
           </div>
-          <Link 
-            href={`/city/${cityStats.cityId}`}
-            className="btn btn-xs btn-primary"
-          >
-            {t('dashboard.exploreYourCity')}
-          </Link>
+          <div className="flex items-center gap-2">
+            <span className="text-2xl">{flagEmoji}</span>
+            <h4 className="text-xl font-bold text-white">{cityStats.cityName}</h4>
+          </div>
         </div>
       </div>
 
@@ -106,7 +101,7 @@ export default async function YourCityPreview({ cityStats }: YourCityPreviewProp
           </div>
         )}
       </div>
-    </div>
+    </Link>
   );
 }
 

@@ -157,22 +157,25 @@ export async function PUT(req: NextRequest) {
         break;
 
       case "currentLocation": {
-        // Handle totalDancers count when changing cities
         const oldCityId = user.city;
         const newCityId = data.city;
 
-        // If user had a previous city, decrement its totalDancers
-        if (oldCityId && oldCityId.toString() !== newCityId) {
-          await City.findByIdAndUpdate(oldCityId, {
-            $inc: { totalDancers: -1 },
-          });
-        }
+        // Only update city dancer counts if profile is already complete
+        // (If profile is not complete yet, we'll update when it becomes complete)
+        if (user.isProfileComplete) {
+          // If user had a previous city, decrement its totalDancers
+          if (oldCityId && oldCityId.toString() !== newCityId) {
+            await City.findByIdAndUpdate(oldCityId, {
+              $inc: { totalDancers: -1 },
+            });
+          }
 
-        // If new city is different from old city, increment its totalDancers
-        if (newCityId && (!oldCityId || oldCityId.toString() !== newCityId)) {
-          await City.findByIdAndUpdate(newCityId, {
-            $inc: { totalDancers: 1 },
-          });
+          // If new city is different from old city, increment its totalDancers
+          if (newCityId && (!oldCityId || oldCityId.toString() !== newCityId)) {
+            await City.findByIdAndUpdate(newCityId, {
+              $inc: { totalDancers: 1 },
+            });
+          }
         }
 
         user.city = newCityId;
@@ -293,6 +296,13 @@ export async function PUT(req: NextRequest) {
     const isComplete = Object.values(steps).every((step) => step === true);
     const wasCompleteBeforeSave = user.isProfileComplete;
     user.isProfileComplete = isComplete;
+
+    // If profile just became complete, increment city's totalDancers
+    if (isComplete && !wasCompleteBeforeSave && user.city) {
+      await City.findByIdAndUpdate(user.city, {
+        $inc: { totalDancers: 1 },
+      });
+    }
 
     await user.save();
 

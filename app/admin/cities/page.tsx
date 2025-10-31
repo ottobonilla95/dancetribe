@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { FaCity, FaPlus, FaEdit, FaSearch, FaGlobe, FaMapMarkerAlt, FaCheck, FaTimes, FaTrash } from "react-icons/fa";
+import { FaCity, FaPlus, FaEdit, FaSearch, FaGlobe, FaMapMarkerAlt, FaCheck, FaTimes, FaTrash, FaSync } from "react-icons/fa";
 
 interface City {
   _id: string;
@@ -62,6 +62,7 @@ export default function AdminCitiesPage() {
   const [cityToDelete, setCityToDelete] = useState<City | null>(null);
   const [deleteConfirmText, setDeleteConfirmText] = useState("");
   const [deleting, setDeleting] = useState(false);
+  const [syncing, setSyncing] = useState(false);
 
   // Form state
   const [formData, setFormData] = useState<Partial<City>>({
@@ -241,6 +242,33 @@ export default function AdminCitiesPage() {
     }
   };
 
+  const handleSyncDancers = async () => {
+    if (!confirm("Sync all city dancer counts based on actual user data? This will update totalDancers for all cities.")) {
+      return;
+    }
+
+    setSyncing(true);
+    try {
+      const res = await fetch("/api/admin/sync/city-dancers", {
+        method: "POST",
+      });
+
+      if (res.ok) {
+        const data = await res.json();
+        alert(`Success! Updated ${data.stats.totalCitiesWithDancers} cities with ${data.stats.totalDancersProcessed} total dancers.`);
+        fetchCities(); // Refresh the list to show updated counts
+      } else {
+        const error = await res.json();
+        alert(error.error || "Failed to sync city dancers");
+      }
+    } catch (error) {
+      console.error("Error syncing city dancers:", error);
+      alert("Error syncing city dancers");
+    } finally {
+      setSyncing(false);
+    }
+  };
+
   return (
     <div className="p-6">
       {/* Header */}
@@ -254,10 +282,29 @@ export default function AdminCitiesPage() {
             Add and edit cities in the platform
           </p>
         </div>
-        <button onClick={handleAddCity} className="btn btn-primary gap-2">
-          <FaPlus />
-          Add City
-        </button>
+        <div className="flex gap-2">
+          <button 
+            onClick={handleSyncDancers} 
+            className="btn btn-secondary gap-2"
+            disabled={syncing}
+          >
+            {syncing ? (
+              <>
+                <span className="loading loading-spinner loading-sm"></span>
+                Syncing...
+              </>
+            ) : (
+              <>
+                <FaSync />
+                Sync Dancers
+              </>
+            )}
+          </button>
+          <button onClick={handleAddCity} className="btn btn-primary gap-2">
+            <FaPlus />
+            Add City
+          </button>
+        </div>
       </div>
 
       {/* Search */}

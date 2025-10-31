@@ -14,7 +14,7 @@ interface DiscoveryFeedProps {
   danceStyles?: DanceStyle[];
   showViewAllLink?: boolean;
   isPreview?: boolean; // Hide filters when showing as a preview on dashboard
-  initialFilter?: 'nearMe' | 'country' | 'worldwide'; // Initial filter from URL
+  initialFilter?: 'nearMe' | 'country' | 'worldwide' | 'pickCity' | 'pickCountry'; // Initial filter from URL
 }
 
 export default function DiscoveryFeed({ initialDancers = [], danceStyles = [], showViewAllLink = false, isPreview = false, initialFilter }: DiscoveryFeedProps) {
@@ -23,8 +23,18 @@ export default function DiscoveryFeed({ initialDancers = [], danceStyles = [], s
   
   // Read URL params for state restoration
   const urlView = searchParams.get('view') as 'list' | 'map' | null;
-  const urlFilter = searchParams.get('filter') as 'nearMe' | 'country' | 'worldwide' | null;
+  const urlFilter = searchParams.get('filter') as 'nearMe' | 'country' | 'worldwide' | 'pickCity' | 'pickCountry' | null;
   const urlLimit = searchParams.get('limit');
+  const urlPickCityId = searchParams.get('pickCityId');
+  const urlPickCountryId = searchParams.get('pickCountryId');
+  const urlDanceStyle = searchParams.get('danceStyle');
+  const urlDanceRole = searchParams.get('danceRole');
+  const urlDanceLevel = searchParams.get('danceLevel');
+  const urlShowTravelers = searchParams.get('showTravelers') === 'true';
+  const urlLookingForPractice = searchParams.get('lookingForPractice') === 'true';
+  const urlIsTeacher = searchParams.get('isTeacher') === 'true';
+  const urlIsDJ = searchParams.get('isDJ') === 'true';
+  const urlIsPhotographer = searchParams.get('isPhotographer') === 'true';
   
   const [dancers, setDancers] = useState(initialDancers);
   const [loading, setLoading] = useState(false);
@@ -37,16 +47,69 @@ export default function DiscoveryFeed({ initialDancers = [], danceStyles = [], s
   // Set initial filter based on URL parameter or default to nearMe
   const getInitialFilters = () => {
     const filterParam = urlFilter || initialFilter;
+    
+    // Base filters from URL (these apply to all location scopes)
+    const baseFilters = {
+      danceStyle: urlDanceStyle || "",
+      danceRole: urlDanceRole || "",
+      danceLevel: urlDanceLevel || "",
+      pickCityId: urlPickCityId || "",
+      pickCountryId: urlPickCountryId || "",
+      showTravelers: urlShowTravelers,
+      lookingForPractice: urlLookingForPractice,
+      openToTravelers: false,
+      isTeacher: urlIsTeacher,
+      isDJ: urlIsDJ,
+      isPhotographer: urlIsPhotographer,
+    };
+    
     if (filterParam === 'country') {
-      return { danceStyle: "", danceRole: "", city: "", nearMe: false, inMyCountry: true };
+      return { 
+        ...baseFilters,
+        nearMe: false, 
+        inMyCountry: true,
+        pickCity: false,
+        pickCountry: false,
+      };
     } else if (filterParam === 'worldwide') {
-      return { danceStyle: "", danceRole: "", city: "", nearMe: false, inMyCountry: false };
+      return { 
+        ...baseFilters,
+        nearMe: false, 
+        inMyCountry: false,
+        pickCity: false,
+        pickCountry: false,
+      };
+    } else if (filterParam === 'pickCity') {
+      return { 
+        ...baseFilters,
+        nearMe: false, 
+        inMyCountry: false,
+        pickCity: true,
+        pickCountry: false,
+      };
+    } else if (filterParam === 'pickCountry') {
+      return { 
+        ...baseFilters,
+        nearMe: false, 
+        inMyCountry: false,
+        pickCity: false,
+        pickCountry: true,
+      };
     }
-    return { danceStyle: "", danceRole: "", city: "", nearMe: true, inMyCountry: false };
+    // Default: Near Me
+    return { 
+      ...baseFilters,
+      nearMe: true, 
+      inMyCountry: false,
+      pickCity: false,
+      pickCountry: false,
+    };
   };
   
   const [filters, setFilters] = useState(getInitialFilters());
   const [showFilters, setShowFilters] = useState(false);
+  const [cities, setCities] = useState<any[]>([]);
+  const [countries, setCountries] = useState<any[]>([]);
   
   // Update URL when state changes (only on full page, not preview)
   const updateURL = useCallback((newFilters: typeof filters, newViewMode: 'list' | 'map', limit?: number) => {
@@ -54,8 +117,8 @@ export default function DiscoveryFeed({ initialDancers = [], danceStyles = [], s
     
     const params = new URLSearchParams();
     
-    // Add filter param
-    const filterParam = newFilters.nearMe ? 'nearMe' : newFilters.inMyCountry ? 'country' : 'worldwide';
+    // Add location scope filter
+    const filterParam = newFilters.nearMe ? 'nearMe' : newFilters.inMyCountry ? 'country' : newFilters.pickCity ? 'pickCity' : newFilters.pickCountry ? 'pickCountry' : 'worldwide';
     params.set('filter', filterParam);
     
     // Add view mode
@@ -65,6 +128,18 @@ export default function DiscoveryFeed({ initialDancers = [], danceStyles = [], s
     if (newViewMode === 'list' && limit && limit > 16) {
       params.set('limit', limit.toString());
     }
+    
+    // Add all other filter parameters
+    if (newFilters.pickCityId) params.set('pickCityId', newFilters.pickCityId);
+    if (newFilters.pickCountryId) params.set('pickCountryId', newFilters.pickCountryId);
+    if (newFilters.danceStyle) params.set('danceStyle', newFilters.danceStyle);
+    if (newFilters.danceRole) params.set('danceRole', newFilters.danceRole);
+    if (newFilters.danceLevel) params.set('danceLevel', newFilters.danceLevel);
+    if (newFilters.showTravelers) params.set('showTravelers', 'true');
+    if (newFilters.lookingForPractice) params.set('lookingForPractice', 'true');
+    if (newFilters.isTeacher) params.set('isTeacher', 'true');
+    if (newFilters.isDJ) params.set('isDJ', 'true');
+    if (newFilters.isPhotographer) params.set('isPhotographer', 'true');
     
     // Update URL without navigation (preserves history)
     const newUrl = `/discover?${params.toString()}`;
@@ -82,9 +157,16 @@ export default function DiscoveryFeed({ initialDancers = [], danceStyles = [], s
       const params = new URLSearchParams();
       if (filters.danceStyle) params.append("danceStyle", filters.danceStyle);
       if (filters.danceRole) params.append("danceRole", filters.danceRole);
-      if (filters.city) params.append("city", filters.city);
+      if (filters.danceLevel) params.append("danceLevel", filters.danceLevel);
+      if (filters.pickCityId) params.append("pickCityId", filters.pickCityId);
+      if (filters.pickCountryId) params.append("pickCountryId", filters.pickCountryId);
       if (filters.nearMe) params.append("nearMe", "true");
       if (filters.inMyCountry) params.append("inMyCountry", "true");
+      if (filters.showTravelers) params.append("showTravelers", "true");
+      if (filters.lookingForPractice) params.append("lookingForPractice", "true");
+      if (filters.isTeacher) params.append("isTeacher", "true");
+      if (filters.isDJ) params.append("isDJ", "true");
+      if (filters.isPhotographer) params.append("isPhotographer", "true");
       
       // 🗺️ For map view, load ALL dancers (no pagination)
       if (viewMode === 'map' && !append) {
@@ -155,78 +237,123 @@ export default function DiscoveryFeed({ initialDancers = [], danceStyles = [], s
     }
   }, [filters, viewMode, loadedCount]); // eslint-disable-line react-hooks/exhaustive-deps
 
+  // Fetch cities and countries for dropdowns
+  const fetchCities = useCallback(async () => {
+    try {
+      const res = await fetch("/api/cities?limit=1000");
+      if (res.ok) {
+        const data = await res.json();
+        setCities(data.cities || []);
+      }
+    } catch (error) {
+      console.error("Error fetching cities:", error);
+    }
+  }, []);
+
+  const fetchCountries = useCallback(async () => {
+    try {
+      const res = await fetch("/api/countries?limit=1000&includeEmpty=true");
+      if (res.ok) {
+        const data = await res.json();
+        setCountries(data.countries || []);
+      }
+    } catch (error) {
+      console.error("Error fetching countries:", error);
+    }
+  }, []);
+
+  // Fetch cities when pickCity is active (including on mount if URL has it)
+  useEffect(() => {
+    if (filters.pickCity) {
+      fetchCities();
+    }
+  }, [filters.pickCity, fetchCities]);
+
+  // Fetch countries when pickCountry is active (including on mount if URL has it)
+  useEffect(() => {
+    if (filters.pickCountry) {
+      fetchCountries();
+    }
+  }, [filters.pickCountry, fetchCountries]);
+
   const clearFilters = () => {
-    setFilters({ danceStyle: "", danceRole: "", city: "", nearMe: false, inMyCountry: false });
+    setFilters(prev => ({
+      ...prev,
+      danceStyle: "",
+      danceRole: "",
+      danceLevel: "",
+      showTravelers: false,
+      lookingForPractice: false,
+      isTeacher: false,
+      isDJ: false,
+      isPhotographer: false
+    }));
   };
 
   return (
     <div>
       {/* Header */}
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-4 mb-6">
-        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-          <div>
-            <h2 className="text-2xl font-bold">{t('discovery.title')}</h2>
-            <p className="text-base-content/60 text-sm">
-              {filters.nearMe ? t('discovery.dancersInYourCity') : 
-               filters.inMyCountry ? t('discovery.dancersInYourCountry') :
-               t('discovery.dancersAroundTheWorld')}
-            </p>
-          </div>
-          <div className="flex gap-2 flex-wrap">
-            {/* View Mode Toggle - Only show on full page (not preview) */}
-            {!isPreview && (
-              <div className="btn-group">
-                <button
-                  onClick={() => {
-                    setViewMode('list');
-                  }}
-                  className={`btn btn-sm gap-1 ${viewMode === 'list' ? 'btn-active' : 'btn-outline'}`}
-                  title="List View"
+        <div className="flex flex-col gap-4">
+          {/* Title and View Modes */}
+          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+            <div>
+              <h2 className="text-2xl font-bold">{t('discovery.title')}</h2>
+              <p className="text-base-content/60 text-sm">
+                {filters.nearMe ? t('discovery.dancersInYourCity') : 
+                 filters.inMyCountry ? t('discovery.dancersInYourCountry') :
+                 filters.pickCity ? 'Dancers in selected city' :
+                 t('discovery.dancersAroundTheWorld')}
+              </p>
+            </div>
+            <div className="flex gap-2 flex-wrap">
+              {/* View Mode Toggle - Only show on full page (not preview) */}
+              {!isPreview && (
+                <div className="btn-group">
+                  <button
+                    onClick={() => {
+                      setViewMode('list');
+                    }}
+                    className={`btn btn-sm gap-1 ${viewMode === 'list' ? 'btn-active' : 'btn-outline'}`}
+                    title="List View"
+                  >
+                    <FaList />
+                    <span>List</span>
+                  </button>
+                  <button
+                    onClick={() => {
+                      setViewMode('map');
+                    }}
+                    className={`btn btn-sm gap-1 ${viewMode === 'map' ? 'btn-active' : 'btn-outline'}`}
+                    title="Map View"
+                  >
+                    <FaMap />
+                    <span>Map</span>
+                  </button>
+                </div>
+              )}
+              {showViewAllLink && (
+                <a
+                  href={`/discover?filter=${filters.nearMe ? 'nearMe' : filters.inMyCountry ? 'country' : filters.pickCity ? 'pickCity' : filters.pickCountry ? 'pickCountry' : 'worldwide'}`}
+                  className="btn btn-primary btn-sm gap-2 hidden sm:flex"
                 >
-                  <FaList />
-                  <span>List</span>
-                </button>
-                <button
-                  onClick={() => {
-                    setViewMode('map');
-                  }}
-                  className={`btn btn-sm gap-1 ${viewMode === 'map' ? 'btn-active' : 'btn-outline'}`}
-                  title="Map View"
-                >
-                  <FaMap />
-                  <span>Map</span>
-                </button>
-              </div>
-            )}
-            {showViewAllLink && (
-              <a
-                href={`/discover?filter=${filters.nearMe ? 'nearMe' : filters.inMyCountry ? 'country' : 'worldwide'}`}
-                className="btn btn-primary btn-sm gap-2 hidden sm:flex"
-              >
-                {t('discovery.viewAll')}
-                <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7l5 5m0 0l-5 5m5-5H6" />
-                </svg>
-              </a>
-            )}
-            {/* More Filters button */}
-            <button
-              onClick={() => setShowFilters(!showFilters)}
-              className={`btn btn-outline btn-sm gap-2 ${isPreview ? 'hidden md:flex' : ''}`}
-            >
-              <FaFilter />
-              <span className="hidden sm:inline">{t('discovery.moreFilters')}</span>
-            </button>
+                  {t('discovery.viewAll')}
+                  <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7l5 5m0 0l-5 5m5-5H6" />
+                  </svg>
+                </a>
+              )}
+            </div>
           </div>
         </div>
 
-        {/* Location Toggle Buttons - Always show */}
+        {/* Location Scope Tabs - Always show */}
         <div className="flex gap-2 flex-wrap">
           <button
             onClick={() => {
-              const newFilters = {...filters, nearMe: true, inMyCountry: false};
+              const newFilters = {...filters, nearMe: true, inMyCountry: false, pickCity: false, pickCountry: false, pickCityId: "", pickCountryId: ""};
               setFilters(newFilters);
-              updateURL(newFilters, viewMode, 16); // Reset to default pagination
+              updateURL(newFilters, viewMode, 16);
             }}
             className={`btn btn-sm ${filters.nearMe ? 'btn-primary' : 'btn-outline'}`}
           >
@@ -234,9 +361,9 @@ export default function DiscoveryFeed({ initialDancers = [], danceStyles = [], s
           </button>
           <button
             onClick={() => {
-              const newFilters = {...filters, nearMe: false, inMyCountry: true};
+              const newFilters = {...filters, nearMe: false, inMyCountry: true, pickCity: false, pickCountry: false, pickCityId: "", pickCountryId: ""};
               setFilters(newFilters);
-              updateURL(newFilters, viewMode, 16); // Reset to default pagination
+              updateURL(newFilters, viewMode, 16);
             }}
             className={`btn btn-sm ${filters.inMyCountry ? 'btn-primary' : 'btn-outline'}`}
           >
@@ -244,13 +371,80 @@ export default function DiscoveryFeed({ initialDancers = [], danceStyles = [], s
           </button>
           <button
             onClick={() => {
-              const newFilters = {...filters, nearMe: false, inMyCountry: false};
+              const newFilters = {...filters, nearMe: false, inMyCountry: false, pickCity: false, pickCountry: false, pickCityId: "", pickCountryId: ""};
               setFilters(newFilters);
-              updateURL(newFilters, viewMode, 16); // Reset to default pagination
+              updateURL(newFilters, viewMode, 16);
             }}
-            className={`btn btn-sm ${(!filters.nearMe && !filters.inMyCountry) ? 'btn-primary' : 'btn-outline'}`}
+            className={`btn btn-sm ${(!filters.nearMe && !filters.inMyCountry && !filters.pickCity && !filters.pickCountry) ? 'btn-primary' : 'btn-outline'}`}
           >
             🌍 {t('discovery.worldwide')}
+          </button>
+          <button
+            onClick={() => {
+              const newFilters = {...filters, nearMe: false, inMyCountry: false, pickCity: true, pickCountry: false, pickCountryId: ""};
+              setFilters(newFilters);
+              updateURL(newFilters, viewMode, 16);
+            }}
+            className={`btn btn-sm ${filters.pickCity ? 'btn-primary' : 'btn-outline'}`}
+          >
+            🏙️ Pick a City
+          </button>
+          <button
+            onClick={() => {
+              const newFilters = {...filters, nearMe: false, inMyCountry: false, pickCity: false, pickCountry: true, pickCityId: ""};
+              setFilters(newFilters);
+              updateURL(newFilters, viewMode, 16);
+            }}
+            className={`btn btn-sm ${filters.pickCountry ? 'btn-primary' : 'btn-outline'}`}
+          >
+            🌎 Pick a Country
+          </button>
+        </div>
+
+        {/* City Picker (only shown when pickCity is true) */}
+        {filters.pickCity && (
+          <div className="form-control max-w-md">
+            <select
+              className="select select-bordered"
+              value={filters.pickCityId}
+              onChange={(e) => setFilters({ ...filters, pickCityId: e.target.value })}
+            >
+              <option value="">Select a city...</option>
+              {cities.map((city) => (
+                <option key={city._id} value={city._id}>
+                  {city.name}{city.country ? `, ${city.country.name}` : ""}
+                </option>
+              ))}
+            </select>
+          </div>
+        )}
+
+        {/* Country Picker (only shown when pickCountry is true) */}
+        {filters.pickCountry && (
+          <div className="form-control max-w-md">
+            <select
+              className="select select-bordered"
+              value={filters.pickCountryId}
+              onChange={(e) => setFilters({ ...filters, pickCountryId: e.target.value })}
+            >
+              <option value="">Select a country...</option>
+              {countries.map((country) => (
+                <option key={country._id} value={country._id}>
+                  {country.name}
+                </option>
+              ))}
+            </select>
+          </div>
+        )}
+
+        {/* More Filters button - Below location scopes on mobile */}
+        <div className="flex justify-start">
+          <button
+            onClick={() => setShowFilters(!showFilters)}
+            className={`btn btn-outline btn-sm gap-2 ${isPreview ? 'hidden' : ''}`}
+          >
+            <FaFilter />
+            <span>More Filters</span>
           </button>
         </div>
       </div>
@@ -297,23 +491,93 @@ export default function DiscoveryFeed({ initialDancers = [], danceStyles = [], s
               </select>
             </div>
 
-            {/* City Filter */}
+            {/* Dance Level Filter */}
             <div className="form-control">
               <label className="label">
-                <span className="label-text">{t('discovery.city')}</span>
+                <span className="label-text">Dance Level</span>
               </label>
-              <input
-                type="text"
-                placeholder={t('discovery.enterCityName')}
-                className="input input-bordered input-sm"
-                value={filters.city}
-                onChange={(e) => setFilters({ ...filters, city: e.target.value })}
-              />
+              <select
+                className="select select-bordered select-sm"
+                value={filters.danceLevel}
+                onChange={(e) => setFilters({ ...filters, danceLevel: e.target.value })}
+              >
+                <option value="">All Levels</option>
+                <option value="beginner">Beginner</option>
+                <option value="intermediate">Intermediate</option>
+                <option value="advanced">Advanced</option>
+                <option value="professional">Professional</option>
+              </select>
+            </div>
+          </div>
+
+          {/* Other Filters */}
+          <div className="mb-6">
+            <label className="label">
+              <span className="label-text font-semibold">Show</span>
+            </label>
+            <div className="flex gap-3 flex-wrap">
+              {/* Only show travelers when location scope is specific */}
+              {(filters.nearMe || filters.inMyCountry || filters.pickCity || filters.pickCountry) && (
+                <label className="cursor-pointer gap-2 btn btn-sm btn-outline">
+                  <input
+                    type="checkbox"
+                    checked={filters.showTravelers}
+                    onChange={(e) => setFilters({ ...filters, showTravelers: e.target.checked })}
+                    className="checkbox checkbox-sm"
+                  />
+                  <span>✈️ Travelers</span>
+                </label>
+              )}
+              <label className="cursor-pointer gap-2 btn btn-sm btn-outline">
+                <input
+                  type="checkbox"
+                  checked={filters.lookingForPractice}
+                  onChange={(e) => setFilters({ ...filters, lookingForPractice: e.target.checked })}
+                  className="checkbox checkbox-sm"
+                />
+                <span>🎯 Practice Partners</span>
+              </label>
+            </div>
+          </div>
+
+          {/* Professional Filters */}
+          <div className="mb-4">
+            <label className="label">
+              <span className="label-text font-semibold">Professional Profiles</span>
+            </label>
+            <div className="flex gap-3 flex-wrap">
+              <label className="cursor-pointer gap-2 btn btn-sm btn-outline">
+                <input
+                  type="checkbox"
+                  checked={filters.isTeacher}
+                  onChange={(e) => setFilters({ ...filters, isTeacher: e.target.checked })}
+                  className="checkbox checkbox-sm"
+                />
+                <span>🎓 Teachers</span>
+              </label>
+              <label className="cursor-pointer gap-2 btn btn-sm btn-outline">
+                <input
+                  type="checkbox"
+                  checked={filters.isDJ}
+                  onChange={(e) => setFilters({ ...filters, isDJ: e.target.checked })}
+                  className="checkbox checkbox-sm"
+                />
+                <span>🎵 DJs</span>
+              </label>
+              <label className="cursor-pointer gap-2 btn btn-sm btn-outline">
+                <input
+                  type="checkbox"
+                  checked={filters.isPhotographer}
+                  onChange={(e) => setFilters({ ...filters, isPhotographer: e.target.checked })}
+                  className="checkbox checkbox-sm"
+                />
+                <span>📸 Photographers</span>
+              </label>
             </div>
           </div>
 
           {/* Clear Filters Button */}
-          {(filters.danceStyle || filters.danceRole || filters.city) && (
+          {(filters.danceStyle || filters.danceRole || filters.danceLevel || filters.isTeacher || filters.isDJ || filters.isPhotographer || filters.showTravelers || filters.lookingForPractice) && (
             <button onClick={clearFilters} className="btn btn-ghost btn-sm">
               {t('discovery.clearAllFilters')}
             </button>
@@ -432,7 +696,7 @@ export default function DiscoveryFeed({ initialDancers = [], danceStyles = [], s
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
               <div className="flex justify-center mt-6">
                 <a
-                  href={`/discover?filter=${filters.nearMe ? 'nearMe' : filters.inMyCountry ? 'country' : 'worldwide'}`}
+                  href={`/discover?filter=${filters.nearMe ? 'nearMe' : filters.inMyCountry ? 'country' : filters.pickCity ? 'pickCity' : filters.pickCountry ? 'pickCountry' : 'worldwide'}`}
                   className="btn btn-outline btn-sm md:btn-md"
                 >
                   {t('dashboard.viewAllDancers')}

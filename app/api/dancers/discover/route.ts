@@ -26,9 +26,17 @@ export async function GET(req: NextRequest) {
     const { searchParams } = new URL(req.url);
     const danceStyle = searchParams.get("danceStyle");
     const danceRole = searchParams.get("danceRole");
+    const danceLevel = searchParams.get("danceLevel");
     const city = searchParams.get("city");
+    const pickCityId = searchParams.get("pickCityId"); // Specific city ID
+    const pickCountryId = searchParams.get("pickCountryId"); // Specific country ID
     const nearMe = searchParams.get("nearMe") === "true";
     const inMyCountry = searchParams.get("inMyCountry") === "true";
+    const showTravelers = searchParams.get("showTravelers") === "true";
+    const lookingForPractice = searchParams.get("lookingForPractice") === "true";
+    const isTeacher = searchParams.get("isTeacher") === "true";
+    const isDJ = searchParams.get("isDJ") === "true";
+    const isPhotographer = searchParams.get("isPhotographer") === "true";
     const limit = parseInt(searchParams.get("limit") || "16");
     const skip = parseInt(searchParams.get("skip") || "0");
 
@@ -41,22 +49,73 @@ export async function GET(req: NextRequest) {
       isProfileComplete: true, // Only show completed profiles
     };
 
-    // Location filtering
-    if (nearMe && currentUser?.city && !city) {
-      query.city = currentUser.city; // ONLY same city
+    // Determine scope city for travelers filter
+    let scopeCityId = null;
+    
+    // Location filtering (scopes are mutually exclusive)
+    if (pickCityId) {
+      // Pick a City tab - specific city selected
+      query.city = pickCityId;
+      scopeCityId = pickCityId;
+    } else if (pickCountryId) {
+      // Pick a Country tab - specific country selected
+      const citiesInCountry = await City.find({ 
+        country: pickCountryId 
+      }).select('_id');
+      query.city = { $in: citiesInCountry.map(c => c._id) };
+      // For travelers, we can't determine a single scope city
+      scopeCityId = null; // Will allow travelers per city if needed
+    } else if (nearMe && currentUser?.city && !city) {
+      // Near Me tab
+      query.city = currentUser.city;
+      scopeCityId = currentUser.city;
     } else if (inMyCountry && currentUser?.city && !city) {
-      // Find all cities in user's country
+      // My Country tab
       const userCityWithCountry = await City.findById(currentUser.city).populate('country');
       if (userCityWithCountry?.country) {
         const citiesInCountry = await City.find({ 
           country: userCityWithCountry.country._id 
         }).select('_id');
         query.city = { $in: citiesInCountry.map(c => c._id) };
+        // For travelers, we'll use user's home city
+        scopeCityId = currentUser.city;
       }
     }
+    // Worldwide tab = no city filter
+    
+    // TRAVELERS FILTER (separate toggle that works with any scope)
+    if (showTravelers && scopeCityId) {
+      // Show people whose activeCity matches scope but it's not their home
+      query.activeCity = scopeCityId;
+      query.openToMeetTravelers = true;
+      query.$expr = { $ne: ["$activeCity", "$city"] };
+    }
+    
+    // OTHER FILTERS
+    if (lookingForPractice) {
+      query.lookingForPracticePartners = true;
+    }
+    
+    if (isTeacher) {
+      query.isTeacher = true;
+    }
+    
+    if (isDJ) {
+      query.isDJ = true;
+    }
+    
+    if (isPhotographer) {
+      query.isPhotographer = true;
+    }
+    
     // Filter by dance role
     if (danceRole && danceRole !== "all") {
       query.danceRole = danceRole;
+    }
+    
+    // Filter by dance level
+    if (danceLevel && danceLevel !== "all") {
+      query.danceLevel = danceLevel;
     }
 
     // Filter by city (accent-insensitive search)

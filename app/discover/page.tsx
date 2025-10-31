@@ -113,10 +113,12 @@ export default async function DiscoverPage({
     getDanceStyles(),
   ]);
 
-  // Parse filter from URL: 'nearMe', 'country', or 'worldwide'
+  // Parse filter from URL: 'nearMe', 'country', 'worldwide', 'pickCity', or 'pickCountry'
   const initialFilter = 
     searchParams.filter === 'country' ? 'country' :
     searchParams.filter === 'worldwide' ? 'worldwide' :
+    searchParams.filter === 'pickCity' ? 'pickCity' :
+    searchParams.filter === 'pickCountry' ? 'pickCountry' :
     'nearMe'; // Default
 
   return (
@@ -125,7 +127,7 @@ export default async function DiscoverPage({
       <DiscoveryFeed 
         initialDancers={initialDancers} 
         danceStyles={danceStyles}
-        initialFilter={initialFilter as 'nearMe' | 'country' | 'worldwide'}
+        initialFilter={initialFilter as 'nearMe' | 'country' | 'worldwide' | 'pickCity' | 'pickCountry'}
       />
     </div>
   );
