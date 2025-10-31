@@ -309,6 +309,14 @@ const userSchema = new mongoose.Schema(
       type: Boolean,
       default: false,
     },
+    // Admin tracking: whether reminder email has been sent for incomplete profile
+    reminderSent: {
+      type: Boolean,
+      default: false,
+    },
+    reminderSentAt: {
+      type: Date,
+    },
   },
   {
     timestamps: true,

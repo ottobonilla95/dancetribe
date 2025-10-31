@@ -11,6 +11,8 @@ interface User {
   sharedOnSocialMedia: boolean;
   isProfileComplete?: boolean;
   createdAt: string;
+  reminderSent?: boolean;
+  reminderSentAt?: string;
   city?: {
     _id: string;
     name: string;
@@ -56,6 +58,11 @@ export default function AdminUsersPage() {
   const [showMarkCompleteModal, setShowMarkCompleteModal] = useState(false);
   const [userToMarkComplete, setUserToMarkComplete] = useState<User | null>(null);
   const [markingComplete, setMarkingComplete] = useState(false);
+  
+  // Send reminder modal state
+  const [showReminderModal, setShowReminderModal] = useState(false);
+  const [userToRemind, setUserToRemind] = useState<User | null>(null);
+  const [sendingReminder, setSendingReminder] = useState(false);
   
   // Invite modal state
   const [showInviteModal, setShowInviteModal] = useState(false);
@@ -228,6 +235,45 @@ export default function AdminUsersPage() {
       alert("Error marking profile as complete");
     } finally {
       setMarkingComplete(false);
+    }
+  };
+
+  const handleSendReminderClick = (user: User) => {
+    setUserToRemind(user);
+    setShowReminderModal(true);
+  };
+
+  const handleSendReminderConfirm = async () => {
+    if (!userToRemind) return;
+
+    setSendingReminder(true);
+    try {
+      const res = await fetch(`/api/admin/users/${userToRemind._id}/send-reminder`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+      });
+
+      if (res.ok) {
+        // Update local state to mark reminder as sent
+        setUsers(prev =>
+          prev.map(user =>
+            user._id === userToRemind._id
+              ? { ...user, reminderSent: true, reminderSentAt: new Date().toISOString() }
+              : user
+          )
+        );
+        setShowReminderModal(false);
+        setUserToRemind(null);
+        alert("Reminder email sent successfully!");
+      } else {
+        const data = await res.json();
+        alert(data.error || "Failed to send reminder");
+      }
+    } catch (error) {
+      console.error("Error sending reminder:", error);
+      alert("Error sending reminder");
+    } finally {
+      setSendingReminder(false);
     }
   };
 
@@ -504,6 +550,22 @@ export default function AdminUsersPage() {
                             >
                               <FaInfoCircle /> Details
                             </button>
+                            {user.reminderSent ? (
+                              <div className="text-xs text-base-content/60 flex flex-col items-start">
+                                <span className="flex items-center gap-1">
+                                  <FaEnvelope className="text-success" /> Reminder Sent ✓
+                                </span>
+                                <span className="text-[10px]">{user.reminderSentAt ? formatDate(user.reminderSentAt) : ''}</span>
+                              </div>
+                            ) : (
+                              <button
+                                onClick={() => handleSendReminderClick(user)}
+                                className="btn btn-primary btn-xs gap-1"
+                                title="Send reminder email"
+                              >
+                                <FaEnvelope /> Remind
+                              </button>
+                            )}
                           </>
                         )}
                       </div>
@@ -812,6 +874,94 @@ export default function AdminUsersPage() {
               if (!markingComplete) {
                 setShowMarkCompleteModal(false);
                 setUserToMarkComplete(null);
+              }
+            }}
+          />
+        </div>
+      )}
+
+      {/* Send Reminder Modal */}
+      {showReminderModal && userToRemind && (
+        <div className="modal modal-open">
+          <div className="modal-box">
+            <h3 className="font-bold text-lg mb-4">
+              Send Reminder Email?
+            </h3>
+            
+            <div className="space-y-4">
+              <div className="alert alert-info">
+                <FaEnvelope />
+                <div>
+                  <p className="font-semibold">Confirm Action</p>
+                  <p className="text-sm">
+                    Send a reminder email to <strong>{userToRemind.name}</strong> to complete their profile?
+                  </p>
+                </div>
+              </div>
+
+              {(() => {
+                const { missing } = getMissingSteps(userToRemind);
+                return (
+                  <div className="text-sm text-base-content/70">
+                    <p className="font-medium mb-2">The email will include:</p>
+                    <ul className="list-disc list-inside space-y-1 ml-2">
+                      <li>Progress percentage</li>
+                      <li>Missing steps ({missing.length})</li>
+                      <li>Link to complete profile</li>
+                    </ul>
+                  </div>
+                );
+              })()}
+
+              {userToRemind.reminderSent && (
+                <div className="alert alert-warning">
+                  <FaTimes />
+                  <div>
+                    <p className="font-semibold">Already Sent</p>
+                    <p className="text-sm">
+                      A reminder was already sent on {userToRemind.reminderSentAt ? formatDate(userToRemind.reminderSentAt) : 'a previous date'}.
+                    </p>
+                  </div>
+                </div>
+              )}
+            </div>
+
+            <div className="modal-action">
+              <button
+                onClick={() => {
+                  setShowReminderModal(false);
+                  setUserToRemind(null);
+                }}
+                className="btn btn-ghost"
+                disabled={sendingReminder}
+              >
+                Cancel
+              </button>
+              <button
+                onClick={handleSendReminderConfirm}
+                className="btn btn-primary"
+                disabled={sendingReminder}
+              >
+                {sendingReminder ? (
+                  <>
+                    <span className="loading loading-spinner loading-sm"></span>
+                    Sending...
+                  </>
+                ) : (
+                  <>
+                    <FaEnvelope /> Send Reminder
+                  </>
+                )}
+              </button>
+            </div>
+          </div>
+          
+          <div 
+            className="modal-backdrop" 
+            onClick={() => {
+              if (!sendingReminder) {
+                setShowReminderModal(false);
+                setUserToRemind(null);
               }
             }}
           />
