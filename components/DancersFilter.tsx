@@ -28,6 +28,7 @@ interface Dancer {
   isTeacher?: boolean;
   isDJ?: boolean;
   isPhotographer?: boolean;
+  isEventOrganizer?: boolean;
   jackAndJillCompetitions?: Array<{
     placement: string;
     year: number;
@@ -56,6 +57,9 @@ export default function DancersFilter({
   const { t } = useTranslation();
   const [showMyStyles, setShowMyStyles] = useState(false);
   const [showOnlyTeachers, setShowOnlyTeachers] = useState(false);
+  const [showOnlyDJs, setShowOnlyDJs] = useState(false);
+  const [showOnlyPhotographers, setShowOnlyPhotographers] = useState(false);
+  const [showOnlyEventOrganizers, setShowOnlyEventOrganizers] = useState(false);
   const [showOpenToPractice, setShowOpenToPractice] = useState(false);
   const [showTravelers, setShowTravelers] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
@@ -72,6 +76,21 @@ export default function DancersFilter({
 
     // Teachers filter
     if (showOnlyTeachers && !dancer.isTeacher) {
+      return false;
+    }
+
+    // DJs filter
+    if (showOnlyDJs && !dancer.isDJ) {
+      return false;
+    }
+
+    // Photographers filter
+    if (showOnlyPhotographers && !dancer.isPhotographer) {
+      return false;
+    }
+
+    // Event Organizers filter
+    if (showOnlyEventOrganizers && !dancer.isEventOrganizer) {
       return false;
     }
 
@@ -104,6 +123,9 @@ export default function DancersFilter({
   const clearAllFilters = () => {
     setShowMyStyles(false);
     setShowOnlyTeachers(false);
+    setShowOnlyDJs(false);
+    setShowOnlyPhotographers(false);
+    setShowOnlyEventOrganizers(false);
     setShowOpenToPractice(false);
     setShowTravelers(false);
     setCurrentPage(1);
@@ -138,59 +160,113 @@ export default function DancersFilter({
           </label>
         )}
 
-        {/* Teachers Filter */}
-        <label className="flex items-center gap-3 cursor-pointer">
-          <input
-            type="checkbox"
-            checked={showOnlyTeachers}
-            onChange={() => {
-              setShowOnlyTeachers(!showOnlyTeachers);
-              handleFilterChange();
-            }}
-            className="toggle toggle-primary"
-          />
-          <div className="flex items-center gap-2">
-            <span className="text-lg">🎓</span>
-            <span className="font-medium">Teachers Only</span>
-          </div>
-        </label>
+        {/* Professional Filters Grid - 2 per row mobile, 3 per row desktop */}
+        <div className="grid grid-cols-2 lg:grid-cols-3 gap-4">
+          {/* Teachers Filter */}
+          <label className="flex items-center gap-2 cursor-pointer">
+            <input
+              type="checkbox"
+              checked={showOnlyTeachers}
+              onChange={() => {
+                setShowOnlyTeachers(!showOnlyTeachers);
+                handleFilterChange();
+              }}
+              className="toggle toggle-primary toggle-sm"
+            />
+            <div className="flex items-center gap-1">
+              <span className="text-lg">🎓</span>
+              <span className="font-medium text-sm">Teachers</span>
+            </div>
+          </label>
 
-        {/* Open to Practice Filter */}
-        <label className="flex items-center gap-3 cursor-pointer">
-          <input
-            type="checkbox"
-            checked={showOpenToPractice}
-            onChange={() => {
-              setShowOpenToPractice(!showOpenToPractice);
-              handleFilterChange();
-            }}
-            className="toggle toggle-primary"
-          />
-          <div className="flex items-center gap-2">
-            <span className="text-lg">🤝</span>
-            <span className="font-medium">Open to Practice</span>
-          </div>
-        </label>
+          {/* DJs Filter */}
+          <label className="flex items-center gap-2 cursor-pointer">
+            <input
+              type="checkbox"
+              checked={showOnlyDJs}
+              onChange={() => {
+                setShowOnlyDJs(!showOnlyDJs);
+                handleFilterChange();
+              }}
+              className="toggle toggle-primary toggle-sm"
+            />
+            <div className="flex items-center gap-1">
+              <span className="text-lg">🎵</span>
+              <span className="font-medium text-sm">DJs</span>
+            </div>
+          </label>
 
-        {/* Travelers Filter */}
-        <label className="flex items-center gap-3 cursor-pointer">
-          <input
-            type="checkbox"
-            checked={showTravelers}
-            onChange={() => {
-              setShowTravelers(!showTravelers);
-              handleFilterChange();
-            }}
-            className="toggle toggle-primary"
-          />
-          <div className="flex items-center gap-2">
-            <span className="text-lg">✈️</span>
-            <span className="font-medium">Travelers</span>
-          </div>
-        </label>
+          {/* Photographers Filter */}
+          <label className="flex items-center gap-2 cursor-pointer">
+            <input
+              type="checkbox"
+              checked={showOnlyPhotographers}
+              onChange={() => {
+                setShowOnlyPhotographers(!showOnlyPhotographers);
+                handleFilterChange();
+              }}
+              className="toggle toggle-primary toggle-sm"
+            />
+            <div className="flex items-center gap-1">
+              <span className="text-lg">📷</span>
+              <span className="font-medium text-sm">Photographers</span>
+            </div>
+          </label>
+
+          {/* Event Organizers Filter */}
+          <label className="flex items-center gap-2 cursor-pointer">
+            <input
+              type="checkbox"
+              checked={showOnlyEventOrganizers}
+              onChange={() => {
+                setShowOnlyEventOrganizers(!showOnlyEventOrganizers);
+                handleFilterChange();
+              }}
+              className="toggle toggle-primary toggle-sm"
+            />
+            <div className="flex items-center gap-1">
+              <span className="text-lg">🎪</span>
+              <span className="font-medium text-sm">Event Organizers</span>
+            </div>
+          </label>
+
+          {/* Open to Practice Filter */}
+          <label className="flex items-center gap-2 cursor-pointer">
+            <input
+              type="checkbox"
+              checked={showOpenToPractice}
+              onChange={() => {
+                setShowOpenToPractice(!showOpenToPractice);
+                handleFilterChange();
+              }}
+              className="toggle toggle-primary toggle-sm"
+            />
+            <div className="flex items-center gap-1">
+              <span className="text-lg">🤝</span>
+              <span className="font-medium text-sm">Practice</span>
+            </div>
+          </label>
+
+          {/* Travelers Filter */}
+          <label className="flex items-center gap-2 cursor-pointer">
+            <input
+              type="checkbox"
+              checked={showTravelers}
+              onChange={() => {
+                setShowTravelers(!showTravelers);
+                handleFilterChange();
+              }}
+              className="toggle toggle-primary toggle-sm"
+            />
+            <div className="flex items-center gap-1">
+              <span className="text-lg">✈️</span>
+              <span className="font-medium text-sm">Travelers</span>
+            </div>
+          </label>
+        </div>
 
         {/* Results Count */}
-        {(showMyStyles || showOnlyTeachers || showOpenToPractice || showTravelers) && (
+        {(showMyStyles || showOnlyTeachers || showOnlyDJs || showOnlyPhotographers || showOnlyEventOrganizers || showOpenToPractice || showTravelers) && (
           <div className="text-sm text-base-content/60">
             {t('filters.found')} <span className="font-bold text-primary">{filteredDancers.length}</span> {t('filters.of')} {dancers.length} {t('filters.dancers')}
           </div>

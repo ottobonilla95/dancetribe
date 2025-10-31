@@ -104,7 +104,7 @@ export default async function CityPage({ params, searchParams }: Props) {
       { activeCity: cityObjectId, openToMeetTravelers: true }, // Travelers
     ],
   })
-    .select("name username image danceStyles dateOfBirth hideAge nationality dancingStartYear danceRole socialMedia likedBy openToMeetTravelers lookingForPracticePartners activeCity city isTeacher isDJ isPhotographer jackAndJillCompetitions bio")
+    .select("name username image danceStyles dateOfBirth hideAge nationality dancingStartYear danceRole socialMedia likedBy openToMeetTravelers lookingForPracticePartners activeCity city isTeacher isDJ isPhotographer isEventOrganizer jackAndJillCompetitions bio")
     .populate({
       path: "danceStyles.danceStyle",
       model: DanceStyle,
@@ -112,10 +112,10 @@ export default async function CityPage({ params, searchParams }: Props) {
     })
     .lean();
 
-  // Sort dancers: professionals (teachers, DJs, photographers) by likes, then regular dancers
+  // Sort dancers: professionals (teachers, DJs, photographers, event organizers) by likes, then regular dancers
   dancers.sort((a, b) => {
-    const aIsProfessional = a.isTeacher || a.isDJ || a.isPhotographer;
-    const bIsProfessional = b.isTeacher || b.isDJ || b.isPhotographer;
+    const aIsProfessional = a.isTeacher || a.isDJ || a.isPhotographer || a.isEventOrganizer;
+    const bIsProfessional = b.isTeacher || b.isDJ || b.isPhotographer || b.isEventOrganizer;
     const aLikes = a.likedBy?.length || 0;
     const bLikes = b.likedBy?.length || 0;
 
@@ -206,6 +206,16 @@ export default async function CityPage({ params, searchParams }: Props) {
     isPhotographer: true,
   })
     .select("name username image photographerProfile")
+    .limit(10)
+    .lean();
+
+  // Get event organizers in this city
+  const eventOrganizers = await User.find({
+    city: cityObjectId,
+    isProfileComplete: true,
+    isEventOrganizer: true,
+  })
+    .select("name username image eventOrganizerProfile")
     .limit(10)
     .lean();
 
@@ -513,6 +523,55 @@ export default async function CityPage({ params, searchParams }: Props) {
                           {photographer.photographerProfile?.specialties && (
                             <p className="text-xs text-base-content/60 truncate">
                               {photographer.photographerProfile.specialties}
+                            </p>
+                          )}
+                        </div>
+                        <div className="badge badge-accent badge-sm">{t('city.view')}</div>
+                      </Link>
+                    ))}
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {/* Event Organizers in this City */}
+            {eventOrganizers.length > 0 && (
+              <div className="card bg-base-200 shadow-xl mt-6">
+                <div className="card-body">
+                  <h2 className="card-title mb-4 flex items-center gap-2">
+                    🎪 Event Organizers
+                  </h2>
+                  <div className="space-y-3">
+                    {eventOrganizers.map((organizer: any) => (
+                      <Link
+                        key={organizer._id}
+                        href={`/dancer/${organizer._id}`}
+                        className="flex items-center gap-3 hover:bg-base-300 rounded p-2 transition-colors"
+                      >
+                        <div className="avatar">
+                          <div className="w-10 h-10 rounded-full">
+                            {organizer.image ? (
+                              <img
+                                src={organizer.image}
+                                alt={organizer.name}
+                                className="w-full h-full object-cover rounded-full"
+                              />
+                            ) : (
+                              <div className="bg-accent text-accent-content rounded-full w-full h-full flex items-center justify-center">
+                                <span className="text-sm">
+                                  {organizer.name?.charAt(0)?.toUpperCase() || "?"}
+                                </span>
+                              </div>
+                            )}
+                          </div>
+                        </div>
+                        <div className="flex-1 min-w-0">
+                          <h3 className="font-medium text-sm truncate">
+                            {organizer.name}
+                          </h3>
+                          {organizer.eventOrganizerProfile?.eventTypes && (
+                            <p className="text-xs text-base-content/60 truncate">
+                              {organizer.eventOrganizerProfile.eventTypes}
                             </p>
                           )}
                         </div>

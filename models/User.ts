@@ -204,6 +204,10 @@ const userSchema = new mongoose.Schema(
       type: Boolean,
       default: false,
     },
+    isEventOrganizer: {
+      type: Boolean,
+      default: false,
+    },
     // Teacher profile
     teacherProfile: {
       bio: String,
@@ -223,6 +227,12 @@ const userSchema = new mongoose.Schema(
     photographerProfile: {
       portfolioLink: String, // Instagram, website, etc.
       specialties: String, // e.g., "Events, Portraits, Social Dancing"
+      bio: String,
+    },
+    // Event Organizer profile
+    eventOrganizerProfile: {
+      organizationName: String, // e.g., "Bachata Nights Dublin"
+      eventTypes: String, // e.g., "Socials, Workshops, Festivals"
       bio: String,
     },
     // Shared professional contact (for all professional roles)

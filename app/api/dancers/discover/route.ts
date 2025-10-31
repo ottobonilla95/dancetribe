@@ -37,6 +37,7 @@ export async function GET(req: NextRequest) {
     const isTeacher = searchParams.get("isTeacher") === "true";
     const isDJ = searchParams.get("isDJ") === "true";
     const isPhotographer = searchParams.get("isPhotographer") === "true";
+    const isEventOrganizer = searchParams.get("isEventOrganizer") === "true";
     const limit = parseInt(searchParams.get("limit") || "16");
     const skip = parseInt(searchParams.get("skip") || "0");
 
@@ -106,6 +107,10 @@ export async function GET(req: NextRequest) {
     
     if (isPhotographer) {
       query.isPhotographer = true;
+    }
+    
+    if (isEventOrganizer) {
+      query.isEventOrganizer = true;
     }
     
     // Filter by dance role

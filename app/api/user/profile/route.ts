@@ -20,7 +20,7 @@ export async function GET() {
 
     const user = await User.findById(session.user.id)
       .select(
-        "name firstName lastName username email image dateOfBirth hideAge bio dancingStartYear city activeCity citiesVisited danceStyles anthem socialMedia danceRole gender nationality relationshipStatus onboardingSteps isProfileComplete isTeacher isDJ isPhotographer teacherProfile djProfile photographerProfile professionalContact openToMeetTravelers lookingForPracticePartners jackAndJillCompetitions createdAt"
+        "name firstName lastName username email image dateOfBirth hideAge bio dancingStartYear city activeCity citiesVisited danceStyles anthem socialMedia danceRole gender nationality relationshipStatus onboardingSteps isProfileComplete isTeacher isDJ isPhotographer isEventOrganizer teacherProfile djProfile photographerProfile eventOrganizerProfile professionalContact openToMeetTravelers lookingForPracticePartners jackAndJillCompetitions createdAt"
       )
       .populate({
         path: "city",
@@ -241,6 +241,7 @@ export async function PUT(req: NextRequest) {
         user.isTeacher = data.isTeacher || false;
         user.isDJ = data.isDJ || false;
         user.isPhotographer = data.isPhotographer || false;
+        user.isEventOrganizer = data.isEventOrganizer || false;
         
         // Update teacher profile
         if (data.isTeacher && data.teacherProfile) {
@@ -274,8 +275,19 @@ export async function PUT(req: NextRequest) {
           user.photographerProfile = undefined;
         }
         
+        // Update event organizer profile
+        if (data.isEventOrganizer && data.eventOrganizerProfile) {
+          user.eventOrganizerProfile = {
+            organizationName: data.eventOrganizerProfile.organizationName,
+            eventTypes: data.eventOrganizerProfile.eventTypes,
+            bio: data.eventOrganizerProfile.bio,
+          };
+        } else {
+          user.eventOrganizerProfile = undefined;
+        }
+        
         // Update shared professional contact
-        if (data.professionalContact && (data.isTeacher || data.isDJ || data.isPhotographer)) {
+        if (data.professionalContact && (data.isTeacher || data.isDJ || data.isPhotographer || data.isEventOrganizer)) {
           user.professionalContact = {
             whatsapp: data.professionalContact.whatsapp || "",
             email: data.professionalContact.email || "",

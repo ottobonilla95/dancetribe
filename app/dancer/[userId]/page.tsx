@@ -59,7 +59,7 @@ export default async function PublicProfile({ params }: Props) {
   try {
     user = await User.findById(params.userId)
       .select(
-        "name username email image dateOfBirth hideAge bio dancingStartYear city citiesVisited trips danceStyles anthem socialMedia danceRole gender nationality relationshipStatus createdAt likedBy friends friendRequestsSent friendRequestsReceived isTeacher isDJ isPhotographer teacherProfile djProfile photographerProfile professionalContact jackAndJillCompetitions"
+        "name username email image dateOfBirth hideAge bio dancingStartYear city citiesVisited trips danceStyles anthem socialMedia danceRole gender nationality relationshipStatus createdAt likedBy friends friendRequestsSent friendRequestsReceived isTeacher isDJ isPhotographer isEventOrganizer teacherProfile djProfile photographerProfile eventOrganizerProfile professionalContact jackAndJillCompetitions"
       )
       .populate({
         path: "friends",
@@ -349,6 +349,11 @@ export default async function PublicProfile({ params }: Props) {
                             📷 {t('profile.photographer')}
                           </div>
                         )}
+                        {userData.isEventOrganizer && (
+                          <div className="badge badge-info badge-lg gap-1">
+                            🎪 Event Organizer
+                          </div>
+                        )}
                       </div>
                       {zodiac && !userData.hideAge && (
                         <div className="mt-1 text-small">
@@ -530,8 +535,44 @@ export default async function PublicProfile({ params }: Props) {
                     </div>
                   )}
 
+                  {/* Event Organizer Info */}
+                  {userData.isEventOrganizer && userData.eventOrganizerProfile && (
+                    <div className="mt-4 -mx-[2rem] px-8 py-3 sm:rounded-lg sm:mx-0 sm:px-6 bg-gradient-to-br from-info/20 to-success/20 border-y-2 sm:border-2 border-info/40 overflow-hidden">
+                      <div className="flex items-center gap-2 mb-2 flex-wrap">
+                        <div className="flex items-center gap-2">
+                          <span className="text-xl">🎪</span>
+                          <h3 className="font-bold">Event Organizer</h3>
+                        </div>
+                      </div>
+
+                      {userData.eventOrganizerProfile.organizationName && (
+                        <div className="mb-2">
+                          <div className="text-sm text-base-content/70">
+                            Organization: <span className="font-medium">{userData.eventOrganizerProfile.organizationName}</span>
+                          </div>
+                        </div>
+                      )}
+
+                      {userData.eventOrganizerProfile.eventTypes && (
+                        <div className="mb-2">
+                          <div className="text-sm text-base-content/70">
+                            Event Types: <span className="font-medium">{userData.eventOrganizerProfile.eventTypes}</span>
+                          </div>
+                        </div>
+                      )}
+
+                      {userData.eventOrganizerProfile.bio && (
+                        <div className="mb-2">
+                          <p className="text-sm text-base-content/80 italic line-clamp-3">
+                            &quot;{userData.eventOrganizerProfile.bio}&quot;
+                          </p>
+                        </div>
+                      )}
+                    </div>
+                  )}
+
                   {/* Shared Professional Contact */}
-                  {(userData.isTeacher || userData.isDJ || userData.isPhotographer) && userData.professionalContact && (
+                  {(userData.isTeacher || userData.isDJ || userData.isPhotographer || userData.isEventOrganizer) && userData.professionalContact && (
                     <div className="mt-4 flex flex-wrap gap-2 px-4">
                       {userData.professionalContact.whatsapp && (
                         <a

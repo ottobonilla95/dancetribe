@@ -12,14 +12,10 @@ import { getZodiacSign } from "@/utils/zodiac";
 import { getCountryCode } from "@/utils/countries";
 import { DANCE_LEVELS } from "@/constants/dance-levels";
 import {
-  FaInstagram,
-  FaTiktok,
-  FaYoutube,
   FaWhatsapp,
   FaEnvelope,
 } from "react-icons/fa";
 import Flag from "@/components/Flag";
-import DanceStyleCard from "@/components/DanceStyleCard";
 import CopyProfileLink from "@/components/CopyProfileLink";
 import ProfileQRCode from "@/components/ProfileQRCode";
 import AchievementBadges from "@/components/AchievementBadges";
@@ -29,6 +25,10 @@ import { calculateUserBadges } from "@/utils/badges";
 import WelcomeModal from "@/components/WelcomeModal";
 import UpcomingTrips from "@/components/UpcomingTrips";
 import { getMessages, getTranslation } from "@/lib/i18n";
+import BioSection from "@/components/profile/BioSection";
+import DanceStylesSection from "@/components/profile/DanceStylesSection";
+import SocialMediaSection from "@/components/profile/SocialMediaSection";
+import AnthemSection from "@/components/profile/AnthemSection";
 
 interface ProfileProps {
   searchParams: { welcome?: string };
@@ -50,7 +50,7 @@ export default async function Profile({ searchParams }: ProfileProps) {
 
   const user = await User.findById(session.user.id)
     .select(
-      "name firstName lastName username email image dateOfBirth hideAge bio dancingStartYear city citiesVisited trips danceStyles anthem socialMedia danceRole gender nationality relationshipStatus isTeacher isDJ isPhotographer teacherProfile djProfile photographerProfile professionalContact friends likedBy jackAndJillCompetitions createdAt"
+      "name firstName lastName username email image dateOfBirth hideAge bio dancingStartYear city citiesVisited trips danceStyles anthem socialMedia danceRole gender nationality relationshipStatus isTeacher isDJ isPhotographer isEventOrganizer teacherProfile djProfile photographerProfile eventOrganizerProfile professionalContact friends likedBy jackAndJillCompetitions createdAt"
     )
     .populate({
       path: "city",
@@ -170,29 +170,6 @@ export default async function Profile({ searchParams }: ProfileProps) {
     });
   };
 
-  // Helper function to construct social media URLs
-  const getSocialUrl = (platform: string, value: string) => {
-    if (!value) return "";
-
-    // If it's already a full URL, return as-is
-    if (value.startsWith("http")) {
-      return value;
-    }
-
-    // Otherwise, construct the URL based on platform
-    const cleanValue = value.replace("@", "");
-    switch (platform) {
-      case "instagram":
-        return `https://instagram.com/${cleanValue}`;
-      case "tiktok":
-        return `https://tiktok.com/@${cleanValue}`;
-      case "youtube":
-        return value; // YouTube URLs are usually full URLs
-      default:
-        return value;
-    }
-  };
-
   const getRoleDisplay = (role: string) => {
     const roleMap: Record<string, string> = {
       leader: `${t("profile.leader")} 🕺`,
@@ -307,6 +284,11 @@ export default async function Profile({ searchParams }: ProfileProps) {
                       {userData.isPhotographer && (
                         <div className="badge badge-accent badge-lg gap-1">
                           📷 {t("profile.photographer")}
+                        </div>
+                      )}
+                      {userData.isEventOrganizer && (
+                        <div className="badge badge-info badge-lg gap-1">
+                          🎪 Event Organizer
                         </div>
                       )}
                     </div>
@@ -484,10 +466,53 @@ export default async function Profile({ searchParams }: ProfileProps) {
                   </div>
                 )}
 
+                {/* Event Organizer Info */}
+                {userData.isEventOrganizer && userData.eventOrganizerProfile && (
+                  <div className="mt-6 -mx-8 sm:mx-0 px-8 py-4 sm:px-6 bg-gradient-to-br from-info/20 to-success/20 sm:rounded-lg border-y-2 sm:border-2 border-info/40">
+                    <div className="flex items-center gap-2 mb-3">
+                      <span className="text-2xl">🎪</span>
+                      <h3 className="font-bold text-lg">
+                        Event Organizer
+                      </h3>
+                    </div>
+
+                    {userData.eventOrganizerProfile.organizationName && (
+                      <div className="mb-3">
+                        <div className="text-sm text-base-content/70">
+                          Organization:{" "}
+                          <span className="font-medium">
+                            {userData.eventOrganizerProfile.organizationName}
+                          </span>
+                        </div>
+                      </div>
+                    )}
+
+                    {userData.eventOrganizerProfile.eventTypes && (
+                      <div className="mb-3">
+                        <div className="text-sm text-base-content/70">
+                          Event Types:{" "}
+                          <span className="font-medium">
+                            {userData.eventOrganizerProfile.eventTypes}
+                          </span>
+                        </div>
+                      </div>
+                    )}
+
+                    {userData.eventOrganizerProfile.bio && (
+                      <div className="mb-3">
+                        <p className="text-sm text-base-content/80 italic">
+                          &quot;{userData.eventOrganizerProfile.bio}&quot;
+                        </p>
+                      </div>
+                    )}
+                  </div>
+                )}
+
                 {/* Shared Professional Contact */}
                 {(userData.isTeacher ||
                   userData.isDJ ||
-                  userData.isPhotographer) &&
+                  userData.isPhotographer ||
+                  userData.isEventOrganizer) &&
                   userData.professionalContact && (
                     <div className="mt-6 flex flex-wrap gap-2 px-0">
                       {userData.professionalContact.whatsapp && (
@@ -550,13 +575,7 @@ export default async function Profile({ searchParams }: ProfileProps) {
                 </h3>
 
                 {/* Bio */}
-                {userData.bio && (
-                  <div className="mb-4">
-                    <p className="text-base italic text-base-content/80">
-                      &ldquo;{userData.bio}&rdquo;
-                    </p>
-                  </div>
-                )}
+                <BioSection initialBio={userData.bio} />
 
                 {/* Dance Role */}
                 {userData.danceRole && (
@@ -599,12 +618,11 @@ export default async function Profile({ searchParams }: ProfileProps) {
                 )}
 
                 {/* Dance Styles */}
-                {userData.danceStyles && userData.danceStyles.length > 0 && (
-                  <DanceStyleCard
-                    danceStyles={getDanceStylesWithLevels(userData.danceStyles)}
-                    title={t("profile.danceStylesLevels")}
+                <div className="mb-8">
+                  <DanceStylesSection 
+                    initialDanceStyles={getDanceStylesWithLevels(userData.danceStyles || [])}
                   />
-                )}
+                </div>
 
                 {/* Cities Visited */}
                 <CitiesVisitedManager cities={userData.citiesVisited || []} />
@@ -660,62 +678,11 @@ export default async function Profile({ searchParams }: ProfileProps) {
             </div> */}
 
             {/* Social Media */}
-            {userData.socialMedia &&
-              (userData.socialMedia.instagram ||
-                userData.socialMedia.tiktok ||
-                userData.socialMedia.youtube) && (
-                <div className="card bg-base-200 shadow-xl">
-                  <div className="card-body">
-                    <h3 className="card-title text-xl mb-4">
-                      🌐 {t("profile.socialMedia")}
-                    </h3>
-                    <div className="flex gap-3">
-                      {userData.socialMedia.instagram && (
-                        <a
-                          href={getSocialUrl(
-                            "instagram",
-                            userData.socialMedia.instagram
-                          )}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className="btn btn-circle btn-outline hover:bg-gradient-to-r hover:from-purple-500 hover:to-pink-500 hover:text-white hover:border-purple-500"
-                          title={`@${userData.socialMedia.instagram.replace("@", "")} on Instagram`}
-                        >
-                          <FaInstagram className="text-xl" />
-                        </a>
-                      )}
-                      {userData.socialMedia.tiktok && (
-                        <a
-                          href={getSocialUrl(
-                            "tiktok",
-                            userData.socialMedia.tiktok
-                          )}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className="btn btn-circle btn-outline hover:bg-black hover:text-white hover:border-black"
-                          title={`@${userData.socialMedia.tiktok.replace("@", "")} on TikTok`}
-                        >
-                          <FaTiktok className="text-xl" />
-                        </a>
-                      )}
-                      {userData.socialMedia.youtube && (
-                        <a
-                          href={getSocialUrl(
-                            "youtube",
-                            userData.socialMedia.youtube
-                          )}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className="btn btn-circle btn-outline hover:bg-red-600 hover:text-white hover:border-red-600"
-                          title="YouTube Channel"
-                        >
-                          <FaYoutube className="text-xl" />
-                        </a>
-                      )}
-                    </div>
-                  </div>
-                </div>
-              )}
+            <div className="card bg-base-200 shadow-xl">
+              <div className="card-body">
+                <SocialMediaSection initialSocialMedia={userData.socialMedia} />
+              </div>
+            </div>
 
             {/* Upcoming Trips */}
             <div className="card bg-base-200 shadow-xl">
@@ -725,66 +692,11 @@ export default async function Profile({ searchParams }: ProfileProps) {
             </div>
 
             {/* Dance Anthem */}
-            {userData.anthem && userData.anthem.url && (
-              <div className="card bg-base-200 shadow-xl">
-                <div className="card-body">
-                  <h3 className="card-title text-xl mb-4">
-                    🎵 {t("profile.danceAnthem")}
-                  </h3>
-                  <div className="rounded-lg">
-                    {/* Iframe for Spotify/YouTube */}
-                    {(() => {
-                      const url = userData.anthem.url;
-                      let embedUrl = "";
-
-                      if (userData.anthem.platform === "spotify") {
-                        const spotifyMatch = url.match(
-                          /(?:spotify\.com\/track\/|spotify:track:)([a-zA-Z0-9]+)/
-                        );
-                        if (spotifyMatch) {
-                          embedUrl = `https://open.spotify.com/embed/track/${spotifyMatch[1]}`;
-                        }
-                      } else if (userData.anthem.platform === "youtube") {
-                        const youtubeMatch = url.match(
-                          /(?:youtube\.com\/watch\?v=|youtu\.be\/)([a-zA-Z0-9_-]+)/
-                        );
-                        if (youtubeMatch) {
-                          embedUrl = `https://www.youtube.com/embed/${youtubeMatch[1]}`;
-                        }
-                      }
-
-                      return embedUrl ? (
-                        <div
-                          className="rounded-lg overflow-hidden"
-                          style={{ height: "152px" }}
-                        >
-                          <iframe
-                            src={embedUrl}
-                            width="100%"
-                            height="152"
-                            frameBorder="0"
-                            scrolling="no"
-                            className="rounded-2xl"
-                            style={{ overflow: "hidden" }}
-                            allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture"
-                            loading="lazy"
-                          />
-                        </div>
-                      ) : (
-                        <a
-                          href={url}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className="btn btn-xs btn-primary"
-                        >
-                          🎧 Listen
-                        </a>
-                      );
-                    })()}
-                  </div>
-                </div>
+            <div className="card bg-base-200 shadow-xl">
+              <div className="card-body">
+                <AnthemSection initialAnthem={userData.anthem} />
               </div>
-            )}
+            </div>
           </div>
         </div>
 

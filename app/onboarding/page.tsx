@@ -90,6 +90,7 @@ export default function Onboarding() {
   const [isTeacher, setIsTeacher] = useState(false);
   const [isDJ, setIsDJ] = useState(false);
   const [isPhotographer, setIsPhotographer] = useState(false);
+  const [isEventOrganizer, setIsEventOrganizer] = useState(false);
   const [teacherBio, setTeacherBio] = useState("");
   const [yearsOfExperience, setYearsOfExperience] = useState("");
   const [djName, setDjName] = useState("");
@@ -98,6 +99,9 @@ export default function Onboarding() {
   const [photographerPortfolio, setPhotographerPortfolio] = useState("");
   const [photographerSpecialties, setPhotographerSpecialties] = useState("");
   const [photographerBio, setPhotographerBio] = useState("");
+  const [eventOrganizerName, setEventOrganizerName] = useState("");
+  const [eventTypes, setEventTypes] = useState("");
+  const [eventOrganizerBio, setEventOrganizerBio] = useState("");
   const [professionalContact, setProfessionalContact] = useState({
     whatsapp: "",
     email: "",
@@ -298,7 +302,7 @@ export default function Onboarding() {
         setDanceStyles(normalizedDanceStyles);
       } else if (
         userData.danceStyles?.length === 0 &&
-        (userData.isDJ || userData.isPhotographer)
+        (userData.isDJ || userData.isPhotographer || userData.isEventOrganizer)
       ) {
         // User has explicitly chosen to skip dance sections
         setSkipDanceSections(true);
@@ -406,6 +410,16 @@ export default function Onboarding() {
             userData.photographerProfile.specialties || ""
           );
           setPhotographerBio(userData.photographerProfile.bio || "");
+        }
+      }
+      if (userData.isEventOrganizer) {
+        setIsEventOrganizer(userData.isEventOrganizer);
+        if (userData.eventOrganizerProfile) {
+          setEventOrganizerName(
+            userData.eventOrganizerProfile.organizationName || ""
+          );
+          setEventTypes(userData.eventOrganizerProfile.eventTypes || "");
+          setEventOrganizerBio(userData.eventOrganizerProfile.bio || "");
         }
       }
       if (userData.professionalContact) {
@@ -616,7 +630,7 @@ export default function Onboarding() {
         break;
       case "teacherInfo": {
         // Validate at least one contact method if any professional role is selected
-        const hasAnyProfessionalRole = isTeacher || isDJ || isPhotographer;
+        const hasAnyProfessionalRole = isTeacher || isDJ || isPhotographer || isEventOrganizer;
         if (
           hasAnyProfessionalRole &&
           !professionalContact.whatsapp &&
@@ -631,6 +645,7 @@ export default function Onboarding() {
           isTeacher,
           isDJ,
           isPhotographer,
+          isEventOrganizer,
           teacherProfile: isTeacher
             ? {
                 bio: teacherBio,
@@ -651,6 +666,13 @@ export default function Onboarding() {
                 portfolioLink: photographerPortfolio,
                 specialties: photographerSpecialties,
                 bio: photographerBio,
+              }
+            : undefined,
+          eventOrganizerProfile: isEventOrganizer
+            ? {
+                organizationName: eventOrganizerName,
+                eventTypes: eventTypes,
+                bio: eventOrganizerBio,
               }
             : undefined,
           professionalContact: hasAnyProfessionalRole
@@ -1785,8 +1807,74 @@ export default function Onboarding() {
                   </div>
                 )}
 
+                {/* Event Organizer */}
+                <div className="form-control">
+                  <label className="label cursor-pointer justify-start gap-4">
+                    <input
+                      type="checkbox"
+                      className="toggle toggle-primary"
+                      checked={isEventOrganizer}
+                      onChange={(e) => setIsEventOrganizer(e.target.checked)}
+                    />
+                    <div>
+                      <span className="label-text font-semibold">
+                        🎪 Event Organizer
+                      </span>
+                      <p className="text-sm text-base-content/60">
+                        I organize dance events, socials, workshops, or festivals
+                      </p>
+                    </div>
+                  </label>
+                </div>
+
+                {isEventOrganizer && (
+                  <div className="space-y-4 border-l-4 border-primary pl-4 ml-2">
+                    <div className="form-control">
+                      <label className="label">
+                        <span className="label-text">
+                          Organization/Event Name (optional)
+                        </span>
+                      </label>
+                      <input
+                        type="text"
+                        className="input input-bordered"
+                        placeholder="e.g., Bachata Nights Dublin, Salsa Festival"
+                        value={eventOrganizerName}
+                        onChange={(e) => setEventOrganizerName(e.target.value)}
+                      />
+                    </div>
+
+                    <div className="form-control">
+                      <label className="label">
+                        <span className="label-text">
+                          Event Types (optional)
+                        </span>
+                      </label>
+                      <input
+                        type="text"
+                        className="input input-bordered"
+                        placeholder="e.g., Socials, Workshops, Festivals, Congresses"
+                        value={eventTypes}
+                        onChange={(e) => setEventTypes(e.target.value)}
+                      />
+                    </div>
+
+                    <div className="form-control">
+                      <label className="label">
+                        <span className="label-text">Bio (optional)</span>
+                      </label>
+                      <textarea
+                        className="textarea textarea-bordered h-20"
+                        placeholder="Tell us about the events you organize and your experience..."
+                        value={eventOrganizerBio}
+                        onChange={(e) => setEventOrganizerBio(e.target.value)}
+                      />
+                    </div>
+                  </div>
+                )}
+
                 {/* Shared Professional Contact */}
-                {(isTeacher || isDJ || isPhotographer) && (
+                {(isTeacher || isDJ || isPhotographer || isEventOrganizer) && (
                   <div className="space-y-4 border-t pt-4">
                     <div className="divider">
                       Professional Contact (at least one required)

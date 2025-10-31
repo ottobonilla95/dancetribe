@@ -35,6 +35,7 @@ export default function DiscoveryFeed({ initialDancers = [], danceStyles = [], s
   const urlIsTeacher = searchParams.get('isTeacher') === 'true';
   const urlIsDJ = searchParams.get('isDJ') === 'true';
   const urlIsPhotographer = searchParams.get('isPhotographer') === 'true';
+  const urlIsEventOrganizer = searchParams.get('isEventOrganizer') === 'true';
   
   const [dancers, setDancers] = useState(initialDancers);
   const [loading, setLoading] = useState(false);
@@ -61,6 +62,7 @@ export default function DiscoveryFeed({ initialDancers = [], danceStyles = [], s
       isTeacher: urlIsTeacher,
       isDJ: urlIsDJ,
       isPhotographer: urlIsPhotographer,
+      isEventOrganizer: urlIsEventOrganizer,
     };
     
     if (filterParam === 'country') {
@@ -140,6 +142,7 @@ export default function DiscoveryFeed({ initialDancers = [], danceStyles = [], s
     if (newFilters.isTeacher) params.set('isTeacher', 'true');
     if (newFilters.isDJ) params.set('isDJ', 'true');
     if (newFilters.isPhotographer) params.set('isPhotographer', 'true');
+    if (newFilters.isEventOrganizer) params.set('isEventOrganizer', 'true');
     
     // Update URL without navigation (preserves history)
     const newUrl = `/discover?${params.toString()}`;
@@ -167,6 +170,7 @@ export default function DiscoveryFeed({ initialDancers = [], danceStyles = [], s
       if (filters.isTeacher) params.append("isTeacher", "true");
       if (filters.isDJ) params.append("isDJ", "true");
       if (filters.isPhotographer) params.append("isPhotographer", "true");
+      if (filters.isEventOrganizer) params.append("isEventOrganizer", "true");
       
       // 🗺️ For map view, load ALL dancers (no pagination)
       if (viewMode === 'map' && !append) {
@@ -286,7 +290,8 @@ export default function DiscoveryFeed({ initialDancers = [], danceStyles = [], s
       lookingForPractice: false,
       isTeacher: false,
       isDJ: false,
-      isPhotographer: false
+      isPhotographer: false,
+      isEventOrganizer: false
     }));
   };
 
@@ -573,11 +578,20 @@ export default function DiscoveryFeed({ initialDancers = [], danceStyles = [], s
                 />
                 <span>📸 Photographers</span>
               </label>
+              <label className="cursor-pointer gap-2 btn btn-sm btn-outline">
+                <input
+                  type="checkbox"
+                  checked={filters.isEventOrganizer}
+                  onChange={(e) => setFilters({ ...filters, isEventOrganizer: e.target.checked })}
+                  className="checkbox checkbox-sm"
+                />
+                <span>🎪 Event Organizers</span>
+              </label>
             </div>
           </div>
 
           {/* Clear Filters Button */}
-          {(filters.danceStyle || filters.danceRole || filters.danceLevel || filters.isTeacher || filters.isDJ || filters.isPhotographer || filters.showTravelers || filters.lookingForPractice) && (
+          {(filters.danceStyle || filters.danceRole || filters.danceLevel || filters.isTeacher || filters.isDJ || filters.isPhotographer || filters.isEventOrganizer || filters.showTravelers || filters.lookingForPractice) && (
             <button onClick={clearFilters} className="btn btn-ghost btn-sm">
               {t('discovery.clearAllFilters')}
             </button>
