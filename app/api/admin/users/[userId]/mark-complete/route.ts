@@ -9,7 +9,7 @@ import { sendEmail } from "@/libs/resend";
 // PATCH: Mark user profile as complete
 export async function PATCH(
   req: Request,
-  { params }: { params: { userId: string } }
+  { params }: { params: Promise<{ userId: string }> }
 ) {
   try {
     const session = await getServerSession(authOptions);
@@ -24,9 +24,11 @@ export async function PATCH(
 
     await connectMongo();
 
+    const { userId } = await params;
+    
     // Update user's profile completion status
     const user = await User.findByIdAndUpdate(
-      params.userId,
+      userId,
       { isProfileComplete: true },
       { new: true }
     );

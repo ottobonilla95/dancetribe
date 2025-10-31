@@ -8,7 +8,7 @@ import config from "@/config";
 // GET: Fetch single user details
 export async function GET(
   req: Request,
-  { params }: { params: { userId: string } }
+  { params }: { params: Promise<{ userId: string }> }
 ) {
   try {
     const session = await getServerSession(authOptions);
@@ -23,9 +23,14 @@ export async function GET(
 
     await connectMongo();
 
-    const user = await User.findById(params.userId)
-      .populate("city")
-      .populate("country");
+    const { userId } = await params;
+    const user = await User.findById(userId)
+      .populate({
+        path: "city",
+        populate: {
+          path: "country"
+        }
+      });
 
     if (!user) {
       return NextResponse.json(
@@ -47,7 +52,7 @@ export async function GET(
 // PATCH: Update user details
 export async function PATCH(
   req: Request,
-  { params }: { params: { userId: string } }
+  { params }: { params: Promise<{ userId: string }> }
 ) {
   try {
     const session = await getServerSession(authOptions);
@@ -62,12 +67,13 @@ export async function PATCH(
 
     await connectMongo();
 
+    const { userId } = await params;
     const body = await req.json();
     const { name, email, username, bio, preferredLanguage } = body;
 
     // Update user
     const user = await User.findByIdAndUpdate(
-      params.userId,
+      userId,
       {
         ...(name && { name }),
         ...(email && { email }),

@@ -9,7 +9,7 @@ import { sendEmail } from "@/libs/resend";
 // POST: Send reminder email to incomplete profile
 export async function POST(
   req: Request,
-  { params }: { params: { userId: string } }
+  { params }: { params: Promise<{ userId: string }> }
 ) {
   try {
     const session = await getServerSession(authOptions);
@@ -24,8 +24,10 @@ export async function POST(
 
     await connectMongo();
 
+    const { userId } = await params;
+    
     // Find user and populate onboardingSteps
-    const user = await User.findById(params.userId);
+    const user = await User.findById(userId);
 
     if (!user) {
       return NextResponse.json(
@@ -202,7 +204,7 @@ export async function POST(
       });
 
       // Update user to mark reminder as sent
-      await User.findByIdAndUpdate(params.userId, {
+      await User.findByIdAndUpdate(userId, {
         reminderSent: true,
         reminderSentAt: new Date(),
       });
