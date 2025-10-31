@@ -11,7 +11,6 @@ import Link from "next/link";
 import { getZodiacSign } from "@/utils/zodiac";
 import { getCountryCode } from "@/utils/countries";
 import { DANCE_LEVELS } from "@/constants/dance-levels";
-import ShareToStory from "@/components/ShareToStory";
 import {
   FaInstagram,
   FaTiktok,
@@ -22,6 +21,7 @@ import {
 import Flag from "@/components/Flag";
 import DanceStyleCard from "@/components/DanceStyleCard";
 import CopyProfileLink from "@/components/CopyProfileLink";
+import ProfileQRCode from "@/components/ProfileQRCode";
 import AchievementBadges from "@/components/AchievementBadges";
 import JackAndJillManager from "@/components/JackAndJillManager";
 import CitiesVisitedManager from "@/components/CitiesVisitedManager";
@@ -521,33 +521,20 @@ export default async function Profile({ searchParams }: ProfileProps) {
                   >
                     ✏️ {t("profile.editProfile")}
                   </Link>
+                  
+                  <Link
+                    href={`/dancer/${userData._id}`}
+                    className="btn btn-primary btn-sm w-full gap-2"
+                  >
+                    👁️ {t("profile.viewMyProfile")}
+                  </Link>
+                  
                   <CopyProfileLink username={userData.username} />
-                  <div className="w-full">
-                    <ShareToStory
-                      userData={{
-                        id: userData._id,
-                        name: userData.name,
-                        username: userData.username,
-                        profilePicture: userData.image,
-                        dateOfBirth: userData.dateOfBirth,
-                        hideAge: userData.hideAge,
-                        nationality: userData.nationality,
-                        danceRole: userData.danceRole,
-                        city: userData.city,
-                        danceStyles:
-                          userData.danceStyles?.map((userStyle: any) => ({
-                            name:
-                              userStyle.danceStyle?.name ||
-                              userStyle.danceStyle,
-                            level: userStyle.level || "beginner",
-                          })) || [],
-                        yearsDancing: userData.dancingStartYear
-                          ? new Date().getFullYear() - userData.dancingStartYear
-                          : undefined,
-                        citiesVisited: userData.citiesVisited?.length || 0,
-                      }}
-                    />
-                  </div>
+                  
+                  <ProfileQRCode 
+                    userId={userData._id}
+                    userName={userData.name}
+                  />
                 </div>
               </div>
             </div>
