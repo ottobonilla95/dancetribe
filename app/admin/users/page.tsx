@@ -593,7 +593,7 @@ export default function AdminUsersPage() {
                         )}
                       </div>
                     </td>
-                    <td onClick={(e) => e.stopPropagation()}>
+                    <td onClick={(e) => e.stopPropagation()} className="text-center">
                       <a
                         href={`/admin/users/${user._id}/edit`}
                         className="btn btn-warning btn-xs"
