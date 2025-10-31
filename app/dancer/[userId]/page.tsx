@@ -30,6 +30,7 @@ import AchievementBadges from "@/components/AchievementBadges";
 import { calculateUserBadges } from "@/utils/badges";
 import FriendsListSection from "@/components/FriendsListSection";
 import { getMessages, getTranslation } from "@/lib/i18n";
+import ProfilePictureModal from "@/components/ProfilePictureModal";
 
 interface Props {
   params: {
@@ -324,23 +325,10 @@ export default async function PublicProfile({ params }: Props) {
               <div className="card bg-base-200 shadow-xl">
                 <div className="card-body">
                   <div className="flex flex-row sm:flex-col gap-4">
-                    <div className="avatar">
-                      <div className="w-28 h-28 rounded-full">
-                        {userData.image ? (
-                          <img
-                            src={userData.image}
-                            alt={userData.name || "Profile"}
-                            className="w-full h-full object-cover rounded-full"
-                          />
-                        ) : (
-                          <div className="bg-primary text-primary-content rounded-full w-full h-full flex items-center justify-center">
-                            <span className="text-4xl">
-                              {userData.name?.charAt(0)?.toUpperCase() || "👤"}
-                            </span>
-                          </div>
-                        )}
-                      </div>
-                    </div>
+                    <ProfilePictureModal 
+                      imageUrl={userData.image} 
+                      name={userData.name}
+                    />
                     <div className="flex-1">
                       <div className="flex items-center gap-2 flex-wrap">
                         <h2 className="card-title text-2xl mb-1">
