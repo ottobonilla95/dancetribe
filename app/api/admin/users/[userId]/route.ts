@@ -69,7 +69,7 @@ export async function PATCH(
 
     const { userId } = await params;
     const body = await req.json();
-    const { bio, anthem, socialMedia } = body;
+    const { bio, anthem, socialMedia, sharedOnSocialMedia } = body;
 
     // Update user
     const user = await User.findByIdAndUpdate(
@@ -78,6 +78,7 @@ export async function PATCH(
         ...(bio !== undefined && { bio }),
         ...(anthem !== undefined && { anthem }),
         ...(socialMedia && { socialMedia }),
+        ...(sharedOnSocialMedia !== undefined && { sharedOnSocialMedia }),
       },
       { new: true }
     );
