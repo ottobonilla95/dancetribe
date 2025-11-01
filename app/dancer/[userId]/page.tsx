@@ -31,6 +31,9 @@ import { calculateUserBadges } from "@/utils/badges";
 import FriendsListSection from "@/components/FriendsListSection";
 import { getMessages, getTranslation } from "@/lib/i18n";
 import ProfilePictureModal from "@/components/ProfilePictureModal";
+import AdminSharedCheckbox from "@/components/AdminSharedCheckbox";
+import { cookies } from "next/headers";
+import config from "@/config";
 
 interface Props {
   params: {
@@ -54,12 +57,17 @@ export default async function PublicProfile({ params }: Props) {
   const session = await getServerSession(authOptions);
   const isLoggedIn = !!session;
   const isOwnProfile = session?.user?.id === params.userId;
+  
+  // Check if admin mode is enabled
+  const cookieStore = cookies();
+  const adminModeCookie = cookieStore.get("adminMode");
+  const isAdminMode = session?.user?.email === config.admin.email && adminModeCookie?.value === "true";
 
   let user;
   try {
     user = await User.findById(params.userId)
       .select(
-        "name username email image dateOfBirth hideAge bio dancingStartYear city citiesVisited trips danceStyles anthem socialMedia danceRole gender nationality relationshipStatus createdAt likedBy friends friendRequestsSent friendRequestsReceived isTeacher isDJ isPhotographer isEventOrganizer teacherProfile djProfile photographerProfile eventOrganizerProfile professionalContact jackAndJillCompetitions"
+        "name username email image dateOfBirth hideAge bio dancingStartYear city citiesVisited trips danceStyles anthem socialMedia danceRole gender nationality relationshipStatus createdAt likedBy friends friendRequestsSent friendRequestsReceived isTeacher isDJ isPhotographer isEventOrganizer teacherProfile djProfile photographerProfile eventOrganizerProfile professionalContact jackAndJillCompetitions sharedOnSocialMedia"
       )
       .populate({
         path: "friends",
@@ -284,6 +292,15 @@ export default async function PublicProfile({ params }: Props) {
     <LikesProvider>
       <div className="min-h-screen p-4 bg-base-100">
         <div className="max-w-4xl mx-auto">
+          {/* Admin Shared Indicator Badge - Top Right */}
+          {isAdminMode && (
+            <div className="fixed top-20 right-4 z-40">
+              <div className={`badge gap-2 ${userData.sharedOnSocialMedia ? 'badge-success' : 'badge-warning'}`}>
+                {userData.sharedOnSocialMedia ? '✅ Shared' : '⚠️ Not Shared'}
+              </div>
+            </div>
+          )}
+
           {/* Header */}
           <div className="mb-8 text-center">
             <h1 className="text-4xl font-bold mb-2 bg-gradient-to-r from-purple-600 via-pink-500 to-orange-400 bg-clip-text text-transparent">
@@ -602,6 +619,14 @@ export default async function PublicProfile({ params }: Props) {
 
             {/* Detailed Information */}
             <div className="lg:col-span-2 space-y-6">
+              {/* Admin Controls - Only visible when admin mode is enabled */}
+              {isAdminMode && (
+                <AdminSharedCheckbox 
+                  userId={params.userId} 
+                  initialSharedStatus={userData.sharedOnSocialMedia || false}
+                />
+              )}
+
               {/* Dance Information */}
               <div className="card bg-base-200 shadow-xl">
                 <div className="card-body">

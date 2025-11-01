@@ -104,7 +104,7 @@ export default async function CityPage({ params, searchParams }: Props) {
       { activeCity: cityObjectId, openToMeetTravelers: true }, // Travelers
     ],
   })
-    .select("name username image danceStyles dateOfBirth hideAge nationality dancingStartYear danceRole socialMedia likedBy openToMeetTravelers lookingForPracticePartners activeCity city isTeacher isDJ isPhotographer isEventOrganizer jackAndJillCompetitions bio")
+    .select("name username image danceStyles dateOfBirth hideAge nationality dancingStartYear danceRole socialMedia likedBy openToMeetTravelers lookingForPracticePartners activeCity city isTeacher isDJ isPhotographer isEventOrganizer jackAndJillCompetitions bio sharedOnSocialMedia")
     .populate({
       path: "danceStyles.danceStyle",
       model: DanceStyle,

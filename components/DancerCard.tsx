@@ -3,10 +3,12 @@
 import Image from "next/image";
 import Link from "next/link";
 import { User } from "@/types/user";
-import { FaMapMarkerAlt, FaHeart, FaInstagram, FaTiktok, FaYoutube, FaGraduationCap, FaHeadphones, FaCamera } from "react-icons/fa";
+import { FaMapMarkerAlt, FaHeart, FaInstagram, FaTiktok, FaYoutube, FaGraduationCap, FaHeadphones, FaCamera, FaCheck, FaTimes } from "react-icons/fa";
 import { getZodiacSign } from "@/utils/zodiac";
 import { getCountryCode } from "@/utils/countries";
 import { useTranslation } from "@/components/I18nProvider";
+import { useEffect, useState } from "react";
+import Cookies from "js-cookie";
 
 interface DancerCardProps {
   dancer: User & { 
@@ -18,6 +20,7 @@ interface DancerCardProps {
     isTeacher?: boolean;
     isDJ?: boolean;
     isPhotographer?: boolean;
+    sharedOnSocialMedia?: boolean;
     jackAndJillCompetitions?: Array<{
       placement: string;
       year: number;
@@ -26,11 +29,19 @@ interface DancerCardProps {
   showLikeButton?: boolean;
   showFlag?: boolean;
   showHomeCity?: boolean; // Show home city for travelers
+  isAdminMode?: boolean; // For server-side rendered cards
 }
 
-export default function DancerCard({ dancer, showLikeButton = true, showFlag = false, showHomeCity = false }: DancerCardProps) {
+export default function DancerCard({ dancer, showLikeButton = true, showFlag = false, showHomeCity = false, isAdminMode: serverIsAdminMode }: DancerCardProps) {
   const { t } = useTranslation();
   const zodiacInfo = dancer.dateOfBirth ? getZodiacSign(new Date(dancer.dateOfBirth)) : null;
+  const [isAdminMode, setIsAdminMode] = useState(serverIsAdminMode || false);
+
+  // Check admin mode from cookie on client side
+  useEffect(() => {
+    const adminModeCookie = Cookies.get("adminMode");
+    setIsAdminMode(adminModeCookie === "true");
+  }, []);
   
   // Check if dancer is traveling (activeCity different from home city)
   const isTraveling = dancer.openToMeetTravelers && 
@@ -64,7 +75,20 @@ export default function DancerCard({ dancer, showLikeButton = true, showFlag = f
   const jjStats = getJJStats();
 
   return (
-    <div className="card bg-base-100 shadow-lg hover:shadow-xl transition-all duration-300 border border-base-200">
+    <div className="card bg-base-100 shadow-lg hover:shadow-xl transition-all duration-300 border border-base-200 relative">
+      {/* Admin Shared Indicator - Top Right Corner */}
+      {isAdminMode && (
+        <div className="absolute top-1.5 right-1.5 z-10">
+          <div className={`w-5 h-5 rounded-full flex items-center justify-center ${dancer.sharedOnSocialMedia ? 'bg-success/90' : 'bg-base-300/90'}`}>
+            {dancer.sharedOnSocialMedia ? (
+              <FaCheck className="text-[10px] text-white" />
+            ) : (
+              <FaTimes className="text-[10px] text-base-content/50" />
+            )}
+          </div>
+        </div>
+      )}
+      
       <Link href={`/dancer/${dancer._id}`} className="block">
         <div className="card-body p-4">
           {/* Header with Avatar and Basic Info */}

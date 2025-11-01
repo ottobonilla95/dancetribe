@@ -20,6 +20,7 @@ import LanguageSwitcher from "./LanguageSwitcher";
 import { useTranslation } from "./I18nProvider";
 import DeleteAccountButton from "./DeleteAccountButton";
 import ActiveUsersCounter from "./ActiveUsersCounter";
+import AdminModeToggle from "./AdminModeToggle";
 
 const links: {
   href: string;
@@ -250,6 +251,17 @@ const Header = () => {
                     </li>
                   )}
                   <li><hr /></li>
+                  {/* Admin Mode Toggle - Only for admins */}
+                  {isAdmin && (
+                    <>
+                      <li>
+                        <div className="px-2 py-1">
+                          <AdminModeToggle />
+                        </div>
+                      </li>
+                      <li><hr /></li>
+                    </>
+                  )}
                   <li>
                     <div className="px-2 py-1">
                       <DeleteAccountButton />
@@ -407,6 +419,16 @@ const Header = () => {
                 )}
 
                 <div className="divider"></div>
+
+                {/* Admin Mode Toggle - Only for admins */}
+                {isAdmin && (
+                  <>
+                    <div className="py-2">
+                      <AdminModeToggle />
+                    </div>
+                    <div className="divider"></div>
+                  </>
+                )}
                 
                 {/* Delete Account */}
                 <div className="py-2">
