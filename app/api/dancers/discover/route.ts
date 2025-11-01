@@ -173,7 +173,7 @@ export async function GET(req: NextRequest) {
           select: "name code"
         }
       })
-      .select("-email -friendRequestsSent -friendRequestsReceived -friends sharedOnSocialMedia")
+      .select("-email -friendRequestsSent -friendRequestsReceived -friends")
       .sort(sortCriteria);
 
     let users = await usersQuery.lean();
