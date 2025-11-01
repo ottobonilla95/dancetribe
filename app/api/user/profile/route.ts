@@ -337,3 +337,87 @@ export async function PUT(req: NextRequest) {
     );
   }
 }
+
+// PATCH method for admin edits
+export async function PATCH(req: NextRequest) {
+  const session = await getServerSession(authOptions);
+
+  if (!session) {
+    return NextResponse.json({ error: "Not signed in" }, { status: 401 });
+  }
+
+  try {
+    await connectMongo();
+
+    const body = await req.json();
+    const { userId, field, data } = body;
+
+    // Check if user is admin (from config)
+    const config = await import("@/config");
+    const isAdmin = session.user.email === config.default.admin.email;
+
+    // Determine which user to update
+    let targetUserId = session.user.id;
+    
+    // If userId is provided and user is admin, allow editing other users
+    if (userId && isAdmin) {
+      targetUserId = userId;
+    } else if (userId && !isAdmin) {
+      return NextResponse.json(
+        { error: "Unauthorized - admin only" },
+        { status: 403 }
+      );
+    }
+
+    const user = await User.findById(targetUserId);
+    if (!user) {
+      return NextResponse.json({ error: "User not found" }, { status: 404 });
+    }
+
+    // Update specific field
+    switch (field) {
+      case "socialMedia":
+        user.socialMedia = {
+          instagram: data.instagram || "",
+          tiktok: data.tiktok || "",
+          youtube: data.youtube || "",
+        };
+        break;
+
+      case "bio":
+        user.bio = data.bio || "";
+        break;
+
+      case "anthem":
+        if (data && data.url) {
+          user.anthem = {
+            url: data.url,
+            platform: data.platform,
+          };
+        } else {
+          user.anthem = undefined;
+        }
+        break;
+
+      case "danceStyles":
+        user.danceStyles = data.danceStyles || [];
+        break;
+
+      default:
+        return NextResponse.json({ error: "Invalid field" }, { status: 400 });
+    }
+
+    await user.save();
+
+    return NextResponse.json({
+      success: true,
+      message: "Profile updated successfully",
+    });
+  } catch (error) {
+    console.error("Error updating profile:", error);
+    return NextResponse.json(
+      { error: "Internal server error" },
+      { status: 500 }
+    );
+  }
+}

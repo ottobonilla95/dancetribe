@@ -32,6 +32,7 @@ import FriendsListSection from "@/components/FriendsListSection";
 import { getMessages, getTranslation } from "@/lib/i18n";
 import ProfilePictureModal from "@/components/ProfilePictureModal";
 import AdminSharedCheckbox from "@/components/AdminSharedCheckbox";
+import AdminSocialMediaEdit from "@/components/AdminSocialMediaEdit";
 import { cookies } from "next/headers";
 import config from "@/config";
 
@@ -782,8 +783,14 @@ export default async function PublicProfile({ params }: Props) {
               {/* Friends List */}
               <FriendsListSection friends={populatedFriends} totalCount={friendsCount} />
 
-              {/* Social Media */}
-              {userData.socialMedia &&
+              {/* Social Media - Admin Editable or Regular Display */}
+              {isAdminMode ? (
+                <AdminSocialMediaEdit
+                  userId={params.userId}
+                  initialSocialMedia={userData.socialMedia || {}}
+                />
+              ) : (
+                userData.socialMedia &&
                 (userData.socialMedia.instagram ||
                   userData.socialMedia.tiktok ||
                   userData.socialMedia.youtube) && (
@@ -838,7 +845,8 @@ export default async function PublicProfile({ params }: Props) {
                       </div>
                     </div>
                   </div>
-                )}
+                )
+              )}
 
               {/* Upcoming Trips */}
               {(() => {
