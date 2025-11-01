@@ -625,6 +625,7 @@ export default async function PublicProfile({ params }: Props) {
                 <AdminSharedCheckbox 
                   userId={params.userId} 
                   initialSharedStatus={userData.sharedOnSocialMedia || false}
+                  instagramHandle={userData.socialMedia?.instagram}
                 />
               )}
 
