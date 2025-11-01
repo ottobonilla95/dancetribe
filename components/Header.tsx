@@ -431,7 +431,7 @@ const Header = () => {
                 )}
                 
                 {/* Delete Account */}
-                <div className="py-2">
+                <div className="py">
                   <DeleteAccountButton />
                 </div>
 

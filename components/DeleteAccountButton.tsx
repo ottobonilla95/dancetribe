@@ -146,10 +146,10 @@ export default function DeleteAccountButton({ variant = 'normal' }: DeleteAccoun
     <>
       <button
         onClick={() => setIsModalOpen(true)}
-        className={`btn ${variant === 'danger' ? 'btn-error btn-outline' : 'btn-ghost'} btn-sm w-full gap-2`}
+        className={`btn ${variant === 'danger' ? 'btn-error btn-outline' : 'btn-ghost'} btn-xs sm:btn-sm w-full gap-1 sm:gap-2 text-xs sm:text-sm`}
       >
-        <FaTrash className="w-3 h-3" />
-        {t('profile.deleteAccount') || 'Delete Account'}
+        <FaTrash className="w-2.5 h-2.5 sm:w-3 sm:h-3" />
+        <span className="truncate">{t('profile.deleteAccount') || 'Delete Account'}</span>
       </button>
 
       {/* Render modal in portal at document body level */}

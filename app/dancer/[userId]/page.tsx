@@ -29,6 +29,7 @@ import { authOptions } from "@/libs/next-auth";
 import AchievementBadges from "@/components/AchievementBadges";
 import { calculateUserBadges } from "@/utils/badges";
 import FriendsListSection from "@/components/FriendsListSection";
+import MutualFriends from "@/components/MutualFriends";
 import { getMessages, getTranslation } from "@/lib/i18n";
 import ProfilePictureModal from "@/components/ProfilePictureModal";
 import AdminSharedCheckbox from "@/components/AdminSharedCheckbox";
@@ -74,15 +75,11 @@ export default async function PublicProfile({ params }: Props) {
         path: "friends",
         model: User,
         select: "name username image city",
+        options: { limit: 50 }, // Limit to 50 friends for display
         populate: {
           path: "city",
           model: City,
-          select: "name country",
-          populate: {
-            path: "country",
-            model: Country,
-            select: "name code",
-          },
+          select: "name", // Only need city name for display
         },
       })
       .populate({
@@ -105,19 +102,7 @@ export default async function PublicProfile({ params }: Props) {
       .populate({
         path: "citiesVisited",
         model: City,
-        select: "name country continent rank image",
-        populate: [
-          {
-            path: "country",
-            model: Country,
-            select: "name code",
-          },
-          {
-            path: "continent",
-            model: Continent,
-            select: "name code",
-          },
-        ],
+        select: "name image", // Only need name and image for display
       })
       .populate({
         path: "trips.city",
@@ -288,6 +273,44 @@ export default async function PublicProfile({ params }: Props) {
   const isFriend = isLoggedIn
     ? friendIds.includes(session?.user?.id)
     : false;
+
+  // Calculate mutual friends if logged in and viewing another user's profile
+  let mutualFriends: any[] = [];
+  let otherFriends: any[] = populatedFriends; // Friends who are NOT mutual
+  
+  if (isLoggedIn && !isOwnProfile && populatedFriends.length > 0) {
+    try {
+      // Efficient query: Only fetch friend IDs (no population needed)
+      const currentUser: any = await User.findById(session?.user?.id)
+        .select("friends")
+        .lean();
+      
+      if (currentUser && Array.isArray(currentUser.friends) && currentUser.friends.length > 0) {
+        // Convert to string IDs for efficient comparison
+        const currentUserFriendIds = new Set(
+          currentUser.friends.map((f: any) => 
+            typeof f === 'object' && f !== null ? (f._id || f.id).toString() : f.toString()
+          )
+        );
+        
+        // Separate friends into mutual and non-mutual
+        mutualFriends = [];
+        otherFriends = [];
+        
+        populatedFriends.forEach((friend: any) => {
+          const friendId = (friend._id || friend.id).toString();
+          if (currentUserFriendIds.has(friendId)) {
+            mutualFriends.push(friend);
+          } else {
+            otherFriends.push(friend);
+          }
+        });
+      }
+    } catch (error) {
+      console.error("Error calculating mutual friends:", error);
+      // Continue without mutual friends if there's an error
+    }
+  }
 
   return (
     <LikesProvider>
@@ -781,8 +804,16 @@ export default async function PublicProfile({ params }: Props) {
                 </div>
               )}
 
-              {/* Friends List */}
-              <FriendsListSection friends={populatedFriends} totalCount={friendsCount} />
+              {/* Mutual Friends - Show if logged in and viewing another user's profile */}
+              {!isOwnProfile && mutualFriends.length > 0 && (
+                <MutualFriends 
+                  mutualFriends={mutualFriends} 
+                  profileUserName={userData.name?.split(" ")[0]}
+                />
+              )}
+
+              {/* Friends List - Show other friends (non-mutual if viewing someone else's profile) */}
+              <FriendsListSection friends={otherFriends} totalCount={friendsCount} />
 
               {/* Social Media - Admin Editable or Regular Display */}
               {isAdminMode ? (
