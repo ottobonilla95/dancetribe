@@ -23,10 +23,10 @@ export default function ImageCropPicker({
   const { t } = useTranslation();
   const [crop, setCrop] = useState<Crop>({
     unit: "%",
-    width: 90,
-    height: 90,
-    x: 5,
-    y: 5,
+    width: 80,
+    height: 80,
+    x: 10,
+    y: 10,
   });
   const [completedCrop, setCompletedCrop] = useState<PixelCrop>();
   const [imgSrc, setImgSrc] = useState<string>("");
@@ -224,47 +224,48 @@ export default function ImageCropPicker({
 
       {/* Crop Modal */}
       {showCropModal && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50 p-4">
-          <div className="bg-base-100 rounded-lg w-full max-w-md flex flex-col max-h-[85vh]">
-            {/* Header */}
-            <div className="p-4 border-b border-base-300">
-              <h3 className="text-lg font-bold">{t('onboarding.cropPhoto')}</h3>
-              <p className="text-sm text-base-content/70 mt-1">
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50 p-2 sm:p-4">
+          <div className="bg-base-100 rounded-lg w-full max-w-md flex flex-col h-[450px] sm:h-[450px] sm:max-h-[85vh]">
+            {/* Header - fixed */}
+            <div className="p-3 sm:p-4 border-b border-base-300 flex-shrink-0">
+              <h3 className="text-base sm:text-lg font-bold">{t('onboarding.cropPhoto')}</h3>
+              <p className="text-xs sm:text-sm text-base-content/70 mt-1">
                 {t('onboarding.cropPhotoDesc')}
               </p>
             </div>
 
-            {/* Image area - scrollable if needed */}
-            <div className="flex-1 p-4 overflow-auto">
-              <div className="flex justify-center">
+            {/* Image area - fixed height, centered */}
+            <div className="flex-1 p-3 sm:p-4 overflow-hidden flex items-center justify-center">
+              <div className="flex justify-center items-center w-full h-full">
                 <ReactCrop
                   crop={crop}
                   onChange={setCrop}
                   onComplete={setCompletedCrop}
                   aspect={1}
-                  className="max-w-full"
+                  locked={false}
+                  className="max-w-full max-h-[300px]"
                 >
                   <img
                     ref={imgRef}
                     src={imgSrc}
                     alt="Crop preview"
-                    className="max-w-full max-h-[40vh] w-auto h-auto object-contain"
+                    className="max-w-full max-h-[50vh] sm:max-h-[40vh] w-auto h-auto object-contain"
                     onLoad={onImageLoad}
                   />
                 </ReactCrop>
               </div>
             </div>
 
-            {/* Buttons - always visible */}
-            <div className="p-4 border-t border-base-300 flex gap-3 justify-end">
+            {/* Buttons - always visible, fixed at bottom */}
+            <div className="p-3 sm:p-4 border-t border-base-300 flex gap-2 sm:gap-3 justify-end flex-shrink-0">
               <button
-                className="btn btn-outline"
+                className="btn btn-outline btn-sm sm:btn-md"
                 onClick={() => setShowCropModal(false)}
               >
                 {t('common.cancel')}
               </button>
               <button
-                className="btn btn-primary"
+                className="btn btn-primary btn-sm sm:btn-md"
                 onClick={handleCropComplete}
                 disabled={!completedCrop}
               >

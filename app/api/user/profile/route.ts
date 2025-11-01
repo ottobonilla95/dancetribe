@@ -140,6 +140,11 @@ export async function PUT(req: NextRequest) {
         user.onboardingSteps.profilePic = true;
         break;
 
+      case "profilePicture":
+        user.image = data.image;
+        user.onboardingSteps.profilePic = true;
+        break;
+
       case "dateOfBirth":
         user.dateOfBirth = new Date(data.dateOfBirth);
         user.hideAge = data.hideAge || false;
@@ -152,6 +157,11 @@ export async function PUT(req: NextRequest) {
         break;
 
       case "dancingStartYear":
+        user.dancingStartYear = data.dancingStartYear;
+        user.onboardingSteps.dancingStartYear = true;
+        break;
+
+      case "dancingExperience":
         user.dancingStartYear = data.dancingStartYear;
         user.onboardingSteps.dancingStartYear = true;
         break;

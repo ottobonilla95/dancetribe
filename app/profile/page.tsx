@@ -29,6 +29,10 @@ import BioSection from "@/components/profile/BioSection";
 import DanceStylesSection from "@/components/profile/DanceStylesSection";
 import SocialMediaSection from "@/components/profile/SocialMediaSection";
 import AnthemSection from "@/components/profile/AnthemSection";
+import DanceRoleSection from "@/components/profile/DanceRoleSection";
+import RelationshipStatusSection from "@/components/profile/RelationshipStatusSection";
+import DancingExperienceSection from "@/components/profile/DancingExperienceSection";
+import ProfilePictureSection from "@/components/profile/ProfilePictureSection";
 
 interface ProfileProps {
   searchParams: { welcome?: string };
@@ -247,23 +251,10 @@ export default async function Profile({ searchParams }: ProfileProps) {
             <div className="card bg-base-200 shadow-xl">
               <div className="card-body">
                 <div className="flex flex-row sm:flex-col gap-4">
-                  <div className="avatar">
-                    <div className="w-28 h-28 rounded-full">
-                      {userData.image ? (
-                        <img
-                          src={userData.image}
-                          alt={userData.name || "Profile"}
-                          className="w-full h-full object-cover rounded-full"
-                        />
-                      ) : (
-                        <div className="bg-primary text-primary-content rounded-full w-full h-full flex items-center justify-center">
-                          <span className="text-4xl">
-                            {userData.name?.charAt(0)?.toUpperCase() || "👤"}
-                          </span>
-                        </div>
-                      )}
-                    </div>
-                  </div>
+                  <ProfilePictureSection 
+                    initialImage={userData.image}
+                    userName={userData.name}
+                  />
                   <div>
                     <div className="flex items-center gap-2 flex-wrap">
                       <h2 className="card-title text-2xl mb-1">
@@ -578,44 +569,13 @@ export default async function Profile({ searchParams }: ProfileProps) {
                 <BioSection initialBio={userData.bio} />
 
                 {/* Dance Role */}
-                {userData.danceRole && (
-                  <div className="mb-4">
-                    <div className="text-sm font-medium text-base-content/60 mb-1">
-                      {t("profile.danceRole")}
-                    </div>
-                    <div className="text-lg">
-                      {getRoleDisplay(userData.danceRole)}
-                    </div>
-                  </div>
-                )}
+                <DanceRoleSection initialDanceRole={userData.danceRole} />
 
                 {/* Relationship Status */}
-                {userData.relationshipStatus && (
-                  <div className="mb-4">
-                    <div className="text-sm font-medium text-base-content/60 mb-1">
-                      {t("profile.relationshipStatus")}
-                    </div>
-                    <div className="text-lg">
-                      {getRelationshipStatusDisplay(
-                        userData.relationshipStatus
-                      )}
-                    </div>
-                  </div>
-                )}
+                <RelationshipStatusSection initialRelationshipStatus={userData.relationshipStatus} />
 
                 {/* Dancing Experience */}
-                {userData.dancingStartYear && (
-                  <div className="mb-4">
-                    <div className="text-sm font-medium text-base-content/60 mb-1">
-                      {t("profile.dancingExperience")}
-                    </div>
-                    <div className="text-lg">
-                      {new Date().getFullYear() - userData.dancingStartYear}{" "}
-                      {t("profile.years")} ({t("profile.since")}{" "}
-                      {userData.dancingStartYear})
-                    </div>
-                  </div>
-                )}
+                <DancingExperienceSection initialDancingStartYear={userData.dancingStartYear} />
 
                 {/* Dance Styles */}
                 <div className="mb-8">

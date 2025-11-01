@@ -43,6 +43,9 @@ export default function BioSection({ initialBio }: BioSectionProps) {
   if (isEditing) {
     return (
       <div className="mb-4">
+        <div className="text-sm font-medium text-base-content/60 mb-2">
+          Bio
+        </div>
         <textarea
           value={bio}
           onChange={(e) => setBio(e.target.value)}
@@ -55,21 +58,12 @@ export default function BioSection({ initialBio }: BioSectionProps) {
           <button
             onClick={handleSave}
             disabled={saving}
-            className="btn btn-primary btn-sm gap-2"
+            className="btn btn-primary btn-sm"
           >
-            {saving ? (
-              <>
-                <span className="loading loading-spinner loading-xs"></span>
-                Saving...
-              </>
-            ) : (
-              <>
-                <FaSave /> Save
-              </>
-            )}
+            {saving ? "Saving..." : "Save"}
           </button>
-          <button onClick={handleCancel} className="btn btn-ghost btn-sm gap-2">
-            <FaTimes /> Cancel
+          <button onClick={handleCancel} className="btn btn-ghost btn-sm">
+            Cancel
           </button>
         </div>
       </div>
@@ -77,7 +71,18 @@ export default function BioSection({ initialBio }: BioSectionProps) {
   }
 
   return (
-    <div className="mb-4 group relative">
+    <div className="mb-4">
+      <div className="flex justify-between items-start mb-1">
+        <div className="text-sm font-medium text-base-content/60">
+          Bio
+        </div>
+        <button
+          onClick={() => setIsEditing(true)}
+          className="btn btn-ghost btn-xs"
+        >
+          Edit
+        </button>
+      </div>
       {bio ? (
         <p className="text-base italic text-base-content/80">
           &ldquo;{bio}&rdquo;
@@ -85,12 +90,6 @@ export default function BioSection({ initialBio }: BioSectionProps) {
       ) : (
         <p className="text-base-content/50 italic">No bio added yet. Click edit to add one.</p>
       )}
-      <button
-        onClick={() => setIsEditing(true)}
-        className="btn btn-ghost btn-xs gap-1 ml-2"
-      >
-        <FaEdit /> Edit
-      </button>
     </div>
   );
 }
