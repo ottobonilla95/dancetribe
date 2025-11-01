@@ -3,7 +3,7 @@
 import { useSession } from "next-auth/react";
 import { useEffect, useState } from "react";
 import Link from "next/link";
-import { FaHeart, FaTrophy, FaChalkboardTeacher, FaMusic } from "react-icons/fa";
+import { FaHeart, FaTrophy, FaChalkboardTeacher, FaMusic, FaCamera } from "react-icons/fa";
 import { useTranslation } from "@/components/I18nProvider";
 
 type LeaderboardUser = {
@@ -20,14 +20,17 @@ type LeaderboardUser = {
 type LeaderboardData = {
   mostLiked: LeaderboardUser[];
   jjChampions: LeaderboardUser[];
-  topTeachers: LeaderboardUser[];
-  topDJs: LeaderboardUser[];
+  jjPodium: LeaderboardUser[];
+  jjParticipation: LeaderboardUser[];
+  mostLikedTeachers: LeaderboardUser[];
+  mostLikedDJs: LeaderboardUser[];
+  mostLikedPhotographers: LeaderboardUser[];
 };
 
 export default function LeaderboardsPage() {
   const { data: session } = useSession();
   const { t } = useTranslation();
-  const [activeTab, setActiveTab] = useState<'mostLiked' | 'jjChampions' | 'topTeachers' | 'topDJs'>('mostLiked');
+  const [activeTab, setActiveTab] = useState<'mostLiked' | 'jjChampions' | 'jjPodium' | 'jjParticipation' | 'mostLikedTeachers' | 'mostLikedDJs' | 'mostLikedPhotographers'>('mostLiked');
   const [data, setData] = useState<LeaderboardData | null>(null);
   const [loading, setLoading] = useState(true);
   const currentUserId = session?.user?.id;
@@ -49,9 +52,12 @@ export default function LeaderboardsPage() {
 
   const tabs = [
     { id: 'mostLiked', label: t('leaderboards.mostLiked'), icon: <FaHeart className="text-error" /> },
-    { id: 'jjChampions', label: t('leaderboards.jjChampions'), icon: <FaTrophy className="text-warning" /> },
-    { id: 'topTeachers', label: t('leaderboards.topTeachers'), icon: <FaChalkboardTeacher className="text-info" /> },
-    { id: 'topDJs', label: t('leaderboards.topDJs'), icon: <FaMusic className="text-secondary" /> },
+    { id: 'jjChampions', label: 'J&J Champions', icon: <FaTrophy className="text-warning" /> },
+    { id: 'jjPodium', label: 'J&J Podium', icon: <span className="text-warning">🥇</span> },
+    { id: 'jjParticipation', label: 'J&J Participation', icon: <span>🎉</span> },
+    { id: 'mostLikedTeachers', label: 'Most Liked Teachers', icon: <FaChalkboardTeacher className="text-info" /> },
+    { id: 'mostLikedDJs', label: 'Most Liked DJs', icon: <FaMusic className="text-secondary" /> },
+    { id: 'mostLikedPhotographers', label: 'Most Liked Photographers', icon: <FaCamera className="text-accent" /> },
   ];
 
   const getCurrentUsers = () => {
@@ -61,10 +67,16 @@ export default function LeaderboardsPage() {
         return data.mostLiked;
       case 'jjChampions':
         return data.jjChampions;
-      case 'topTeachers':
-        return data.topTeachers;
-      case 'topDJs':
-        return data.topDJs;
+      case 'jjPodium':
+        return data.jjPodium;
+      case 'jjParticipation':
+        return data.jjParticipation;
+      case 'mostLikedTeachers':
+        return data.mostLikedTeachers;
+      case 'mostLikedDJs':
+        return data.mostLikedDJs;
+      case 'mostLikedPhotographers':
+        return data.mostLikedPhotographers;
       default:
         return [];
     }
@@ -76,9 +88,15 @@ export default function LeaderboardsPage() {
         return { metric: 'likesCount', label: t('leaderboards.likes') };
       case 'jjChampions':
         return { metric: 'firstPlaces', label: t('leaderboards.wins') };
-      case 'topTeachers':
+      case 'jjPodium':
+        return { metric: 'podiumFinishes', label: 'Podiums' };
+      case 'jjParticipation':
+        return { metric: 'competitionsCount', label: 'Competitions' };
+      case 'mostLikedTeachers':
         return { metric: 'likesCount', label: t('leaderboards.likes') };
-      case 'topDJs':
+      case 'mostLikedDJs':
+        return { metric: 'likesCount', label: t('leaderboards.likes') };
+      case 'mostLikedPhotographers':
         return { metric: 'likesCount', label: t('leaderboards.likes') };
       default:
         return { metric: 'likesCount', label: '' };

@@ -74,8 +74,66 @@ export async function GET() {
       }
     ]);
 
-    // 3. Top Teachers (Most liked teachers) - Exclude current user
-    const topTeachers = await User.aggregate([
+    // 2b. J&J Podium (Most podium finishes: 1st, 2nd, 3rd) - Exclude current user
+    const jjPodium = await User.aggregate([
+      { $match: { 
+        isProfileComplete: true, 
+        jackAndJillCompetitions: { $exists: true, $ne: [] },
+        ...(currentUserId ? { _id: { $ne: currentUserId } } : {})
+      } },
+      {
+        $addFields: {
+          podiumFinishes: {
+            $size: {
+              $filter: {
+                input: "$jackAndJillCompetitions",
+                as: "comp",
+                cond: { $in: ["$$comp.placement", ["1st", "2nd", "3rd"]] }
+              }
+            }
+          }
+        }
+      },
+      { $match: { podiumFinishes: { $gt: 0 } } },
+      { $sort: { podiumFinishes: -1 } },
+      { $limit: 50 },
+      {
+        $project: {
+          name: 1,
+          username: 1,
+          image: 1,
+          podiumFinishes: 1
+        }
+      }
+    ]);
+
+    // 2c. J&J Participation (Most competitions participated) - Exclude current user
+    const jjParticipation = await User.aggregate([
+      { $match: { 
+        isProfileComplete: true, 
+        jackAndJillCompetitions: { $exists: true, $ne: [] },
+        ...(currentUserId ? { _id: { $ne: currentUserId } } : {})
+      } },
+      {
+        $addFields: {
+          competitionsCount: { $size: "$jackAndJillCompetitions" }
+        }
+      },
+      { $match: { competitionsCount: { $gt: 0 } } },
+      { $sort: { competitionsCount: -1 } },
+      { $limit: 50 },
+      {
+        $project: {
+          name: 1,
+          username: 1,
+          image: 1,
+          competitionsCount: 1
+        }
+      }
+    ]);
+
+    // 3. Most Liked Teachers - Exclude current user
+    const mostLikedTeachers = await User.aggregate([
       { 
         $match: { 
           isProfileComplete: true,
@@ -101,8 +159,8 @@ export async function GET() {
       }
     ]);
 
-    // 4. Top DJs (Most liked DJs) - Exclude current user
-    const topDJs = await User.aggregate([
+    // 4. Most Liked DJs - Exclude current user
+    const mostLikedDJs = await User.aggregate([
       { 
         $match: { 
           isProfileComplete: true,
@@ -128,11 +186,41 @@ export async function GET() {
       }
     ]);
 
+    // 5. Most Liked Photographers - Exclude current user
+    const mostLikedPhotographers = await User.aggregate([
+      { 
+        $match: { 
+          isProfileComplete: true,
+          isPhotographer: true,
+          ...(currentUserId ? { _id: { $ne: currentUserId } } : {})
+        } 
+      },
+      {
+        $addFields: {
+          likesCount: { $size: { $ifNull: ["$likedBy", []] } }
+        }
+      },
+      { $match: { likesCount: { $gt: 0 } } },
+      { $sort: { likesCount: -1 } },
+      { $limit: 50 },
+      {
+        $project: {
+          name: 1,
+          username: 1,
+          image: 1,
+          likesCount: 1
+        }
+      }
+    ]);
+
     return NextResponse.json({
       mostLiked: mostLikedDancers,
       jjChampions,
-      topTeachers,
-      topDJs,
+      jjPodium,
+      jjParticipation,
+      mostLikedTeachers,
+      mostLikedDJs,
+      mostLikedPhotographers,
     });
   } catch (error) {
     console.error('Error fetching leaderboards:', error);
