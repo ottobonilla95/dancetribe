@@ -13,6 +13,7 @@ interface InstallInstructionsModalProps {
 }
 
 export default function InstallInstructionsModal({ isOpen, onClose }: InstallInstructionsModalProps) {
+  
   const { t } = useTranslation();
   const [isIOS, setIsIOS] = useState(false);
   const [isAndroid, setIsAndroid] = useState(false);
@@ -54,21 +55,6 @@ export default function InstallInstructionsModal({ isOpen, onClose }: InstallIns
             </p>
           </div>
 
-          {/* Important Notice - Open in Browser */}
-          <div className="alert alert-warning mb-4 shadow-lg">
-            <div className="flex flex-col gap-2 w-full">
-              <div className="flex items-center gap-2">
-                <span className="text-2xl">⚠️</span>
-                <span className="font-bold text-sm">
-                  {isIOS ? t('installApp.openInSafari') : t('installApp.openInChrome')}
-                </span>
-              </div>
-              <p className="text-xs text-left">
-                {t('installApp.notFromInstagram')}
-              </p>
-            </div>
-          </div>
-
           {/* Platform-specific icon */}
           <div className="flex justify-center mb-4">
             {isIOS && (
@@ -94,12 +80,12 @@ export default function InstallInstructionsModal({ isOpen, onClose }: InstallIns
                   <span className="font-bold text-info">0.</span>
                   <div className="flex-1">
                     <div className="flex items-center gap-2 mb-2">
-                      <span className="font-bold text-info">If you&apos;re on Instagram:</span>
+                      <span className="font-bold text-info">{t('installApp.step0Title')}</span>
                     </div>
                     <div className="space-y-1 text-xs">
-                      <p>• Tap the <span className="font-semibold">three dots</span> (⋯) in the top right</p>
-                      <p>• Select <span className="font-semibold">&quot;Open in Safari&quot;</span></p>
-                      <p className="text-info font-semibold mt-2">Then follow the steps below ⬇️</p>
+                      <p>{t('installApp.step0iOS1')}</p>
+                      <p>{t('installApp.step0iOS2')}</p>
+                      <p className="text-info font-semibold mt-2">{t('installApp.step0Footer')}</p>
                     </div>
                   </div>
                 </li>
@@ -107,34 +93,32 @@ export default function InstallInstructionsModal({ isOpen, onClose }: InstallIns
                 <li className="flex gap-3 items-start">
                   <span className="font-bold text-primary">1.</span>
                   <div className="flex-1">
+                    <p className="mb-2">{t('installApp.step1iOS')}</p>
                     <div className="flex items-center gap-2 mb-2">
-                      <span>In Safari, tap the</span>
                       <div className="inline-flex items-center justify-center bg-primary/20 rounded-lg px-3 py-2 border-2 border-primary/30">
                         <IoShareOutline className="text-2xl text-primary" />
                       </div>
-                      <span className="font-semibold">Share button</span>
+                      <span className="font-semibold">{t('installApp.shareButton')}</span>
                     </div>
-                    <p className="text-xs text-base-content/60">at the bottom of the screen</p>
+                    <p className="text-xs text-base-content/60">{t('installApp.atBottom')}</p>
                   </div>
                 </li>
                 <li className="flex gap-3 items-start">
                   <span className="font-bold text-primary">2.</span>
                   <div className="flex-1">
-                    <div className="flex items-center gap-2 mb-2">
-                      <span>Scroll down and tap</span>
-                      <div className="inline-flex items-center gap-1 bg-primary/20 rounded-lg px-3 py-2 border-2 border-primary/30">
+                    <p className="mb-2">{t('installApp.step2iOS')}</p>
+                    <div className="flex items-center gap-2 mb-1">
+                      <div className="inline-flex items-center justify-center bg-primary/20 rounded-lg px-3 py-2 border-2 border-primary/30">
                         <FaPlus className="text-lg text-primary" />
                       </div>
+                      <span className="font-semibold">&quot;{t('installApp.addToHomeScreen')}&quot;</span>
                     </div>
-                    <p className="font-semibold">&quot;Add to Home Screen&quot;</p>
                   </div>
                 </li>
                 <li className="flex gap-3 items-start">
                   <span className="font-bold text-primary">3.</span>
                   <div className="flex-1">
-                    <span>Tap </span>
-                    <span className="font-semibold text-primary">&quot;Add&quot;</span>
-                    <span> in the top right corner</span>
+                    <span>{t('installApp.step3iOS')}</span>
                   </div>
                 </li>
                 <li className="flex gap-3 items-start">
@@ -155,12 +139,12 @@ export default function InstallInstructionsModal({ isOpen, onClose }: InstallIns
                   <span className="font-bold text-info">0.</span>
                   <div className="flex-1">
                     <div className="flex items-center gap-2 mb-2">
-                      <span className="font-bold text-info">If you&apos;re on Instagram:</span>
+                      <span className="font-bold text-info">{t('installApp.step0Title')}</span>
                     </div>
                     <div className="space-y-1 text-xs">
-                      <p>• Tap the <span className="font-semibold">three dots</span> (⋮) in the top right</p>
-                      <p>• Select <span className="font-semibold">&quot;Open in external browser&quot;</span> or <span className="font-semibold">&quot;Open in Chrome&quot;</span></p>
-                      <p className="text-info font-semibold mt-2">Then follow the steps below ⬇️</p>
+                      <p>{t('installApp.step0Android1')}</p>
+                      <p>{t('installApp.step0Android2')}</p>
+                      <p className="text-info font-semibold mt-2">{t('installApp.step0Footer')}</p>
                     </div>
                   </div>
                 </li>
@@ -168,34 +152,32 @@ export default function InstallInstructionsModal({ isOpen, onClose }: InstallIns
                 <li className="flex gap-3 items-start">
                   <span className="font-bold text-primary">1.</span>
                   <div className="flex-1">
+                    <p className="mb-2">{t('installApp.step1Android')}</p>
                     <div className="flex items-center gap-2 mb-2">
-                      <span>In Chrome, tap the</span>
                       <div className="inline-flex items-center justify-center bg-primary/20 rounded-lg px-3 py-2 border-2 border-primary/30">
                         <HiOutlineDotsVertical className="text-2xl text-primary" />
                       </div>
-                      <span className="font-semibold">Menu button</span>
+                      <span className="font-semibold">{t('installApp.menuButton')}</span>
                     </div>
-                    <p className="text-xs text-base-content/60">in the top right corner</p>
+                    <p className="text-xs text-base-content/60">{t('installApp.atTopRight')}</p>
                   </div>
                 </li>
                 <li className="flex gap-3 items-start">
                   <span className="font-bold text-primary">2.</span>
                   <div className="flex-1">
-                    <div className="flex items-center gap-2 mb-2">
-                      <span>Tap</span>
-                      <div className="inline-flex items-center gap-1 bg-primary/20 rounded-lg px-3 py-2 border-2 border-primary/30">
+                    <p className="mb-2">{t('installApp.step2Android')}</p>
+                    <div className="flex items-center gap-2 mb-1">
+                      <div className="inline-flex items-center justify-center bg-primary/20 rounded-lg px-3 py-2 border-2 border-primary/30">
                         <MdInstallMobile className="text-xl text-primary" />
                       </div>
+                      <span className="font-semibold">&quot;{t('installApp.installOrAdd')}&quot;</span>
                     </div>
-                    <p className="font-semibold">&quot;Install app&quot; or &quot;Add to Home screen&quot;</p>
                   </div>
                 </li>
                 <li className="flex gap-3 items-start">
                   <span className="font-bold text-primary">3.</span>
                   <div className="flex-1">
-                    <span>Tap </span>
-                    <span className="font-semibold text-primary">&quot;Install&quot;</span>
-                    <span> to confirm</span>
+                    <span>{t('installApp.step3Android')}</span>
                   </div>
                 </li>
                 <li className="flex gap-3 items-start">
