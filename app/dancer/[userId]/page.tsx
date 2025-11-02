@@ -371,28 +371,28 @@ export default async function PublicProfile({ params }: Props) {
                       name={userData.name}
                     />
                     <div className="flex-1">
+                      <h2 className="card-title text-2xl mb-2">
+                        {`${userData.name.charAt(0).toUpperCase() + userData.name.slice(1)}${age && !userData.hideAge ? `, ${age}` : ""}`}
+                      </h2>
                       <div className="flex items-center gap-2 flex-wrap">
-                        <h2 className="card-title text-2xl mb-1">
-                          {`${userData.name.charAt(0).toUpperCase() + userData.name.slice(1)}${age && !userData.hideAge ? `, ${age}` : ""}`}
-                        </h2>
                         {userData.isTeacher && (
-                          <div className="badge badge-primary badge-lg gap-1">
+                          <div className="badge badge-primary badge-md sm:badge-lg gap-1 whitespace-nowrap">
                             🎓 {t('profile.teacher')}
                           </div>
                         )}
                         {userData.isDJ && (
-                          <div className="badge badge-secondary badge-lg gap-1">
+                          <div className="badge badge-secondary badge-md sm:badge-lg gap-1 whitespace-nowrap">
                             🎵 {t('profile.dj')}
                           </div>
                         )}
                         {userData.isPhotographer && (
-                          <div className="badge badge-accent badge-lg gap-1">
+                          <div className="badge badge-accent badge-md sm:badge-lg gap-1 whitespace-nowrap">
                             📷 {t('profile.photographer')}
                           </div>
                         )}
                         {userData.isEventOrganizer && (
-                          <div className="badge badge-info badge-lg gap-1">
-                            🎪 Event Organizer
+                          <div className="badge badge-info badge-md sm:badge-lg gap-1 whitespace-nowrap">
+                            🎪 {t('profile.eventOrganizer')}
                           </div>
                         )}
                       </div>
