@@ -58,6 +58,9 @@ const CrispChat = (): null => {
 // 4. Tooltip: Show a tooltip if any JSX element has these 2 attributes: data-tooltip-id="tooltip" data-tooltip-content=""
 // 5. CrispChat: Set Crisp customer chat support (see above)
 const ClientLayout = ({ children, initialLocale }: { children: ReactNode; initialLocale: 'en' | 'es' }) => {
+  const pathname = usePathname();
+  const isDancerProfilePage = pathname?.startsWith('/dancer/');
+  
   return (
     <>
       <SessionProvider>
@@ -91,8 +94,8 @@ const ClientLayout = ({ children, initialLocale }: { children: ReactNode; initia
             {/* Track user presence (online/offline) */}
             <PresenceTracker />
             
-            {/* Suggestion Box - Floating button for user feedback */}
-            <SuggestionBox />
+            {/* Suggestion Box - Floating button for user feedback (hidden on dancer profile pages) */}
+            {!isDancerProfilePage && <SuggestionBox />}
             
             {/* Facebook Pixel - Track page views */}
             <Suspense fallback={null}>
