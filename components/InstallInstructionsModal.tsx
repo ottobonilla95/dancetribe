@@ -1,7 +1,10 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { FaApple, FaAndroid, FaTimes } from "react-icons/fa";
+import { FaApple, FaAndroid, FaTimes, FaShareAlt, FaPlus, FaEllipsisV } from "react-icons/fa";
+import { IoShareOutline, IoAddCircleOutline } from "react-icons/io5";
+import { HiOutlineDotsVertical } from "react-icons/hi";
+import { MdInstallMobile } from "react-icons/md";
 import { useTranslation } from "./I18nProvider";
 
 interface InstallInstructionsModalProps {
@@ -51,6 +54,21 @@ export default function InstallInstructionsModal({ isOpen, onClose }: InstallIns
             </p>
           </div>
 
+          {/* Important Notice - Open in Browser */}
+          <div className="alert alert-warning mb-4 shadow-lg">
+            <div className="flex flex-col gap-2 w-full">
+              <div className="flex items-center gap-2">
+                <span className="text-2xl">⚠️</span>
+                <span className="font-bold text-sm">
+                  {isIOS ? t('installApp.openInSafari') : t('installApp.openInChrome')}
+                </span>
+              </div>
+              <p className="text-xs text-left">
+                {t('installApp.notFromInstagram')}
+              </p>
+            </div>
+          </div>
+
           {/* Platform-specific icon */}
           <div className="flex justify-center mb-4">
             {isIOS && (
@@ -70,22 +88,60 @@ export default function InstallInstructionsModal({ isOpen, onClose }: InstallIns
           {/* Instructions based on platform */}
           {isIOS && (
             <div className="space-y-4">
-              <ol className="space-y-3 text-sm">
-                <li className="flex gap-3">
-                  <span className="font-bold">1.</span>
-                  <span dangerouslySetInnerHTML={{ __html: t('installApp.iosStep1') }} />
+              <ol className="space-y-4 text-sm">
+                {/* Step 0: Open in Safari from Instagram */}
+                <li className="flex gap-3 items-start bg-info/10 p-3 rounded-lg border-2 border-info/30">
+                  <span className="font-bold text-info">0.</span>
+                  <div className="flex-1">
+                    <div className="flex items-center gap-2 mb-2">
+                      <span className="font-bold text-info">If you're on Instagram:</span>
+                    </div>
+                    <div className="space-y-1 text-xs">
+                      <p>• Tap the <span className="font-semibold">three dots</span> (⋯) in the top right</p>
+                      <p>• Select <span className="font-semibold">"Open in Safari"</span></p>
+                      <p className="text-info font-semibold mt-2">Then follow the steps below ⬇️</p>
+                    </div>
+                  </div>
                 </li>
-                <li className="flex gap-3">
-                  <span className="font-bold">2.</span>
-                  <span dangerouslySetInnerHTML={{ __html: t('installApp.iosStep2') }} />
+
+                <li className="flex gap-3 items-start">
+                  <span className="font-bold text-primary">1.</span>
+                  <div className="flex-1">
+                    <div className="flex items-center gap-2 mb-2">
+                      <span>In Safari, tap the</span>
+                      <div className="inline-flex items-center justify-center bg-primary/20 rounded-lg px-3 py-2 border-2 border-primary/30">
+                        <IoShareOutline className="text-2xl text-primary" />
+                      </div>
+                      <span className="font-semibold">Share button</span>
+                    </div>
+                    <p className="text-xs text-base-content/60">at the bottom of the screen</p>
+                  </div>
                 </li>
-                <li className="flex gap-3">
-                  <span className="font-bold">3.</span>
-                  <span dangerouslySetInnerHTML={{ __html: t('installApp.iosStep3') }} />
+                <li className="flex gap-3 items-start">
+                  <span className="font-bold text-primary">2.</span>
+                  <div className="flex-1">
+                    <div className="flex items-center gap-2 mb-2">
+                      <span>Scroll down and tap</span>
+                      <div className="inline-flex items-center gap-1 bg-primary/20 rounded-lg px-3 py-2 border-2 border-primary/30">
+                        <FaPlus className="text-lg text-primary" />
+                      </div>
+                    </div>
+                    <p className="font-semibold">"Add to Home Screen"</p>
+                  </div>
                 </li>
-                <li className="flex gap-3">
-                  <span className="font-bold">4.</span>
-                  <span>{t('installApp.iosStep4')}</span>
+                <li className="flex gap-3 items-start">
+                  <span className="font-bold text-primary">3.</span>
+                  <div className="flex-1">
+                    <span>Tap </span>
+                    <span className="font-semibold text-primary">"Add"</span>
+                    <span> in the top right corner</span>
+                  </div>
+                </li>
+                <li className="flex gap-3 items-start">
+                  <span className="font-bold text-primary">4.</span>
+                  <div className="flex-1">
+                    <span>{t('installApp.iosStep4')}</span>
+                  </div>
                 </li>
               </ol>
             </div>
@@ -93,22 +149,60 @@ export default function InstallInstructionsModal({ isOpen, onClose }: InstallIns
 
           {isAndroid && (
             <div className="space-y-4">
-              <ol className="space-y-3 text-sm">
-                <li className="flex gap-3">
-                  <span className="font-bold">1.</span>
-                  <span dangerouslySetInnerHTML={{ __html: t('installApp.androidStep1') }} />
+              <ol className="space-y-4 text-sm">
+                {/* Step 0: Open in Chrome from Instagram */}
+                <li className="flex gap-3 items-start bg-info/10 p-3 rounded-lg border-2 border-info/30">
+                  <span className="font-bold text-info">0.</span>
+                  <div className="flex-1">
+                    <div className="flex items-center gap-2 mb-2">
+                      <span className="font-bold text-info">If you're on Instagram:</span>
+                    </div>
+                    <div className="space-y-1 text-xs">
+                      <p>• Tap the <span className="font-semibold">three dots</span> (⋮) in the top right</p>
+                      <p>• Select <span className="font-semibold">"Open in external browser"</span> or <span className="font-semibold">"Open in Chrome"</span></p>
+                      <p className="text-info font-semibold mt-2">Then follow the steps below ⬇️</p>
+                    </div>
+                  </div>
                 </li>
-                <li className="flex gap-3">
-                  <span className="font-bold">2.</span>
-                  <span dangerouslySetInnerHTML={{ __html: t('installApp.androidStep2') }} />
+
+                <li className="flex gap-3 items-start">
+                  <span className="font-bold text-primary">1.</span>
+                  <div className="flex-1">
+                    <div className="flex items-center gap-2 mb-2">
+                      <span>In Chrome, tap the</span>
+                      <div className="inline-flex items-center justify-center bg-primary/20 rounded-lg px-3 py-2 border-2 border-primary/30">
+                        <HiOutlineDotsVertical className="text-2xl text-primary" />
+                      </div>
+                      <span className="font-semibold">Menu button</span>
+                    </div>
+                    <p className="text-xs text-base-content/60">in the top right corner</p>
+                  </div>
                 </li>
-                <li className="flex gap-3">
-                  <span className="font-bold">3.</span>
-                  <span dangerouslySetInnerHTML={{ __html: t('installApp.androidStep3') }} />
+                <li className="flex gap-3 items-start">
+                  <span className="font-bold text-primary">2.</span>
+                  <div className="flex-1">
+                    <div className="flex items-center gap-2 mb-2">
+                      <span>Tap</span>
+                      <div className="inline-flex items-center gap-1 bg-primary/20 rounded-lg px-3 py-2 border-2 border-primary/30">
+                        <MdInstallMobile className="text-xl text-primary" />
+                      </div>
+                    </div>
+                    <p className="font-semibold">"Install app" or "Add to Home screen"</p>
+                  </div>
                 </li>
-                <li className="flex gap-3">
-                  <span className="font-bold">4.</span>
-                  <span>{t('installApp.androidStep4')}</span>
+                <li className="flex gap-3 items-start">
+                  <span className="font-bold text-primary">3.</span>
+                  <div className="flex-1">
+                    <span>Tap </span>
+                    <span className="font-semibold text-primary">"Install"</span>
+                    <span> to confirm</span>
+                  </div>
+                </li>
+                <li className="flex gap-3 items-start">
+                  <span className="font-bold text-primary">4.</span>
+                  <div className="flex-1">
+                    <span>{t('installApp.androidStep4')}</span>
+                  </div>
                 </li>
               </ol>
             </div>
