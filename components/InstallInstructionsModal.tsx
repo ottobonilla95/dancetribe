@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { createPortal } from "react-dom";
 import { FaApple, FaAndroid, FaTimes, FaPlus } from "react-icons/fa";
 import { IoShareOutline } from "react-icons/io5";
 import { HiOutlineDotsVertical } from "react-icons/hi";
@@ -17,27 +18,33 @@ export default function InstallInstructionsModal({ isOpen, onClose }: InstallIns
   const { t } = useTranslation();
   const [isIOS, setIsIOS] = useState(false);
   const [isAndroid, setIsAndroid] = useState(false);
+  const [mounted, setMounted] = useState(false);
 
   useEffect(() => {
+    setMounted(true);
+    
     // Detect platform
     const userAgent = window.navigator.userAgent.toLowerCase();
     setIsIOS(/iphone|ipad|ipod/.test(userAgent));
     setIsAndroid(/android/.test(userAgent));
   }, []);
 
-  if (!isOpen) return null;
+  if (!isOpen || !mounted) return null;
 
-  return (
+  const modalContent = (
     <>
       {/* Backdrop */}
       <div
-        className="fixed inset-0 bg-black/50 z-[100]"
+        className="fixed inset-0 bg-black/50 z-[9999]"
         onClick={onClose}
       />
 
       {/* Modal Content */}
-      <div className="fixed inset-0 z-[101] flex items-center justify-center p-4">
-        <div className="bg-base-100 rounded-2xl shadow-2xl max-w-md w-full p-6 relative">
+      <div className="fixed inset-0 z-[10000] flex items-center justify-center p-4">
+        <div 
+          className="bg-base-100 rounded-2xl shadow-2xl max-w-md w-full p-6 relative"
+          onClick={(e) => e.stopPropagation()}
+        >
           {/* Close Button */}
           <button
             onClick={onClose}
@@ -215,5 +222,8 @@ export default function InstallInstructionsModal({ isOpen, onClose }: InstallIns
       </div>
     </>
   );
+
+  // Render at body level using Portal to escape nav z-index
+  return createPortal(modalContent, document.body);
 }
 
