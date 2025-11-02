@@ -1,8 +1,8 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { FaApple, FaAndroid, FaTimes, FaShareAlt, FaPlus, FaEllipsisV } from "react-icons/fa";
-import { IoShareOutline, IoAddCircleOutline } from "react-icons/io5";
+import { FaApple, FaAndroid, FaTimes, FaPlus } from "react-icons/fa";
+import { IoShareOutline } from "react-icons/io5";
 import { HiOutlineDotsVertical } from "react-icons/hi";
 import { MdInstallMobile } from "react-icons/md";
 import { useTranslation } from "./I18nProvider";
@@ -94,11 +94,11 @@ export default function InstallInstructionsModal({ isOpen, onClose }: InstallIns
                   <span className="font-bold text-info">0.</span>
                   <div className="flex-1">
                     <div className="flex items-center gap-2 mb-2">
-                      <span className="font-bold text-info">If you're on Instagram:</span>
+                      <span className="font-bold text-info">If you&apos;re on Instagram:</span>
                     </div>
                     <div className="space-y-1 text-xs">
                       <p>• Tap the <span className="font-semibold">three dots</span> (⋯) in the top right</p>
-                      <p>• Select <span className="font-semibold">"Open in Safari"</span></p>
+                      <p>• Select <span className="font-semibold">&quot;Open in Safari&quot;</span></p>
                       <p className="text-info font-semibold mt-2">Then follow the steps below ⬇️</p>
                     </div>
                   </div>
@@ -126,14 +126,14 @@ export default function InstallInstructionsModal({ isOpen, onClose }: InstallIns
                         <FaPlus className="text-lg text-primary" />
                       </div>
                     </div>
-                    <p className="font-semibold">"Add to Home Screen"</p>
+                    <p className="font-semibold">&quot;Add to Home Screen&quot;</p>
                   </div>
                 </li>
                 <li className="flex gap-3 items-start">
                   <span className="font-bold text-primary">3.</span>
                   <div className="flex-1">
                     <span>Tap </span>
-                    <span className="font-semibold text-primary">"Add"</span>
+                    <span className="font-semibold text-primary">&quot;Add&quot;</span>
                     <span> in the top right corner</span>
                   </div>
                 </li>
@@ -155,11 +155,11 @@ export default function InstallInstructionsModal({ isOpen, onClose }: InstallIns
                   <span className="font-bold text-info">0.</span>
                   <div className="flex-1">
                     <div className="flex items-center gap-2 mb-2">
-                      <span className="font-bold text-info">If you're on Instagram:</span>
+                      <span className="font-bold text-info">If you&apos;re on Instagram:</span>
                     </div>
                     <div className="space-y-1 text-xs">
                       <p>• Tap the <span className="font-semibold">three dots</span> (⋮) in the top right</p>
-                      <p>• Select <span className="font-semibold">"Open in external browser"</span> or <span className="font-semibold">"Open in Chrome"</span></p>
+                      <p>• Select <span className="font-semibold">&quot;Open in external browser&quot;</span> or <span className="font-semibold">&quot;Open in Chrome&quot;</span></p>
                       <p className="text-info font-semibold mt-2">Then follow the steps below ⬇️</p>
                     </div>
                   </div>
@@ -187,14 +187,14 @@ export default function InstallInstructionsModal({ isOpen, onClose }: InstallIns
                         <MdInstallMobile className="text-xl text-primary" />
                       </div>
                     </div>
-                    <p className="font-semibold">"Install app" or "Add to Home screen"</p>
+                    <p className="font-semibold">&quot;Install app&quot; or &quot;Add to Home screen&quot;</p>
                   </div>
                 </li>
                 <li className="flex gap-3 items-start">
                   <span className="font-bold text-primary">3.</span>
                   <div className="flex-1">
                     <span>Tap </span>
-                    <span className="font-semibold text-primary">"Install"</span>
+                    <span className="font-semibold text-primary">&quot;Install&quot;</span>
                     <span> to confirm</span>
                   </div>
                 </li>
