@@ -314,8 +314,31 @@ export async function PUT(req: NextRequest) {
     }
 
     // Check if profile is complete
+    // Only require mandatory steps - optional ones like bio, anthem, socialMedia shouldn't block completion
     const steps = user.onboardingSteps;
-    const isComplete = Object.values(steps).every((step) => step === true);
+    const mandatorySteps = [
+      'nameDetails',
+      'username', 
+      'profilePic',      // They need to at least go through this step (can skip photo)
+      'dateOfBirth',
+      'gender',
+      'nationality',
+      'currentLocation',
+      'danceRole',
+      'teacherInfo'
+    ];
+    
+    // Optional steps that shouldn't block profile completion:
+    // - bio (truly optional)
+    // - dancingStartYear (optional for non-dancers)
+    // - danceStyles (optional for non-dancers)
+    // - citiesVisited (optional)
+    // - anthem (optional)
+    // - socialMedia (optional)
+    // - relationshipStatus (optional - "prefer not to say" is valid)
+    
+    // Profile is complete if all mandatory steps are done
+    const isComplete = mandatorySteps.every((stepKey) => steps[stepKey] === true);
     const wasCompleteBeforeSave = user.isProfileComplete;
     user.isProfileComplete = isComplete;
 

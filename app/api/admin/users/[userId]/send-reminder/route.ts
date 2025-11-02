@@ -102,18 +102,22 @@ export async function POST(
     };
     const t = translations[lang];
 
-    // Determine missing steps
+    // Determine missing steps - use ACTUAL onboarding step keys
+    // Match the mandatory steps from profile completion logic
     const allSteps = [
-      { key: 'name', label: t.steps.name },
-      { key: 'bio', label: t.steps.bio },
-      { key: 'city', label: t.steps.city },
-      { key: 'danceStyles', label: t.steps.danceStyles },
-      { key: 'profilePicture', label: t.steps.profilePicture },
+      { key: 'nameDetails', label: t.steps.name },
+      { key: 'username', label: 'Username' },
+      { key: 'profilePic', label: t.steps.profilePicture },
+      { key: 'dateOfBirth', label: 'Date of Birth' },
+      { key: 'gender', label: 'Gender' },
+      { key: 'nationality', label: 'Nationality' },
+      { key: 'currentLocation', label: t.steps.city },
+      { key: 'danceRole', label: 'Dance Role' },
+      { key: 'teacherInfo', label: 'Professional Info' },
     ];
 
     const missingSteps = allSteps.filter(step => {
-      const stepKey = step.key as keyof typeof user.onboardingSteps;
-      return !user.onboardingSteps?.[stepKey];
+      return !user.onboardingSteps?.[step.key];
     });
 
     const completionPercentage = Math.round(((allSteps.length - missingSteps.length) / allSteps.length) * 100);
