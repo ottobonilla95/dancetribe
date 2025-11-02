@@ -14,6 +14,7 @@ import FacebookPixel from "./FacebookPixel";
 import { I18nProvider } from "./I18nProvider";
 import { FriendRequestProvider } from "@/contexts/FriendRequestContext";
 import PresenceTracker from "./PresenceTracker";
+import SuggestionBox from "./SuggestionBox";
 
 // Crisp customer chat support:
 // This component is separated from ClientLayout because it needs to be wrapped with <SessionProvider> to use useSession() hook
@@ -89,6 +90,9 @@ const ClientLayout = ({ children, initialLocale }: { children: ReactNode; initia
             
             {/* Track user presence (online/offline) */}
             <PresenceTracker />
+            
+            {/* Suggestion Box - Floating button for user feedback */}
+            <SuggestionBox />
             
             {/* Facebook Pixel - Track page views */}
             <Suspense fallback={null}>
