@@ -24,6 +24,7 @@ import {
   FaWhatsapp,
   FaFacebook,
   FaInstagram,
+  FaGlobe,
 } from "react-icons/fa";
 import { SiLine, SiTelegram } from "react-icons/si";
 
@@ -106,7 +107,7 @@ export default async function CountryPage({ params, searchParams }: Props) {
     city: { $in: cityIds },
     isProfileComplete: true,
   })
-    .select("name username image danceStyles city dateOfBirth hideAge nationality dancingStartYear danceRole socialMedia likedBy openToMeetTravelers lookingForPracticePartners isTeacher isDJ isPhotographer jackAndJillCompetitions bio")
+    .select("name username image danceStyles city dateOfBirth hideAge nationality dancingStartYear danceRole socialMedia likedBy openToMeetTravelers lookingForPracticePartners isTeacher isDJ isPhotographer jackAndJillCompetitions bio sharedOnSocialMedia")
     .populate({
       path: "city",
       model: City,
@@ -589,7 +590,7 @@ export default async function CountryPage({ params, searchParams }: Props) {
             )}
 
             {/* Country Dance Groups */}
-            {(country.socialGroups?.whatsapp || country.socialGroups?.line || country.socialGroups?.telegram || country.socialGroups?.facebook || country.socialGroups?.instagram) && (
+            {(country.socialGroups?.whatsapp || country.socialGroups?.line || country.socialGroups?.telegram || country.socialGroups?.facebook || country.socialGroups?.instagram || country.socialGroups?.website) && (
               <div className="card bg-base-200 shadow-xl mt-6">
                 <div className="card-body">
                   <h2 className="card-title mb-4">💬 {t('country.communityGroups')}</h2>
@@ -653,6 +654,17 @@ export default async function CountryPage({ params, searchParams }: Props) {
                       >
                         <SiLine className="text-lg" />
                         LINE
+                      </a>
+                    )}
+                    {country.socialGroups.website && (
+                      <a
+                        href={country.socialGroups.website}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="btn btn-primary btn-sm gap-2 w-full"
+                      >
+                        <FaGlobe className="text-lg" />
+                        Website
                       </a>
                     )}
                   </div>

@@ -92,7 +92,7 @@ export default async function ContinentPage({ params }: Props) {
     city: { $in: cityIds },
     isProfileComplete: true,
   })
-    .select("name username image danceStyles city dateOfBirth hideAge nationality dancingStartYear danceRole socialMedia likedBy openToMeetTravelers lookingForPracticePartners isTeacher isDJ isPhotographer jackAndJillCompetitions")
+    .select("name username image danceStyles city dateOfBirth hideAge nationality dancingStartYear danceRole socialMedia likedBy openToMeetTravelers lookingForPracticePartners isTeacher isDJ isPhotographer jackAndJillCompetitions sharedOnSocialMedia")
     .populate({
       path: "city",
       model: City,

@@ -22,6 +22,7 @@ import {
   FaWhatsapp,
   FaFacebook,
   FaInstagram,
+  FaGlobe,
 } from "react-icons/fa";
 import { SiLine, SiTelegram } from "react-icons/si";
 
@@ -636,7 +637,7 @@ export default async function CityPage({ params, searchParams }: Props) {
             )}
 
             {/* City Dance Groups */}
-            {(city.socialGroups?.whatsapp || city.socialGroups?.line || city.socialGroups?.telegram || city.socialGroups?.facebook || city.socialGroups?.instagram) && (
+            {(city.socialGroups?.whatsapp || city.socialGroups?.line || city.socialGroups?.telegram || city.socialGroups?.facebook || city.socialGroups?.instagram || city.socialGroups?.website) && (
               <div className="card bg-base-200 shadow-xl mt-6">
                 <div className="card-body">
                   <h2 className="card-title mb-4">💬 {t('city.communityGroups')}</h2>
@@ -700,6 +701,17 @@ export default async function CityPage({ params, searchParams }: Props) {
                       >
                         <SiLine className="text-lg" />
                         LINE
+                      </a>
+                    )}
+                    {city.socialGroups.website && (
+                      <a
+                        href={city.socialGroups.website}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="btn btn-primary btn-sm gap-2 w-full"
+                      >
+                        <FaGlobe className="text-lg" />
+                        Website
                       </a>
                     )}
                   </div>

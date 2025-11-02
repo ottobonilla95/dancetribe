@@ -29,6 +29,7 @@ interface Dancer {
   isDJ?: boolean;
   isPhotographer?: boolean;
   isEventOrganizer?: boolean;
+  sharedOnSocialMedia?: boolean;
   jackAndJillCompetitions?: Array<{
     placement: string;
     year: number;

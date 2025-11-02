@@ -70,6 +70,10 @@ const citySchema = new mongoose.Schema(
         type: String,
         trim: true,
       },
+      website: {
+        type: String,
+        trim: true,
+      },
     },
   },
   {
