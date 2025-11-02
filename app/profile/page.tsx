@@ -102,7 +102,14 @@ export default async function Profile({ searchParams }: ProfileProps) {
     })
     .lean();
 
-  const danceStyles = await DanceStyle.find({}).lean();
+  // Fetch and sort dance styles (null/undefined sequences go last)
+  let danceStyles = await DanceStyle.find({}).lean();
+  danceStyles = danceStyles.sort((a: any, b: any) => {
+    const seqA = a.sequence ?? Infinity;
+    const seqB = b.sequence ?? Infinity;
+    if (seqA !== seqB) return seqA - seqB;
+    return a.name.localeCompare(b.name);
+  });
 
   if (!user) {
     redirect("/dashboard");
