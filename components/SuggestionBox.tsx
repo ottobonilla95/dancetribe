@@ -14,6 +14,11 @@ export default function SuggestionBox() {
   const [submitting, setSubmitting] = useState(false);
   const [submitted, setSubmitted] = useState(false);
 
+  // Only show for logged-in users
+  if (!session?.user) {
+    return null;
+  }
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
@@ -87,9 +92,9 @@ export default function SuggestionBox() {
                 // Success State
                 <div className="text-center py-8">
                   <div className="text-6xl mb-4">🎉</div>
-                  <h3 className="text-2xl font-bold mb-2">Thank You!</h3>
+                  <h3 className="text-2xl font-bold mb-2">{t('suggestions.thankYou')}</h3>
                   <p className="text-base-content/70">
-                    Your suggestion has been submitted. We appreciate your feedback!
+                    {t('suggestions.submitted')}
                   </p>
                 </div>
               ) : (
@@ -97,15 +102,15 @@ export default function SuggestionBox() {
                 <>
                   {/* Header */}
                   <div className="flex items-center justify-between mb-6">
-                    <div>
-                      <h3 className="text-2xl font-bold flex items-center gap-2">
-                        <FaLightbulb className="text-accent" />
-                        Share Your Ideas
-                      </h3>
-                      <p className="text-sm text-base-content/60 mt-1">
-                        Help us improve DanceCircle!
-                      </p>
-                    </div>
+                  <div>
+                    <h3 className="text-2xl font-bold flex items-center gap-2">
+                      <FaLightbulb className="text-accent" />
+                      {t('suggestions.title')}
+                    </h3>
+                    <p className="text-sm text-base-content/60 mt-1">
+                      {t('suggestions.subtitle')}
+                    </p>
+                  </div>
                     <button
                       onClick={() => setShowModal(false)}
                       className="btn btn-ghost btn-sm btn-circle"
@@ -119,13 +124,13 @@ export default function SuggestionBox() {
                     {/* Category Selection */}
                     <div className="form-control">
                       <label className="label">
-                        <span className="label-text font-medium">Category</span>
+                        <span className="label-text font-medium">{t('suggestions.category')}</span>
                       </label>
                       <div className="grid grid-cols-3 gap-2">
                         {[
-                          { value: "feature", label: "✨ Feature", color: "btn-primary" },
-                          { value: "improvement", label: "🚀 Improvement", color: "btn-accent" },
-                          { value: "other", label: "💭 Other", color: "btn-secondary" },
+                          { value: "feature", label: `✨ ${t('suggestions.categoryFeature')}`, color: "btn-primary" },
+                          { value: "improvement", label: `🚀 ${t('suggestions.categoryImprovement')}`, color: "btn-accent" },
+                          { value: "other", label: `💭 ${t('suggestions.categoryOther')}`, color: "btn-secondary" },
                         ].map((cat) => (
                           <button
                             key={cat.value}
@@ -144,14 +149,14 @@ export default function SuggestionBox() {
                     {/* Suggestion Textarea */}
                     <div className="form-control">
                       <label className="label">
-                        <span className="label-text font-medium">Your Suggestion</span>
+                        <span className="label-text font-medium">{t('suggestions.yourSuggestion')}</span>
                         <span className="label-text-alt text-base-content/50">
                           {suggestion.length}/500
                         </span>
                       </label>
                       <textarea
                         className="textarea textarea-bordered h-32 resize-none"
-                        placeholder="I'd love to see... / It would be great if... / Have you considered..."
+                        placeholder={t('suggestions.placeholder')}
                         value={suggestion}
                         onChange={(e) => {
                           if (e.target.value.length <= 500) {
@@ -171,7 +176,7 @@ export default function SuggestionBox() {
                           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
                         </svg>
                         <span className="text-xs">
-                          Submitting as <strong>{session.user.name}</strong> ({session.user.email})
+                          {t('suggestions.submittingAs')} <strong>{session.user.name}</strong> ({session.user.email})
                         </span>
                       </div>
                     )}
@@ -185,18 +190,18 @@ export default function SuggestionBox() {
                       {submitting ? (
                         <>
                           <span className="loading loading-spinner loading-sm"></span>
-                          Submitting...
+                          {t('suggestions.submitting')}
                         </>
                       ) : (
                         <>
                           <FaPaperPlane />
-                          Send Suggestion
+                          {t('suggestions.send')}
                         </>
                       )}
                     </button>
 
                     <p className="text-xs text-center text-base-content/50 pt-2">
-                      We read every suggestion and appreciate your input! 💙
+                      {t('suggestions.appreciation')}
                     </p>
                   </form>
                 </>

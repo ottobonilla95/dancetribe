@@ -613,6 +613,23 @@
     "instagramDM": "Instagram DM",
     "responseTime": "We typically respond within 24 hours"
   },
+  "suggestions": {
+    "title": "Share Your Ideas",
+    "subtitle": "Help us improve DanceCircle!",
+    "category": "Category",
+    "categoryFeature": "Feature",
+    "categoryImprovement": "Improvement",
+    "categoryOther": "Other",
+    "yourSuggestion": "Your Suggestion",
+    "placeholder": "I'd love to see... / It would be great if... / Have you considered...",
+    "submittingAs": "Submitting as",
+    "send": "Send Suggestion",
+    "submitting": "Submitting...",
+    "thankYou": "Thank You!",
+    "submitted": "Your suggestion has been submitted. We appreciate your feedback!",
+    "appreciation": "We read every suggestion and appreciate your input! 💙",
+    "characterCount": "{count}/500"
+  },
   "friends": {
     "friends": "Friends",
     "connectedDancers": "Connected dancers",
