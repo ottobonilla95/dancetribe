@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import React, { useState } from "react";
 import { FaLightbulb, FaTimes, FaPaperPlane } from "react-icons/fa";
 import { useSession } from "next-auth/react";
 import { useTranslation } from "@/components/I18nProvider";
