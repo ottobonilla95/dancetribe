@@ -101,6 +101,7 @@ export async function POST(req: Request) {
         telegram: body.socialGroups?.telegram || "",
         facebook: body.socialGroups?.facebook || "",
         instagram: body.socialGroups?.instagram || "",
+        website: body.socialGroups?.website || "",
       },
     });
 

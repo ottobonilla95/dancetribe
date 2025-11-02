@@ -88,6 +88,7 @@ export async function PUT(
           telegram: body.socialGroups?.telegram || "",
           facebook: body.socialGroups?.facebook || "",
           instagram: body.socialGroups?.instagram || "",
+          website: body.socialGroups?.website || "",
         },
       },
       { new: true }
