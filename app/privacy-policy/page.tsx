@@ -2,29 +2,6 @@ import Link from "next/link";
 import { getSEOTags } from "@/libs/seo";
 import config from "@/config";
 
-// CHATGPT PROMPT TO GENERATE YOUR PRIVACY POLICY — replace with your own data 👇
-
-// 1. Go to https://chat.openai.com/
-// 2. Copy paste bellow
-// 3. Replace the data with your own (if needed)
-// 4. Paste the answer from ChatGPT directly in the <pre> tag below
-
-// You are an excellent lawyer.
-
-// I need your help to write a simple privacy policy for my website. Here is some context:
-// - Website: https://shipfa.st
-// - Name: ShipFast
-// - Description: A JavaScript code boilerplate to help entrepreneurs launch their startups faster
-// - User data collected: name, email and payment information
-// - Non-personal data collection: web cookies
-// - Purpose of Data Collection: Order processing
-// - Data sharing: we do not share the data with any other parties
-// - Children's Privacy: we do not collect any data from children
-// - Updates to the Privacy Policy: users will be updated by email
-// - Contact information: marc@shipfa.st
-
-// Please write a simple privacy policy for my site. Add the current date.  Do not add or explain your reasoning. Answer:
-
 export const metadata = getSEOTags({
   title: `Privacy Policy | ${config.appName}`,
   canonicalUrlRelative: "/privacy-policy",
@@ -32,7 +9,7 @@ export const metadata = getSEOTags({
 
 const PrivacyPolicy = () => {
   return (
-    <main className="max-w-xl mx-auto">
+    <main className="max-w-4xl mx-auto">
       <div className="p-5">
         <Link href="/" className="btn btn-ghost">
           <svg
@@ -57,51 +34,252 @@ const PrivacyPolicy = () => {
           className="leading-relaxed whitespace-pre-wrap"
           style={{ fontFamily: "sans-serif" }}
         >
-          {`Last Updated: 2023-08-25
+          {`Last Updated: November 2, 2025
 
-Thank you for visiting ShipFast ("we," "us," or "our"). This Privacy Policy outlines how we collect, use, and protect your personal and non-personal information when you use our website located at https://shipfa.st (the "Website").
+IMPORTANT NOTICE: This Privacy Policy has been drafted to comply with applicable data protection laws. However, it should be reviewed by a qualified attorney to ensure full legal compliance in your jurisdiction.
 
-By accessing or using the Website, you agree to the terms of this Privacy Policy. If you do not agree with the practices described in this policy, please do not use the Website.
+Introduction
 
-1. Information We Collect
+Welcome to DanceCircle ("we," "us," "our," or "the Platform"). This Privacy Policy explains how JMO Ventures LLC collects, uses, shares, and protects your personal information when you use our website at https://dancecircle.co and our related services (collectively, the "Services").
 
-1.1 Personal Data
+By accessing or using DanceCircle, you agree to the terms of this Privacy Policy. If you do not agree, please do not use our Services.
 
-We collect the following personal information from you:
+1. INFORMATION WE COLLECT
 
-Name: We collect your name to personalize your experience and communicate with you effectively.
-Email: We collect your email address to send you important information regarding your orders, updates, and communication.
-Payment Information: We collect payment details to process your orders securely. However, we do not store your payment information on our servers. Payments are processed by trusted third-party payment processors.
+1.1 Personal Information You Provide
 
-1.2 Non-Personal Data
+When you create an account and use DanceCircle, we collect:
 
-We may use web cookies and similar technologies to collect non-personal information such as your IP address, browser type, device information, and browsing patterns. This information helps us to enhance your browsing experience, analyze trends, and improve our services.
+• Account Information: Email address, password (encrypted), first name, last name, username
+• Profile Information: Profile photo, date of birth, gender, nationality, relationship status
+• Dance Information: Dance styles you practice, skill levels, dance role (leader/follower/both), years of dancing experience, cities where you've danced
+• Location Data: Current city, cities visited, country, continent
+• Professional Information (if applicable): Teacher bio, years of teaching experience, DJ name and genres, photographer portfolio, event organizer details, professional contact information (WhatsApp, email)
+• Social Information: Dance anthem (Spotify links), social media handles (Instagram, TikTok, YouTube), bio
+• Communication Data: Friend connections, messages, suggestions and feedback you submit
+• Trip Information: Upcoming trips and travel plans you share
 
-2. Purpose of Data Collection
+1.2 Automatically Collected Information
 
-We collect and use your personal data for the sole purpose of order processing. This includes processing your orders, sending order confirmations, providing customer support, and keeping you updated about the status of your orders.
+When you use our Services, we automatically collect:
 
-3. Data Sharing
+• Usage Data: Pages viewed, features used, time spent on the platform, search queries
+• Device Information: IP address, browser type, device type, operating system, device identifiers
+• Location Information: Approximate location based on IP address
+• Cookies and Tracking: We use cookies, web beacons, and similar technologies (see Section 8)
 
-We do not share your personal data with any third parties except as required for order processing (e.g., sharing your information with payment processors). We do not sell, trade, or rent your personal information to others.
+1.3 Information from Third Parties
 
-4. Children's Privacy
+• Authentication Data: If you sign in with email magic links, we process authentication tokens
+• Payment Information: We use Stripe to process payments. We do not store your full credit card information on our servers
+• Social Media: If you link your social media accounts, we may display your public profile information
 
-ShipFast is not intended for children under the age of 13. We do not knowingly collect personal information from children. If you are a parent or guardian and believe that your child has provided us with personal information, please contact us at the email address provided below.
+2. HOW WE USE YOUR INFORMATION
 
-5. Updates to the Privacy Policy
+We use your information to:
 
-We may update this Privacy Policy from time to time to reflect changes in our practices or for other operational, legal, or regulatory reasons. Any updates will be posted on this page, and we may notify you via email about significant changes.
+2.1 Provide and Improve Services
+• Create and manage your account
+• Display your public dancer profile
+• Connect you with other dancers in your city and worldwide
+• Show you personalized content (nearby dancers, events, cities)
+• Enable friend connections and social features
+• Process your suggestions and feedback
+• Improve our platform and develop new features
 
-6. Contact Information
+2.2 Communications
+• Send you account-related notifications
+• Respond to your inquiries and support requests
+• Send administrative updates about our Services
+• Notify you of friend requests and platform activity
+• Send reminder emails if your profile is incomplete (you can opt out)
 
-If you have any questions, concerns, or requests related to this Privacy Policy, you can contact us at:
+2.3 Safety and Security
+• Verify your identity and prevent fraud
+• Monitor for suspicious activity
+• Enforce our Terms of Service
+• Comply with legal obligations
 
-Email: marc@shipfa.st
+2.4 Analytics and Marketing
+• Analyze usage patterns to improve user experience
+• Track engagement with Facebook Pixel for advertising purposes
+• Create aggregated, anonymized statistics about our community
 
-For all other inquiries, please visit our Contact Us page on the Website.
+3. HOW WE SHARE YOUR INFORMATION
 
-By using ShipFast, you consent to the terms of this Privacy Policy.`}
+3.1 Public Information
+
+By default, certain information is PUBLIC and visible to all DanceCircle users:
+• Your profile photo, name, username
+• Dance styles and skill levels
+• Dance role (leader/follower/both)
+• Current city and cities visited
+• Bio and dance anthem
+• Social media handles
+• Professional profiles (if you're a teacher/DJ/photographer/event organizer)
+• Friend connections
+• Upcoming trips
+
+You can manage some privacy settings in your profile.
+
+3.2 With Other Users
+• Your profile is searchable and viewable by other registered users
+• Friend requests allow users to connect with you
+• Users can see mutual friends you have in common
+
+3.3 Service Providers
+
+We share data with trusted third-party service providers who assist us:
+• Cloudinary: Image hosting and delivery
+• Stripe: Payment processing
+• MongoDB Atlas: Database hosting
+• Vercel: Platform hosting
+• Resend: Email delivery
+• Facebook: Analytics via Facebook Pixel
+• Google Maps/Mapbox: Location services
+
+These providers are contractually obligated to protect your data.
+
+3.4 Legal Requirements
+
+We may disclose your information if required by law, court order, or government request, or to protect our rights, property, or safety.
+
+3.5 Business Transfers
+
+If DanceCircle is involved in a merger, acquisition, or sale of assets, your information may be transferred. We will notify you before your information becomes subject to a different privacy policy.
+
+3.6 With Your Consent
+
+We may share your information in other ways with your explicit consent.
+
+4. DATA RETENTION
+
+We retain your information as long as:
+• Your account is active
+• Needed to provide our Services
+• Required by law or for legitimate business purposes
+
+When you delete your account, we will delete or anonymize your personal information within 30 days, except where we must retain it for legal compliance.
+
+5. YOUR RIGHTS AND CHOICES
+
+Depending on your location, you may have the following rights:
+
+5.1 Access and Portability
+• Request a copy of your personal data
+• Export your data in a portable format
+
+5.2 Correction
+• Update or correct inaccurate information in your profile settings
+
+5.3 Deletion
+• Delete your account and personal information (except where retention is required by law)
+• Use the "Delete Account" button in your profile settings
+
+5.4 Opt-Out
+• Unsubscribe from marketing emails (link in email footer)
+• Disable cookies in your browser settings
+• Request to opt out of analytics tracking
+
+5.5 Restrict Processing
+• Request that we limit how we use your data
+
+5.6 Object
+• Object to processing of your data for certain purposes
+
+To exercise these rights, contact us at: ${config.resend?.supportEmail || 'support@dancecircle.co'}
+
+6. INTERNATIONAL DATA TRANSFERS
+
+DanceCircle is based in the United States. If you are located outside the U.S., your information will be transferred to and processed in the U.S. By using our Services, you consent to this transfer.
+
+For users in the European Economic Area (EEA) and UK, we implement appropriate safeguards to protect your data in accordance with GDPR.
+
+7. DATA SECURITY
+
+We implement industry-standard security measures to protect your information:
+• Encryption of data in transit (HTTPS/TLS)
+• Encrypted storage of passwords
+• Regular security audits
+• Access controls and authentication
+• Secure cloud infrastructure
+
+However, no system is 100% secure. We cannot guarantee absolute security of your data.
+
+8. COOKIES AND TRACKING TECHNOLOGIES
+
+We use cookies and similar technologies to:
+• Keep you logged in
+• Remember your preferences
+• Analyze usage patterns
+• Enable social features
+• Serve relevant content
+
+Types of cookies we use:
+• Essential Cookies: Required for the platform to function
+• Analytics Cookies: Help us understand how you use the platform
+• Advertising Cookies: Facebook Pixel for ad targeting (you can opt out)
+
+You can control cookies through your browser settings, but disabling them may limit platform functionality.
+
+9. THIRD-PARTY LINKS
+
+DanceCircle may contain links to external websites (e.g., Spotify, Instagram, user-submitted websites). We are not responsible for the privacy practices of these third parties. Please review their privacy policies.
+
+10. CHILDREN'S PRIVACY
+
+DanceCircle is intended for users aged 16 and older. We do not knowingly collect information from children under 16. If you believe a child under 16 has provided us with personal information, please contact us immediately, and we will delete it.
+
+Note: Some jurisdictions may have different age requirements (e.g., 13+ in the U.S. with parental consent).
+
+11. CALIFORNIA PRIVACY RIGHTS (CCPA)
+
+If you are a California resident, you have additional rights under the California Consumer Privacy Act (CCPA):
+
+• Right to Know: What personal information we collect, use, and share
+• Right to Delete: Request deletion of your personal information
+• Right to Opt-Out: Opt out of sale of personal information (we do not sell your data)
+• Right to Non-Discrimination: We will not discriminate against you for exercising your rights
+
+To exercise these rights, contact us at: ${config.resend?.supportEmail || 'support@dancecircle.co'}
+
+12. EUROPEAN PRIVACY RIGHTS (GDPR)
+
+If you are located in the EEA or UK, you have rights under GDPR, including:
+
+• Right to Access, Rectification, Erasure, Restriction, and Portability (see Section 5)
+• Right to Object to processing
+• Right to Withdraw Consent
+• Right to Lodge a Complaint with your local data protection authority
+
+Legal basis for processing:
+• Consent: For optional features like analytics
+• Contract: To provide our Services
+• Legitimate Interests: To improve our platform and ensure security
+• Legal Obligation: To comply with applicable laws
+
+13. UPDATES TO THIS PRIVACY POLICY
+
+We may update this Privacy Policy from time to time. We will notify you of significant changes by:
+• Posting the new policy on this page with an updated "Last Updated" date
+• Sending an email notification to registered users (for material changes)
+
+Your continued use of DanceCircle after changes become effective constitutes acceptance of the updated policy.
+
+14. CONTACT US
+
+If you have questions, concerns, or requests regarding this Privacy Policy or our data practices, please contact us:
+
+Email: ${config.resend?.supportEmail || 'support@dancecircle.co'}
+Website: https://dancecircle.co
+Company: JMO Ventures LLC
+
+For GDPR-related inquiries, please include "GDPR Request" in your subject line.
+For CCPA-related inquiries, please include "CCPA Request" in your subject line.
+
+---
+
+DISCLAIMER: This Privacy Policy is provided as a starting point and should be reviewed by a qualified attorney to ensure compliance with all applicable laws in your jurisdiction. Laws vary by country, state, and region, and this document may not cover all legal requirements.`}
         </pre>
       </div>
     </main>
