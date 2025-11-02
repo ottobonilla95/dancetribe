@@ -9,23 +9,34 @@ import logo from "@/app/icon.png";
 import config from "@/config";
 import { useTranslation } from "@/components/I18nProvider";
 import LanguageSwitcher from "@/components/LanguageSwitcher";
+import SupportButton from "@/components/SupportButton";
 
 export default function SignIn() {
   const { t } = useTranslation();
   const searchParams = useSearchParams();
   const [email, setEmail] = useState("");
   const [isLoading, setIsLoading] = useState(false);
+  const [emailSent, setEmailSent] = useState(false);
   const callbackUrl = searchParams?.get("callbackUrl") || config.auth.callbackUrl;
+  
+  // Check for NextAuth errors (expired token, verification error, etc.)
+  const error = searchParams?.get("error");
 
   const handleEmailSignIn = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
+    setEmailSent(false);
     
     try {
-      await signIn("email", {
+      const result = await signIn("email", {
         email,
         callbackUrl,
+        redirect: false, // Don't redirect so we can show success message
       });
+      
+      if (result?.ok) {
+        setEmailSent(true);
+      }
     } catch (error) {
       console.error("Sign in error:", error);
     } finally {
@@ -61,6 +72,44 @@ export default function SignIn() {
               {t('auth.welcomeBack')}
             </p>
           </div>
+
+          {/* Error Messages */}
+          {error === "Verification" && (
+            <div className="space-y-3 mb-4">
+              <div className="alert alert-error">
+                <svg xmlns="http://www.w3.org/2000/svg" className="stroke-current shrink-0 h-6 w-6" fill="none" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                </svg>
+                <div className="flex-1">
+                  <h3 className="font-bold">Link Expired</h3>
+                  <div className="text-sm">Your sign-in link has expired or was already used. Please request a new one below.</div>
+                </div>
+              </div>
+              <SupportButton variant="inline" className="w-full" />
+            </div>
+          )}
+          
+          {error && error !== "Verification" && (
+            <div className="alert alert-error mb-4">
+              <svg xmlns="http://www.w3.org/2000/svg" className="stroke-current shrink-0 h-6 w-6" fill="none" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z" />
+              </svg>
+              <span>Sign in error. Please try again.</span>
+            </div>
+          )}
+          
+          {/* Success Message */}
+          {emailSent && (
+            <div className="alert alert-success mb-4">
+              <svg xmlns="http://www.w3.org/2000/svg" className="stroke-current shrink-0 h-6 w-6" fill="none" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+              </svg>
+              <div>
+                <h3 className="font-bold">Check your email!</h3>
+                <div className="text-sm">We sent you a sign-in link. It&apos;s valid for 7 days.</div>
+              </div>
+            </div>
+          )}
 
           {/* Google Sign In - Official Google Button Style */}
           <button
@@ -131,6 +180,9 @@ export default function SignIn() {
           </div>
         </div>
       </div>
+      
+      {/* Floating Support Button */}
+      <SupportButton variant="floating" />
     </div>
   );
 }

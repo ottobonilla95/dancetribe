@@ -47,6 +47,8 @@ export const authOptions: NextAuthOptionsExtended = {
               },
             },
             from: config.resend.fromNoReply,
+            // Token expires in 7 days instead of default 24 hours
+            maxAge: 7 * 24 * 60 * 60, // 7 days in seconds
           }),
         ]
       : []),

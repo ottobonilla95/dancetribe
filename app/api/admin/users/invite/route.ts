@@ -51,7 +51,7 @@ export async function POST(req: Request) {
     // Generate verification token (exactly like NextAuth does)
     const token = crypto.randomBytes(32).toString("hex");
     const expires = new Date();
-    expires.setDate(expires.getDate() + 1); // 1 day
+    expires.setDate(expires.getDate() + 7); // 7 days - matches EmailProvider maxAge
 
     // Hash token with secret
     const secret = process.env.NEXTAUTH_SECRET || "";
