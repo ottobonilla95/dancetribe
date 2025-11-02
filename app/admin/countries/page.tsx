@@ -20,6 +20,7 @@ interface Country {
     telegram?: string;
     facebook?: string;
     instagram?: string;
+    website?: string;
   };
 }
 
@@ -53,6 +54,7 @@ export default function AdminCountriesPage() {
       telegram: "",
       facebook: "",
       instagram: "",
+      website: "",
     },
   });
 
@@ -493,6 +495,26 @@ export default function AdminCountriesPage() {
                         socialGroups: {
                           ...formData.socialGroups!,
                           line: e.target.value,
+                        },
+                      })
+                    }
+                    className="input input-bordered input-sm"
+                  />
+                </div>
+                <div className="form-control">
+                  <label className="label">
+                    <span className="label-text">Website</span>
+                  </label>
+                  <input
+                    type="text"
+                    placeholder="Community website URL"
+                    value={formData.socialGroups?.website}
+                    onChange={(e) =>
+                      setFormData({
+                        ...formData,
+                        socialGroups: {
+                          ...formData.socialGroups!,
+                          website: e.target.value,
                         },
                       })
                     }
