@@ -316,7 +316,14 @@ export async function PUT(req: NextRequest) {
     // Check if profile is complete
     // Only require mandatory steps - optional ones like bio, anthem, socialMedia shouldn't block completion
     const steps = user.onboardingSteps;
-    const mandatorySteps = [
+    
+    // Check if user is ONLY a professional (not a dancer/teacher)
+    const isProfessionalOnly = (user.isDJ || user.isPhotographer || user.isEventOrganizer) 
+      && !user.isTeacher 
+      && (!user.danceStyles || user.danceStyles.length === 0);
+    
+    // Base mandatory steps for everyone
+    const baseMandatorySteps = [
       'nameDetails',
       'username', 
       'profilePic',      // They need to at least go through this step (can skip photo)
@@ -324,14 +331,25 @@ export async function PUT(req: NextRequest) {
       'gender',
       'nationality',
       'currentLocation',
-      'danceRole',
-      'teacherInfo'
+      'teacherInfo'      // Need to declare professional roles
     ];
+    
+    // Dance-related mandatory steps (only for dancers/teachers)
+    const danceMandatorySteps = [
+      'danceRole',
+      // 'danceStyles' - optional even for dancers in case they want to skip
+      // 'dancingStartYear' - optional
+    ];
+    
+    // Combine based on user type
+    const mandatorySteps = isProfessionalOnly 
+      ? baseMandatorySteps 
+      : [...baseMandatorySteps, ...danceMandatorySteps];
     
     // Optional steps that shouldn't block profile completion:
     // - bio (truly optional)
-    // - dancingStartYear (optional for non-dancers)
-    // - danceStyles (optional for non-dancers)
+    // - dancingStartYear (optional for everyone)
+    // - danceStyles (optional - professionals don't need it)
     // - citiesVisited (optional)
     // - anthem (optional)
     // - socialMedia (optional)
