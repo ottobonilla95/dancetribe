@@ -327,6 +327,13 @@ const userSchema = new mongoose.Schema(
     reminderSentAt: {
       type: Date,
     },
+    // Hero featured sequence - dancers with lower numbers appear first in landing page hero
+    // undefined/null dancers appear after (randomized)
+    heroSequence: {
+      type: Number,
+      default: undefined,
+      sparse: true, // Only index documents that have this field
+    },
   },
   {
     timestamps: true,

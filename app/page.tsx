@@ -211,13 +211,13 @@ const getTrendingSongs = unstable_cache(
 { revalidate: 900, tags: ["trending-songs"] } // 15 minutes - same tag as dashboard/music for unified cache invalidation
 );
 
-// Cached: Featured users for hero section - randomized
+// Cached: Featured users for hero section - prioritizes heroSequence, then random
 const getFeaturedUsers = unstable_cache(
   async () => {
   try {
     await connectMongo();
 
-    // Use aggregation to get random users with quality images
+    // ONE query: Sort by heroSequence (nulls last), then randomize, limit 8
     const users = await User.aggregate([
       { 
         $match: { 
@@ -228,8 +228,16 @@ const getFeaturedUsers = unstable_cache(
           }
         } 
       },
-      // Randomize
-      { $sample: { size: 8 } },
+      // Add random field for shuffling those without heroSequence
+      { $addFields: { randomOrder: { $rand: {} } } },
+      // Sort: heroSequence first (ascending), nulls go to end, then by random
+      { 
+        $sort: { 
+          heroSequence: 1,  // 1, 2, 3... then nulls
+          randomOrder: 1     // Randomize the nulls
+        } 
+      },
+      { $limit: 8 },
       { $project: { name: 1, image: 1 } }
     ]);
 
