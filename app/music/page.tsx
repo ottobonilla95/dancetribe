@@ -132,47 +132,49 @@ export default async function MusicPage() {
             {trendingSongs.map((song, index) => (
               <div key={song.url} className="card bg-base-300 shadow-xl overflow-hidden">
                 <div className="px-4 pt-4 pb-2">
-                  <div className="flex items-center gap-3 mb-3">
-                    <div className="text-3xl font-bold text-primary">
-                      #{index + 1}
-                    </div>
-                    <div className="badge badge-primary gap-2">
-                      <FaUsers className="text-xs" />
-                      {song.count} {song.count === 1 ? t('musicPage.dancer') : t('musicPage.dancers')}
-                    </div>
-                  </div>
-                  
-                  {/* User Avatars */}
-                  {song.users && song.users.length > 0 && (
-                    <div className="flex items-center gap-1">
-                      <div className="flex -space-x-2">
-                        {song.users.slice(0, 5).map((user: any) => (
-                          <Link
-                            key={user._id}
-                            href={`/${user.username || `dancer/${user._id}`}`}
-                            className="relative"
-                          >
-                            <div className="avatar">
-                              <div className="w-8 h-8 rounded-full ring ring-base-300 ring-offset-base-100 ring-offset-1">
-                                <Image
-                                  src={user.image || '/default-avatar.png'}
-                                  alt={user.name}
-                                  width={32}
-                                  height={32}
-                                  className="rounded-full object-cover"
-                                />
-                              </div>
-                            </div>
-                          </Link>
-                        ))}
+                  <div className="flex items-center justify-between gap-3 flex-wrap">
+                    <div className="flex items-center gap-3">
+                      <div className="text-3xl font-bold text-primary">
+                        #{index + 1}
                       </div>
-                      {song.users.length > 5 && (
-                        <span className="text-xs text-base-content/60 ml-2">
-                          +{song.users.length - 5} more
-                        </span>
-                      )}
+                      <div className="badge badge-primary gap-2">
+                        <FaUsers className="text-xs" />
+                        {song.count} {song.count === 1 ? t('musicPage.dancer') : t('musicPage.dancers')}
+                      </div>
                     </div>
-                  )}
+                    
+                    {/* User Avatars */}
+                    {song.users && song.users.length > 0 && (
+                      <div className="flex items-center gap-1">
+                        <div className="flex -space-x-2">
+                          {song.users.slice(0, 5).map((user: any) => (
+                            <Link
+                              key={user._id}
+                              href={`/${user.username || `dancer/${user._id}`}`}
+                              className="relative"
+                            >
+                              <div className="avatar">
+                                <div className="w-7 h-7 rounded-full ring ring-base-300 ring-offset-base-100 ring-offset-1">
+                                  <Image
+                                    src={user.image || '/default-avatar.png'}
+                                    alt={user.name}
+                                    width={28}
+                                    height={28}
+                                    className="rounded-full object-cover"
+                                  />
+                                </div>
+                              </div>
+                            </Link>
+                          ))}
+                        </div>
+                        {song.users.length > 5 && (
+                          <span className="text-xs text-base-content/60 ml-1">
+                            +{song.users.length - 5}
+                          </span>
+                        )}
+                      </div>
+                    )}
+                  </div>
                 </div>
 
                 {/* Spotify Embed */}

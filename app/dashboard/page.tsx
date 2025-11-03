@@ -400,11 +400,11 @@ const getTrendingSongs = unstable_cache(
       const users = await User.find({
         "anthem.url": { $exists: true, $ne: "" },
       })
-        .select("anthem")
+        .select("anthem name image username")
         .lean();
 
       // Count occurrences of each song by Spotify track ID (ignore YouTube)
-      const songData: { [trackId: string]: { count: number; url: string } } = {};
+      const songData: { [trackId: string]: { count: number; url: string; users: any[] } } = {};
       
       users.forEach((user: any) => {
         if (user.anthem?.url) {
@@ -415,9 +415,15 @@ const getTrendingSongs = unstable_cache(
             const trackId = extractSpotifyTrackId(user.anthem.url);
             if (trackId) {
               if (!songData[trackId]) {
-                songData[trackId] = { count: 0, url: user.anthem.url };
+                songData[trackId] = { count: 0, url: user.anthem.url, users: [] };
               }
               songData[trackId].count += 1;
+              songData[trackId].users.push({
+                _id: user._id,
+                name: user.name,
+                image: user.image,
+                username: user.username,
+              });
             }
           }
         }
@@ -431,6 +437,7 @@ const getTrendingSongs = unstable_cache(
           platform: "spotify" as const,
           spotifyTrackId: trackId,
           youtubeVideoId: null as string | null,
+          users: data.users,
         }))
         .sort((a, b) => b.count - a.count);
 

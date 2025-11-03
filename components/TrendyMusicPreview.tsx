@@ -1,4 +1,5 @@
 import Link from "next/link";
+import Image from "next/image";
 import { FaMusic, FaSpotify, FaYoutube, FaFire } from "react-icons/fa";
 import { getMessages, getTranslation } from "@/lib/i18n";
 
@@ -8,6 +9,12 @@ interface Song {
   platform: 'spotify' | 'youtube' | null;
   spotifyTrackId?: string | null;
   youtubeVideoId?: string | null;
+  users?: Array<{
+    _id: string;
+    name: string;
+    image: string;
+    username: string;
+  }>;
 }
 
 export default async function TrendyMusicPreview({ songs }: { songs: Song[] }) {
@@ -37,13 +44,47 @@ export default async function TrendyMusicPreview({ songs }: { songs: Song[] }) {
         {topSongs.map((song, index) => (
           <div key={song.url} className="card bg-base-200 shadow-xl overflow-hidden">
             <div className="card-body p-4 pb-0 md:pb-4">
-              <div className="flex items-center gap-2 mb-1 sm:mb-3">
-                <div className="text-2xl font-bold text-primary">
-                  #{index + 1}
+              <div className="flex items-center justify-between gap-2 mb-3 flex-wrap">
+                <div className="flex items-center gap-2">
+                  <div className="text-2xl font-bold text-primary">
+                    #{index + 1}
+                  </div>
+                  <div className="badge badge-sm badge-primary">
+                    {song.count} {song.count === 1 ? t('common.dancer') : t('common.dancers').toLowerCase()}
+                  </div>
                 </div>
-                <div className="badge badge-sm badge-primary">
-                  {song.count} {song.count === 1 ? t('common.dancer') : t('common.dancers').toLowerCase()}
-                </div>
+
+                {/* User Avatars */}
+                {song.users && song.users.length > 0 && (
+                  <div className="flex items-center gap-1">
+                    <div className="flex -space-x-2">
+                      {song.users.slice(0, 4).map((user) => (
+                        <Link
+                          key={user._id}
+                          href={`/${user.username || `dancer/${user._id}`}`}
+                          className="relative"
+                        >
+                          <div className="avatar">
+                            <div className="w-6 h-6 rounded-full ring ring-base-200 ring-offset-base-100 ring-offset-1">
+                              <Image
+                                src={user.image || '/default-avatar.png'}
+                                alt={user.name}
+                                width={24}
+                                height={24}
+                                className="rounded-full object-cover"
+                              />
+                            </div>
+                          </div>
+                        </Link>
+                      ))}
+                    </div>
+                    {song.users.length > 4 && (
+                      <span className="text-xs text-base-content/60 ml-1">
+                        +{song.users.length - 4}
+                      </span>
+                    )}
+                  </div>
+                )}
               </div>
 
               {/* Spotify Embed */}
