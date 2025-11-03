@@ -1,48 +1,71 @@
 import Image from "next/image";
+import connectMongo from "@/libs/mongoose";
+import User from "@/models/User";
+import { unstable_cache } from "next/cache";
 
-const avatars: {
-  alt: string;
-  src: string;
-}[] = [
-  {
-    alt: "User",
-    // Ideally, load from a statically generated image for better SEO performance (import userImage from "@/public/userImage.png")
-    src: "https://images.unsplash.com/photo-1534528741775-53994a69daeb?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=3276&q=80",
+// Cached: Get random active dancers with profile pictures
+const getRandomDancers = unstable_cache(
+  async () => {
+    try {
+      await connectMongo();
+      
+      // Get 5 random dancers with images
+      const dancers = await User.aggregate([
+        { 
+          $match: { 
+            image: { $exists: true, $ne: "" },
+            isProfileComplete: true
+          } 
+        },
+        { $sample: { size: 5 } },
+        { $project: { name: 1, image: 1 } }
+      ]);
+      
+      // Get total dancer count
+      const totalDancers = await User.countDocuments({ 
+        isProfileComplete: true 
+      });
+      
+      return { dancers, totalDancers };
+    } catch (error) {
+      console.error("Error fetching dancers:", error);
+      return { dancers: [], totalDancers: 0 };
+    }
   },
-  {
-    alt: "User",
-    src: "https://images.unsplash.com/photo-1517841905240-472988babdf9?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=774&q=80",
-  },
-  {
-    alt: "User",
-    src: "https://images.unsplash.com/photo-1539571696357-5a69c17a67c6?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=774&q=80",
-  },
-  {
-    alt: "User",
-    src: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=774&q=80",
-  },
-  {
-    alt: "User",
-    src: "https://images.unsplash.com/photo-1488161628813-04466f872be2?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=3376&q=80",
-  },
-];
+  ["testimonials-avatars"],
+  { revalidate: 3600 } // 1 hour cache
+);
 
-const TestimonialsAvatars = ({ priority }: { priority?: boolean }) => {
+const TestimonialsAvatars = async ({ priority }: { priority?: boolean }) => {
+  const { dancers, totalDancers } = await getRandomDancers();
+  // Format the number with commas
+  const formattedTotal = totalDancers.toLocaleString();
+
   return (
     <div className="flex flex-col md:flex-row justify-center items-center md:items-start gap-3">
       {/* AVATARS */}
       <div className={`-space-x-5 avatar-group justy-start`}>
-        {avatars.map((image, i) => (
-          <div className="avatar w-12 h-12" key={i}>
-            <Image
-              src={image.src}
-              alt={image.alt}
-              priority={priority}
-              width={50}
-              height={50}
-            />
-          </div>
-        ))}
+        {dancers.length > 0 ? (
+          dancers.map((dancer: any) => (
+            <div className="avatar w-12 h-12" key={dancer._id}>
+              <Image
+                src={dancer.image || '/default-avatar.png'}
+                alt={dancer.name}
+                priority={priority}
+                width={50}
+                height={50}
+                className="rounded-full object-cover"
+              />
+            </div>
+          ))
+        ) : (
+          // Fallback if no dancers found
+          [...Array(5)].map((_, i) => (
+            <div className="avatar w-12 h-12" key={i}>
+              <div className="bg-base-300 rounded-full w-12 h-12" />
+            </div>
+          ))
+        )}
       </div>
 
       {/* RATING */}
@@ -66,8 +89,7 @@ const TestimonialsAvatars = ({ priority }: { priority?: boolean }) => {
         </div>
 
         <div className="text-base text-neutral-content/80">
-          <span className="font-semibold text-neutral-content">32</span> makers
-          ship faster
+          <span className="font-semibold text-neutral-content">{formattedTotal}</span> dancers connected
         </div>
       </div>
     </div>

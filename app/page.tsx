@@ -19,6 +19,7 @@ import DancerCard from "@/components/DancerCard";
 import TrendyMusicPreview from "@/components/TrendyMusicPreview";
 import DancersMap from "@/components/DancersMap";
 import AnimatedCounter from "@/components/AnimatedCounter";
+import TestimonialsAvatars from "@/components/TestimonialsAvatars";
 import { getMessages, getTranslation } from "@/lib/i18n";
 import { unstable_cache } from "next/cache";
 
@@ -210,34 +211,44 @@ const getTrendingSongs = unstable_cache(
 { revalidate: 900, tags: ["trending-songs"] } // 15 minutes - same tag as dashboard/music for unified cache invalidation
 );
 
-// Cached: Featured users for hero section
+// Cached: Featured users for hero section - randomized
 const getFeaturedUsers = unstable_cache(
   async () => {
   try {
     await connectMongo();
 
-    const users = await User.find({
-      isProfileComplete: true,
-      image: { 
-        $exists: true, 
-        $ne: null,
-        // Exclude Google's default avatar images (with initials)
-        $not: { $regex: /googleusercontent\.com.*[?&]d=/ }
+    // Use aggregation to get random users with quality images
+    const users = await User.aggregate([
+      { 
+        $match: { 
+          isProfileComplete: true,
+          image: { 
+            $exists: true, 
+            $nin: [null, ""]
+          }
+        } 
       },
-    })
-      .select("name image")
-      .sort({ createdAt: -1 })
-      .limit(8)
-      .lean();
+      // Randomize
+      { $sample: { size: 8 } },
+      { $project: { name: 1, image: 1 } }
+    ]);
 
-    return users.map((user: any) => ({
-      _id: user._id.toString(),
-      name: user.name,
-      image: user.image,
-    }));
+    // Get total dancer count
+    const totalDancers = await User.countDocuments({ 
+      isProfileComplete: true 
+    });
+
+    return { 
+      users: users.map((user: any) => ({
+        _id: user._id.toString(),
+        name: user.name,
+        image: user.image,
+      })),
+      totalDancers
+    };
   } catch (error) {
     console.error("Error fetching featured users:", error);
-    return [];
+    return { users: [], totalDancers: 0 };
   }
 },
 ["landing-featured-users"],
@@ -382,7 +393,7 @@ export default async function Home() {
   const t = (key: string) => getTranslation(messages, key);
 
   // Fetch data in parallel
-  const [cities, hotDanceStyles, recentDancers, trendingSongs, featuredUsers, communityMapData] = await Promise.all([
+  const [cities, hotDanceStyles, recentDancers, trendingSongs, featuredUsersData, communityMapData] = await Promise.all([
     getCities(),
     getHotDanceStyles(),
     getRecentDancers(),
@@ -394,7 +405,7 @@ export default async function Home() {
   return (
     <>
       <main>
-        <Hero featuredUsers={featuredUsers} />
+        <Hero featuredUsers={featuredUsersData.users} totalDancers={featuredUsersData.totalDancers} />
         
         {/* Global Community Map Section */}
         {communityMapData.dancersForMap.length > 0 && (
