@@ -465,6 +465,7 @@
     "myProfile": "My Profile",
     "friends": "Friends",
     "trendyMusic": "Trendy Music",
+    "settings": "Settings",
     "inviteFriends": "Invite Friends",
     "getSupport": "Get Support",
     "signOut": "Sign Out",
@@ -472,6 +473,24 @@
     "openMenu": "Open main menu",
     "closeMenu": "Close menu",
     "installApp": "Install App"
+  },
+  "settings": {
+    "title": "Settings",
+    "subtitle": "Manage your account preferences and notifications",
+    "notifications": "Notifications",
+    "emailNotifications": "Email Notifications",
+    "notificationsDesc": "Control what email notifications you receive",
+    "enableEmailNotifications": "Enable Email Notifications",
+    "masterToggleDesc": "Turn off to stop receiving all email notifications",
+    "notificationTypes": "Notification Types",
+    "friendRequests": "Friend Requests",
+    "friendRequestsDesc": "Get notified when someone sends you a friend request or accepts yours",
+    "profileLikes": "Profile Likes",
+    "profileLikesDesc": "Get notified when someone likes your profile",
+    "saved": "Settings saved successfully!",
+    "saveFailed": "Failed to save settings. Please try again.",
+    "saving": "Saving...",
+    "saveChanges": "Save Changes"
   },
   "footer": {
     "company": "COMPANY",

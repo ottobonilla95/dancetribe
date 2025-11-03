@@ -68,6 +68,7 @@ const Header = () => {
       badge: pendingRequests > 0 ? pendingRequests : undefined 
     },
     { href: "/music", label: t('nav.trendyMusic'), icon: FaMusic },
+    { href: "/settings", label: t('nav.settings'), icon: FaCog },
     { href: "/invite", label: t('nav.inviteFriends'), icon: FaUserPlus, highlight: true },
     // Admin link - only visible to admin
     ...(isAdmin ? [{ href: "/admin", label: "Admin", icon: FaShieldAlt, highlight: true }] : []),

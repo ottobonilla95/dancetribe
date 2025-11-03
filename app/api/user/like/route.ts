@@ -74,8 +74,12 @@ export async function POST(req: NextRequest) {
         { new: true }
       );
 
-      // Send email notification (non-blocking)
-      if (targetUser.email) {
+      // Send email notification (non-blocking) - Check notification settings
+      if (
+        targetUser.email &&
+        targetUser.notificationSettings?.emailNotifications !== false &&
+        targetUser.notificationSettings?.profileLikedNotifications !== false
+      ) {
         const emailTemplate = profileLikedEmail(
           { name: currentUser.name, username: currentUser.username, image: currentUser.image, _id: currentUserId },
           { name: targetUser.name, email: targetUser.email },

@@ -100,8 +100,12 @@ export async function POST(req: NextRequest) {
           },
         });
 
-        // Send email notification (non-blocking)
-        if (targetUser.email) {
+        // Send email notification (non-blocking) - Check notification settings
+        if (
+          targetUser.email &&
+          targetUser.notificationSettings?.emailNotifications !== false &&
+          targetUser.notificationSettings?.friendRequestNotifications !== false
+        ) {
           const emailTemplate = friendRequestReceivedEmail(
             { name: currentUser.name, username: currentUser.username, image: currentUser.image },
             { name: targetUser.name, email: targetUser.email },
@@ -142,8 +146,12 @@ export async function POST(req: NextRequest) {
           $pull: { friendRequestsSent: { user: currentUserId } },
         });
 
-        // Send email notification to the person who sent the request (non-blocking)
-        if (targetUser.email) {
+        // Send email notification to the person who sent the request (non-blocking) - Check notification settings
+        if (
+          targetUser.email &&
+          targetUser.notificationSettings?.emailNotifications !== false &&
+          targetUser.notificationSettings?.friendRequestNotifications !== false
+        ) {
           const emailTemplate = friendRequestAcceptedEmail(
             { name: currentUser.name, username: currentUser.username, image: currentUser.image, _id: currentUserId },
             { name: targetUser.name, email: targetUser.email },

@@ -334,6 +334,21 @@ const userSchema = new mongoose.Schema(
       default: undefined,
       sparse: true, // Only index documents that have this field
     },
+    // Email notification preferences
+    notificationSettings: {
+      emailNotifications: {
+        type: Boolean,
+        default: true, // Enabled by default
+      },
+      friendRequestNotifications: {
+        type: Boolean,
+        default: true, // Enabled by default
+      },
+      profileLikedNotifications: {
+        type: Boolean,
+        default: true, // Enabled by default
+      },
+    },
   },
   {
     timestamps: true,

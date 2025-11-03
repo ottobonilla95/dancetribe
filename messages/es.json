@@ -465,6 +465,7 @@
     "myProfile": "Mi Perfil",
     "friends": "Amigos",
     "trendyMusic": "Música en Tendencia",
+    "settings": "Configuración",
     "inviteFriends": "Invitar Amigos",
     "getSupport": "Obtener Soporte",
     "signOut": "Cerrar Sesión",
@@ -472,6 +473,24 @@
     "openMenu": "Abrir menú principal",
     "closeMenu": "Cerrar menú",
     "installApp": "Instalar App"
+  },
+  "settings": {
+    "title": "Configuración",
+    "subtitle": "Gestiona tus preferencias de cuenta y notificaciones",
+    "notifications": "Notificaciones",
+    "emailNotifications": "Notificaciones por Email",
+    "notificationsDesc": "Controla qué notificaciones por email recibes",
+    "enableEmailNotifications": "Habilitar Notificaciones por Email",
+    "masterToggleDesc": "Desactiva para dejar de recibir todas las notificaciones por email",
+    "notificationTypes": "Tipos de Notificaciones",
+    "friendRequests": "Solicitudes de Amistad",
+    "friendRequestsDesc": "Recibe notificaciones cuando alguien te envíe una solicitud de amistad o acepte la tuya",
+    "profileLikes": "Me Gusta en el Perfil",
+    "profileLikesDesc": "Recibe notificaciones cuando alguien le dé me gusta a tu perfil",
+    "saved": "¡Configuración guardada exitosamente!",
+    "saveFailed": "Error al guardar la configuración. Por favor intenta de nuevo.",
+    "saving": "Guardando...",
+    "saveChanges": "Guardar Cambios"
   },
   "footer": {
     "company": "COMPAÑÍA",
