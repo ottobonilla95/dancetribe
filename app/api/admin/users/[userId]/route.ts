@@ -4,6 +4,7 @@ import { authOptions } from "@/libs/next-auth";
 import connectMongo from "@/libs/mongoose";
 import User from "@/models/User";
 import config from "@/config";
+import { revalidateTag } from "next/cache";
 
 // GET: Fetch single user details
 export async function GET(
@@ -88,6 +89,11 @@ export async function PATCH(
         { error: "User not found" },
         { status: 404 }
       );
+    }
+
+    // If anthem was updated, invalidate trending songs cache
+    if (anthem !== undefined) {
+      revalidateTag("trending-songs");
     }
 
     return NextResponse.json({

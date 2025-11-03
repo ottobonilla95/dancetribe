@@ -7,6 +7,7 @@ import City from "@/models/City";
 import DanceStyle from "@/models/DanceStyle";
 import Country from "@/models/Country";
 import Continent from "@/models/Continent";
+import { revalidateTag } from "next/cache";
 
 export async function GET() {
   const session = await getServerSession(authOptions);
@@ -215,6 +216,8 @@ export async function PUT(req: NextRequest) {
           user.anthem = undefined;
         }
         user.onboardingSteps.anthem = true;
+        // Invalidate trending songs cache when anthem is updated
+        revalidateTag("trending-songs");
         break;
 
       case "socialMedia":
@@ -448,6 +451,8 @@ export async function PATCH(req: NextRequest) {
         } else {
           user.anthem = undefined;
         }
+        // Invalidate trending songs cache when anthem is updated
+        revalidateTag("trending-songs");
         break;
 
       case "danceStyles":

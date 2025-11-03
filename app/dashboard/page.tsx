@@ -365,7 +365,8 @@ const getCommunityStats = unstable_cache(
 // Extract Spotify track ID from URL
 function extractSpotifyTrackId(url: string): string | null {
   const match = url.match(/track\/([a-zA-Z0-9]+)/);
-  return match ? match[1] : null;
+  // Normalize to lowercase to avoid case-sensitivity issues
+  return match ? match[1].toLowerCase() : null;
 }
 
 // Extract YouTube video ID from URL
@@ -430,16 +431,28 @@ const getTrendingSongs = unstable_cache(
           count: data.count,
           platform: "spotify" as const,
           spotifyTrackId: trackId,
-          youtubeVideoId: null,
+          youtubeVideoId: null as string | null,
         }))
-        .sort((a, b) => b.count - a.count)
-        .slice(0, 10); // Top 10
+        .sort((a, b) => b.count - a.count);
 
-      if (trendingSongs.length === 0) {
+      // Additional deduplication check by track ID (case-insensitive)
+      const seenTrackIds = new Set<string>();
+      const deduplicated = trendingSongs.filter(song => {
+        const normalizedId = song.spotifyTrackId.toLowerCase();
+        if (seenTrackIds.has(normalizedId)) {
+          return false;
+        }
+        seenTrackIds.add(normalizedId);
+        return true;
+      });
+
+      const finalSongs = deduplicated.slice(0, 10); // Top 10
+
+      if (finalSongs.length === 0) {
         console.warn("⚠️ getTrendingSongs returned empty - users may not have anthems set");
       }
 
-      return trendingSongs;
+      return finalSongs;
     } catch (error) {
       console.error("Error fetching trending songs:", error);
       return [];

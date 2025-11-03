@@ -1,7 +1,8 @@
 import connectDB from "@/libs/mongoose";
 import User from "@/models/User";
-import { FaMusic, FaSpotify, FaFire, FaUsers, FaYoutube } from "react-icons/fa";
+import { FaMusic, FaFire, FaUsers } from "react-icons/fa";
 import { getMessages, getTranslation } from "@/lib/i18n";
+import { unstable_cache } from "next/cache";
 
 export const metadata = {
   title: "Trending Dance Music | DanceCircle",
@@ -11,22 +12,8 @@ export const metadata = {
 // Extract Spotify track ID from URL
 function extractSpotifyTrackId(url: string): string | null {
   const match = url.match(/track\/([a-zA-Z0-9]+)/);
-  return match ? match[1] : null;
-}
-
-// Extract YouTube video ID from URL
-function extractYouTubeVideoId(url: string): string | null {
-  const patterns = [
-    /(?:youtube\.com\/watch\?v=|youtu\.be\/)([a-zA-Z0-9_-]+)/,
-    /youtube\.com\/embed\/([a-zA-Z0-9_-]+)/,
-  ];
-
-  for (const pattern of patterns) {
-    const match = url.match(pattern);
-    if (match) return match[1];
-  }
-
-  return null;
+  // Normalize to lowercase to avoid case-sensitivity issues
+  return match ? match[1].toLowerCase() : null;
 }
 
 // Determine platform from URL
@@ -36,51 +23,78 @@ function detectPlatform(url: string): "spotify" | "youtube" | null {
   return null;
 }
 
+// Cached: Trending songs - change when users update their anthems
+const getTrendingSongs = unstable_cache(
+  async () => {
+    try {
+      await connectDB();
+
+      // Get all users with anthem URLs
+      const users = await User.find({
+        "anthem.url": { $exists: true, $ne: "" },
+      })
+        .select("anthem")
+        .lean();
+
+      // Count occurrences of each song by Spotify track ID (ignore YouTube)
+      const songData: { [trackId: string]: { count: number; url: string } } = {};
+      
+      users.forEach((user: any) => {
+        if (user.anthem?.url) {
+          const platform = detectPlatform(user.anthem.url);
+          
+          // Only count Spotify songs
+          if (platform === "spotify") {
+            const trackId = extractSpotifyTrackId(user.anthem.url);
+            if (trackId) {
+              if (!songData[trackId]) {
+                songData[trackId] = { count: 0, url: user.anthem.url };
+              }
+              songData[trackId].count += 1;
+            }
+          }
+        }
+      });
+
+      // Convert to array and sort by count
+      const trendingSongs = Object.entries(songData)
+        .map(([trackId, data]) => ({
+          url: data.url,
+          count: data.count,
+          platform: "spotify" as const,
+          spotifyTrackId: trackId,
+          youtubeVideoId: null as string | null,
+        }))
+        .sort((a, b) => b.count - a.count);
+
+      // Additional deduplication check by track ID (case-insensitive)
+      const seenTrackIds = new Set<string>();
+      const deduplicated = trendingSongs.filter(song => {
+        const normalizedId = song.spotifyTrackId.toLowerCase();
+        if (seenTrackIds.has(normalizedId)) {
+          return false;
+        }
+        seenTrackIds.add(normalizedId);
+        return true;
+      });
+
+      return deduplicated.slice(0, 10); // Top 10
+    } catch (error) {
+      console.error("Error fetching trending songs:", error);
+      return [];
+    }
+  },
+  ["music-trending-songs"],
+  { revalidate: 300, tags: ["trending-songs"] } // 5 minutes cache, same as dashboard
+);
+
 export default async function MusicPage() {
   // Get translations
   const messages = await getMessages();
   const t = (key: string) => getTranslation(messages, key);
 
-  await connectDB();
-
-  // Get all users with anthem URLs
-  const users = await User.find({
-    "anthem.url": { $exists: true, $ne: "" },
-  })
-    .select("anthem")
-    .lean();
-
-  // Count occurrences of each song by Spotify track ID (ignore YouTube)
-  const songData: { [trackId: string]: { count: number; url: string } } = {};
-  
-  users.forEach((user: any) => {
-    if (user.anthem?.url) {
-      const platform = detectPlatform(user.anthem.url);
-      
-      // Only count Spotify songs
-      if (platform === "spotify") {
-        const trackId = extractSpotifyTrackId(user.anthem.url);
-        if (trackId) {
-          if (!songData[trackId]) {
-            songData[trackId] = { count: 0, url: user.anthem.url };
-          }
-          songData[trackId].count += 1;
-        }
-      }
-    }
-  });
-
-  // Convert to array and sort by count
-  const trendingSongs = Object.entries(songData)
-    .map(([trackId, data]) => ({
-      url: data.url,
-      count: data.count,
-      platform: "spotify" as const,
-      spotifyTrackId: trackId,
-      youtubeVideoId: null,
-    }))
-    .sort((a, b) => b.count - a.count)
-    .slice(0, 10); // Top 10
+  // Fetch trending songs (cached)
+  const trendingSongs = await getTrendingSongs();
 
   return (
     <div className="bg-base-100">
@@ -122,7 +136,7 @@ export default async function MusicPage() {
                 </div>
 
                 {/* Spotify Embed */}
-                {song.platform === "spotify" && song.spotifyTrackId && (
+                {song.spotifyTrackId && (
                   <div className="w-full rounded-xl overflow-hidden" style={{ height: "152px" }}>
                     <iframe
                       src={`https://open.spotify.com/embed/track/${song.spotifyTrackId}?utm_source=generator`}
@@ -132,21 +146,6 @@ export default async function MusicPage() {
                       scrolling="no"
                       style={{ overflow: "hidden" }}
                       allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture"
-                      loading="lazy"
-                    ></iframe>
-                  </div>
-                )}
-
-                {/* YouTube Embed */}
-                {song.platform === "youtube" && song.youtubeVideoId && (
-                  <div className="w-full aspect-video">
-                    <iframe
-                      src={`https://www.youtube.com/embed/${song.youtubeVideoId}`}
-                      width="100%"
-                      height="100%"
-                      frameBorder="0"
-                      allowFullScreen
-                      allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
                       loading="lazy"
                     ></iframe>
                   </div>

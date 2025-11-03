@@ -120,7 +120,8 @@ const getCities = unstable_cache(
 // Extract Spotify track ID from URL
 function extractSpotifyTrackId(url: string): string | null {
   const match = url.match(/track\/([a-zA-Z0-9]+)/);
-  return match ? match[1] : null;
+  // Normalize to lowercase to avoid case-sensitivity issues
+  return match ? match[1].toLowerCase() : null;
 }
 
 // Extract YouTube video ID from URL
@@ -185,19 +186,29 @@ const getTrendingSongs = unstable_cache(
         count: data.count,
         platform: "spotify" as const,
         spotifyTrackId: trackId,
-        youtubeVideoId: null,
+        youtubeVideoId: null as string | null,
       }))
-      .sort((a, b) => b.count - a.count)
-      .slice(0, 10); // Top 10
+      .sort((a, b) => b.count - a.count);
 
-    return trendingSongs;
+    // Additional deduplication check by track ID (case-insensitive)
+    const seenTrackIds = new Set<string>();
+    const deduplicated = trendingSongs.filter(song => {
+      const normalizedId = song.spotifyTrackId.toLowerCase();
+      if (seenTrackIds.has(normalizedId)) {
+        return false;
+      }
+      seenTrackIds.add(normalizedId);
+      return true;
+    });
+
+    return deduplicated.slice(0, 10); // Top 10
   } catch (error) {
     console.error("Error fetching trending songs:", error);
     return [];
   }
 },
 ["landing-trending-songs"],
-{ revalidate: 900, tags: ["landing-trending-songs"] } // 15 minutes
+{ revalidate: 900, tags: ["trending-songs"] } // 15 minutes - same tag as dashboard/music for unified cache invalidation
 );
 
 // Cached: Featured users for hero section
