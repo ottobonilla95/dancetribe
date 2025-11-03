@@ -30,7 +30,13 @@ export default function SettingsPage() {
 
   const fetchSettings = async () => {
     try {
-      const data = await apiClient.get("/user/settings");
+      const data = await apiClient.get("/user/settings") as {
+        notificationSettings: {
+          emailNotifications: boolean;
+          friendRequestNotifications: boolean;
+          profileLikedNotifications: boolean;
+        };
+      };
       
       // Set notification settings
       setEmailNotifications(data.notificationSettings?.emailNotifications ?? true);
