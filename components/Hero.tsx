@@ -135,7 +135,7 @@ const Hero = ({ featuredUsers = [], totalDancers = 0 }: HeroProps) => {
               </div>
 
               <div className="text-sm sm:text-base text-white">
-                <span className="font-semibold">{formattedTotal}</span> dancers connected
+                <span className="font-semibold">{formattedTotal}</span> {t('hero.dancersConnected')}
               </div>
             </div>
           </div>

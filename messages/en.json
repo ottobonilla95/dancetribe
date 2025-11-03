@@ -215,9 +215,10 @@
     "feature2b": "worldwide",
     "feature3": "Connect with teachers & practice partners",
     "feature4": "Discover trending music, cities & dance styles",
-    "ctaButton": "Join DanceCircle →",
+    "ctaButton": "Join FREE →",
     "alreadyMember": "If you already have an account, we'll log you in",
-    "exploreMore": "Explore more"
+    "exploreMore": "Explore more",
+    "dancersConnected": "dancers connected"
   },
   "landing": {
     "hottestCities": "Hottest Dance Cities 🔥",

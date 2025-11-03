@@ -2,6 +2,7 @@ import Image from "next/image";
 import connectMongo from "@/libs/mongoose";
 import User from "@/models/User";
 import { unstable_cache } from "next/cache";
+import { getMessages, getTranslation } from "@/lib/i18n";
 
 // Cached: Get random active dancers with profile pictures
 const getRandomDancers = unstable_cache(
@@ -38,6 +39,9 @@ const getRandomDancers = unstable_cache(
 
 const TestimonialsAvatars = async ({ priority }: { priority?: boolean }) => {
   const { dancers, totalDancers } = await getRandomDancers();
+  const messages = await getMessages();
+  const t = (key: string) => getTranslation(messages, key);
+  
   // Format the number with commas
   const formattedTotal = totalDancers.toLocaleString();
 
@@ -89,7 +93,7 @@ const TestimonialsAvatars = async ({ priority }: { priority?: boolean }) => {
         </div>
 
         <div className="text-base text-neutral-content/80">
-          <span className="font-semibold text-neutral-content">{formattedTotal}</span> dancers connected
+          <span className="font-semibold text-neutral-content">{formattedTotal}</span> {t('hero.dancersConnected')}
         </div>
       </div>
     </div>

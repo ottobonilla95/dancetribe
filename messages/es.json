@@ -215,9 +215,10 @@
     "feature2b": "alrededor del mundo",
     "feature3": "Conecta con profesores y encuentra compañeros de práctica",
     "feature4": "Descubre música, ciudades y estilos de baile en tendencia",
-    "ctaButton": "Únete a DanceCircle →",
+    "ctaButton": "Únete GRATIS →",
     "alreadyMember": "Si ya tienes una cuenta, te iniciaremos sesión",
-    "exploreMore": "Explora más"
+    "exploreMore": "Explora más",
+    "dancersConnected": "bailarines conectados"
   },
   "landing": {
     "hottestCities": "Ciudades de Baile Más Populares 🔥",
