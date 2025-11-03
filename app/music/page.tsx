@@ -3,6 +3,8 @@ import User from "@/models/User";
 import { FaMusic, FaFire, FaUsers } from "react-icons/fa";
 import { getMessages, getTranslation } from "@/lib/i18n";
 import { unstable_cache } from "next/cache";
+import Link from "next/link";
+import Image from "next/image";
 
 export const metadata = {
   title: "Trending Dance Music | DanceCircle",
@@ -32,11 +34,11 @@ const getTrendingSongs = unstable_cache(
       const users = await User.find({
         "anthem.url": { $exists: true, $ne: "" },
       })
-        .select("anthem")
+        .select("anthem name image username")
         .lean();
 
       // Count occurrences of each song by Spotify track ID (ignore YouTube)
-      const songData: { [trackId: string]: { count: number; url: string } } = {};
+      const songData: { [trackId: string]: { count: number; url: string; users: any[] } } = {};
       
       users.forEach((user: any) => {
         if (user.anthem?.url) {
@@ -47,9 +49,15 @@ const getTrendingSongs = unstable_cache(
             const trackId = extractSpotifyTrackId(user.anthem.url);
             if (trackId) {
               if (!songData[trackId]) {
-                songData[trackId] = { count: 0, url: user.anthem.url };
+                songData[trackId] = { count: 0, url: user.anthem.url, users: [] };
               }
               songData[trackId].count += 1;
+              songData[trackId].users.push({
+                _id: user._id,
+                name: user.name,
+                image: user.image,
+                username: user.username,
+              });
             }
           }
         }
@@ -63,6 +71,7 @@ const getTrendingSongs = unstable_cache(
           platform: "spotify" as const,
           spotifyTrackId: trackId,
           youtubeVideoId: null as string | null,
+          users: data.users,
         }))
         .sort((a, b) => b.count - a.count);
 
@@ -123,7 +132,7 @@ export default async function MusicPage() {
             {trendingSongs.map((song, index) => (
               <div key={song.url} className="card bg-base-300 shadow-xl overflow-hidden">
                 <div className="px-4 pt-4 pb-2">
-                  <div className="flex items-center gap-3">
+                  <div className="flex items-center gap-3 mb-3">
                     <div className="text-3xl font-bold text-primary">
                       #{index + 1}
                     </div>
@@ -132,6 +141,38 @@ export default async function MusicPage() {
                       {song.count} {song.count === 1 ? t('musicPage.dancer') : t('musicPage.dancers')}
                     </div>
                   </div>
+                  
+                  {/* User Avatars */}
+                  {song.users && song.users.length > 0 && (
+                    <div className="flex items-center gap-1">
+                      <div className="flex -space-x-2">
+                        {song.users.slice(0, 5).map((user: any) => (
+                          <Link
+                            key={user._id}
+                            href={`/${user.username || `dancer/${user._id}`}`}
+                            className="relative"
+                          >
+                            <div className="avatar">
+                              <div className="w-8 h-8 rounded-full ring ring-base-300 ring-offset-base-100 ring-offset-1">
+                                <Image
+                                  src={user.image || '/default-avatar.png'}
+                                  alt={user.name}
+                                  width={32}
+                                  height={32}
+                                  className="rounded-full object-cover"
+                                />
+                              </div>
+                            </div>
+                          </Link>
+                        ))}
+                      </div>
+                      {song.users.length > 5 && (
+                        <span className="text-xs text-base-content/60 ml-2">
+                          +{song.users.length - 5} more
+                        </span>
+                      )}
+                    </div>
+                  )}
                 </div>
 
                 {/* Spotify Embed */}
