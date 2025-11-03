@@ -403,29 +403,35 @@ const getTrendingSongs = unstable_cache(
         .select("anthem")
         .lean();
 
-      // Count occurrences of each song
-      const songCounts: { [key: string]: number } = {};
+      // Count occurrences of each song by Spotify track ID (ignore YouTube)
+      const songData: { [trackId: string]: { count: number; url: string } } = {};
+      
       users.forEach((user: any) => {
         if (user.anthem?.url) {
-          songCounts[user.anthem.url] = (songCounts[user.anthem.url] || 0) + 1;
+          const platform = detectPlatform(user.anthem.url);
+          
+          // Only count Spotify songs
+          if (platform === "spotify") {
+            const trackId = extractSpotifyTrackId(user.anthem.url);
+            if (trackId) {
+              if (!songData[trackId]) {
+                songData[trackId] = { count: 0, url: user.anthem.url };
+              }
+              songData[trackId].count += 1;
+            }
+          }
         }
       });
 
       // Convert to array and sort by count
-      const trendingSongs = Object.entries(songCounts)
-        .map(([url, count]) => {
-          const platform = detectPlatform(url);
-          return {
-            url,
-            count,
-            platform,
-            spotifyTrackId:
-              platform === "spotify" ? extractSpotifyTrackId(url) : null,
-            youtubeVideoId:
-              platform === "youtube" ? extractYouTubeVideoId(url) : null,
-          };
-        })
-        .filter((song) => song.spotifyTrackId || song.youtubeVideoId) // Only valid URLs
+      const trendingSongs = Object.entries(songData)
+        .map(([trackId, data]) => ({
+          url: data.url,
+          count: data.count,
+          platform: "spotify" as const,
+          spotifyTrackId: trackId,
+          youtubeVideoId: null,
+        }))
         .sort((a, b) => b.count - a.count)
         .slice(0, 10); // Top 10
 
