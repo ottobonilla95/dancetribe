@@ -69,7 +69,7 @@ export default async function PublicProfile({ params }: Props) {
   try {
     user = await User.findById(params.userId)
       .select(
-        "name username email image dateOfBirth hideAge bio dancingStartYear city citiesVisited trips danceStyles anthem socialMedia danceRole gender nationality relationshipStatus createdAt likedBy friends friendRequestsSent friendRequestsReceived isTeacher isDJ isPhotographer isEventOrganizer teacherProfile djProfile photographerProfile eventOrganizerProfile professionalContact jackAndJillCompetitions sharedOnSocialMedia"
+        "name username email image dateOfBirth hideAge bio dancingStartYear city citiesVisited trips danceStyles anthem socialMedia danceRole gender nationality relationshipStatus createdAt likedBy friends friendRequestsSent friendRequestsReceived isTeacher isDJ isPhotographer isEventOrganizer teacherProfile djProfile photographerProfile eventOrganizerProfile professionalContact jackAndJillCompetitions sharedOnSocialMedia heroSequence"
       )
       .populate({
         path: "friends",
@@ -645,11 +645,48 @@ export default async function PublicProfile({ params }: Props) {
             <div className="lg:col-span-2 space-y-6">
               {/* Admin Controls - Only visible when admin mode is enabled */}
               {isAdminMode && (
-                <AdminSharedCheckbox 
-                  userId={params.userId} 
-                  initialSharedStatus={userData.sharedOnSocialMedia || false}
-                  instagramHandle={userData.socialMedia?.instagram}
-                />
+                <>
+                  <AdminSharedCheckbox 
+                    userId={params.userId} 
+                    initialSharedStatus={userData.sharedOnSocialMedia || false}
+                    instagramHandle={userData.socialMedia?.instagram}
+                  />
+                  
+                  {/* Hero Sequence Control */}
+                  <div className="card bg-amber-50 dark:bg-amber-950 border-2 border-amber-500 shadow-xl">
+                    <div className="card-body">
+                      <h3 className="card-title text-amber-800 dark:text-amber-200">
+                        🌟 Hero Featured Position
+                      </h3>
+                      <form action={`/api/admin/users/${params.userId}/hero-sequence`} method="POST" className="flex gap-2">
+                        <input
+                          type="number"
+                          name="heroSequence"
+                          min="1"
+                          max="999"
+                          placeholder="e.g., 1 (first position)"
+                          defaultValue={userData.heroSequence || ''}
+                          className="input input-bordered flex-1"
+                        />
+                        <button type="submit" className="btn btn-primary">
+                          Update
+                        </button>
+                        <button 
+                          type="submit" 
+                          formAction={`/api/admin/users/${params.userId}/hero-sequence?clear=true`}
+                          className="btn btn-ghost"
+                        >
+                          Clear
+                        </button>
+                      </form>
+                      {userData.heroSequence && (
+                        <p className="text-xs text-success mt-2">
+                          ✅ Currently featured at position {userData.heroSequence}
+                        </p>
+                      )}
+                    </div>
+                  </div>
+                </>
               )}
 
               {/* Dance Information */}
