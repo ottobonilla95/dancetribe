@@ -365,8 +365,7 @@ const getCommunityStats = unstable_cache(
 // Extract Spotify track ID from URL
 function extractSpotifyTrackId(url: string): string | null {
   const match = url.match(/track\/([a-zA-Z0-9]+)/);
-  // Normalize to lowercase to avoid case-sensitivity issues
-  return match ? match[1].toLowerCase() : null;
+  return match ? match[1] : null;
 }
 
 // Extract YouTube video ID from URL
