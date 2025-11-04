@@ -34,6 +34,7 @@ import { getMessages, getTranslation } from "@/lib/i18n";
 import ProfilePictureModal from "@/components/ProfilePictureModal";
 import AdminSharedCheckbox from "@/components/AdminSharedCheckbox";
 import AdminSocialMediaEdit from "@/components/AdminSocialMediaEdit";
+import ProfileViewTracker from "@/components/ProfileViewTracker";
 import { cookies } from "next/headers";
 import config from "@/config";
 
@@ -420,6 +421,9 @@ export default async function PublicProfile({ params }: Props) {
   return (
     <LikesProvider>
       <div className="min-h-screen p-4 bg-base-100">
+        {/* Track profile views */}
+        <ProfileViewTracker profileUserId={params.userId} />
+        
         <div className="max-w-4xl mx-auto">
           {/* Admin Shared Indicator Badge - Top Right */}
           {isAdminMode && (

@@ -349,6 +349,20 @@ const userSchema = new mongoose.Schema(
         default: true, // Enabled by default
       },
     },
+    // Profile view tracking
+    profileViews: [
+      {
+        viewer: {
+          type: mongoose.Schema.Types.ObjectId,
+          ref: "User",
+          required: true,
+        },
+        viewedAt: {
+          type: Date,
+          default: Date.now,
+        },
+      },
+    ],
   },
   {
     timestamps: true,
