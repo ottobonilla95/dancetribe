@@ -810,6 +810,13 @@
     "instagramTip": "Tip: Use \"Share my profile\" from your profile page to copy your link, then add it to your Instagram bio or share with friends!",
     "instagramCopied": "Message copied! Paste it in your Instagram Story or post!"
   },
+  "inviteBanner": {
+    "message": "Know other dancers?",
+    "invite": "Invite your crew - find each other anywhere! 🌍",
+    "share": "Share",
+    "copy": "Copy",
+    "copied": "Copied!"
+  },
   "dancerCard": {
     "traveler": "Traveler",
     "openToPractice": "Open to practice"

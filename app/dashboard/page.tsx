@@ -19,6 +19,7 @@ import TrendyCountries from "@/components/TrendyCountries";
 import TripOverlaps from "@/components/TripOverlaps";
 import DiscoverySettings from "@/components/DiscoverySettings";
 import YourCityPreview from "@/components/YourCityPreview";
+import InviteFriendsBanner from "@/components/InviteFriendsBanner";
 import Link from "next/link";
 import { getMessages, getTranslation } from "@/lib/i18n";
 import { unstable_cache } from "next/cache";
@@ -853,6 +854,19 @@ async function getCities(): Promise<CityType[]> {
   return cities.slice(0, 6);
 }
 
+// Get user's friends count for invite banner
+async function getUserFriendsCount(userId: string): Promise<number> {
+  try {
+    await connectMongo();
+    const user: any = await User.findById(userId).select("friends").lean();
+    if (!user || !user.friends) return 0;
+    return user.friends.length;
+  } catch (error) {
+    console.error("Error fetching friends count:", error);
+    return 0;
+  }
+}
+
 // Get user preferences for discovery settings
 async function getUserPreferences(userId: string) {
   try {
@@ -1003,6 +1017,7 @@ export default async function Dashboard() {
     friendsTrips,
     userPreferences,
     userCityStats,
+    friendsCount,
   ] = await Promise.all([
     getInitialDancers(session.user.id),
     getDanceStyles(),
@@ -1015,11 +1030,15 @@ export default async function Dashboard() {
     getFriendsTrips(session.user.id),
     getUserPreferences(session.user.id),
     getUserCityStats(session.user.id),
+    getUserFriendsCount(session.user.id),
   ]);
 
   return (
     <main className="min-h-screen pb-24 py-8">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        {/* Invite Friends Banner */}
+        <InviteFriendsBanner friendsCount={friendsCount} />
+
         {/* Hot Cities Section */}
         <h2 className="max-w-3xl font-extrabold text-xl md:text-2xl tracking-tight mb-2 md:mb-8">
           {t("dashboard.hottestCities")}

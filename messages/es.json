@@ -810,6 +810,13 @@
     "instagramTip": "Consejo: Usa \"Compartir mi perfil\" desde tu página de perfil para copiar tu enlace, luego agrégalo a tu bio de Instagram o compártelo con amigos!",
     "instagramCopied": "¡Mensaje copiado! Pégalo en tu Instagram Story o publicación!"
   },
+  "inviteBanner": {
+    "message": "¿Conoces otros bailarines?",
+    "invite": "¡Invita a tu gente - encuéntralos en cualquier ciudad! 🌍",
+    "share": "Compartir",
+    "copy": "Copiar",
+    "copied": "¡Copiado!"
+  },
   "dancerCard": {
     "traveler": "Viajero",
     "openToPractice": "Abierto a practicar"
