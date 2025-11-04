@@ -43,6 +43,111 @@ interface Props {
   };
 }
 
+// Generate dynamic SEO metadata for dancer profiles
+export async function generateMetadata({ params }: Props) {
+  await connectMongo();
+
+  if (!isValidObjectId(params.userId)) {
+    return {
+      title: "Dancer Not Found",
+    };
+  }
+
+  try {
+    const user: any = await User.findById(params.userId)
+      .select("name username bio danceStyles city isTeacher isDJ isPhotographer isEventOrganizer")
+      .populate({
+        path: "city",
+        model: City,
+        select: "name country",
+        populate: {
+          path: "country",
+          model: Country,
+          select: "name",
+        },
+      })
+      .populate({
+        path: "danceStyles.danceStyle",
+        model: DanceStyle,
+        select: "name",
+      })
+      .lean();
+
+    if (!user) {
+      return {
+        title: "Dancer Not Found",
+      };
+    }
+
+    // Build professional roles
+    const roles = [];
+    if (user.isTeacher) roles.push("Teacher");
+    if (user.isDJ) roles.push("DJ");
+    if (user.isPhotographer) roles.push("Photographer");
+    if (user.isEventOrganizer) roles.push("Event Organizer");
+
+    // Get dance styles
+    const danceStyles = user.danceStyles
+      ?.map((ds: any) => ds.danceStyle?.name)
+      .filter(Boolean)
+      .join(", ") || "Dancer";
+
+    // Build location
+    const location = user.city?.name
+      ? `${user.city.name}${user.city.country?.name ? `, ${user.city.country.name}` : ""}`
+      : "";
+
+    // Build title
+    const roleText = roles.length > 0 ? roles.join(" & ") : "Dancer";
+    const title = location
+      ? `${user.name} - ${roleText} | ${danceStyles} in ${location}`
+      : `${user.name} - ${roleText} | ${danceStyles}`;
+
+    // Build description
+    const bioExcerpt = user.bio ? user.bio.substring(0, 150).trim() + "..." : "";
+    const description = bioExcerpt
+      ? `${user.name} - ${roleText} specializing in ${danceStyles}. ${bioExcerpt}`
+      : `Connect with ${user.name}, ${roleText} specializing in ${danceStyles}${location ? ` in ${location}` : ""}. View profile, dance styles, and connect on DanceCircle.`;
+
+    // Build keywords
+    const keywords = [
+      user.name,
+      danceStyles,
+      ...roles,
+      location,
+      user.city?.name,
+      user.city?.country?.name,
+      "dance community",
+      "dance partner",
+    ]
+      .filter(Boolean)
+      .join(", ");
+
+    return {
+      title,
+      description,
+      keywords,
+      openGraph: {
+        title,
+        description,
+        images: user.image ? [user.image] : [],
+        type: "profile",
+      },
+      twitter: {
+        card: "summary_large_image",
+        title,
+        description,
+        images: user.image ? [user.image] : [],
+      },
+    };
+  } catch (error) {
+    console.error("Error generating dancer metadata:", error);
+    return {
+      title: "Dancer Profile",
+    };
+  }
+}
+
 export default async function PublicProfile({ params }: Props) {
   await connectMongo();
 
