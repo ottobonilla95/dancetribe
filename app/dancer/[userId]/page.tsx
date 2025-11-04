@@ -448,9 +448,9 @@ export default async function PublicProfile({ params }: Props) {
               <div className="flex gap-2 items-center">
                 <FaHeart className="text-lg" />
 
-                <h3 className="font-bold">
+                <div className="font-bold">
                   {t('dancer.wantToConnect').replace('{name}', userData.name?.split(" ")[0] || '')}
-                </h3>
+                </div>
               </div>
               {/* </div> */}
               <div className="flex-none">
@@ -575,7 +575,7 @@ export default async function PublicProfile({ params }: Props) {
                     <div className="mt-4 -mx-[2rem] px-8 py-3 sm:rounded-lg sm:mx-0 sm:px-6 bg-gradient-to-br from-primary/20 to-secondary/20 border-y-2 sm:border-2 border-primary/40">
                       <div className="flex items-center gap-2 mb-2">
                         <span className="text-xl">🎓</span>
-                        <h3 className="font-bold">{t('profile.danceTeacher')}</h3>
+                        <h2 className="font-bold">{t('profile.danceTeacher')}</h2>
                       </div>
 
                       {userData.teacherProfile.yearsOfExperience !==
@@ -609,7 +609,7 @@ export default async function PublicProfile({ params }: Props) {
                     <div className="mt-4 -mx-[2rem] px-8 py-3 sm:rounded-lg sm:mx-0 sm:px-6 bg-gradient-to-br from-secondary/20 to-accent/20 border-y-2 sm:border-2 border-secondary/40">
                       <div className="flex items-center gap-2 mb-2">
                         <span className="text-xl">🎵</span>
-                        <h3 className="font-bold">DJ</h3>
+                        <h2 className="font-bold">DJ</h2>
                       </div>
 
                       {userData.djProfile.djName && (
@@ -644,7 +644,7 @@ export default async function PublicProfile({ params }: Props) {
                       <div className="flex items-center gap-2 mb-2 flex-wrap">
                         <div className="flex items-center gap-2">
                           <span className="text-xl">📷</span>
-                          <h3 className="font-bold">{t('profile.photographer')}</h3>
+                          <h2 className="font-bold">{t('profile.photographer')}</h2>
                         </div>
                       </div>
 
@@ -687,7 +687,7 @@ export default async function PublicProfile({ params }: Props) {
                       <div className="flex items-center gap-2 mb-2 flex-wrap">
                         <div className="flex items-center gap-2">
                           <span className="text-xl">🎪</span>
-                          <h3 className="font-bold">Event Organizer</h3>
+                          <h2 className="font-bold">Event Organizer</h2>
                         </div>
                       </div>
 
@@ -760,9 +760,9 @@ export default async function PublicProfile({ params }: Props) {
                   {/* Hero Sequence Control */}
                   <div className="card bg-amber-50 dark:bg-amber-950 border-2 border-amber-500 shadow-xl">
                     <div className="card-body">
-                      <h3 className="card-title text-amber-800 dark:text-amber-200">
+                      <h2 className="card-title text-amber-800 dark:text-amber-200">
                         🌟 Hero Featured Position
-                      </h3>
+                      </h2>
                       <form action={`/api/admin/users/${params.userId}/hero-sequence`} method="POST" className="flex gap-2">
                         <input
                           type="number"
@@ -797,7 +797,7 @@ export default async function PublicProfile({ params }: Props) {
               {/* Dance Information */}
               <div className="card bg-base-200 shadow-xl">
                 <div className="card-body">
-                  <h3 className="card-title text-xl mb-4">{t('profile.danceProfile')}</h3>
+                  <h2 className="card-title text-xl mb-4">{t('profile.danceProfile')}</h2>
 
                   {/* Bio */}
                   {userData.bio && (
@@ -899,9 +899,9 @@ export default async function PublicProfile({ params }: Props) {
               {/* Achievement Badges */}
               <div className="card bg-base-200 shadow-xl">
                 <div className="card-body">
-                  <h3 className="card-title text-xl mb-4">
+                  <h2 className="card-title text-xl mb-4">
                     🏆 {t('profile.achievementBadges')}
-                  </h3>
+                  </h2>
                   <AchievementBadges
                     badges={calculateUserBadges(userData)}
                     maxDisplay={6}
@@ -913,7 +913,7 @@ export default async function PublicProfile({ params }: Props) {
               {userData.jackAndJillCompetitions && userData.jackAndJillCompetitions.length > 0 && (
                 <div className="card bg-base-200 shadow-xl">
                   <div className="card-body">
-                    <h3 className="card-title text-xl mb-4">🏅 {t('profile.jackAndJill')}</h3>
+                    <h2 className="card-title text-xl mb-4">🏅 {t('profile.jackAndJill')}</h2>
                     <div className="space-y-3">
                       {userData.jackAndJillCompetitions
                         .sort((a: any, b: any) => {
@@ -970,9 +970,9 @@ export default async function PublicProfile({ params }: Props) {
                   userData.socialMedia.youtube) && (
                   <div className="card bg-base-200 shadow-xl">
                     <div className="card-body">
-                      <h3 className="card-title text-xl mb-4">
+                      <h2 className="card-title text-xl mb-4">
                         🌐 {t('profile.socialMedia')}
-                      </h3>
+                      </h2>
                       <div className="flex gap-3">
                         {userData.socialMedia.instagram && (
                           <a
@@ -1034,7 +1034,7 @@ export default async function PublicProfile({ params }: Props) {
                 return (
                   <div className="card bg-base-200 shadow-xl">
                     <div className="card-body">
-                      <h3 className="card-title text-xl mb-4">✈️ Upcoming Trips</h3>
+                      <h2 className="card-title text-xl mb-4">✈️ Upcoming Trips</h2>
                       <div className="space-y-3">
                         {upcomingTrips.map((trip: any) => (
                           <Link
@@ -1090,7 +1090,7 @@ export default async function PublicProfile({ params }: Props) {
               {userData.anthem && userData.anthem.url && (
                 <div className="card bg-base-200 shadow-xl">
                   <div className="card-body">
-                    <h3 className="card-title text-xl mb-4">🎵 {t('profile.danceAnthem')}</h3>
+                    <h2 className="card-title text-xl mb-4">🎵 {t('profile.danceAnthem')}</h2>
                     <div className="rounded-lg">
                       {/* Iframe for Spotify/YouTube */}
                       {(() => {
@@ -1152,9 +1152,9 @@ export default async function PublicProfile({ params }: Props) {
           {!isLoggedIn && (
             <div className="alert alert-info shadow-lg mt-4">
               <div className="flex-1 text-center">
-                <h3 className="font-bold text-lg mb-3">
+                <h2 className="font-bold text-lg mb-3">
                   ⭐️ Create your dance profile now
-                </h3>
+                </h2>
                 <Link
                   href="/api/auth/signin"
                   className="btn btn-primary btn-sm gap-2"
