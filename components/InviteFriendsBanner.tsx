@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { FaUserPlus, FaTimes, FaWhatsapp, FaCopy, FaCheck } from "react-icons/fa";
+import { FaTimes, FaWhatsapp, FaCopy, FaCheck } from "react-icons/fa";
 import { useTranslation } from "@/components/I18nProvider";
 import Link from "next/link";
 
@@ -68,15 +68,10 @@ export default function InviteFriendsBanner({ friendsCount }: InviteFriendsBanne
       </button>
 
       <div className="flex items-center gap-3 pr-6">
-        {/* Icon */}
-        <div className="flex-shrink-0">
-          <FaUserPlus className="text-2xl text-primary" />
-        </div>
-
         {/* Content */}
         <div className="flex-1 min-w-0">
           <p className="text-sm text-base-content/90">
-            💃 <span className="font-semibold">{t('inviteBanner.message') || "Love DanceCircle?"}</span> {t('inviteBanner.invite') || "Invite your dance friends to join the community!"}
+            💃 <span className="font-semibold">{t('inviteBanner.message') || "Know other dancers?"}</span> {t('inviteBanner.invite') || "Invite your crew - they'll love it too!"}
           </p>
         </div>
 
