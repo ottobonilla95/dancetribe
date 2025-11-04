@@ -2,6 +2,8 @@ import { MetadataRoute } from 'next';
 import connectMongo from '@/libs/mongoose';
 import User from '@/models/User';
 import City from '@/models/City';
+import Country from '@/models/Country';
+import Continent from '@/models/Continent';
 import DanceStyle from '@/models/DanceStyle';
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
@@ -18,8 +20,18 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       .select('username updatedAt')
       .lean();
 
-    // Fetch all cities
-    const cities = await City.find({ rank: { $gt: 0 } })
+    // Fetch all cities with dancers
+    const cities = await City.find({ totalDancers: { $gt: 0 } })
+      .select('_id updatedAt')
+      .lean();
+
+    // Fetch all active countries (totalDancers field may not be populated, so just get all active)
+    const countries = await Country.find({ isActive: true })
+      .select('_id updatedAt')
+      .lean();
+
+    // Fetch all active continents (totalDancers field may not be populated, so just get all active)
+    const continents = await Continent.find({ isActive: true })
       .select('_id updatedAt')
       .lean();
 
@@ -41,6 +53,18 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
         lastModified: new Date(),
         changeFrequency: 'weekly' as const,
         priority: 0.8,
+      },
+      {
+        url: `${baseUrl}/cities`,
+        lastModified: new Date(),
+        changeFrequency: 'daily' as const,
+        priority: 0.7,
+      },
+      {
+        url: `${baseUrl}/countries`,
+        lastModified: new Date(),
+        changeFrequency: 'daily' as const,
+        priority: 0.7,
       },
       {
         url: `${baseUrl}/privacy-policy`,
@@ -72,6 +96,22 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       priority: 0.6,
     }));
 
+    // Country pages (public)
+    const countryPages = countries.map((country: any) => ({
+      url: `${baseUrl}/country/${country._id.toString()}`,
+      lastModified: country.updatedAt || new Date(),
+      changeFrequency: 'weekly' as const,
+      priority: 0.6,
+    }));
+
+    // Continent pages (public)
+    const continentPages = continents.map((continent: any) => ({
+      url: `${baseUrl}/continent/${continent._id.toString()}`,
+      lastModified: continent.updatedAt || new Date(),
+      changeFrequency: 'weekly' as const,
+      priority: 0.5,
+    }));
+
     // Dance style pages (note: these are now private, but keeping for when we make them public)
     // Commenting out for now since they require auth
     /*
@@ -87,6 +127,8 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       ...staticPages,
       ...userPages,
       ...cityPages,
+      ...countryPages,
+      ...continentPages,
       // ...danceStylePages, // Uncomment when dance styles are public
     ];
   } catch (error) {

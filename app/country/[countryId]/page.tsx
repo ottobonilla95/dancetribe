@@ -37,6 +37,82 @@ interface Props {
   };
 }
 
+// Generate dynamic SEO metadata
+export async function generateMetadata({ params }: Props) {
+  await connectMongo();
+
+  if (!isValidObjectId(params.countryId)) {
+    return {
+      title: "Country Not Found",
+    };
+  }
+
+  try {
+    const country: any = await Country.findById(params.countryId)
+      .populate({
+        path: "continent",
+        model: Continent,
+        select: "name code",
+      })
+      .lean();
+
+    if (!country) {
+      return {
+        title: "Country Not Found",
+      };
+    }
+
+    // Get ALL dance styles from database for SEO (fast, no aggregation)
+    const allDanceStyles = await DanceStyle.find({ isActive: true })
+      .select('name')
+      .sort({ name: 1 })
+      .lean();
+
+    // Get all cities in this country
+    const countryObjectId = new mongoose.Types.ObjectId(params.countryId);
+    const citiesInCountry = await City.find({
+      country: countryObjectId,
+      isActive: true,
+    })
+      .select("_id")
+      .lean();
+
+    const cityIds = citiesInCountry.map((city: any) => city._id);
+
+    const totalDancers = await User.countDocuments({
+      city: { $in: cityIds },
+      isProfileComplete: true,
+    });
+
+    // Build dance styles string for SEO (all styles, not just ones in this country)
+    const danceStylesText = allDanceStyles.map((ds: any) => ds.name).join(", ");
+    const topStyles = allDanceStyles.slice(0, 3).map((ds: any) => ds.name).join(", ");
+
+    const title = `${country.name} Dance Community | ${topStyles || "Dancers"} in ${country.name}`;
+    const description = `Discover ${totalDancers} dancers across ${country.name}. Connect with ${danceStylesText || "dance"} communities, find partners, teachers, and events throughout ${country.name}.`;
+    
+    return {
+      title,
+      description,
+      keywords: `${country.name} dance, ${country.name} dancers, ${danceStylesText}, dance community ${country.name}, dance partners ${country.name}, ${country.name} dance scene, dance classes ${country.name}`,
+      openGraph: {
+        title,
+        description,
+      },
+      twitter: {
+        card: "summary_large_image",
+        title,
+        description,
+      },
+    };
+  } catch (error) {
+    console.error("Error generating country metadata:", error);
+    return {
+      title: "Country Page",
+    };
+  }
+}
+
 export default async function CountryPage({ params, searchParams }: Props) {
   await connectMongo();
 

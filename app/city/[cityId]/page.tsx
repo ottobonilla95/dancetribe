@@ -35,6 +35,74 @@ interface Props {
   };
 }
 
+// Generate dynamic SEO metadata
+export async function generateMetadata({ params }: Props) {
+  await connectMongo();
+
+  if (!isValidObjectId(params.cityId)) {
+    return {
+      title: "City Not Found",
+    };
+  }
+
+  try {
+    const city: any = await City.findById(params.cityId)
+      .populate({
+        path: "country",
+        model: Country,
+        select: "name code",
+      })
+      .lean();
+
+    if (!city) {
+      return {
+        title: "City Not Found",
+      };
+    }
+
+    // Get ALL dance styles from database for SEO (fast, no aggregation)
+    const allDanceStyles = await DanceStyle.find({ isActive: true })
+      .select('name')
+      .sort({ name: 1 })
+      .lean();
+
+    const cityObjectId = new mongoose.Types.ObjectId(params.cityId);
+    const totalDancers = await User.countDocuments({
+      city: cityObjectId,
+      isProfileComplete: true,
+    });
+
+    // Build dance styles string for SEO (all styles, not just ones in this city)
+    const danceStylesText = allDanceStyles.map((ds: any) => ds.name).join(", ");
+    const topStyles = allDanceStyles.slice(0, 3).map((ds: any) => ds.name).join(", ");
+
+    const title = `${city.name} Dance Community | ${topStyles || "Dancers"} in ${city.name}`;
+    const description = `Connect with ${totalDancers} dancers in ${city.name}, ${city.country?.name}. Find ${danceStylesText || "dance"} partners, classes, and events. Join the ${city.name} dance scene!`;
+    
+    return {
+      title,
+      description,
+      keywords: `${city.name} dance, ${city.name} dancers, ${danceStylesText}, dance community ${city.name}, ${city.name} ${city.country?.name} dance, dance partners ${city.name}, dance classes ${city.name}`,
+      openGraph: {
+        title,
+        description,
+        images: city.image ? [city.image] : [],
+      },
+      twitter: {
+        card: "summary_large_image",
+        title,
+        description,
+        images: city.image ? [city.image] : [],
+      },
+    };
+  } catch (error) {
+    console.error("Error generating city metadata:", error);
+    return {
+      title: "City Page",
+    };
+  }
+}
+
 export default async function CityPage({ params, searchParams }: Props) {
   await connectMongo();
 
