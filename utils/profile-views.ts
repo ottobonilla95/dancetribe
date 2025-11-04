@@ -5,7 +5,7 @@ import User from "@/models/User";
  */
 export async function getProfileViewCount(userId: string, daysAgo: number = 7): Promise<number> {
   try {
-    const user = await User.findById(userId).select('profileViews').lean();
+    const user: any = await User.findById(userId).select('profileViews').lean();
     if (!user || !user.profileViews) return 0;
 
     const cutoffDate = new Date();
@@ -27,7 +27,7 @@ export async function getProfileViewCount(userId: string, daysAgo: number = 7): 
  */
 export async function getUniqueViewerCount(userId: string, daysAgo: number = 7): Promise<number> {
   try {
-    const user = await User.findById(userId).select('profileViews').lean();
+    const user: any = await User.findById(userId).select('profileViews').lean();
     if (!user || !user.profileViews) return 0;
 
     const cutoffDate = new Date();
@@ -53,7 +53,7 @@ export async function getUniqueViewerCount(userId: string, daysAgo: number = 7):
  */
 export async function getRecentViewers(userId: string, limit: number = 5, daysAgo: number = 7) {
   try {
-    const user = await User.findById(userId)
+    const user: any = await User.findById(userId)
       .select('profileViews')
       .populate({
         path: 'profileViews.viewer',
