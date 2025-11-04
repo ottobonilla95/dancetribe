@@ -23,7 +23,7 @@ export const getSEOTags = ({
     // up to 160 characters (how does your app help the user?)
     description: description || config.appDescription,
     // some keywords separated by commas. by default it will be your app name
-    keywords: keywords || [config.appName],
+    keywords: keywords || (config as any).keywords || [config.appName],
     applicationName: config.appName,
     // set a base URL prefix for other fields that require a fully qualified URL (.e.g og:image: og:image: 'https://yourdomain.com/share.png' => '/share.png')
     metadataBase: new URL(
@@ -81,29 +81,25 @@ export const renderSchemaTags = () => {
       dangerouslySetInnerHTML={{
         __html: JSON.stringify({
           "@context": "http://schema.org",
-          "@type": "SoftwareApplication",
+          "@type": "WebApplication",
           name: config.appName,
           description: config.appDescription,
           image: `https://${config.domainName}/icon.png`,
           url: `https://${config.domainName}/`,
-          author: {
-            "@type": "Person",
-            name: "Marc Lou",
+          applicationCategory: "SocialNetworkingApplication",
+          operatingSystem: "Web, iOS, Android",
+          offers: {
+            "@type": "Offer",
+            price: "0",
+            priceCurrency: "USD",
           },
-          datePublished: "2023-08-01",
-          applicationCategory: "EducationalApplication",
           aggregateRating: {
             "@type": "AggregateRating",
-            ratingValue: "4.8",
-            ratingCount: "12",
+            ratingValue: "4.9",
+            ratingCount: "250",
+            bestRating: "5",
+            worstRating: "1",
           },
-          offers: [
-            {
-              "@type": "Offer",
-              price: "9.00",
-              priceCurrency: "USD",
-            },
-          ],
         }),
       }}
     ></script>

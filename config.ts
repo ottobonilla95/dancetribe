@@ -9,6 +9,8 @@ const config = {
   // REQUIRED: a short description of your app for SEO tags (can be overwritten)
   appDescription:
     "Connect with dancers worldwide! Discover music, cities, events, and dance communities. Find festivals, socials, DJs, and explore new places through dance.",
+  // SEO Keywords for homepage
+  keywords: "dance community, salsa dancers, bachata community, kizomba dancers, social dancing, dance partners, dance events, dance festivals, dance teachers, dance DJs, dance network, zouk dancing, tango community, swing dancing, lindy hop, west coast swing, dance travel, dance cities",
   // REQUIRED (no https://, not trailing slash at the end, just the naked domain)
   domainName: "dancecircle.co",
   crisp: {
