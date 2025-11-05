@@ -3,6 +3,7 @@
 import { useSession } from "next-auth/react";
 import { useEffect, useState } from "react";
 import Link from "next/link";
+import { useSearchParams, useRouter } from "next/navigation";
 import { FaHeart, FaTrophy, FaChalkboardTeacher, FaMusic, FaCamera } from "react-icons/fa";
 import { useTranslation } from "@/components/I18nProvider";
 
@@ -30,10 +31,26 @@ type LeaderboardData = {
 export default function LeaderboardsPage() {
   const { data: session } = useSession();
   const { t } = useTranslation();
-  const [activeTab, setActiveTab] = useState<'mostLiked' | 'jjChampions' | 'jjPodium' | 'jjParticipation' | 'mostLikedTeachers' | 'mostLikedDJs' | 'mostLikedPhotographers'>('mostLiked');
+  const searchParams = useSearchParams();
+  const router = useRouter();
+  const categoryParam = searchParams.get('category') as 'mostLiked' | 'jjChampions' | 'jjPodium' | 'jjParticipation' | 'mostLikedTeachers' | 'mostLikedDJs' | 'mostLikedPhotographers' | null;
+  
+  const [activeTab, setActiveTab] = useState<'mostLiked' | 'jjChampions' | 'jjPodium' | 'jjParticipation' | 'mostLikedTeachers' | 'mostLikedDJs' | 'mostLikedPhotographers'>(categoryParam || 'mostLiked');
   const [data, setData] = useState<LeaderboardData | null>(null);
   const [loading, setLoading] = useState(true);
   const currentUserId = session?.user?.id;
+
+  const handleTabChange = (tabId: 'mostLiked' | 'jjChampions' | 'jjPodium' | 'jjParticipation' | 'mostLikedTeachers' | 'mostLikedDJs' | 'mostLikedPhotographers') => {
+    setActiveTab(tabId);
+    router.push(`/leaderboards?category=${tabId}`);
+  };
+
+  // Update active tab when URL parameter changes
+  useEffect(() => {
+    if (categoryParam && ['mostLiked', 'jjChampions', 'jjPodium', 'jjParticipation', 'mostLikedTeachers', 'mostLikedDJs', 'mostLikedPhotographers'].includes(categoryParam)) {
+      setActiveTab(categoryParam);
+    }
+  }, [categoryParam]);
 
   useEffect(() => {
     async function fetchLeaderboards() {
@@ -132,7 +149,7 @@ export default function LeaderboardsPage() {
           {tabs.map((tab) => (
             <button
               key={tab.id}
-              onClick={() => setActiveTab(tab.id as any)}
+              onClick={() => handleTabChange(tab.id as any)}
               className={`btn gap-2 ${
                 activeTab === tab.id ? 'btn-primary' : 'btn-outline'
               }`}

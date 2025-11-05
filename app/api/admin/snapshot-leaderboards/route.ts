@@ -2,6 +2,7 @@ import { NextResponse, NextRequest } from "next/server";
 import { getServerSession } from "next-auth/next";
 import { authOptions } from "@/libs/next-auth";
 import { snapshotAllLeaderboards } from "@/utils/leaderboard-snapshot";
+import config from "@/config";
 
 /**
  * POST /api/admin/snapshot-leaderboards
@@ -16,18 +17,15 @@ export async function POST(req: NextRequest) {
     // Check authentication
     const session = await getServerSession(authOptions);
     
-    if (!session?.user) {
+    if (!session?.user?.email) {
       return NextResponse.json(
         { error: "Unauthorized" },
         { status: 401 }
       );
     }
 
-    // Check admin permission (you should have an isAdmin field in your User model)
-    // For now, checking if user email matches admin email
-    const adminEmails = process.env.ADMIN_EMAILS?.split(',') || [];
-    
-    if (!adminEmails.includes(session.user.email || '')) {
+    // Check admin permission
+    if (session.user.email !== config.admin.email) {
       return NextResponse.json(
         { error: "Forbidden - Admin access required" },
         { status: 403 }

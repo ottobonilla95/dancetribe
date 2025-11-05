@@ -25,9 +25,10 @@ interface RankingEntry {
 export async function calculateRankings(category: LeaderboardCategory): Promise<RankingEntry[]> {
   await connectMongo();
 
-  // Get admin user to exclude from leaderboards
-  const adminUser = await User.findOne({ email: config.admin.email }).select('_id').lean() as any;
-  const adminId = adminUser?._id;
+  // TEMPORARILY DISABLED FOR TESTING - Get admin user to exclude from leaderboards
+  // const adminUser = await User.findOne({ email: config.admin.email }).select('_id').lean() as any;
+  // const adminId = adminUser?._id;
+  const adminId = null; // ⚠️ TESTING ONLY - Remove this line after testing!
 
   let aggregationPipeline: any[] = [];
 
@@ -256,6 +257,7 @@ export async function calculateRankings(category: LeaderboardCategory): Promise<
 
 /**
  * Snapshot all leaderboard categories
+ * Uses upsert to prevent duplicate snapshots on the same day
  */
 export async function snapshotAllLeaderboards(): Promise<{ success: boolean; snapshots: number; error?: string }> {
   try {
@@ -273,17 +275,37 @@ export async function snapshotAllLeaderboards(): Promise<{ success: boolean; sna
 
     let snapshotsCreated = 0;
     const now = new Date();
+    
+    // Get start and end of today for deduplication
+    const startOfDay = new Date(now);
+    startOfDay.setHours(0, 0, 0, 0);
+    const endOfDay = new Date(now);
+    endOfDay.setHours(23, 59, 59, 999);
 
     for (const category of categories) {
       const rankings = await calculateRankings(category);
 
       if (rankings.length > 0) {
-        await LeaderboardSnapshot.create({
-          date: now,
-          category,
-          rankings
-        });
-        snapshotsCreated++;
+        // Use updateOne with upsert to prevent duplicates on the same day
+        const result = await LeaderboardSnapshot.updateOne(
+          {
+            category,
+            date: { $gte: startOfDay, $lte: endOfDay }
+          },
+          {
+            $set: {
+              date: now,
+              category,
+              rankings
+            }
+          },
+          { upsert: true }
+        );
+        
+        // Count as created if it was a new snapshot or updated
+        if (result.upsertedCount > 0 || result.modifiedCount > 0) {
+          snapshotsCreated++;
+        }
       }
     }
 

@@ -27,8 +27,11 @@ export function generateWeeklyDigestHTML(data: WeeklyDigestData): string {
         : `Most Liked: #${change.current} (↑${Math.abs(change.change)})`;
       leaderboardItems.push(`
         <div style="padding: 15px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); border-radius: 8px; margin-bottom: 10px;">
-          <div style="color: white; font-size: 18px; font-weight: bold;">${emoji} ${text}</div>
-          ${!change.isNew ? `<div style="color: rgba(255,255,255,0.9); font-size: 14px; margin-top: 5px;">Keep it up! You're climbing.</div>` : ''}
+          <div style="color: white; font-size: 18px; font-weight: bold; margin-bottom: 10px;">${emoji} ${text}</div>
+          ${!change.isNew ? `<div style="color: rgba(255,255,255,0.9); font-size: 14px; margin-bottom: 10px;">Keep it up! You're climbing.</div>` : ''}
+          <a href="https://${config.domainName}/leaderboards?category=mostLiked" style="display: inline-block; background: white; color: #667eea; padding: 8px 16px; text-decoration: none; border-radius: 4px; font-weight: bold; font-size: 13px;">
+            View Leaderboard →
+          </a>
         </div>
       `);
     }
@@ -41,8 +44,11 @@ export function generateWeeklyDigestHTML(data: WeeklyDigestData): string {
         : `J&J Champions: #${change.current} (↑${Math.abs(change.change)})`;
       leaderboardItems.push(`
         <div style="padding: 15px; background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%); border-radius: 8px; margin-bottom: 10px;">
-          <div style="color: white; font-size: 18px; font-weight: bold;">${emoji} ${text}</div>
-          ${!change.isNew ? `<div style="color: rgba(255,255,255,0.9); font-size: 14px; margin-top: 5px;">Amazing progress!</div>` : ''}
+          <div style="color: white; font-size: 18px; font-weight: bold; margin-bottom: 10px;">${emoji} ${text}</div>
+          ${!change.isNew ? `<div style="color: rgba(255,255,255,0.9); font-size: 14px; margin-bottom: 10px;">Amazing progress!</div>` : ''}
+          <a href="https://${config.domainName}/leaderboards?category=jjChampions" style="display: inline-block; background: white; color: #f5576c; padding: 8px 16px; text-decoration: none; border-radius: 4px; font-weight: bold; font-size: 13px;">
+            View Leaderboard →
+          </a>
         </div>
       `);
     }
@@ -55,7 +61,10 @@ export function generateWeeklyDigestHTML(data: WeeklyDigestData): string {
         : `J&J Podium: #${change.current} (↑${Math.abs(change.change)})`;
       leaderboardItems.push(`
         <div style="padding: 15px; background: linear-gradient(135deg, #fa709a 0%, #fee140 100%); border-radius: 8px; margin-bottom: 10px;">
-          <div style="color: white; font-size: 18px; font-weight: bold;">${emoji} ${text}</div>
+          <div style="color: white; font-size: 18px; font-weight: bold; margin-bottom: 10px;">${emoji} ${text}</div>
+          <a href="https://${config.domainName}/leaderboards?category=jjPodium" style="display: inline-block; background: white; color: #fa709a; padding: 8px 16px; text-decoration: none; border-radius: 4px; font-weight: bold; font-size: 13px;">
+            View Leaderboard →
+          </a>
         </div>
       `);
     }
@@ -68,7 +77,10 @@ export function generateWeeklyDigestHTML(data: WeeklyDigestData): string {
         : `J&J Participation: #${change.current} (↑${Math.abs(change.change)})`;
       leaderboardItems.push(`
         <div style="padding: 15px; background: linear-gradient(135deg, #d299c2 0%, #fef9d7 100%); border-radius: 8px; margin-bottom: 10px;">
-          <div style="color: #333; font-size: 18px; font-weight: bold;">${emoji} ${text}</div>
+          <div style="color: #333; font-size: 18px; font-weight: bold; margin-bottom: 10px;">${emoji} ${text}</div>
+          <a href="https://${config.domainName}/leaderboards?category=jjParticipation" style="display: inline-block; background: #d299c2; color: white; padding: 8px 16px; text-decoration: none; border-radius: 4px; font-weight: bold; font-size: 13px;">
+            View Leaderboard →
+          </a>
         </div>
       `);
     }
@@ -81,7 +93,10 @@ export function generateWeeklyDigestHTML(data: WeeklyDigestData): string {
         : `Most Liked Teachers: #${change.current} (↑${Math.abs(change.change)})`;
       leaderboardItems.push(`
         <div style="padding: 15px; background: linear-gradient(135deg, #a8edea 0%, #fed6e3 100%); border-radius: 8px; margin-bottom: 10px;">
-          <div style="color: #333; font-size: 18px; font-weight: bold;">${emoji} ${text}</div>
+          <div style="color: #333; font-size: 18px; font-weight: bold; margin-bottom: 10px;">${emoji} ${text}</div>
+          <a href="https://${config.domainName}/leaderboards?category=mostLikedTeachers" style="display: inline-block; background: #a8edea; color: white; padding: 8px 16px; text-decoration: none; border-radius: 4px; font-weight: bold; font-size: 13px;">
+            View Leaderboard →
+          </a>
         </div>
       `);
     }
@@ -94,7 +109,10 @@ export function generateWeeklyDigestHTML(data: WeeklyDigestData): string {
         : `Most Liked DJs: #${change.current} (↑${Math.abs(change.change)})`;
       leaderboardItems.push(`
         <div style="padding: 15px; background: linear-gradient(135deg, #ff9a9e 0%, #fecfef 100%); border-radius: 8px; margin-bottom: 10px;">
-          <div style="color: #333; font-size: 18px; font-weight: bold;">${emoji} ${text}</div>
+          <div style="color: #333; font-size: 18px; font-weight: bold; margin-bottom: 10px;">${emoji} ${text}</div>
+          <a href="https://${config.domainName}/leaderboards?category=mostLikedDJs" style="display: inline-block; background: #ff9a9e; color: white; padding: 8px 16px; text-decoration: none; border-radius: 4px; font-weight: bold; font-size: 13px;">
+            View Leaderboard →
+          </a>
         </div>
       `);
     }
@@ -107,7 +125,10 @@ export function generateWeeklyDigestHTML(data: WeeklyDigestData): string {
         : `Most Liked Photographers: #${change.current} (↑${Math.abs(change.change)})`;
       leaderboardItems.push(`
         <div style="padding: 15px; background: linear-gradient(135deg, #ffecd2 0%, #fcb69f 100%); border-radius: 8px; margin-bottom: 10px;">
-          <div style="color: #333; font-size: 18px; font-weight: bold;">${emoji} ${text}</div>
+          <div style="color: #333; font-size: 18px; font-weight: bold; margin-bottom: 10px;">${emoji} ${text}</div>
+          <a href="https://${config.domainName}/leaderboards?category=mostLikedPhotographers" style="display: inline-block; background: #ffecd2; color: #333; padding: 8px 16px; text-decoration: none; border-radius: 4px; font-weight: bold; font-size: 13px;">
+            View Leaderboard →
+          </a>
         </div>
       `);
     }
@@ -115,7 +136,7 @@ export function generateWeeklyDigestHTML(data: WeeklyDigestData): string {
     if (leaderboardItems.length > 0) {
       leaderboardHTML = `
         <div style="margin-bottom: 30px;">
-          <h2 style="color: #333; font-size: 20px; margin-bottom: 15px; border-bottom: 2px solid #667eea; padding-bottom: 10px;">
+          <h2 style="color: #333; font-size: 20px; margin-bottom: 15px; padding-bottom: 10px;">
             📊 Your Leaderboard Stats
           </h2>
           ${leaderboardItems.join('')}
@@ -140,7 +161,7 @@ export function generateWeeklyDigestHTML(data: WeeklyDigestData): string {
     if (activityItems.length > 0) {
       profileActivityHTML = `
         <div style="margin-bottom: 30px;">
-          <h2 style="color: #333; font-size: 20px; margin-bottom: 15px; border-bottom: 2px solid #667eea; padding-bottom: 10px;">
+          <h2 style="color: #333; font-size: 20px; margin-bottom: 15px; padding-bottom: 10px;">
             👀 Profile Activity
           </h2>
           <div style="background: #f8f9fa; padding: 20px; border-radius: 8px;">
@@ -156,11 +177,14 @@ export function generateWeeklyDigestHTML(data: WeeklyDigestData): string {
   if (hasFriendActivity) {
     friendActivityHTML = `
       <div style="margin-bottom: 30px;">
-        <h2 style="color: #333; font-size: 20px; margin-bottom: 15px; border-bottom: 2px solid #667eea; padding-bottom: 10px;">
+        <h2 style="color: #333; font-size: 20px; margin-bottom: 15px; padding-bottom: 10px;">
           👥 Friend Activity
         </h2>
         <div style="background: #f8f9fa; padding: 20px; border-radius: 8px;">
-          <div style="font-size: 16px;">• <strong>${friendActivity.friendsWithUpcomingTrips}</strong> friend${friendActivity.friendsWithUpcomingTrips > 1 ? 's have' : ' has'} upcoming trips ✈️</div>
+          <div style="font-size: 16px; margin-bottom: 15px;">• <strong>${friendActivity.friendsWithUpcomingTrips}</strong> friend${friendActivity.friendsWithUpcomingTrips > 1 ? 's have' : ' has'} upcoming trips ✈️</div>
+          <a href="https://${config.domainName}/friends/trips" style="display: inline-block; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 12px 24px; text-decoration: none; border-radius: 6px; font-weight: bold; font-size: 14px; margin-top: 10px;">
+            See All Trips
+          </a>
         </div>
       </div>
     `;
@@ -175,7 +199,7 @@ export function generateWeeklyDigestHTML(data: WeeklyDigestData): string {
 
     tripActivityHTML = `
       <div style="margin-bottom: 30px;">
-        <h2 style="color: #333; font-size: 20px; margin-bottom: 15px; border-bottom: 2px solid #667eea; padding-bottom: 10px;">
+        <h2 style="color: #333; font-size: 20px; margin-bottom: 15px; padding-bottom: 10px;">
           ✈️ Trip Overlaps
         </h2>
         <div style="background: linear-gradient(135deg, #ffeaa7 0%, #fdcb6e 100%); padding: 20px; border-radius: 8px;">
@@ -310,6 +334,7 @@ export function generateWeeklyDigestText(data: WeeklyDigestData): string {
     text += `FRIEND ACTIVITY\n`;
     text += `----------------\n`;
     text += `• ${friendActivity.friendsWithUpcomingTrips} friend${friendActivity.friendsWithUpcomingTrips > 1 ? 's have' : ' has'} upcoming trips\n`;
+    text += `\nSee all trips: https://${config.domainName}/friends/trips\n`;
     text += '\n';
   }
 
