@@ -24,13 +24,15 @@ interface DancersMapProps {
   mapboxToken?: string;
   autoSpin?: boolean; // Auto-rotate the globe
   disableMobileDrag?: boolean; // Disable one-finger drag on mobile (allows page scroll)
+  hideDancerCount?: boolean; // Hide dancer count in legend (for landing page)
 }
 
 export default function DancersMap({ 
   dancers, 
   mapboxToken, 
   autoSpin = false,
-  disableMobileDrag = false 
+  disableMobileDrag = false,
+  hideDancerCount = false
 }: DancersMapProps) {
   const mapContainerRef = useRef<HTMLDivElement>(null);
   const mapRef = useRef<mapboxgl.Map | null>(null);
@@ -546,7 +548,10 @@ export default function DancersMap({
                 <div className="flex items-center gap-2">
                   <div className="w-6 h-6 rounded-full bg-gradient-to-br from-purple-500 to-purple-700"></div>
                   <span className="text-base-content/80">
-                    {dancersWithCoordinates.length} dancer{dancersWithCoordinates.length !== 1 ? 's' : ''} in {new Set(dancersWithCoordinates.map(d => d.city._id)).size} {new Set(dancersWithCoordinates.map(d => d.city._id)).size !== 1 ? 'cities' : 'city'}
+                    {hideDancerCount 
+                      ? `${new Set(dancersWithCoordinates.map(d => d.city._id)).size} ${new Set(dancersWithCoordinates.map(d => d.city._id)).size !== 1 ? 'cities' : 'city'}`
+                      : `${dancersWithCoordinates.length} dancer${dancersWithCoordinates.length !== 1 ? 's' : ''} in ${new Set(dancersWithCoordinates.map(d => d.city._id)).size} ${new Set(dancersWithCoordinates.map(d => d.city._id)).size !== 1 ? 'cities' : 'city'}`
+                    }
                   </span>
                 </div>
                 <div className="text-base-content/60 text-xs">

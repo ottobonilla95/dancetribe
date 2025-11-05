@@ -43,7 +43,7 @@ const CityCard = ({ city, index }: CityCardProps) => {
               </div>
               <div className="flex items-center gap-1">
                 <span className="font-bold text-sm">{t('common.dancers')}:</span>
-                {city.totalDancers >= 30 ? (
+                {city.totalDancers >= 100 ? (
                   <span className="text-sm">{city.totalDancers}</span>
                 ) : (
                   <span className="text-sm text-orange-400 animate-pulse font-medium">

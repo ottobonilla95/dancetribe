@@ -15,12 +15,9 @@ interface HeroProps {
   totalDancers?: number;
 }
 
-const Hero = ({ featuredUsers = [], totalDancers = 0 }: HeroProps) => {
+const Hero = ({ featuredUsers = [] }: HeroProps) => {
   const videoRef = useRef<HTMLVideoElement>(null);
   const { t } = useTranslation();
-  
-  // Format the number with commas
-  const formattedTotal = totalDancers.toLocaleString();
 
   useEffect(() => {
     const video = videoRef.current;
@@ -86,7 +83,7 @@ const Hero = ({ featuredUsers = [], totalDancers = 0 }: HeroProps) => {
           {t('hero.subtitle')}
         </p>
 
-        {/* Testimonials Avatars with Stars and Count */}
+        {/* Testimonials Avatars with Stars */}
         {featuredUsers.length > 0 && (
           <div className="flex flex-col md:flex-row justify-center items-center md:items-center gap-3 mb-5 sm:mb-7">
             {/* AVATARS */}
@@ -114,7 +111,7 @@ const Hero = ({ featuredUsers = [], totalDancers = 0 }: HeroProps) => {
               ))}
             </div>
 
-            {/* RATING & COUNT */}
+            {/* RATING */}
             <div className="flex flex-col justify-center items-center md:items-start gap-1">
               <div className="flex gap-0.5">
                 {[...Array(5)].map((_, i) => (
@@ -134,8 +131,8 @@ const Hero = ({ featuredUsers = [], totalDancers = 0 }: HeroProps) => {
                 ))}
               </div>
 
-              <div className="text-sm sm:text-base text-white">
-                <span className="font-semibold">{formattedTotal}</span> {t('hero.dancersConnected')}
+              <div className="text-sm sm:text-base text-white font-semibold">
+                {t('hero.globalDanceCommunity')}
               </div>
             </div>
           </div>
