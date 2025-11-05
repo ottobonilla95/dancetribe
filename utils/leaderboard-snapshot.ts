@@ -25,10 +25,9 @@ interface RankingEntry {
 export async function calculateRankings(category: LeaderboardCategory): Promise<RankingEntry[]> {
   await connectMongo();
 
-  // TEMPORARILY DISABLED FOR TESTING - Get admin user to exclude from leaderboards
-  // const adminUser = await User.findOne({ email: config.admin.email }).select('_id').lean() as any;
-  // const adminId = adminUser?._id;
-  const adminId = null; // ⚠️ TESTING ONLY - Remove this line after testing!
+  // Get admin user to exclude from leaderboards
+  const adminUser = await User.findOne({ email: config.admin.email }).select('_id').lean() as any;
+  const adminId = adminUser?._id;
 
   let aggregationPipeline: any[] = [];
 
