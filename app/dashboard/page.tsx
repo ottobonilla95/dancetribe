@@ -813,7 +813,7 @@ const getTrendyCountries = unstable_cache(
 );
 
 // Cached: Cities list changes when dancer counts change
-// Note: Shared with landing page - we cache top 10, dashboard uses first 6
+// Note: Shared with landing page - we cache top 10, dashboard uses first 8
 const getCitiesCached = unstable_cache(
   async (): Promise<CityType[]> => {
     console.log("🚀 getCities FUNCTION CALLED");
@@ -824,7 +824,7 @@ const getCitiesCached = unstable_cache(
         .populate({ path: "country", model: Country, select: "name code" })
         .populate({ path: "continent", model: Continent, select: "name" })
         .sort({ totalDancers: -1 })
-        .limit(10) // Cache top 10 (landing uses 10, dashboard uses 6)
+        .limit(10) // Cache top 10 (landing uses 10, dashboard uses 8)
         .lean();
 
       const result = cities.map((doc: any) => ({
@@ -848,10 +848,10 @@ const getCitiesCached = unstable_cache(
   { revalidate: 60, tags: ["hot-cities"] } // Shared cache with landing page
 );
 
-// Dashboard wrapper - returns only first 6 cities
+// Dashboard wrapper - returns only first 8 cities
 async function getCities(): Promise<CityType[]> {
   const cities = await getCitiesCached();
-  return cities.slice(0, 6);
+  return cities.slice(0, 8);
 }
 
 // Get user's friends count for invite banner
