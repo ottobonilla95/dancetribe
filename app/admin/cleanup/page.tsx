@@ -5,10 +5,11 @@ import { FaTrash, FaCheckCircle, FaSpinner } from "react-icons/fa";
 
 interface CleanupResult {
   success: boolean;
-  task: string;
-  message: string;
+  task?: string;
+  message?: string;
   usersAffected?: number;
-  results?: Array<{ task: string; affected: number }>;
+  snapshotsDeleted?: number;
+  results?: Array<{ task: string; affected?: number; deleted?: number }>;
 }
 
 export default function AdminCleanupPage() {
@@ -61,6 +62,13 @@ export default function AdminCleanupPage() {
       color: "btn-accent",
     },
     {
+      id: "old-snapshots",
+      name: "Old Leaderboard Snapshots",
+      description: "Delete snapshots older than 12 weeks",
+      icon: "📊",
+      color: "btn-warning",
+    },
+    {
       id: "all",
       name: "Run All Cleanups",
       description: "Execute all cleanup tasks at once",
@@ -83,20 +91,24 @@ export default function AdminCleanupPage() {
         <div className="alert alert-success mb-6">
           <FaCheckCircle className="text-2xl" />
           <div className="flex-1">
-            <h3 className="font-bold">{results.message}</h3>
+            <h3 className="font-bold">{results.message || 'Operation completed successfully'}</h3>
             {results.results ? (
               <div className="text-sm mt-2">
                 {results.results.map((r, i) => (
                   <div key={i}>
-                    • {r.task}: {r.affected} users affected
+                    • {r.task}: {r.affected !== undefined ? `${r.affected} users affected` : `${r.deleted} snapshots deleted`}
                   </div>
                 ))}
               </div>
-            ) : (
+            ) : results.usersAffected !== undefined ? (
               <div className="text-sm">
                 {results.usersAffected} users affected
               </div>
-            )}
+            ) : results.snapshotsDeleted !== undefined ? (
+              <div className="text-sm">
+                {results.snapshotsDeleted} snapshots deleted
+              </div>
+            ) : null}
           </div>
         </div>
       )}
@@ -158,10 +170,13 @@ export default function AdminCleanupPage() {
         <div>
           <h3 className="font-bold">Cleanup Information</h3>
           <div className="text-xs">
-            • These tasks can be run manually or via Lambda/cron
+            • <strong>Recommended Schedule:</strong> Monthly (1st of month at 2:00 AM)
+            <br />
+            • Cleanup tasks can be run manually or automated via cron/Lambda
+            <br />
+            • Safe to run multiple times - idempotent operations
             <br />
             • API endpoint: POST /api/admin/cleanup (admin auth required)
-            <br />• Safe to run multiple times - idempotent operations
           </div>
         </div>
       </div>
@@ -170,17 +185,12 @@ export default function AdminCleanupPage() {
       <div className="mt-6 p-4 bg-base-200 rounded-lg">
         <h3 className="font-bold mb-2">API Usage (Lambda/Cron)</h3>
         <pre className="text-xs bg-base-300 p-3 rounded overflow-x-auto">
-          {`// Example: Call from Lambda function
-fetch('https://dancecircle.co/api/admin/cleanup', {
-  method: 'POST',
-  headers: {
-    'Content-Type': 'application/json',
-    'Cookie': 'your-admin-session-cookie'
-  },
-  body: JSON.stringify({ 
-    task: 'all' // or 'old-trips', 'old-profile-views', etc.
-  })
-})`}
+          {`curl -X POST https://dancecircle.co/api/admin/cleanup \\
+  -H "Content-Type: application/json" \\
+  -H "Cookie: your-admin-session-cookie" \\
+  -d '{"task": "all"}'
+
+# Or specific tasks: "old-trips", "orphaned-friend-requests", "old-snapshots"`}
         </pre>
       </div>
     </div>

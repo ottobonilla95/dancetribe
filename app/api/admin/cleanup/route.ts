@@ -4,6 +4,7 @@ import { authOptions } from "@/libs/next-auth";
 import connectMongo from "@/libs/mongoose";
 import User from "@/models/User";
 import config from "@/config";
+import { cleanupOldSnapshots } from "@/utils/leaderboard-snapshot";
 
 export async function POST(req: Request) {
   try {
@@ -82,6 +83,25 @@ export async function POST(req: Request) {
         });
       }
 
+      case "old-snapshots": {
+        // Delete leaderboard snapshots older than 12 weeks
+        const snapshotResult = await cleanupOldSnapshots();
+
+        if (!snapshotResult.success) {
+          return NextResponse.json(
+            { error: snapshotResult.error || "Failed to clean snapshots" },
+            { status: 500 }
+          );
+        }
+
+        return NextResponse.json({
+          success: true,
+          task: "old-snapshots",
+          message: `Cleaned up old leaderboard snapshots (kept last 12 weeks)`,
+          snapshotsDeleted: snapshotResult.deleted,
+        });
+      }
+
       case "all": {
         // Run all cleanup tasks
         const results = [];
@@ -123,6 +143,13 @@ export async function POST(req: Request) {
         results.push({
           task: "orphaned-friend-requests",
           affected: sentResult.modifiedCount + receivedResult.modifiedCount,
+        });
+
+        // 4. Old snapshots
+        const snapshotResult = await cleanupOldSnapshots();
+        results.push({
+          task: "old-snapshots",
+          deleted: snapshotResult.deleted,
         });
 
         return NextResponse.json({

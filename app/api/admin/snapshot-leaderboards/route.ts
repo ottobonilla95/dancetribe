@@ -1,0 +1,62 @@
+import { NextResponse, NextRequest } from "next/server";
+import { getServerSession } from "next-auth/next";
+import { authOptions } from "@/libs/next-auth";
+import { snapshotAllLeaderboards } from "@/utils/leaderboard-snapshot";
+
+/**
+ * POST /api/admin/snapshot-leaderboards
+ * 
+ * Manually trigger a snapshot of all leaderboard rankings.
+ * This should typically be run weekly via a cron job.
+ * 
+ * Admin-only endpoint.
+ */
+export async function POST(req: NextRequest) {
+  try {
+    // Check authentication
+    const session = await getServerSession(authOptions);
+    
+    if (!session?.user) {
+      return NextResponse.json(
+        { error: "Unauthorized" },
+        { status: 401 }
+      );
+    }
+
+    // Check admin permission (you should have an isAdmin field in your User model)
+    // For now, checking if user email matches admin email
+    const adminEmails = process.env.ADMIN_EMAILS?.split(',') || [];
+    
+    if (!adminEmails.includes(session.user.email || '')) {
+      return NextResponse.json(
+        { error: "Forbidden - Admin access required" },
+        { status: 403 }
+      );
+    }
+
+    // Snapshot all leaderboards
+    const result = await snapshotAllLeaderboards();
+
+    if (!result.success) {
+      return NextResponse.json(
+        { error: result.error || "Failed to snapshot leaderboards" },
+        { status: 500 }
+      );
+    }
+
+    return NextResponse.json({
+      success: true,
+      message: `Successfully created ${result.snapshots} leaderboard snapshots`,
+      snapshots: result.snapshots,
+      timestamp: new Date().toISOString()
+    });
+
+  } catch (error: any) {
+    console.error("Error in snapshot-leaderboards API:", error);
+    return NextResponse.json(
+      { error: error.message || "Internal server error" },
+      { status: 500 }
+    );
+  }
+}
+

@@ -30,6 +30,11 @@ export default async function AdminLayout({
       icon: FaDatabase,
     },
     {
+      name: "Weekly Digest",
+      href: "/admin/digest",
+      icon: FaChartLine,
+    },
+    {
       name: "Database Cleanup",
       href: "/admin/cleanup",
       icon: FaTrash,
