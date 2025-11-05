@@ -281,7 +281,7 @@ const getRecentDancers = unstable_cache(
           select: "name code",
         },
       })
-      .select("name username image danceStyles city likedBy dateOfBirth nationality dancingStartYear socialMedia danceRole isTeacher isDJ isPhotographer jackAndJillCompetitions openToMeetTravelers lookingForPracticePartners")
+      .select("name username image danceStyles city likedBy dateOfBirth nationality dancingStartYear socialMedia danceRole isTeacher isDJ isPhotographer isEventOrganizer isProducer isFeaturedProfessional jackAndJillCompetitions openToMeetTravelers lookingForPracticePartners")
       .sort({ createdAt: -1 })
       .limit(16)
       .lean();
@@ -420,17 +420,7 @@ export default async function Home() {
           <div className="mt-8 md:mt-12">
             {/* Stats Bar */}
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 md:py-10">
-              <div className="grid grid-cols-3 gap-4 md:gap-8">
-                <div className="text-center">
-                  <AnimatedCounter 
-                    end={communityMapData.totalDancers} 
-                    suffix="+"
-                    className="text-3xl md:text-5xl font-extrabold text-primary"
-                  />
-                  <div className="text-sm md:text-base text-base-content/70 mt-1">
-                    {t('common.dancers')}
-                  </div>
-                </div>
+              <div className="grid grid-cols-2 gap-8 md:gap-16 max-w-2xl mx-auto">
                 <div className="text-center">
                   <AnimatedCounter 
                     end={communityMapData.totalCountries}
@@ -468,6 +458,7 @@ export default async function Home() {
                   dancers={JSON.parse(JSON.stringify(communityMapData.dancersForMap))} 
                   autoSpin={true}
                   disableMobileDrag={true}
+                  hideDancerCount={true}
                 />
               </div>
             </div>
