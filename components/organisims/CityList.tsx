@@ -63,7 +63,12 @@ const CityList = ({ initialCities }: CityListProps) => {
 
       <div className="grid grid-cols-2 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3 md:gap-6">
         {cities.map((city, index) => (
-          <CityCard key={city._id} city={city} index={index + 1} />
+          <div
+            key={city._id}
+            className={index >= 6 ? 'hidden md:block' : ''}
+          >
+            <CityCard city={city} index={index + 1} />
+          </div>
         ))}
       </div>
 
