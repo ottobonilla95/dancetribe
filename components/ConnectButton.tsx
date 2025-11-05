@@ -5,6 +5,7 @@ import { FaUserPlus, FaUserCheck, FaUserClock, FaCheck, FaTimes } from "react-ic
 import { useSession } from "next-auth/react";
 import Link from "next/link";
 import { useTranslation } from "./I18nProvider";
+import { useRefreshFriendRequests } from "@/contexts/FriendRequestContext";
 
 interface ConnectButtonProps {
   targetUserId: string;
@@ -23,6 +24,7 @@ export default function ConnectButton({
 }: ConnectButtonProps) {
   const { t } = useTranslation();
   const { data: session } = useSession();
+  const refreshFriendRequests = useRefreshFriendRequests();
   const [loading, setLoading] = useState(false);
   const [status, setStatus] = useState({
     isFriend,
@@ -56,9 +58,13 @@ export default function ConnectButton({
             break;
           case 'accept':
             setStatus(prev => ({ ...prev, isFriend: true, hasReceivedRequest: false }));
+            // Refresh friend request count to update bell notification
+            await refreshFriendRequests();
             break;
           case 'reject':
             setStatus(prev => ({ ...prev, hasReceivedRequest: false }));
+            // Refresh friend request count to update bell notification
+            await refreshFriendRequests();
             break;
           case 'cancel':
             setStatus(prev => ({ ...prev, hasSentRequest: false }));

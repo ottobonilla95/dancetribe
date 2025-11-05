@@ -10,7 +10,9 @@ import {
   FaEye,
 } from "react-icons/fa";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { useTranslation } from "@/components/I18nProvider";
+import { useRefreshFriendRequests } from "@/contexts/FriendRequestContext";
 
 interface FriendsContentProps {
   userData: any;
@@ -18,6 +20,8 @@ interface FriendsContentProps {
 
 export default function FriendsContent({ userData }: FriendsContentProps) {
   const { t } = useTranslation();
+  const router = useRouter();
+  const refreshFriendRequests = useRefreshFriendRequests();
   const [activeTab, setActiveTab] = useState("requests");
   const [loading, setLoading] = useState<string | null>(null);
 
@@ -35,8 +39,11 @@ export default function FriendsContent({ userData }: FriendsContentProps) {
       const data = await response.json();
 
       if (data.success) {
-        // Refresh the page to update the lists
-        window.location.reload();
+        // Refresh friend request count in context (updates bell notification)
+        await refreshFriendRequests();
+        
+        // Use Next.js router refresh to re-fetch server component data
+        router.refresh();
       } else {
         alert(data.error || "Something went wrong");
       }

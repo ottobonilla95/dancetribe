@@ -1,6 +1,6 @@
 "use client";
 
-import { createContext, useContext, useState, useEffect, ReactNode, useCallback, useRef } from 'react';
+import { createContext, useContext, useState, useEffect, ReactNode, useCallback, useRef, useMemo } from 'react';
 import { useSession } from 'next-auth/react';
 
 interface FriendRequestContextType {
@@ -50,12 +50,18 @@ export function FriendRequestProvider({ children }: { children: ReactNode }) {
     fetchPendingRequests();
   }, [session?.user?.id, fetchPendingRequests]);
 
-  const refreshCount = async () => {
+  const refreshCount = useCallback(async () => {
     await fetchPendingRequests();
-  };
+  }, [fetchPendingRequests]);
+
+  // Memoize context value to prevent unnecessary re-renders
+  const contextValue = useMemo(
+    () => ({ pendingCount, refreshCount }),
+    [pendingCount, refreshCount]
+  );
 
   return (
-    <FriendRequestContext.Provider value={{ pendingCount, refreshCount }}>
+    <FriendRequestContext.Provider value={contextValue}>
       {children}
     </FriendRequestContext.Provider>
   );

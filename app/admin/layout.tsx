@@ -3,7 +3,7 @@ import { getServerSession } from "next-auth";
 import { authOptions } from "@/libs/next-auth";
 import config from "@/config";
 import Link from "next/link";
-import { FaDatabase, FaChartLine, FaUsers, FaGlobeAmericas, FaMusic, FaGlobe } from "react-icons/fa";
+import { FaDatabase, FaChartLine, FaUsers, FaGlobeAmericas, FaMusic, FaGlobe, FaTrash } from "react-icons/fa";
 import { ReactNode } from "react";
 
 export default async function AdminLayout({
@@ -28,6 +28,11 @@ export default async function AdminLayout({
       name: "Cache Settings",
       href: "/admin/cache",
       icon: FaDatabase,
+    },
+    {
+      name: "Database Cleanup",
+      href: "/admin/cleanup",
+      icon: FaTrash,
     },
     {
       name: "Cities",
