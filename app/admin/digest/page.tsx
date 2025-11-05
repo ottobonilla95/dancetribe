@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { FaCheckCircle, FaSpinner, FaCamera, FaEnvelope } from "react-icons/fa";
+import { FaCheckCircle, FaSpinner, FaCamera, FaEnvelope, FaFlask } from "react-icons/fa";
 
 interface DigestResult {
   success: boolean;
@@ -12,6 +12,8 @@ interface DigestResult {
   emailsSkipped?: number;
   emailsFailed?: number;
   timestamp?: string;
+  recipient?: string;
+  digestData?: any;
 }
 
 export default function AdminDigestPage() {
@@ -79,6 +81,37 @@ export default function AdminDigestPage() {
     }
   };
 
+  const testWeeklyDigest = async () => {
+    if (!confirm("Send a test weekly digest email to your admin email?")) {
+      return;
+    }
+
+    setLoading("test-digest");
+    setResults(null);
+
+    try {
+      const response = await fetch("/api/admin/test-weekly-digest", {
+        method: "POST",
+        headers: { 
+          "Content-Type": "application/json",
+        },
+      });
+
+      const data = await response.json();
+
+      if (response.ok) {
+        setResults(data);
+      } else {
+        alert(`Error: ${data.error}`);
+      }
+    } catch (error) {
+      console.error("Test digest error:", error);
+      alert("Failed to send test email");
+    } finally {
+      setLoading(null);
+    }
+  };
+
   return (
     <div className="max-w-6xl mx-auto p-6">
       <div className="mb-8">
@@ -98,6 +131,17 @@ export default function AdminDigestPage() {
               <div className="text-sm">
                 {results.snapshots} snapshots created
               </div>
+            ) : results.recipient ? (
+              <div className="text-sm mt-2">
+                <div>📧 Test email sent to: <strong>{results.recipient}</strong></div>
+                {results.digestData && (
+                  <div className="mt-2 text-xs opacity-70">
+                    <div>Profile views: {results.digestData.profileViews}</div>
+                    <div>New likes: {results.digestData.newLikes}</div>
+                    <div>Trip overlaps: {results.digestData.tripOverlaps?.length || 0}</div>
+                  </div>
+                )}
+              </div>
             ) : results.emailsSent !== undefined ? (
               <div className="text-sm mt-2">
                 <div>📧 Emails sent: <strong>{results.emailsSent}</strong></div>
@@ -112,6 +156,46 @@ export default function AdminDigestPage() {
 
       {/* Action Cards */}
       <div className="space-y-6">
+        {/* Test Button */}
+        <div className="card bg-gradient-to-br from-yellow-500/20 to-orange-500/20 shadow-xl border-2 border-yellow-500/30">
+          <div className="card-body">
+            <div className="flex items-start gap-3">
+              <div className="flex items-center justify-center w-10 h-10 rounded-full bg-yellow-500 text-white">
+                <FaFlask />
+              </div>
+              <div className="flex-1">
+                <h2 className="card-title flex items-center gap-2">
+                  <FaFlask className="text-yellow-400" />
+                  Test Weekly Digest
+                </h2>
+                <p className="text-sm text-base-content/70 mb-4">
+                  Send a test weekly digest email <strong>only to your admin email</strong> (mr.bonilla51@gmail.com). Safe to use anytime for testing.
+                </p>
+
+                <button
+                  onClick={testWeeklyDigest}
+                  disabled={loading !== null}
+                  className={`btn btn-warning btn-sm gap-2 ${
+                    loading === "test-digest" ? "loading" : ""
+                  }`}
+                >
+                  {loading === "test-digest" ? (
+                    <>
+                      <FaSpinner className="animate-spin" />
+                      Sending Test...
+                    </>
+                  ) : (
+                    <>
+                      <FaFlask />
+                      Send Test Email
+                    </>
+                  )}
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+
         {/* Step 1: Snapshot */}
         <div className="card bg-gradient-to-br from-purple-500/20 to-pink-500/20 shadow-xl border-2 border-purple-500/30">
           <div className="card-body">

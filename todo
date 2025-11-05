@@ -7,13 +7,6 @@ Everyday
 
 -----
 
-in desktop dashboard show 8 hottest cities
-
-- are we cleaning trips?
-Optional: In-App Badge (Subtle)
-badge in user profile.. most liked user!
-
-
 TEST
 - weekly email...
 - leaderboard notificaotion...
@@ -22,8 +15,9 @@ shoudl it be when someone chante position? we notify.. how oftehn?
 if someone remains in the top 1 shoudl we notify or only on changes?
 there are several leaderboards, are you considering them all? for the email..
 
-
-
+- are we cleaning trips?
+Optional: In-App Badge (Subtle)
+badge in user profile.. most liked user!
 
 
 -----------------------------------
@@ -41,8 +35,7 @@ australia page
 ------------------------------
 
 Today:
-- leaderboard per city..
-
+- leaderboard per city?
 - Space to confess, blog/forum?
 - how to get them engaged!
 - any new email notification remmber needs s setting.
