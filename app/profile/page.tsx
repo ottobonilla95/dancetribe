@@ -33,6 +33,8 @@ import DanceRoleSection from "@/components/profile/DanceRoleSection";
 import RelationshipStatusSection from "@/components/profile/RelationshipStatusSection";
 import DancingExperienceSection from "@/components/profile/DancingExperienceSection";
 import ProfilePictureSection from "@/components/profile/ProfilePictureSection";
+import LeaderboardBadges from "@/components/LeaderboardBadges";
+import { getUserLeaderboardBadges } from "@/utils/leaderboard-badges";
 
 interface ProfileProps {
   searchParams: { welcome?: string };
@@ -101,6 +103,9 @@ export default async function Profile({ searchParams }: ProfileProps) {
       select: "name",
     })
     .lean();
+
+  // Fetch leaderboard badges
+  const leaderboardBadges = await getUserLeaderboardBadges(session.user.id);
 
   // Fetch and sort dance styles (null/undefined sequences go last)
   let danceStyles = await DanceStyle.find({}).lean();
@@ -608,6 +613,18 @@ export default async function Profile({ searchParams }: ProfileProps) {
                 />
               </div>
             </div>
+
+            {/* Leaderboard Badges */}
+            {leaderboardBadges.length > 0 && (
+              <div className="card bg-base-200 shadow-xl">
+                <div className="card-body">
+                  <h3 className="card-title text-xl mb-4">
+                    🏅 Leaderboard Rankings
+                  </h3>
+                  <LeaderboardBadges badges={leaderboardBadges} />
+                </div>
+              </div>
+            )}
 
             {/* Jack & Jill Competitions */}
             <JackAndJillManager

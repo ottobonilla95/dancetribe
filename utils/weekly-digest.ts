@@ -11,6 +11,9 @@ export interface WeeklyDigestData {
     name: string;
     email: string;
     username?: string;
+    notificationSettings?: {
+      weeklyDigest?: boolean;
+    };
   };
   profileActivity: {
     views: number;
@@ -96,7 +99,7 @@ export async function getWeeklyDigestData(userId: string): Promise<WeeklyDigestD
     await connectMongo();
 
     const user = await User.findById(userId)
-      .select('name email username profileViews likedBy friendRequestsReceived friends trips')
+      .select('name email username profileViews likedBy friendRequestsReceived friends trips notificationSettings')
       .lean() as any;
 
     if (!user || !user.email) {
@@ -191,6 +194,7 @@ export async function getWeeklyDigestData(userId: string): Promise<WeeklyDigestD
         name: user.name,
         email: user.email,
         username: user.username,
+        notificationSettings: user.notificationSettings,
       },
       profileActivity: {
         views: weeklyViews.totalViews,

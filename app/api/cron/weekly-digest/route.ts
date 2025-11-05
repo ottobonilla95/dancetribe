@@ -62,6 +62,13 @@ export async function POST(req: Request) {
               return;
             }
 
+            // Check if user has weekly digest enabled
+            if (digestData.user.notificationSettings?.weeklyDigest === false) {
+              emailsSkipped++;
+              console.log(`⏭️ Skipped ${digestData.user.name} - weekly digest disabled in settings`);
+              return;
+            }
+
             // Check if we should send (has activity)
             if (!shouldSendDigest(digestData)) {
               emailsSkipped++;

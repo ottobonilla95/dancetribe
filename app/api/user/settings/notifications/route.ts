@@ -13,7 +13,7 @@ export async function POST(req: NextRequest) {
     }
 
     const body = await req.json();
-    const { emailNotifications, friendRequestNotifications, profileLikedNotifications } = body;
+    const { emailNotifications, friendRequestNotifications, profileLikedNotifications, weeklyDigest } = body;
 
     await connectMongo();
 
@@ -24,6 +24,7 @@ export async function POST(req: NextRequest) {
           'notificationSettings.emailNotifications': emailNotifications,
           'notificationSettings.friendRequestNotifications': friendRequestNotifications,
           'notificationSettings.profileLikedNotifications': profileLikedNotifications,
+          'notificationSettings.weeklyDigest': weeklyDigest,
         }
       },
       { new: true }

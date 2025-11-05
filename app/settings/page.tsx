@@ -5,7 +5,7 @@ import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import apiClient from "@/libs/api";
 import { useTranslation } from "@/components/I18nProvider";
-import { FaBell, FaEnvelope, FaUserFriends, FaHeart } from "react-icons/fa";
+import { FaBell, FaEnvelope, FaUserFriends, FaHeart, FaCalendarWeek } from "react-icons/fa";
 
 export default function SettingsPage() {
   const { data: session, status } = useSession();
@@ -19,6 +19,7 @@ export default function SettingsPage() {
   const [emailNotifications, setEmailNotifications] = useState(true);
   const [friendRequestNotifications, setFriendRequestNotifications] = useState(true);
   const [profileLikedNotifications, setProfileLikedNotifications] = useState(true);
+  const [weeklyDigest, setWeeklyDigest] = useState(true);
 
   useEffect(() => {
     if (status === "unauthenticated") {
@@ -35,6 +36,7 @@ export default function SettingsPage() {
           emailNotifications: boolean;
           friendRequestNotifications: boolean;
           profileLikedNotifications: boolean;
+          weeklyDigest: boolean;
         };
       };
       
@@ -42,6 +44,7 @@ export default function SettingsPage() {
       setEmailNotifications(data.notificationSettings?.emailNotifications ?? true);
       setFriendRequestNotifications(data.notificationSettings?.friendRequestNotifications ?? true);
       setProfileLikedNotifications(data.notificationSettings?.profileLikedNotifications ?? true);
+      setWeeklyDigest(data.notificationSettings?.weeklyDigest ?? true);
       
       setLoading(false);
     } catch (error) {
@@ -59,6 +62,7 @@ export default function SettingsPage() {
         emailNotifications,
         friendRequestNotifications,
         profileLikedNotifications,
+        weeklyDigest,
       });
       
       setMessage({ type: 'success', text: t('settings.saved') });
@@ -166,6 +170,26 @@ export default function SettingsPage() {
                     className="toggle toggle-error"
                     checked={profileLikedNotifications}
                     onChange={(e) => setProfileLikedNotifications(e.target.checked)}
+                    disabled={!emailNotifications}
+                  />
+                </label>
+              </div>
+
+              {/* Weekly Digest */}
+              <div className="form-control">
+                <label className="label cursor-pointer justify-between p-4 bg-base-200 rounded-lg">
+                  <div className="flex items-center gap-3">
+                    <FaCalendarWeek className="text-lg text-success" />
+                    <div>
+                      <span className="label-text font-semibold">{t('settings.weeklyDigest')}</span>
+                      <p className="text-xs text-base-content/60 mt-1">{t('settings.weeklyDigestDesc')}</p>
+                    </div>
+                  </div>
+                  <input
+                    type="checkbox"
+                    className="toggle toggle-success"
+                    checked={weeklyDigest}
+                    onChange={(e) => setWeeklyDigest(e.target.checked)}
                     disabled={!emailNotifications}
                   />
                 </label>

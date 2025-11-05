@@ -348,6 +348,10 @@ const userSchema = new mongoose.Schema(
         type: Boolean,
         default: true, // Enabled by default
       },
+      weeklyDigest: {
+        type: Boolean,
+        default: true, // Enabled by default
+      },
     },
     // Profile view tracking
     profileViews: [

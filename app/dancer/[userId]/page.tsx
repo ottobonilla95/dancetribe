@@ -37,6 +37,8 @@ import AdminSocialMediaEdit from "@/components/AdminSocialMediaEdit";
 import ProfileViewTracker from "@/components/ProfileViewTracker";
 import { cookies } from "next/headers";
 import config from "@/config";
+import LeaderboardBadges from "@/components/LeaderboardBadges";
+import { getUserLeaderboardBadges } from "@/utils/leaderboard-badges";
 
 interface Props {
   params: {
@@ -417,6 +419,9 @@ export default async function PublicProfile({ params }: Props) {
       // Continue without mutual friends if there's an error
     }
   }
+
+  // Fetch leaderboard badges
+  const leaderboardBadges = await getUserLeaderboardBadges(params.userId);
 
   return (
     <LikesProvider>
@@ -912,6 +917,18 @@ export default async function PublicProfile({ params }: Props) {
                   />
                 </div>
               </div>
+
+              {/* Leaderboard Badges */}
+              {leaderboardBadges.length > 0 && (
+                <div className="card bg-base-200 shadow-xl">
+                  <div className="card-body">
+                    <h2 className="card-title text-xl mb-4">
+                      🏅 Leaderboard Rankings
+                    </h2>
+                    <LeaderboardBadges badges={leaderboardBadges} />
+                  </div>
+                </div>
+              )}
 
               {/* Jack & Jill Competitions - Read Only Display */}
               {userData.jackAndJillCompetitions && userData.jackAndJillCompetitions.length > 0 && (

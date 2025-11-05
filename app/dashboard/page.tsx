@@ -23,6 +23,8 @@ import InviteFriendsBanner from "@/components/InviteFriendsBanner";
 import Link from "next/link";
 import { getMessages, getTranslation } from "@/lib/i18n";
 import { unstable_cache } from "next/cache";
+import LeaderboardBadges from "@/components/LeaderboardBadges";
+import { getUserLeaderboardBadges } from "@/utils/leaderboard-badges";
 
 export const dynamic = "force-dynamic";
 
@@ -1018,6 +1020,7 @@ export default async function Dashboard() {
     userPreferences,
     userCityStats,
     friendsCount,
+    leaderboardBadges,
   ] = await Promise.all([
     getInitialDancers(session.user.id),
     getDanceStyles(),
@@ -1031,6 +1034,7 @@ export default async function Dashboard() {
     getUserPreferences(session.user.id),
     getUserCityStats(session.user.id),
     getUserFriendsCount(session.user.id),
+    getUserLeaderboardBadges(session.user.id),
   ]);
 
   return (
@@ -1038,6 +1042,18 @@ export default async function Dashboard() {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Invite Friends Banner */}
         <InviteFriendsBanner friendsCount={friendsCount} />
+
+        {/* Leaderboard Badges */}
+        {leaderboardBadges.length > 0 && (
+          <div className="mb-8 card bg-gradient-to-br from-warning/10 to-accent/10 shadow-xl">
+            <div className="card-body">
+              <h2 className="card-title text-xl">
+                🏅 Your Leaderboard Rankings
+              </h2>
+              <LeaderboardBadges badges={leaderboardBadges} />
+            </div>
+          </div>
+        )}
 
         {/* Hot Cities Section */}
         <h2 className="max-w-3xl font-extrabold text-xl md:text-2xl tracking-tight mb-2 md:mb-8">

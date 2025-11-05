@@ -487,6 +487,8 @@
     "friendRequestsDesc": "Recibe notificaciones cuando alguien te envíe una solicitud de amistad o acepte la tuya",
     "profileLikes": "Me Gusta en el Perfil",
     "profileLikesDesc": "Recibe notificaciones cuando alguien le dé me gusta a tu perfil",
+    "weeklyDigest": "Resumen Semanal",
+    "weeklyDigestDesc": "Recibe un resumen semanal de tu actividad, cambios en clasificaciones y actualizaciones de amigos",
     "saved": "¡Configuración guardada exitosamente!",
     "saveFailed": "Error al guardar la configuración. Por favor intenta de nuevo.",
     "saving": "Guardando...",
