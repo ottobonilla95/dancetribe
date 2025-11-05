@@ -5,9 +5,16 @@ import { useSession } from 'next-auth/react';
 import { ref, onValue, set, onDisconnect, serverTimestamp } from 'firebase/database';
 import { database } from '@/libs/firebase';
 
+export interface OnlineUser {
+  userId: string;
+  name: string;
+  lastChanged: number;
+}
+
 export function usePresence() {
   const { data: session } = useSession();
   const [activeUsers, setActiveUsers] = useState<number>(0);
+  const [onlineUsers, setOnlineUsers] = useState<OnlineUser[]>([]);
 
   useEffect(() => {
     if (!session?.user?.id || !database) return;
@@ -42,25 +49,37 @@ export function usePresence() {
     };
   }, [session]);
 
-  // Count active users (admin only will call this)
+  // Count active users and get their details (admin only will call this)
   useEffect(() => {
     if (!database) return;
 
     const statusRef = ref(database, 'status');
     const unsubscribe = onValue(statusRef, (snapshot) => {
       let count = 0;
+      const users: OnlineUser[] = [];
+      
       snapshot.forEach((childSnapshot) => {
         const status = childSnapshot.val();
         if (status?.state === 'online') {
           count++;
+          users.push({
+            userId: status.userId || childSnapshot.key || 'unknown',
+            name: status.name || 'Anonymous',
+            lastChanged: status.lastChanged || Date.now(),
+          });
         }
       });
+      
+      // Sort by name
+      users.sort((a, b) => a.name.localeCompare(b.name));
+      
       setActiveUsers(count);
+      setOnlineUsers(users);
     });
 
     return () => unsubscribe();
   }, []);
 
-  return { activeUsers };
+  return { activeUsers, onlineUsers };
 }
 
