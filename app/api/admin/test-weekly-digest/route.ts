@@ -2,11 +2,10 @@ import { NextRequest, NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/libs/next-auth";
 import config from "@/config";
-import connectMongo from "@/libs/mongo";
 import User from "@/models/User";
 import { getWeeklyDigestData } from "@/utils/weekly-digest";
 import { sendEmail } from "@/libs/resend";
-import { getWeeklyDigestEmailTemplate } from "@/utils/email-templates/weekly-digest";
+import { generateWeeklyDigestHTML, generateWeeklyDigestText } from "@/utils/email-templates/weekly-digest";
 
 /**
  * Admin endpoint to test weekly digest email
@@ -23,10 +22,8 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    await connectMongo();
-
     // Get admin user
-    const adminUser = await User.findOne({ email: config.admin.email }).lean();
+    const adminUser = await User.findOne({ email: config.admin.email }).lean() as any;
     if (!adminUser) {
       return NextResponse.json(
         { error: "Admin user not found" },
@@ -40,10 +37,8 @@ export async function POST(req: NextRequest) {
     const digestData = await getWeeklyDigestData(adminUser._id.toString());
 
     // Generate email templates
-    const { html, text } = getWeeklyDigestEmailTemplate(
-      adminUser.name || "Admin",
-      digestData
-    );
+    const html = generateWeeklyDigestHTML(digestData);
+    const text = generateWeeklyDigestText(digestData);
 
     // Send test email
     try {
