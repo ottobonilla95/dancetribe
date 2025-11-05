@@ -131,9 +131,9 @@ const Hero = ({ featuredUsers = [] }: HeroProps) => {
                 ))}
               </div>
 
-              <div className="text-sm sm:text-base text-white font-semibold">
+              {/* <div className="text-sm sm:text-base text-white font-semibold">
                 {t('hero.globalDanceCommunity')}
-              </div>
+              </div> */}
             </div>
           </div>
         )}
