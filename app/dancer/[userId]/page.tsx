@@ -549,11 +549,13 @@ export default async function PublicProfile({ params }: Props) {
                       name={userData.name}
                     />
                     <div className="flex-1">
-                      <h2 className="card-title text-2xl mb-2 flex items-center gap-2">
-                        {`${userData.name.charAt(0).toUpperCase() + userData.name.slice(1)}${age && !userData.hideAge ? `, ${age}` : ""}`}
-                        {userData.isFeaturedProfessional && (
-                          <VerifiedBadge size="md" />
-                        )}
+                      <h2 className="card-title text-2xl mb-2">
+                        <span className="flex items-center gap-2">
+                          {`${userData.name.charAt(0).toUpperCase() + userData.name.slice(1)}${age && !userData.hideAge ? `, ${age}` : ""}`}
+                          {userData.isFeaturedProfessional && (
+                            <VerifiedBadge size="lg" className="flex-shrink-0" />
+                          )}
+                        </span>
                       </h2>
                       <div className="flex items-center gap-2 flex-wrap">
                         {userData.isTeacher && (
