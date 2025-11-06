@@ -133,7 +133,7 @@ export default async function ReleasesPage({ params }: ReleasesPageProps) {
           href={`/${producer.username || producer._id}`}
           className="btn btn-outline btn-lg"
         >
-          Back to {producer.name}'s Profile
+          Back to {producer.name}&apos;s Profile
         </Link>
       </div>
     </div>
