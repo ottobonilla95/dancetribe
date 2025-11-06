@@ -3,6 +3,7 @@ import { getServerSession } from "next-auth";
 import { authOptions } from "@/libs/next-auth";
 import connectMongo from "@/libs/mongoose";
 import User from "@/models/User";
+import Notification from "@/models/Notification";
 import { sendEmail } from "@/libs/resend";
 import { friendRequestReceivedEmail, friendRequestAcceptedEmail } from "@/libs/email-templates";
 import { notifyFriendRequest, notifyFriendAccepted } from "@/utils/notifications";
@@ -152,6 +153,13 @@ export async function POST(req: NextRequest) {
           $pull: { friendRequestsSent: { user: currentUserId } },
         });
 
+        // Delete the friend request notification (since it's been accepted)
+        await Notification.deleteMany({
+          recipient: currentUserId,
+          sender: targetUserId,
+          type: "friend_request",
+        });
+
         // Send in-app notification to the person who sent the request
         await notifyFriendAccepted(targetUserId, currentUserId, `/${currentUser.username || currentUserId}`);
 
@@ -188,6 +196,13 @@ export async function POST(req: NextRequest) {
           $pull: { friendRequestsSent: { user: currentUserId } },
         });
 
+        // Delete the friend request notification
+        await Notification.deleteMany({
+          recipient: currentUserId,
+          sender: targetUserId,
+          type: "friend_request",
+        });
+
         return NextResponse.json({
           success: true,
           action: "request_rejected",
@@ -202,6 +217,13 @@ export async function POST(req: NextRequest) {
 
         await User.findByIdAndUpdate(targetUserId, {
           $pull: { friendRequestsReceived: { user: currentUserId } },
+        });
+
+        // Delete the friend request notification
+        await Notification.deleteMany({
+          recipient: targetUserId,
+          sender: currentUserId,
+          type: "friend_request",
         });
 
         return NextResponse.json({
