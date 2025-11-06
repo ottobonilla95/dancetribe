@@ -6,6 +6,7 @@ export type SearchUser = {
   city?: {
     name: string;
   } | null;
+  isFeaturedProfessional?: boolean;
 };
 
 export type SearchCity = {

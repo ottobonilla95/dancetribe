@@ -33,6 +33,7 @@ import ProfilePictureSection from "@/components/profile/ProfilePictureSection";
 import LeaderboardBadges from "@/components/LeaderboardBadges";
 import { getUserLeaderboardBadges } from "@/utils/leaderboard-badges";
 import ProducerReleases from "@/components/ProducerReleases";
+import VerifiedBadge from "@/components/VerifiedBadge";
 
 interface ProfileProps {
   searchParams: { welcome?: string };
@@ -269,12 +270,7 @@ export default async function Profile({ searchParams }: ProfileProps) {
                           ? `${userData.firstName} ${userData.lastName}, ${age}`
                           : `${userData.name?.charAt(0)?.toUpperCase() + userData.name?.slice(1)}, ${age}`}
                         {userData.isFeaturedProfessional && (
-                          <span
-                            className="text-blue-500 text-xl"
-                            title="Verified Professional"
-                          >
-                            ✓
-                          </span>
+                          <VerifiedBadge size="md" />
                         )}
                       </h2>
                       {userData.isTeacher && (

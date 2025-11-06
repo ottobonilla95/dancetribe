@@ -4,6 +4,7 @@ import { useState, useEffect } from "react";
 import { useSession } from "next-auth/react";
 import { redirect } from "next/navigation";
 import config from "@/config";
+import VerifiedBadge from "@/components/VerifiedBadge";
 
 interface User {
   _id: string;
@@ -186,7 +187,7 @@ export default function FeaturedProfessionalsAdmin() {
                             <div className="font-bold flex items-center gap-1">
                               {user.name}
                               {user.isFeaturedProfessional && (
-                                <span className="text-blue-500" title="Verified Professional">✓</span>
+                                <VerifiedBadge size="sm" />
                               )}
                             </div>
                             <div className="text-sm opacity-50">@{user.username}</div>

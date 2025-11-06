@@ -7,6 +7,7 @@ import Image from "next/image";
 import { FaSearch, FaTimes, FaUser, FaCity, FaGlobe, FaUsers } from "react-icons/fa";
 import { SearchUser, SearchCity, SearchCountry, UnifiedSearchResponse } from "@/types/search";
 import Flag from "./Flag";
+import VerifiedBadge from "./VerifiedBadge";
 import { useTranslation } from "./I18nProvider";
 
 interface SearchBarProps {
@@ -212,6 +213,9 @@ export default function SearchBar({
                         <div className="flex-1 min-w-0">
                           <div className="flex items-center gap-2 mb-0.5">
                             <span className="font-medium text-sm truncate">{user.name}</span>
+                            {user.isFeaturedProfessional && (
+                              <VerifiedBadge size="sm" />
+                            )}
                             <span className="text-xs text-base-content/60">@{user.username}</span>
                           </div>
                           {user.city && (

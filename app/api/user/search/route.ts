@@ -91,6 +91,7 @@ export async function GET(req: NextRequest) {
       username: user.username,
       image: user.image,
       city: user.city ? { name: user.city.name } : null,
+      isFeaturedProfessional: user.isFeaturedProfessional || false,
     }));
 
     const formattedCities = cities.map((city: any) => ({

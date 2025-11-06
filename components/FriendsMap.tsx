@@ -328,11 +328,11 @@ export default function FriendsMap({ friends, mapboxToken }: FriendsMapProps) {
             </p>
             <a 
               href="/discover" 
-              className="btn btn-primary btn-lg gap-2"
-            >
-              <span>🔍</span>
-              Discover Dancers
-            </a>
+            className="btn btn-primary btn-lg gap-2"
+          >
+            <span>🔍</span>
+            Discover People
+          </a>
           </div>
         </div>
       )}

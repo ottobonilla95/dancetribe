@@ -23,6 +23,7 @@ interface ProducerReleasesProps {
 
 export default function ProducerReleases({ producerId, isOwnProfile }: ProducerReleasesProps) {
   const [releases, setReleases] = useState<Release[]>([]);
+  const [totalReleases, setTotalReleases] = useState(0);
   const [loading, setLoading] = useState(true);
 
   const fetchReleases = async () => {
@@ -31,7 +32,9 @@ export default function ProducerReleases({ producerId, isOwnProfile }: ProducerR
       const data = await response.json();
 
       if (data.success) {
-        setReleases(data.releases);
+        setTotalReleases(data.releases.length);
+        // Only show top 10 on profile
+        setReleases(data.releases.slice(0, 10));
       }
     } catch (error) {
       console.error("Error fetching releases:", error);
@@ -99,46 +102,61 @@ export default function ProducerReleases({ producerId, isOwnProfile }: ProducerR
             )}
           </div>
         ) : (
-          <div className="space-y-4">
-            {releases.map((release) => (
-              <Link
-                key={release._id}
-                href={`/release/${release._id}`}
-                className="block p-4 rounded-lg bg-base-300 hover:bg-base-100 transition-colors"
-              >
-                <div className="flex items-start gap-3">
-                  {/* Platform Icon */}
-                  <div className="flex-shrink-0">
-                    {release.platform === "spotify" ? (
-                      <FaSpotify className="text-3xl text-green-500" />
-                    ) : (
-                      <FaYoutube className="text-3xl text-red-500" />
-                    )}
-                  </div>
+          <>
+            <div className="space-y-4">
+              {releases.map((release) => (
+                <Link
+                  key={release._id}
+                  href={`/release/${release._id}`}
+                  className="block p-4 rounded-lg bg-base-300 hover:bg-base-100 transition-colors"
+                >
+                  <div className="flex items-start gap-3">
+                    {/* Platform Icon */}
+                    <div className="flex-shrink-0">
+                      {release.platform === "spotify" ? (
+                        <FaSpotify className="text-3xl text-green-500" />
+                      ) : (
+                        <FaYoutube className="text-3xl text-red-500" />
+                      )}
+                    </div>
 
-                  {/* Content */}
-                  <div className="flex-1 min-w-0">
-                    <h3 className="font-bold text-lg truncate">
-                      {release.title}
-                    </h3>
-                    {release.description && (
-                      <p className="text-sm text-base-content/70 line-clamp-2 mt-1">
-                        {release.description}
+                    {/* Content */}
+                    <div className="flex-1 min-w-0">
+                      <h3 className="font-bold text-lg truncate">
+                        {release.title}
+                      </h3>
+                      {release.description && (
+                        <p className="text-sm text-base-content/70 line-clamp-2 mt-1">
+                          {release.description}
+                        </p>
+                      )}
+                      <p className="text-xs text-base-content/50 mt-2">
+                        {formatDate(release.createdAt)}
                       </p>
-                    )}
-                    <p className="text-xs text-base-content/50 mt-2">
-                      {formatDate(release.createdAt)}
-                    </p>
-                  </div>
+                    </div>
 
-                  {/* Arrow */}
-                  <div className="flex-shrink-0">
-                    <FaExternalLinkAlt className="text-base-content/40" />
+                    {/* Arrow */}
+                    <div className="flex-shrink-0">
+                      <FaExternalLinkAlt className="text-base-content/40" />
+                    </div>
                   </div>
-                </div>
-              </Link>
-            ))}
-          </div>
+                </Link>
+              ))}
+            </div>
+
+            {/* See All Button - only show if there are more than 10 releases */}
+            {totalReleases > 10 && (
+              <div className="mt-6 text-center">
+                <Link
+                  href={`/releases/${producerId}`}
+                  className="btn btn-outline btn-sm gap-2"
+                >
+                  See All {totalReleases} Releases
+                  <FaExternalLinkAlt />
+                </Link>
+              </div>
+            )}
+          </>
         )}
       </div>
     </div>

@@ -40,6 +40,7 @@ import config from "@/config";
 import LeaderboardBadges from "@/components/LeaderboardBadges";
 import { getUserLeaderboardBadges } from "@/utils/leaderboard-badges";
 import ProducerReleases from "@/components/ProducerReleases";
+import VerifiedBadge from "@/components/VerifiedBadge";
 
 interface Props {
   params: {
@@ -551,12 +552,7 @@ export default async function PublicProfile({ params }: Props) {
                       <h2 className="card-title text-2xl mb-2 flex items-center gap-2">
                         {`${userData.name.charAt(0).toUpperCase() + userData.name.slice(1)}${age && !userData.hideAge ? `, ${age}` : ""}`}
                         {userData.isFeaturedProfessional && (
-                          <span
-                            className="text-blue-500 text-xl"
-                            title="Verified Professional"
-                          >
-                            ✓
-                          </span>
+                          <VerifiedBadge size="md" />
                         )}
                       </h2>
                       <div className="flex items-center gap-2 flex-wrap">

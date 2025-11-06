@@ -9,6 +9,7 @@ import { getCountryCode } from "@/utils/countries";
 import { useTranslation } from "@/components/I18nProvider";
 import { useEffect, useState } from "react";
 import Cookies from "js-cookie";
+import VerifiedBadge from "./VerifiedBadge";
 
 interface DancerCardProps {
   dancer: User & { 
@@ -123,7 +124,7 @@ export default function DancerCard({ dancer, showLikeButton = true, showFlag = f
                 <h3 className="font-bold text-lg truncate flex items-center gap-1">
                   {dancer.name}
                   {dancer.isFeaturedProfessional && (
-                    <span className="text-blue-500 flex-shrink-0" title="Verified Professional">✓</span>
+                    <VerifiedBadge size="sm" className="flex-shrink-0" />
                   )}
                 </h3>
               </div>

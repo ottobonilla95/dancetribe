@@ -39,19 +39,18 @@ export default async function ReleasePage({ params }: ReleasePageProps) {
   };
 
   return (
-    <div className="min-h-screen bg-base-100 pb-24">
-      <div className="max-w-4xl mx-auto px-4 py-8">
-        {/* Back Button */}
-        <Link
-          href={`/${producer.username || producer._id}`}
-          className="btn btn-ghost btn-sm gap-2 mb-6"
-        >
-          <FaArrowLeft />
-          Back to Profile
-        </Link>
+    <div className="container mx-auto px-4 py-8 max-w-4xl">
+      {/* Back Button */}
+      <Link
+        href={`/${producer.username || producer._id}`}
+        className="btn btn-ghost btn-sm gap-2 mb-6"
+      >
+        <FaArrowLeft />
+        Back to Profile
+      </Link>
 
-        {/* Release Card */}
-        <div className="card bg-base-200 shadow-xl">
+      {/* Release Card */}
+      <div className="card bg-base-200 shadow-xl">
           <div className="card-body">
             {/* Header */}
             <div className="flex items-center gap-4 mb-6">
@@ -158,15 +157,14 @@ export default async function ReleasePage({ params }: ReleasePageProps) {
           </div>
         </div>
 
-        {/* More from this producer */}
-        <div className="mt-8 text-center">
-          <Link
-            href={`/${producer.username || producer._id}`}
-            className="btn btn-outline btn-lg gap-2"
-          >
-            More from {producer.name}
-          </Link>
-        </div>
+      {/* More from this producer */}
+      <div className="mt-8 text-center">
+        <Link
+          href={`/${producer.username || producer._id}`}
+          className="btn btn-outline btn-lg gap-2"
+        >
+          More from {producer.name}
+        </Link>
       </div>
     </div>
   );
