@@ -1109,11 +1109,11 @@ export default async function PublicProfile({ params }: Props) {
                 </div>
               )}
 
-              {/* Producer Releases */}
+              {/* Producer Releases - Public view only (no Add button) */}
               {userData.isProducer && (
                 <ProducerReleases
                   producerId={params.userId}
-                  isOwnProfile={isOwnProfile}
+                  isOwnProfile={false}
                 />
               )}
 

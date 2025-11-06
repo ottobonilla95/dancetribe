@@ -5,6 +5,7 @@ import connectMongo from "@/libs/mongoose";
 import User from "@/models/User";
 import { sendEmail } from "@/libs/resend";
 import { friendRequestReceivedEmail, friendRequestAcceptedEmail } from "@/libs/email-templates";
+import { notifyFriendRequest, notifyFriendAccepted } from "@/utils/notifications";
 
 export async function POST(req: NextRequest) {
   try {
@@ -100,6 +101,9 @@ export async function POST(req: NextRequest) {
           },
         });
 
+        // Send in-app notification
+        await notifyFriendRequest(targetUserId, currentUserId, "/friends");
+
         // Send email notification (non-blocking) - Check notification settings
         if (
           targetUser.email &&
@@ -145,6 +149,9 @@ export async function POST(req: NextRequest) {
           $push: { friends: currentUserId },
           $pull: { friendRequestsSent: { user: currentUserId } },
         });
+
+        // Send in-app notification to the person who sent the request
+        await notifyFriendAccepted(targetUserId, currentUserId, `/${currentUser.username || currentUserId}`);
 
         // Send email notification to the person who sent the request (non-blocking) - Check notification settings
         if (

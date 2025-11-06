@@ -602,16 +602,6 @@ export default async function Profile({ searchParams }: ProfileProps) {
                   </div>
                 )}
 
-                {/* Producer Releases */}
-                {userData.isProducer && (
-                  <div className="mt-6">
-                    <ProducerReleases
-                      producerId={userData._id}
-                      isOwnProfile={true}
-                    />
-                  </div>
-                )}
-
                 {/* Profile Actions */}
                 <div className="mt-6 space-y-3">
                   <Link
@@ -743,6 +733,14 @@ export default async function Profile({ searchParams }: ProfileProps) {
                           )?.name || "",
                   })) || []
                 }
+                isOwnProfile={true}
+              />
+            )}
+
+            {/* Producer Releases */}
+            {userData.isProducer && (
+              <ProducerReleases
+                producerId={userData._id}
                 isOwnProfile={true}
               />
             )}

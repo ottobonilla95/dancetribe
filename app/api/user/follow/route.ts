@@ -3,6 +3,7 @@ import { getServerSession } from "next-auth";
 import { authOptions } from "@/libs/next-auth";
 import connectMongo from "@/libs/mongoose";
 import User from "@/models/User";
+import { notifyNewFollower } from "@/utils/notifications";
 
 export const dynamic = 'force-dynamic';
 
@@ -79,6 +80,9 @@ export async function POST(req: NextRequest) {
     await User.findByIdAndUpdate(userId, {
       $addToSet: { followers: session.user.id }
     });
+
+    // Send in-app notification
+    await notifyNewFollower(userId, session.user.id, `/${currentUser.username || session.user.id}`);
 
     return NextResponse.json({ 
       success: true,

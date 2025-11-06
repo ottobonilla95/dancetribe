@@ -5,6 +5,7 @@ import connectMongo from "@/libs/mongoose";
 import User from "@/models/User";
 import { sendEmail } from "@/libs/resend";
 import { profileLikedEmail } from "@/libs/email-templates";
+import { notifyProfileLiked } from "@/utils/notifications";
 
 export async function POST(req: NextRequest) {
   try {
@@ -73,6 +74,9 @@ export async function POST(req: NextRequest) {
         { $addToSet: { likedBy: currentUserId } },
         { new: true }
       );
+
+      // Send in-app notification
+      await notifyProfileLiked(targetUserId, currentUserId, `/${currentUser.username || currentUserId}`);
 
       // Send email notification (non-blocking) - Check notification settings
       if (

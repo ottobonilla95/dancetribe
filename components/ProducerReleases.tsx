@@ -70,6 +70,11 @@ export default function ProducerReleases({ producerId, isOwnProfile }: ProducerR
     );
   }
 
+  // Hide section completely if no releases on public view
+  if (!isOwnProfile && releases.length === 0) {
+    return null;
+  }
+
   return (
     <div className="card bg-base-200 shadow-xl">
       <div className="card-body">
