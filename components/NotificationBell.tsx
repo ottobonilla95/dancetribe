@@ -35,7 +35,8 @@ export default function NotificationBell() {
     if (!session?.user) return;
 
     try {
-      const response = await fetch("/api/notifications");
+      // Fetch only the most recent 30 notifications
+      const response = await fetch("/api/notifications?limit=30");
       const data = await response.json();
 
       if (data.success) {
@@ -274,6 +275,15 @@ export default function NotificationBell() {
               })
             )}
           </div>
+
+          {/* Footer - show if there are many notifications */}
+          {notifications.length >= 30 && (
+            <div className="p-3 text-center border-t border-base-300">
+              <p className="text-xs text-base-content/60">
+                {t("notifications.showingRecent")} {notifications.length}
+              </p>
+            </div>
+          )}
         </div>
       )}
     </div>

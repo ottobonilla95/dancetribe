@@ -16,7 +16,8 @@
     "justNow": "Justo ahora",
     "minutesAgo": "hace {count}m",
     "hoursAgo": "hace {count}h",
-    "daysAgo": "hace {count}d"
+    "daysAgo": "hace {count}d",
+    "showingRecent": "Mostrando recientes"
   },
   "onboarding": {
     "step": "Paso",
