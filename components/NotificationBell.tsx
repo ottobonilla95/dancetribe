@@ -138,13 +138,8 @@ export default function NotificationBell() {
         return notification.data.actionUrl;
       }
       
-      // Fallback defaults for backwards compatibility
-      switch (notification.type) {
-        case "friend_request":
-          return "/friends";
-        default:
-          return `/${notification.sender?.username || notification.sender?._id}`;
-      }
+      // Fallback default: sender's profile (works for all notification types)
+      return `/${notification.sender?.username || notification.sender?._id}`;
     };
     
     switch (notification.type) {

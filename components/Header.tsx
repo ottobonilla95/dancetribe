@@ -10,7 +10,6 @@ import ButtonSignin from "./ButtonSignin";
 import SearchBar from "./SearchBar";
 import logo from "@/app/icon.png";
 import config from "@/config";
-import { useFriendRequestCount } from "@/contexts/FriendRequestContext";
 import { FaUser, FaUserFriends, FaCog, FaSignOutAlt, FaHome, FaUserPlus, FaMusic, FaSearch, FaPlane, FaShieldAlt, FaTrophy } from "react-icons/fa";
 import { signOut } from "next-auth/react";
 import { CONTACT } from "@/constants/contact";
@@ -44,7 +43,6 @@ const Header = () => {
   const [isOpen, setIsOpen] = useState<boolean>(false);
   const [isSearchOpen, setIsSearchOpen] = useState<boolean>(false);
   const [isSupportModalOpen, setIsSupportModalOpen] = useState<boolean>(false);
-  const pendingRequests = useFriendRequestCount();
 
   // setIsOpen(false) when the route changes (i.e: when the user clicks on a link on mobile)
   useEffect(() => {
@@ -62,12 +60,7 @@ const Header = () => {
     { href: "/discover", label: t('nav.discoverDancers'), icon: FaUserPlus },
     { href: "/leaderboards", label: t('nav.leaderboards'), icon: FaTrophy },
     { href: "/profile", label: t('nav.myProfile'), icon: FaUser },
-    { 
-      href: "/friends", 
-      label: t('nav.friends'), 
-      icon: FaUserFriends, 
-      badge: pendingRequests > 0 ? pendingRequests : undefined 
-    },
+    { href: "/friends", label: t('nav.friends'), icon: FaUserFriends },
     { href: "/music", label: t('nav.trendyMusic'), icon: FaMusic },
     { href: "/settings", label: t('nav.settings'), icon: FaCog },
     { href: "/invite", label: t('nav.inviteFriends'), icon: FaUserPlus, highlight: true },
@@ -150,16 +143,10 @@ const Header = () => {
               <path
                 strokeLinecap="round"
                 strokeLinejoin="round"
-                d="M3.75 6.75h16.5M3.75 12h16.5m-16.5 5.25h16.5"
-              />
-            </svg>
-            {/* Friend request notification badge */}
-            {session && pendingRequests > 0 && (
-              <span className="absolute -top-1 -right-1 bg-error text-error-content text-xs rounded-full h-5 w-5 flex items-center justify-center font-medium animate-pulse">
-                {pendingRequests > 9 ? '9+' : pendingRequests}
-              </span>
-            )}
-          </button>
+              d="M3.75 6.75h16.5M3.75 12h16.5m-16.5 5.25h16.5"
+            />
+          </svg>
+        </button>
         </div>
 
         {/* Your links on large screens */}
@@ -205,14 +192,6 @@ const Header = () => {
 
               {/* Notification Bell */}
               <NotificationBell />
-
-              {/* Friend Requests Badge */}
-              {pendingRequests > 0 && (
-                <Link href="/friends" className="btn btn-ghost btn-sm gap-2">
-                  <FaUserFriends />
-                  <span className="badge badge-secondary badge-sm">{pendingRequests}</span>
-                </Link>
-              )}
               
               {/* User Avatar/Menu */}
               <div className="dropdown dropdown-end">
@@ -242,9 +221,6 @@ const Header = () => {
                       <Link href={item.href} className="flex items-center gap-2">
                         <item.icon />
                         {item.label}
-                        {item.badge && (
-                          <span className="badge badge-secondary badge-xs ml-auto">{item.badge}</span>
-                        )}
                       </Link>
                     </li>
                   ))}
@@ -393,11 +369,6 @@ const Header = () => {
                       >
                         <item.icon className="text-lg" />
                         <span className="font-medium">{item.label}</span>
-                        {item.badge && (
-                          <span className="ml-auto badge badge-secondary badge-sm">
-                            {item.badge}
-                          </span>
-                        )}
                       </Link>
                     ))}
                   </div>

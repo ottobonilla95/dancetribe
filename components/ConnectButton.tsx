@@ -1,7 +1,7 @@
 "use client";
 
-import { useState } from "react";
-import { FaUserPlus, FaUserCheck, FaUserClock, FaCheck, FaTimes } from "react-icons/fa";
+import { useState, useRef, useEffect } from "react";
+import { FaUserPlus, FaUserCheck, FaUserClock, FaCheck, FaTimes, FaChevronDown } from "react-icons/fa";
 import { useSession } from "next-auth/react";
 import Link from "next/link";
 import { useTranslation } from "./I18nProvider";
@@ -32,12 +32,28 @@ export default function ConnectButton({
   const { data: session } = useSession();
   const refreshFriendRequests = useRefreshFriendRequests();
   const [loading, setLoading] = useState(false);
+  const [dropdownOpen, setDropdownOpen] = useState(false);
+  const dropdownRef = useRef<HTMLDivElement>(null);
   const [status, setStatus] = useState({
     isFriend,
     hasSentRequest,
     hasReceivedRequest,
     isFollowing
   });
+
+  // Close dropdown when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
+        setDropdownOpen(false);
+      }
+    };
+
+    if (dropdownOpen) {
+      document.addEventListener("mousedown", handleClickOutside);
+      return () => document.removeEventListener("mousedown", handleClickOutside);
+    }
+  }, [dropdownOpen]);
 
   const handleFollow = async () => {
     if (!session) {
@@ -140,63 +156,102 @@ export default function ConnectButton({
     );
   }
 
-  // Featured Professional: Show BOTH Follow + Friend buttons (LinkedIn-style)
+  // Featured Professional: Dropdown with Follow primary, Add Friend secondary
   if (isFeaturedProfessional) {
     return (
-      <div className="flex gap-2 flex-wrap">
-        {/* Primary: Follow Button */}
-        <button
-          onClick={handleFollow}
-          disabled={loading}
-          className={`btn ${status.isFollowing ? 'btn-outline' : 'btn-primary'} btn-sm gap-2`}
-        >
-          <FaUserCheck className="text-sm" />
-          {loading ? t('connect.loading') : (status.isFollowing ? t('connect.following') : t('connect.follow'))}
-        </button>
-
-        {/* Secondary: Friend Button */}
-        {status.isFriend ? (
-          <button className="btn btn-success btn-sm gap-2" disabled>
+      <div className="relative" ref={dropdownRef}>
+        <div className="flex gap-0">
+          {/* Primary: Follow Button */}
+          <button
+            onClick={handleFollow}
+            disabled={loading}
+            className={`btn ${status.isFollowing ? 'btn-outline' : 'btn-primary'} btn-sm gap-2 rounded-r-none`}
+          >
             <FaUserCheck className="text-sm" />
-            {t('connect.friends')}
+            {loading ? t('connect.loading') : (status.isFollowing ? t('connect.following') : t('connect.follow'))}
           </button>
-        ) : status.hasReceivedRequest ? (
-          <div className="flex gap-1">
-            <button
-              onClick={() => handleFriendRequest('accept')}
-              disabled={loading}
-              className="btn btn-success btn-sm"
-              title={t('connect.acceptRequest')}
-            >
-              <FaCheck className="text-sm" />
-            </button>
-            <button
-              onClick={() => handleFriendRequest('reject')}
-              disabled={loading}
-              className="btn btn-error btn-sm"
-              title={t('connect.rejectRequest')}
-            >
-              <FaTimes className="text-sm" />
-            </button>
+
+          {/* Dropdown Toggle */}
+          <button
+            onClick={() => setDropdownOpen(!dropdownOpen)}
+            disabled={loading}
+            className={`btn ${status.isFollowing ? 'btn-outline' : 'btn-primary'} btn-sm rounded-l-none border-l-0 px-2`}
+          >
+            <FaChevronDown className={`text-xs transition-transform ${dropdownOpen ? 'rotate-180' : ''}`} />
+          </button>
+        </div>
+
+        {/* Dropdown Menu */}
+        {dropdownOpen && (
+          <div className="absolute top-full left-0 mt-1 w-48 bg-base-200 rounded-lg shadow-lg border border-base-300 z-50 animate-in fade-in slide-in-from-top-2 duration-200">
+            <ul className="menu menu-sm p-2">
+              {status.isFriend ? (
+                <li>
+                  <button disabled className="gap-2">
+                    <FaUserCheck className="text-sm" />
+                    {t('connect.friends')}
+                  </button>
+                </li>
+              ) : status.hasReceivedRequest ? (
+                <>
+                  <li>
+                    <button
+                      onClick={() => {
+                        handleFriendRequest('accept');
+                        setDropdownOpen(false);
+                      }}
+                      disabled={loading}
+                      className="gap-2 text-success"
+                    >
+                      <FaCheck className="text-sm" />
+                      {t('connect.acceptRequest')}
+                    </button>
+                  </li>
+                  <li>
+                    <button
+                      onClick={() => {
+                        handleFriendRequest('reject');
+                        setDropdownOpen(false);
+                      }}
+                      disabled={loading}
+                      className="gap-2 text-error"
+                    >
+                      <FaTimes className="text-sm" />
+                      {t('connect.rejectRequest')}
+                    </button>
+                  </li>
+                </>
+              ) : status.hasSentRequest ? (
+                <li>
+                  <button
+                    onClick={() => {
+                      handleFriendRequest('cancel');
+                      setDropdownOpen(false);
+                    }}
+                    disabled={loading}
+                    className="gap-2"
+                  >
+                    <FaUserClock className="text-sm" />
+                    {t('connect.pending')}
+                  </button>
+                </li>
+              ) : (
+                <li>
+                  <button
+                    onClick={() => {
+                      handleFriendRequest('send');
+                      setDropdownOpen(false);
+                    }}
+                    disabled={loading}
+                    className="gap-2"
+                  >
+                    <FaUserPlus className="text-sm" />
+                    {t('connect.connect')}
+                  </button>
+                </li>
+              )}
+            </ul>
           </div>
-        ) : status.hasSentRequest ? (
-          <button
-            onClick={() => handleFriendRequest('cancel')}
-            disabled={loading}
-            className="btn btn-outline btn-sm gap-2"
-          >
-            <FaUserClock className="text-sm" />
-            {t('connect.pending')}
-          </button>
-        ) : (
-          <button
-            onClick={() => handleFriendRequest('send')}
-            disabled={loading}
-            className="btn btn-outline btn-sm gap-2"
-          >
-            <FaUserPlus className="text-sm" />
-            {t('connect.addFriend')}
-          </button>
         )}
       </div>
     );

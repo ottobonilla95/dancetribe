@@ -45,7 +45,9 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: "User not found" }, { status: 404 });
     }
 
-    const currentUser = await User.findById(currentUserId);
+    const currentUser = await User.findById(currentUserId).select(
+      "name username email image friends friendRequestsSent friendRequestsReceived notificationSettings preferredLanguage"
+    );
 
     switch (action) {
       case "send": {
@@ -101,8 +103,8 @@ export async function POST(req: NextRequest) {
           },
         });
 
-        // Send in-app notification
-        await notifyFriendRequest(targetUserId, currentUserId, "/friends");
+        // Send in-app notification - link to sender's profile
+        await notifyFriendRequest(targetUserId, currentUserId, `/${currentUser.username || currentUserId}`);
 
         // Send email notification (non-blocking) - Check notification settings
         if (
