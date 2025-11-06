@@ -20,6 +20,7 @@ interface DancerCardProps {
     isTeacher?: boolean;
     isDJ?: boolean;
     isPhotographer?: boolean;
+    isFeaturedProfessional?: boolean;
     sharedOnSocialMedia?: boolean;
     jackAndJillCompetitions?: Array<{
       placement: string;
@@ -119,7 +120,12 @@ export default function DancerCard({ dancer, showLikeButton = true, showFlag = f
                 {dancer.nationality && (
                   <span className="text-xl">{getFlagEmoji(getCountryCode(dancer.nationality))}</span>
                 )}
-                <h3 className="font-bold text-lg truncate">{dancer.name}</h3>
+                <h3 className="font-bold text-lg truncate flex items-center gap-1">
+                  {dancer.name}
+                  {dancer.isFeaturedProfessional && (
+                    <span className="text-blue-500 flex-shrink-0" title="Verified Professional">✓</span>
+                  )}
+                </h3>
               </div>
               <p className="text-sm text-base-content/60">@{dancer.username}</p>
               
@@ -169,7 +175,7 @@ export default function DancerCard({ dancer, showLikeButton = true, showFlag = f
           )}
 
           {/* Professional Roles - Prominent Display */}
-          {(dancer.isTeacher || dancer.isDJ || dancer.isPhotographer) && (
+          {(dancer.isTeacher || dancer.isDJ || dancer.isPhotographer || dancer.isEventOrganizer || dancer.isProducer) && (
             <div className="flex flex-wrap gap-2">
               {dancer.isTeacher && (
                 <span className="badge badge-sm badge-primary gap-1.5 font-semibold">
@@ -187,6 +193,18 @@ export default function DancerCard({ dancer, showLikeButton = true, showFlag = f
                 <span className="badge badge-sm badge-accent gap-1.5 font-semibold">
                   <FaCamera className="text-sm" />
                   Photographer
+                </span>
+              )}
+              {dancer.isEventOrganizer && (
+                <span className="badge badge-sm badge-info gap-1.5 font-semibold">
+                  🎪
+                  Event Organizer
+                </span>
+              )}
+              {dancer.isProducer && (
+                <span className="badge badge-sm badge-success gap-1.5 font-semibold">
+                  🎹
+                  Producer
                 </span>
               )}
             </div>

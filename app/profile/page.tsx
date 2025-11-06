@@ -11,10 +11,7 @@ import Link from "next/link";
 import { getZodiacSign } from "@/utils/zodiac";
 import { getCountryCode } from "@/utils/countries";
 import { DANCE_LEVELS } from "@/constants/dance-levels";
-import {
-  FaWhatsapp,
-  FaEnvelope,
-} from "react-icons/fa";
+import { FaWhatsapp, FaEnvelope } from "react-icons/fa";
 import Flag from "@/components/Flag";
 import CopyProfileLink from "@/components/CopyProfileLink";
 import ProfileQRCode from "@/components/ProfileQRCode";
@@ -35,6 +32,7 @@ import DancingExperienceSection from "@/components/profile/DancingExperienceSect
 import ProfilePictureSection from "@/components/profile/ProfilePictureSection";
 import LeaderboardBadges from "@/components/LeaderboardBadges";
 import { getUserLeaderboardBadges } from "@/utils/leaderboard-badges";
+import ProducerReleases from "@/components/ProducerReleases";
 
 interface ProfileProps {
   searchParams: { welcome?: string };
@@ -56,7 +54,7 @@ export default async function Profile({ searchParams }: ProfileProps) {
 
   const user = await User.findById(session.user.id)
     .select(
-      "name firstName lastName username email image dateOfBirth hideAge bio dancingStartYear city citiesVisited trips danceStyles anthem socialMedia danceRole gender nationality relationshipStatus isTeacher isDJ isPhotographer isEventOrganizer teacherProfile djProfile photographerProfile eventOrganizerProfile professionalContact friends likedBy jackAndJillCompetitions createdAt"
+      "name firstName lastName username email image dateOfBirth hideAge bio dancingStartYear city citiesVisited trips danceStyles anthem socialMedia danceRole gender nationality relationshipStatus isTeacher isDJ isPhotographer isEventOrganizer isProducer teacherProfile djProfile photographerProfile eventOrganizerProfile producerProfile professionalContact friends likedBy jackAndJillCompetitions createdAt isFeaturedProfessional followers following userType"
     )
     .populate({
       path: "city",
@@ -138,15 +136,6 @@ export default async function Profile({ searchParams }: ProfileProps) {
     return age;
   };
 
-  const formatDate = (date: Date | string) => {
-    if (!date) return "Not set";
-    return new Date(date).toLocaleDateString("en-US", {
-      year: "numeric",
-      month: "long",
-      day: "numeric",
-    });
-  };
-
   const getDanceStylesWithLevels = (userDanceStyles: any[]) => {
     return userDanceStyles.map((userStyle) => {
       const levelInfo = DANCE_LEVELS.find((l) => l.value === userStyle.level);
@@ -186,32 +175,38 @@ export default async function Profile({ searchParams }: ProfileProps) {
     });
   };
 
-  const getRoleDisplay = (role: string) => {
-    const roleMap: Record<string, string> = {
-      leader: `${t("profile.leader")} 🕺`,
-      follower: `${t("profile.follower")} 💃`,
-      both: `${t("common.both")} (${t("profile.leader")} & ${t("profile.follower")})`,
-    };
-    return roleMap[role] || role;
-  };
-
-  const getRelationshipStatusDisplay = (status: string) => {
-    const statusMap: Record<string, string> = {
-      single: `${t("profile.single")} 💙`,
-      in_a_relationship: `${t("profile.relationship")} 💕`,
-      married: `${t("profile.married")} 💍`,
-      its_complicated: "It's complicated 🤷",
-      prefer_not_to_say: "Prefer not to say",
-    };
-    return statusMap[status] || status;
-  };
-
   // Type cast to avoid Mongoose lean() typing issues
   const userData = user as any;
+
+  // Check if user is professional-only
+  const isProfessionalOnly = userData.userType === "professional";
+
   const zodiac = userData.dateOfBirth
     ? getZodiacSign(userData.dateOfBirth)
     : null;
   const age = userData.dateOfBirth ? getAge(userData.dateOfBirth) : null;
+
+  // Social stats
+  const friendsCount = userData.friends?.length || 0;
+  const likesCount = userData.likedBy?.length || 0;
+  const followersCount = userData.followers?.length || 0;
+  const followingCount = userData.following?.length || 0;
+
+  const isProfessional =
+    userData.isTeacher ||
+    userData.isDJ ||
+    userData.isPhotographer ||
+    userData.isEventOrganizer ||
+    userData.isProducer;
+
+  // Check if there's any actual content to show in Dance Profile section
+  const hasDanceProfileContent =
+    (userData.bio && userData.bio.trim().length > 0) ||
+    (userData.relationshipStatus && userData.relationshipStatus.trim && userData.relationshipStatus.trim().length > 0) ||
+    (!isProfessionalOnly && userData.danceRole) ||
+    (!isProfessionalOnly && userData.dancingStartYear) ||
+    (!isProfessionalOnly && userData.danceStyles && userData.danceStyles.length > 0) ||
+    (!isProfessionalOnly && userData.citiesVisited && userData.citiesVisited.length > 0);
 
   return (
     <div className="min-h-screen p-4 bg-base-100">
@@ -263,35 +258,48 @@ export default async function Profile({ searchParams }: ProfileProps) {
             <div className="card bg-base-200 shadow-xl">
               <div className="card-body">
                 <div className="flex flex-row sm:flex-col gap-4">
-                  <ProfilePictureSection 
+                  <ProfilePictureSection
                     initialImage={userData.image}
                     userName={userData.name}
                   />
                   <div>
                     <div className="flex items-center gap-2 flex-wrap">
-                      <h2 className="card-title text-2xl mb-1">
+                      <h2 className="card-title text-2xl mb-1 flex items-center gap-2">
                         {userData.firstName && userData.lastName
                           ? `${userData.firstName} ${userData.lastName}, ${age}`
                           : `${userData.name?.charAt(0)?.toUpperCase() + userData.name?.slice(1)}, ${age}`}
+                        {userData.isFeaturedProfessional && (
+                          <span
+                            className="text-blue-500 text-xl"
+                            title="Verified Professional"
+                          >
+                            ✓
+                          </span>
+                        )}
                       </h2>
                       {userData.isTeacher && (
-                        <div className="badge badge-primary badge-lg gap-1">
+                        <div className="badge badge-primary badge-md sm:badge-lg gap-1">
                           🎓 {t("profile.teacher")}
                         </div>
                       )}
                       {userData.isDJ && (
-                        <div className="badge badge-secondary badge-lg gap-1">
+                        <div className="badge badge-secondary badge-md sm:badge-lg gap-1">
                           🎵 {t("profile.dj")}
                         </div>
                       )}
                       {userData.isPhotographer && (
-                        <div className="badge badge-accent badge-lg gap-1">
+                        <div className="badge badge-accent badge-md sm:badge-lg gap-1">
                           📷 {t("profile.photographer")}
                         </div>
                       )}
                       {userData.isEventOrganizer && (
-                        <div className="badge badge-info badge-lg gap-1">
+                        <div className="badge badge-info badge-md sm:badge-lg gap-1">
                           🎪 Event Organizer
+                        </div>
+                      )}
+                      {userData.isProducer && (
+                        <div className="badge badge-success badge-md sm:badge-lg gap-1">
+                          🎹 {t("profile.producer")}
                         </div>
                       )}
                     </div>
@@ -323,6 +331,22 @@ export default async function Profile({ searchParams }: ProfileProps) {
                         )}
                       </div>
                     )}
+
+                    {/* Social Stats */}
+                    <div className="mt-2 flex gap-4 text-sm text-base-content/60 flex-wrap">
+                      <span>❤️ {likesCount}</span>
+                      <span>👥 {friendsCount}</span>
+                      {userData.isFeaturedProfessional && (
+                        <span>
+                          ⭐ {followersCount}{" "}
+                          {t("connect.followers").toLowerCase()}
+                        </span>
+                      )}
+                      {!userData.isFeaturedProfessional &&
+                        followingCount > 0 && (
+                          <span>⭐ {followingCount} following</span>
+                        )}
+                    </div>
                     {/* Nationality */}
                     {userData.nationality && (
                       <div className="mt-4">
@@ -341,19 +365,21 @@ export default async function Profile({ searchParams }: ProfileProps) {
                   </div>
                 </div>
 
+                {isProfessional && <div className="h-4" />}
+
                 {/* Professional Info - Prominent (Full Width) */}
                 {userData.isTeacher && userData.teacherProfile && (
-                  <div className="mt-6 -mx-8 sm:mx-0 px-8 py-4 sm:px-6 bg-gradient-to-br from-primary/20 to-secondary/20 sm:rounded-lg border-y-2 sm:border-2 border-primary/40">
-                    <div className="flex items-center gap-2 mb-3">
-                      <span className="text-2xl">🎓</span>
-                      <h3 className="font-bold text-lg">
+                  <div className="mt-4 -mx-8 sm:mx-0 px-6 py-3 sm:px-5 bg-gradient-to-br from-primary/20 to-secondary/20 sm:rounded-lg border-y-2 sm:border-2 border-primary/40">
+                    <div className="flex items-center gap-2 mb-2">
+                      <span className="text-xl">🎓</span>
+                      <h3 className="font-bold text-base">
                         {t("profile.danceTeacher")}
                       </h3>
                     </div>
 
                     {userData.teacherProfile.yearsOfExperience !==
                       undefined && (
-                      <div className="mb-3">
+                      <div className="mb-1.5">
                         <div className="text-sm text-base-content/70">
                           <span className="font-semibold text-primary">
                             {userData.teacherProfile.yearsOfExperience}
@@ -368,7 +394,7 @@ export default async function Profile({ searchParams }: ProfileProps) {
                     )}
 
                     {userData.teacherProfile.bio && (
-                      <div className="mb-3">
+                      <div>
                         <p className="text-sm text-base-content/80 italic">
                           &quot;{userData.teacherProfile.bio}&quot;
                         </p>
@@ -379,16 +405,16 @@ export default async function Profile({ searchParams }: ProfileProps) {
 
                 {/* DJ Info */}
                 {userData.isDJ && userData.djProfile && (
-                  <div className="mt-6 -mx-8 sm:mx-0 px-8 py-4 sm:px-6 bg-gradient-to-br from-secondary/20 to-accent/20 sm:rounded-lg border-y-2 sm:border-2 border-secondary/40">
-                    <div className="flex items-center gap-2 mb-3">
-                      <span className="text-2xl">🎵</span>
-                      <h3 className="font-bold text-lg">
+                  <div className="-mx-8 sm:mx-0 px-6 py-3 sm:px-5 bg-gradient-to-br from-secondary/20 to-accent/20 sm:rounded-lg border-y-2 sm:border-2 border-secondary/40">
+                    <div className="flex items-center gap-2 mb-2">
+                      <span className="text-xl">🎵</span>
+                      <h3 className="font-bold text-base">
                         {t("profile.djProfile")}
                       </h3>
                     </div>
 
                     {userData.djProfile.djName && (
-                      <div className="mb-3">
+                      <div className="mb-1.5">
                         <div className="text-sm text-base-content/70">
                           Known as:{" "}
                           <span className="font-semibold text-secondary">
@@ -399,7 +425,7 @@ export default async function Profile({ searchParams }: ProfileProps) {
                     )}
 
                     {userData.djProfile.genres && (
-                      <div className="mb-3">
+                      <div className="mb-1.5">
                         <div className="text-sm text-base-content/70">
                           Genres:{" "}
                           <span className="font-medium">
@@ -410,7 +436,7 @@ export default async function Profile({ searchParams }: ProfileProps) {
                     )}
 
                     {userData.djProfile.bio && (
-                      <div className="mb-3">
+                      <div>
                         <p className="text-sm text-base-content/80 italic">
                           &quot;{userData.djProfile.bio}&quot;
                         </p>
@@ -421,16 +447,16 @@ export default async function Profile({ searchParams }: ProfileProps) {
 
                 {/* Photographer Info */}
                 {userData.isPhotographer && userData.photographerProfile && (
-                  <div className="mt-6 -mx-8 sm:mx-0 px-8 py-4 sm:px-6 bg-gradient-to-br from-accent/20 to-info/20 sm:rounded-lg border-y-2 sm:border-2 border-accent/40">
-                    <div className="flex items-center gap-2 mb-3">
-                      <span className="text-2xl">📷</span>
-                      <h3 className="font-bold text-lg">
+                  <div className="-mx-8 sm:mx-0 px-6 py-3 sm:px-5 bg-gradient-to-br from-accent/20 to-info/20 sm:rounded-lg border-y-2 sm:border-2 border-accent/40">
+                    <div className="flex items-center gap-2 mb-2">
+                      <span className="text-xl">📷</span>
+                      <h3 className="font-bold text-base">
                         {t("profile.photographer")}
                       </h3>
                     </div>
 
                     {userData.photographerProfile.specialties && (
-                      <div className="mb-3">
+                      <div className="mb-1.5">
                         <div className="text-sm text-base-content/70">
                           Specialties:{" "}
                           <span className="font-medium">
@@ -441,7 +467,7 @@ export default async function Profile({ searchParams }: ProfileProps) {
                     )}
 
                     {userData.photographerProfile.portfolioLink && (
-                      <div className="mb-3">
+                      <div className="mb-1.5">
                         <a
                           href={
                             userData.photographerProfile.portfolioLink.startsWith(
@@ -460,7 +486,7 @@ export default async function Profile({ searchParams }: ProfileProps) {
                     )}
 
                     {userData.photographerProfile.bio && (
-                      <div className="mb-3">
+                      <div>
                         <p className="text-sm text-base-content/80 italic">
                           &quot;{userData.photographerProfile.bio}&quot;
                         </p>
@@ -470,41 +496,80 @@ export default async function Profile({ searchParams }: ProfileProps) {
                 )}
 
                 {/* Event Organizer Info */}
-                {userData.isEventOrganizer && userData.eventOrganizerProfile && (
-                  <div className="mt-6 -mx-8 sm:mx-0 px-8 py-4 sm:px-6 bg-gradient-to-br from-info/20 to-success/20 sm:rounded-lg border-y-2 sm:border-2 border-info/40">
-                    <div className="flex items-center gap-2 mb-3">
-                      <span className="text-2xl">🎪</span>
-                      <h3 className="font-bold text-lg">
-                        Event Organizer
-                      </h3>
+                {userData.isEventOrganizer &&
+                  userData.eventOrganizerProfile && (
+                    <div className="-mx-8 sm:mx-0 px-6 py-3 sm:px-5 bg-gradient-to-br from-info/20 to-success/20 sm:rounded-lg border-y-2 sm:border-2 border-info/40">
+                      <div className="flex items-center gap-2 mb-2">
+                        <span className="text-xl">🎪</span>
+                        <h3 className="font-bold text-base">Event Organizer</h3>
+                      </div>
+
+                      {userData.eventOrganizerProfile.organizationName && (
+                        <div className="mb-1.5">
+                          <div className="text-sm text-base-content/70">
+                            Organization:{" "}
+                            <span className="font-medium">
+                              {userData.eventOrganizerProfile.organizationName}
+                            </span>
+                          </div>
+                        </div>
+                      )}
+
+                      {userData.eventOrganizerProfile.eventTypes && (
+                        <div className="mb-1.5">
+                          <div className="text-sm text-base-content/70">
+                            Event Types:{" "}
+                            <span className="font-medium">
+                              {userData.eventOrganizerProfile.eventTypes}
+                            </span>
+                          </div>
+                        </div>
+                      )}
+
+                      {userData.eventOrganizerProfile.bio && (
+                        <div>
+                          <p className="text-sm text-base-content/80 italic">
+                            &quot;{userData.eventOrganizerProfile.bio}&quot;
+                          </p>
+                        </div>
+                      )}
+                    </div>
+                  )}
+
+                {/* Producer Info */}
+                {userData.isProducer && userData.producerProfile && (
+                  <div className="-mx-8 sm:mx-0 px-6 py-3 sm:px-5 bg-gradient-to-br from-purple-500/20 to-pink-500/20 sm:rounded-lg border-y-2 sm:border-2 border-purple-500/40">
+                    <div className="flex items-center gap-2 mb-2">
+                      <span className="text-xl">🎹</span>
+                      <h3 className="font-bold text-base">Producer</h3>
                     </div>
 
-                    {userData.eventOrganizerProfile.organizationName && (
-                      <div className="mb-3">
+                    {userData.producerProfile.producerName && (
+                      <div className="mb-1.5">
                         <div className="text-sm text-base-content/70">
-                          Organization:{" "}
-                          <span className="font-medium">
-                            {userData.eventOrganizerProfile.organizationName}
+                          Known as:{" "}
+                          <span className="font-semibold text-purple-400">
+                            {userData.producerProfile.producerName}
                           </span>
                         </div>
                       </div>
                     )}
 
-                    {userData.eventOrganizerProfile.eventTypes && (
-                      <div className="mb-3">
+                    {userData.producerProfile.genres && (
+                      <div className="mb-1.5">
                         <div className="text-sm text-base-content/70">
-                          Event Types:{" "}
+                          Genres:{" "}
                           <span className="font-medium">
-                            {userData.eventOrganizerProfile.eventTypes}
+                            {userData.producerProfile.genres}
                           </span>
                         </div>
                       </div>
                     )}
 
-                    {userData.eventOrganizerProfile.bio && (
-                      <div className="mb-3">
+                    {userData.producerProfile.bio && (
+                      <div>
                         <p className="text-sm text-base-content/80 italic">
-                          &quot;{userData.eventOrganizerProfile.bio}&quot;
+                          &quot;{userData.producerProfile.bio}&quot;
                         </p>
                       </div>
                     )}
@@ -512,34 +577,40 @@ export default async function Profile({ searchParams }: ProfileProps) {
                 )}
 
                 {/* Shared Professional Contact */}
-                {(userData.isTeacher ||
-                  userData.isDJ ||
-                  userData.isPhotographer ||
-                  userData.isEventOrganizer) &&
-                  userData.professionalContact && (
-                    <div className="mt-6 flex flex-wrap gap-2 px-0">
-                      {userData.professionalContact.whatsapp && (
-                        <a
-                          href={`https://wa.me/${userData.professionalContact.whatsapp.replace(/\D/g, "")}`}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className="btn btn-success btn-sm gap-2 flex-1"
-                        >
-                          <FaWhatsapp />
-                          WhatsApp
-                        </a>
-                      )}
-                      {userData.professionalContact.email && (
-                        <a
-                          href={`mailto:${userData.professionalContact.email}`}
-                          className="btn btn-outline btn-sm gap-2 flex-1"
-                        >
-                          <FaEnvelope />
-                          Email
-                        </a>
-                      )}
-                    </div>
-                  )}
+                {isProfessional && userData.professionalContact && (
+                  <div className="mt-6 flex flex-wrap gap-2 px-0">
+                    {userData.professionalContact.whatsapp && (
+                      <a
+                        href={`https://wa.me/${userData.professionalContact.whatsapp.replace(/\D/g, "")}`}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="btn btn-success btn-sm gap-2"
+                      >
+                        <FaWhatsapp />
+                        WhatsApp
+                      </a>
+                    )}
+                    {userData.professionalContact.email && (
+                      <a
+                        href={`mailto:${userData.professionalContact.email}`}
+                        className="btn btn-outline btn-sm gap-2"
+                      >
+                        <FaEnvelope />
+                        Email
+                      </a>
+                    )}
+                  </div>
+                )}
+
+                {/* Producer Releases */}
+                {userData.isProducer && (
+                  <div className="mt-6">
+                    <ProducerReleases
+                      producerId={userData._id}
+                      isOwnProfile={true}
+                    />
+                  </div>
+                )}
 
                 {/* Profile Actions */}
                 <div className="mt-6 space-y-3">
@@ -549,17 +620,17 @@ export default async function Profile({ searchParams }: ProfileProps) {
                   >
                     ✏️ {t("profile.editProfile")}
                   </Link>
-                  
+
                   <Link
                     href={`/dancer/${userData._id}`}
                     className="btn btn-primary btn-sm w-full gap-2"
                   >
                     👁️ {t("profile.viewMyProfile")}
                   </Link>
-                  
+
                   <CopyProfileLink username={userData.username} />
-                  
-                  <ProfileQRCode 
+
+                  <ProfileQRCode
                     userId={userData._id}
                     userName={userData.name}
                   />
@@ -570,49 +641,77 @@ export default async function Profile({ searchParams }: ProfileProps) {
 
           {/* Detailed Information */}
           <div className="lg:col-span-2 space-y-6">
-            {/* Dance Information */}
-            <div className="card bg-base-200 shadow-xl">
-              <div className="card-body">
-                <h3 className="card-title text-xl mb-4">
-                  {t("profile.danceProfile")}
-                </h3>
+            {/* Dance Information - Only show if there's actual content */}
+            {hasDanceProfileContent && (
+              <div className="card bg-base-200 shadow-xl">
+                <div className="card-body">
+                  <h3 className="card-title text-xl mb-4">
+                    {t("profile.danceProfile")}
+                  </h3>
 
-                {/* Bio */}
-                <BioSection initialBio={userData.bio} />
+                  {/* Bio */}
+                  {userData.bio && userData.bio.trim().length > 0 && (
+                    <BioSection initialBio={userData.bio} />
+                  )}
 
-                {/* Dance Role */}
-                <DanceRoleSection initialDanceRole={userData.danceRole} />
+                  {/* Dance Role - Only for dancers */}
+                  {!isProfessionalOnly && userData.danceRole && (
+                    <DanceRoleSection initialDanceRole={userData.danceRole} />
+                  )}
 
-                {/* Relationship Status */}
-                <RelationshipStatusSection initialRelationshipStatus={userData.relationshipStatus} />
+                  {/* Relationship Status */}
+                  {userData.relationshipStatus && userData.relationshipStatus.trim && userData.relationshipStatus.trim().length > 0 && (
+                    <RelationshipStatusSection
+                      initialRelationshipStatus={userData.relationshipStatus}
+                    />
+                  )}
 
-                {/* Dancing Experience */}
-                <DancingExperienceSection initialDancingStartYear={userData.dancingStartYear} />
+                  {/* Dancing Experience - Only for dancers */}
+                  {!isProfessionalOnly && userData.dancingStartYear && (
+                    <DancingExperienceSection
+                      initialDancingStartYear={userData.dancingStartYear}
+                    />
+                  )}
 
-                {/* Dance Styles */}
-                <div className="mb-8">
-                  <DanceStylesSection 
-                    initialDanceStyles={getDanceStylesWithLevels(userData.danceStyles || [])}
+                  {/* Dance Styles - Only for dancers */}
+                  {!isProfessionalOnly &&
+                    userData.danceStyles &&
+                    userData.danceStyles.length > 0 && (
+                      <div className="mb-8">
+                        <DanceStylesSection
+                          initialDanceStyles={getDanceStylesWithLevels(
+                            userData.danceStyles || []
+                          )}
+                        />
+                      </div>
+                    )}
+
+                  {/* Cities Visited - Only for dancers */}
+                  {!isProfessionalOnly &&
+                    userData.citiesVisited &&
+                    userData.citiesVisited.length > 0 && (
+                      <CitiesVisitedManager
+                        cities={userData.citiesVisited || []}
+                      />
+                    )}
+                </div>
+              </div>
+            )}
+
+            {/* Achievement Badges - Only show for dancers */}
+            {!isProfessionalOnly && (
+              <div className="card bg-base-200 shadow-xl">
+                <div className="card-body">
+                  <h3 className="card-title text-xl mb-4">
+                    🏆 {t("profile.achievementBadges")}
+                  </h3>
+                  <AchievementBadges
+                    badges={calculateUserBadges(userData)}
+                    maxDisplay={6}
                   />
                 </div>
-
-                {/* Cities Visited */}
-                <CitiesVisitedManager cities={userData.citiesVisited || []} />
               </div>
-            </div>
-
-            {/* Achievement Badges */}
-            <div className="card bg-base-200 shadow-xl">
-              <div className="card-body">
-                <h3 className="card-title text-xl mb-4">
-                  🏆 {t("profile.achievementBadges")}
-                </h3>
-                <AchievementBadges
-                  badges={calculateUserBadges(userData)}
-                  maxDisplay={6}
-                />
-              </div>
-            </div>
+            )}
 
             {/* Leaderboard Badges */}
             {leaderboardBadges.length > 0 && (
@@ -626,25 +725,27 @@ export default async function Profile({ searchParams }: ProfileProps) {
               </div>
             )}
 
-            {/* Jack & Jill Competitions */}
-            <JackAndJillManager
-              competitions={userData.jackAndJillCompetitions || []}
-              danceStyles={
-                userData.danceStyles?.map((ds: any) => ({
-                  _id:
-                    typeof ds.danceStyle === "object"
-                      ? ds.danceStyle._id
-                      : ds.danceStyle,
-                  name:
-                    typeof ds.danceStyle === "object"
-                      ? ds.danceStyle.name
-                      : danceStyles.find(
-                          (style: any) => style._id === ds.danceStyle
-                        )?.name || "",
-                })) || []
-              }
-              isOwnProfile={true}
-            />
+            {/* Jack & Jill Competitions - Only show for dancers */}
+            {!isProfessionalOnly && (
+              <JackAndJillManager
+                competitions={userData.jackAndJillCompetitions || []}
+                danceStyles={
+                  userData.danceStyles?.map((ds: any) => ({
+                    _id:
+                      typeof ds.danceStyle === "object"
+                        ? ds.danceStyle._id
+                        : ds.danceStyle,
+                    name:
+                      typeof ds.danceStyle === "object"
+                        ? ds.danceStyle.name
+                        : danceStyles.find(
+                            (style: any) => style._id === ds.danceStyle
+                          )?.name || "",
+                  })) || []
+                }
+                isOwnProfile={true}
+              />
+            )}
 
             {/* Member Since */}
             {/* <div className="card bg-base-200 shadow-xl">

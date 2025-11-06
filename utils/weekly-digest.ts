@@ -19,6 +19,8 @@ export interface WeeklyDigestData {
     views: number;
     uniqueViewers: number;
     newLikes: number;
+    followersCount: number;
+    isFeaturedProfessional: boolean;
   };
   leaderboardChanges: {
     mostLiked?: {
@@ -77,6 +79,14 @@ export interface WeeklyDigestData {
       isNew: boolean;
       droppedOut: boolean;
     };
+    mostLikedProducers?: {
+      current: number | null;
+      previous: number | null;
+      change: number;
+      improved: boolean;
+      isNew: boolean;
+      droppedOut: boolean;
+    };
   };
   friendActivity: {
     friendsWithUpcomingTrips: number;
@@ -99,7 +109,7 @@ export async function getWeeklyDigestData(userId: string): Promise<WeeklyDigestD
     await connectMongo();
 
     const user = await User.findById(userId)
-      .select('name email username profileViews likedBy friendRequestsReceived friends trips notificationSettings')
+      .select('name email username profileViews likedBy friendRequestsReceived friends trips notificationSettings isFeaturedProfessional followers')
       .lean() as any;
 
     if (!user || !user.email) {
@@ -200,6 +210,8 @@ export async function getWeeklyDigestData(userId: string): Promise<WeeklyDigestD
         views: weeklyViews.totalViews,
         uniqueViewers: weeklyViews.uniqueViewers,
         newLikes,
+        followersCount: user.followers?.length || 0,
+        isFeaturedProfessional: user.isFeaturedProfessional || false,
       },
       leaderboardChanges,
       friendActivity: {

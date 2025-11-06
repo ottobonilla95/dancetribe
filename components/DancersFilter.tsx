@@ -29,6 +29,7 @@ interface Dancer {
   isDJ?: boolean;
   isPhotographer?: boolean;
   isEventOrganizer?: boolean;
+  isProducer?: boolean;
   sharedOnSocialMedia?: boolean;
   jackAndJillCompetitions?: Array<{
     placement: string;
@@ -61,6 +62,7 @@ export default function DancersFilter({
   const [showOnlyDJs, setShowOnlyDJs] = useState(false);
   const [showOnlyPhotographers, setShowOnlyPhotographers] = useState(false);
   const [showOnlyEventOrganizers, setShowOnlyEventOrganizers] = useState(false);
+  const [showOnlyProducers, setShowOnlyProducers] = useState(false);
   const [showOpenToPractice, setShowOpenToPractice] = useState(false);
   const [showTravelers, setShowTravelers] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
@@ -92,6 +94,11 @@ export default function DancersFilter({
 
     // Event Organizers filter
     if (showOnlyEventOrganizers && !dancer.isEventOrganizer) {
+      return false;
+    }
+
+    // Producers filter
+    if (showOnlyProducers && !dancer.isProducer) {
       return false;
     }
 
@@ -231,6 +238,23 @@ export default function DancersFilter({
             </div>
           </label>
 
+          {/* Producers Filter */}
+          <label className="flex items-center gap-2 cursor-pointer">
+            <input
+              type="checkbox"
+              checked={showOnlyProducers}
+              onChange={() => {
+                setShowOnlyProducers(!showOnlyProducers);
+                handleFilterChange();
+              }}
+              className="toggle toggle-primary toggle-sm"
+            />
+            <div className="flex items-center gap-1">
+              <span className="text-lg">🎹</span>
+              <span className="font-medium text-sm">Producers</span>
+            </div>
+          </label>
+
           {/* Open to Practice Filter */}
           <label className="flex items-center gap-2 cursor-pointer">
             <input
@@ -267,7 +291,7 @@ export default function DancersFilter({
         </div>
 
         {/* Results Count */}
-        {(showMyStyles || showOnlyTeachers || showOnlyDJs || showOnlyPhotographers || showOnlyEventOrganizers || showOpenToPractice || showTravelers) && (
+        {(showMyStyles || showOnlyTeachers || showOnlyDJs || showOnlyPhotographers || showOnlyEventOrganizers || showOnlyProducers || showOpenToPractice || showTravelers) && (
           <div className="text-sm text-base-content/60">
             {t('filters.found')} <span className="font-bold text-primary">{filteredDancers.length}</span> {t('filters.of')} {dancers.length} {t('filters.dancers')}
           </div>

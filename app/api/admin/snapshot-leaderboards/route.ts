@@ -2,6 +2,8 @@ import { NextResponse, NextRequest } from "next/server";
 import { getServerSession } from "next-auth/next";
 import { authOptions } from "@/libs/next-auth";
 import { snapshotAllLeaderboards } from "@/utils/leaderboard-snapshot";
+import connectMongo from "@/libs/mongoose";
+import AdminTask from "@/models/AdminTask";
 import config from "@/config";
 
 /**
@@ -41,6 +43,22 @@ export async function POST(req: NextRequest) {
         { status: 500 }
       );
     }
+
+    // Track last run in AdminTask
+    await connectMongo();
+    await AdminTask.findOneAndUpdate(
+      { taskName: "snapshot-leaderboards" },
+      {
+        taskName: "snapshot-leaderboards",
+        lastRunAt: new Date(),
+        lastRunBy: session.user.email,
+        status: "success",
+        details: {
+          snapshots: result.snapshots,
+        },
+      },
+      { upsert: true, new: true }
+    );
 
     return NextResponse.json({
       success: true,

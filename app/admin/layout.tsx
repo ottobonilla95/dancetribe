@@ -3,7 +3,7 @@ import { getServerSession } from "next-auth";
 import { authOptions } from "@/libs/next-auth";
 import config from "@/config";
 import Link from "next/link";
-import { FaDatabase, FaChartLine, FaUsers, FaGlobeAmericas, FaMusic, FaGlobe, FaTrash } from "react-icons/fa";
+import { FaDatabase, FaChartLine, FaUsers, FaGlobeAmericas, FaMusic, FaGlobe, FaTrash, FaStar, FaBell } from "react-icons/fa";
 import { ReactNode } from "react";
 
 export default async function AdminLayout({
@@ -40,6 +40,11 @@ export default async function AdminLayout({
       icon: FaTrash,
     },
     {
+      name: "Test Notifications",
+      href: "/admin/test-notifications",
+      icon: FaBell,
+    },
+    {
       name: "Cities",
       href: "/admin/cities",
       icon: FaGlobeAmericas,
@@ -58,6 +63,11 @@ export default async function AdminLayout({
       name: "Users (Social Media)",
       href: "/admin/users",
       icon: FaUsers,
+    },
+    {
+      name: "Featured Professionals",
+      href: "/admin/featured",
+      icon: FaStar,
     },
     {
       name: "Analytics",

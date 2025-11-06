@@ -38,6 +38,7 @@ export async function GET(req: NextRequest) {
     const isDJ = searchParams.get("isDJ") === "true";
     const isPhotographer = searchParams.get("isPhotographer") === "true";
     const isEventOrganizer = searchParams.get("isEventOrganizer") === "true";
+    const isProducer = searchParams.get("isProducer") === "true";
     const limit = parseInt(searchParams.get("limit") || "16");
     const skip = parseInt(searchParams.get("skip") || "0");
 
@@ -111,6 +112,10 @@ export async function GET(req: NextRequest) {
     
     if (isEventOrganizer) {
       query.isEventOrganizer = true;
+    }
+    
+    if (isProducer) {
+      query.isProducer = true;
     }
     
     // Filter by dance role

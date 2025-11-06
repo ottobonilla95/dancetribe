@@ -11,7 +11,8 @@ export type LeaderboardCategory =
   | 'jjParticipation'
   | 'mostLikedTeachers'
   | 'mostLikedDJs'
-  | 'mostLikedPhotographers';
+  | 'mostLikedPhotographers'
+  | 'mostLikedProducers';
 
 interface RankingEntry {
   userId: mongoose.Types.ObjectId;
@@ -228,6 +229,32 @@ export async function calculateRankings(category: LeaderboardCategory): Promise<
       ];
       break;
 
+    case 'mostLikedProducers':
+      aggregationPipeline = [
+        { 
+          $match: { 
+            isProfileComplete: true,
+            isProducer: true,
+            ...(adminId && { _id: { $ne: adminId } })
+          } 
+        },
+        {
+          $addFields: {
+            likesCount: { $size: { $ifNull: ["$likedBy", []] } }
+          }
+        },
+        { $match: { likesCount: { $gt: 0 } } },
+        { $sort: { likesCount: -1 } },
+        { $limit: 100 },
+        {
+          $project: {
+            _id: 1,
+            likesCount: 1
+          }
+        }
+      ];
+      break;
+
     default:
       throw new Error(`Unknown leaderboard category: ${category}`);
   }
@@ -237,7 +264,7 @@ export async function calculateRankings(category: LeaderboardCategory): Promise<
   // Convert to RankingEntry format with ranks
   return results.map((result, index) => {
     const scoreField = 
-      category === 'mostLiked' || category === 'mostLikedTeachers' || category === 'mostLikedDJs' || category === 'mostLikedPhotographers'
+      category === 'mostLiked' || category === 'mostLikedTeachers' || category === 'mostLikedDJs' || category === 'mostLikedPhotographers' || category === 'mostLikedProducers'
         ? 'likesCount'
         : category === 'jjChampions'
         ? 'firstPlaces'
@@ -268,7 +295,8 @@ export async function snapshotAllLeaderboards(): Promise<{ success: boolean; sna
       'jjParticipation',
       'mostLikedTeachers',
       'mostLikedDJs',
-      'mostLikedPhotographers'
+      'mostLikedPhotographers',
+      'mostLikedProducers'
     ];
 
     let snapshotsCreated = 0;
@@ -382,7 +410,8 @@ export async function getAllRankChanges(userId: string) {
     'jjParticipation',
     'mostLikedTeachers',
     'mostLikedDJs',
-    'mostLikedPhotographers'
+    'mostLikedPhotographers',
+    'mostLikedProducers'
   ];
 
   const changes: Record<string, any> = {};

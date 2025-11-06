@@ -28,6 +28,10 @@ export type User = {
   gender?: "male" | "female" | "other";
   nationality?: string;
   relationshipStatus?: "single" | "in_a_relationship" | "married" | "its_complicated" | "prefer_not_to_say";
+  userType?: "dancer" | "professional";
+  isFeaturedProfessional?: boolean;
+  followers?: string[];
+  following?: string[];
   isProfileComplete?: boolean;
   preferredLanguage?: "en" | "es";
   onboardingSteps?: OnboardingSteps;
@@ -38,10 +42,12 @@ export type User = {
   isDJ?: boolean;
   isPhotographer?: boolean;
   isEventOrganizer?: boolean;
+  isProducer?: boolean;
   teacherProfile?: TeacherProfile;
   djProfile?: DJProfile;
   photographerProfile?: PhotographerProfile;
   eventOrganizerProfile?: EventOrganizerProfile;
+  producerProfile?: ProducerProfile;
   professionalContact?: ProfessionalContact;
   trips?: Trip[];
   openToMeetTravelers?: boolean;
@@ -69,6 +75,7 @@ export interface Trip {
 }
 
 export interface OnboardingSteps {
+  userType: boolean;
   nameDetails: boolean;
   danceStyles: boolean;
   username: boolean;
@@ -121,6 +128,12 @@ export interface PhotographerProfile {
 export interface EventOrganizerProfile {
   organizationName?: string;
   eventTypes?: string;
+  bio?: string;
+}
+
+export interface ProducerProfile {
+  producerName?: string;
+  genres?: string;
   bio?: string;
 }
 

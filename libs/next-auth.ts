@@ -80,6 +80,7 @@ export const authOptions: NextAuthOptionsExtended = {
             isProfileComplete: false,
             preferredLanguage: detectedLanguage,
             onboardingSteps: {
+              userType: false,
               nameDetails: false,
               danceStyles: false,
               username: false,

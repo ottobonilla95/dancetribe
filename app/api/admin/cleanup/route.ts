@@ -3,8 +3,25 @@ import { getServerSession } from "next-auth";
 import { authOptions } from "@/libs/next-auth";
 import connectMongo from "@/libs/mongoose";
 import User from "@/models/User";
+import Notification from "@/models/Notification";
+import AdminTask from "@/models/AdminTask";
 import config from "@/config";
 import { cleanupOldSnapshots } from "@/utils/leaderboard-snapshot";
+
+// Helper function to update last run date
+async function updateTaskLastRun(taskName: string, adminEmail: string, details: any = {}) {
+  await AdminTask.findOneAndUpdate(
+    { taskName },
+    {
+      taskName,
+      lastRunAt: new Date(),
+      lastRunBy: adminEmail,
+      status: "success",
+      details,
+    },
+    { upsert: true, new: true }
+  );
+}
 
 export async function POST(req: Request) {
   try {
@@ -94,11 +111,37 @@ export async function POST(req: Request) {
           );
         }
 
+        await updateTaskLastRun("old-snapshots", session.user.email!, {
+          snapshotsDeleted: snapshotResult.deleted,
+        });
+
         return NextResponse.json({
           success: true,
           task: "old-snapshots",
           message: `Cleaned up old leaderboard snapshots (kept last 12 weeks)`,
           snapshotsDeleted: snapshotResult.deleted,
+        });
+      }
+
+      case "old-notifications": {
+        // Delete read notifications older than 30 days
+        const cutoffDate = new Date();
+        cutoffDate.setDate(cutoffDate.getDate() - 30);
+
+        const result = await Notification.deleteMany({
+          isRead: true,
+          readAt: { $lt: cutoffDate },
+        });
+
+        await updateTaskLastRun("old-notifications", session.user.email!, {
+          notificationsDeleted: result.deletedCount,
+        });
+
+        return NextResponse.json({
+          success: true,
+          task: "old-notifications",
+          message: `Cleaned up old read notifications (older than 30 days)`,
+          notificationsDeleted: result.deletedCount,
         });
       }
 
@@ -150,6 +193,23 @@ export async function POST(req: Request) {
         results.push({
           task: "old-snapshots",
           deleted: snapshotResult.deleted,
+        });
+
+        // 5. Old notifications
+        const notifCutoffDate = new Date();
+        notifCutoffDate.setDate(notifCutoffDate.getDate() - 30);
+        const notifResult = await Notification.deleteMany({
+          isRead: true,
+          readAt: { $lt: notifCutoffDate },
+        });
+        results.push({
+          task: "old-notifications",
+          deleted: notifResult.deletedCount,
+        });
+
+        // Update last run for all tasks
+        await updateTaskLastRun("all-cleanup-tasks", session.user.email!, {
+          results,
         });
 
         return NextResponse.json({

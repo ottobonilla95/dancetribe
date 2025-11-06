@@ -15,6 +15,7 @@ import { I18nProvider } from "./I18nProvider";
 import { FriendRequestProvider } from "@/contexts/FriendRequestContext";
 import PresenceTracker from "./PresenceTracker";
 import SuggestionBox from "./SuggestionBox";
+import IncompleteProfileBanner from "./IncompleteProfileBanner";
 
 // Crisp customer chat support:
 // This component is separated from ClientLayout because it needs to be wrapped with <SessionProvider> to use useSession() hook
@@ -60,6 +61,7 @@ const CrispChat = (): null => {
 const ClientLayout = ({ children, initialLocale }: { children: ReactNode; initialLocale: 'en' | 'es' }) => {
   const pathname = usePathname();
   const isDancerProfilePage = pathname?.startsWith('/dancer/');
+  const isOnboardingPage = pathname?.startsWith('/onboarding');
   
   return (
     <>
@@ -68,6 +70,9 @@ const ClientLayout = ({ children, initialLocale }: { children: ReactNode; initia
           <I18nProvider initialLocale={initialLocale}>
             {/* Show a progress bar at the top when navigating between pages */}
             <NextTopLoader color={config.colors.main} showSpinner={false} />
+
+            {/* Incomplete Profile Banner */}
+            <IncompleteProfileBanner />
 
             {/* Content inside app/page.js files  */}
             {children}
@@ -94,8 +99,8 @@ const ClientLayout = ({ children, initialLocale }: { children: ReactNode; initia
             {/* Track user presence (online/offline) */}
             <PresenceTracker />
             
-            {/* Suggestion Box - Floating button for user feedback (hidden on dancer profile pages) */}
-            {!isDancerProfilePage && <SuggestionBox />}
+            {/* Suggestion Box - Floating button for user feedback (hidden on dancer profile pages and onboarding) */}
+            {!isDancerProfilePage && !isOnboardingPage && <SuggestionBox />}
             
             {/* Facebook Pixel - Track page views */}
             <Suspense fallback={null}>

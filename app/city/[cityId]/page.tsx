@@ -173,7 +173,7 @@ export default async function CityPage({ params, searchParams }: Props) {
       { activeCity: cityObjectId, openToMeetTravelers: true }, // Travelers
     ],
   })
-    .select("name username image danceStyles dateOfBirth hideAge nationality dancingStartYear danceRole socialMedia likedBy openToMeetTravelers lookingForPracticePartners activeCity city isTeacher isDJ isPhotographer isEventOrganizer jackAndJillCompetitions bio sharedOnSocialMedia")
+    .select("name username image danceStyles dateOfBirth hideAge nationality dancingStartYear danceRole socialMedia likedBy openToMeetTravelers lookingForPracticePartners activeCity city isTeacher isDJ isPhotographer isEventOrganizer isProducer isFeaturedProfessional jackAndJillCompetitions bio sharedOnSocialMedia")
     .populate({
       path: "danceStyles.danceStyle",
       model: DanceStyle,
@@ -181,10 +181,10 @@ export default async function CityPage({ params, searchParams }: Props) {
     })
     .lean();
 
-  // Sort dancers: professionals (teachers, DJs, photographers, event organizers) by likes, then regular dancers
+  // Sort dancers: professionals (teachers, DJs, photographers, event organizers, producers) by likes, then regular dancers
   dancers.sort((a, b) => {
-    const aIsProfessional = a.isTeacher || a.isDJ || a.isPhotographer || a.isEventOrganizer;
-    const bIsProfessional = b.isTeacher || b.isDJ || b.isPhotographer || b.isEventOrganizer;
+    const aIsProfessional = a.isTeacher || a.isDJ || a.isPhotographer || a.isEventOrganizer || a.isProducer;
+    const bIsProfessional = b.isTeacher || b.isDJ || b.isPhotographer || b.isEventOrganizer || b.isProducer;
     const aLikes = a.likedBy?.length || 0;
     const bLikes = b.likedBy?.length || 0;
 
@@ -285,6 +285,16 @@ export default async function CityPage({ params, searchParams }: Props) {
     isEventOrganizer: true,
   })
     .select("name username image eventOrganizerProfile")
+    .limit(10)
+    .lean();
+
+  // Get producers in this city
+  const producers = await User.find({
+    city: cityObjectId,
+    isProfileComplete: true,
+    isProducer: true,
+  })
+    .select("name username image producerProfile")
     .limit(10)
     .lean();
 
@@ -641,6 +651,55 @@ export default async function CityPage({ params, searchParams }: Props) {
                           {organizer.eventOrganizerProfile?.eventTypes && (
                             <p className="text-xs text-base-content/60 truncate">
                               {organizer.eventOrganizerProfile.eventTypes}
+                            </p>
+                          )}
+                        </div>
+                        <div className="badge badge-accent badge-sm">{t('city.view')}</div>
+                      </Link>
+                    ))}
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {/* Producers in this City */}
+            {producers.length > 0 && (
+              <div className="card bg-base-200 shadow-xl mt-6">
+                <div className="card-body">
+                  <h2 className="card-title mb-4 flex items-center gap-2">
+                    🎹 Producers
+                  </h2>
+                  <div className="space-y-3">
+                    {producers.map((producer: any) => (
+                      <Link
+                        key={producer._id}
+                        href={`/dancer/${producer._id}`}
+                        className="flex items-center gap-3 hover:bg-base-300 rounded p-2 transition-colors"
+                      >
+                        <div className="avatar">
+                          <div className="w-10 h-10 rounded-full">
+                            {producer.image ? (
+                              <img
+                                src={producer.image}
+                                alt={producer.name}
+                                className="w-full h-full object-cover rounded-full"
+                              />
+                            ) : (
+                              <div className="bg-accent text-accent-content rounded-full w-full h-full flex items-center justify-center">
+                                <span className="text-sm">
+                                  {producer.name?.charAt(0)?.toUpperCase() || "?"}
+                                </span>
+                              </div>
+                            )}
+                          </div>
+                        </div>
+                        <div className="flex-1 min-w-0">
+                          <h3 className="font-medium text-sm truncate">
+                            {producer.name}
+                          </h3>
+                          {producer.producerProfile?.genres && (
+                            <p className="text-xs text-base-content/60 truncate">
+                              {producer.producerProfile.genres}
                             </p>
                           )}
                         </div>

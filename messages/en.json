@@ -1,4 +1,23 @@
 {
+  "banner": {
+    "incompleteProfileTitle": "Complete Your Profile",
+    "incompleteProfileMessage": "Your profile is not active yet. Complete it now to start connecting with dancers!",
+    "completeNow": "Complete Now"
+  },
+  "notifications": {
+    "title": "Notifications",
+    "markAllRead": "Mark all read",
+    "noNotifications": "No notifications yet",
+    "newMusic": "{name} posted {title}",
+    "friendRequest": "{name} sent you a friend request",
+    "friendAccepted": "{name} accepted your friend request",
+    "profileLiked": "{name} liked your profile",
+    "newFollower": "{name} started following you",
+    "justNow": "Just now",
+    "minutesAgo": "{count}m ago",
+    "hoursAgo": "{count}h ago",
+    "daysAgo": "{count}d ago"
+  },
   "onboarding": {
     "step": "Step",
     "of": "of",
@@ -14,6 +33,12 @@
     "saveChanges": "Save Changes",
     "uploading": "Uploading...",
     "completing": "Completing...",
+    "userTypeTitle": "Do you dance?",
+    "userTypeDesc": "Help us personalize your experience",
+    "userTypeDancer": "Yes, I dance",
+    "userTypeDancerDesc": "I dance socially, competitively, or for fun (can also be a professional)",
+    "userTypeProfessional": "No, I don't dance",
+    "userTypeProfessionalDesc": "I'm only a DJ, Producer, Teacher, Photographer, or Event Organizer",
     "nameTitle": "What's your name?",
     "nameDesc": "Tell us your first and last name",
     "firstName": "First Name",
@@ -118,7 +143,7 @@
     "socialMediaTitle": "Connect your socials",
     "socialMediaDesc": "Let other dancers find you online",
     "professionalTitle": "Are you a dance professional?",
-    "professionalDesc": "Teacher, DJ, Photographer? Let the community find you!",
+    "professionalDesc": "Teacher, DJ, Producer, Photographer? Let the community find you!",
     "selectAllThatApply": "Select all that apply:",
     "danceTeacher": "Dance Teacher",
     "danceTeacherDesc": "Let students find and contact you",
@@ -218,7 +243,8 @@
     "ctaButton": "Join FREE →",
     "alreadyMember": "If you already have an account, we'll log you in",
     "exploreMore": "Explore more",
-    "dancersConnected": "dancers connected"
+    "dancersConnected": "dancers connected",
+    "globalDanceCommunity": "Global Dance Community"
   },
   "landing": {
     "hottestCities": "Hottest Dance Cities 🔥",
@@ -288,6 +314,7 @@
     "dj": "DJ",
     "photographer": "Photographer",
     "eventOrganizer": "Event Organizer",
+    "producer": "Producer",
     "professionalContact": "Professional Contact",
     "yearsTeaching": "Years teaching",
     "danceTeacher": "Dance Teacher",
@@ -583,10 +610,16 @@
   },
   "connect": {
     "connect": "Connect",
+    "addFriend": "Add Friend",
     "friends": "Friends",
     "pending": "Pending",
     "acceptRequest": "Accept friend request",
-    "rejectRequest": "Reject friend request"
+    "rejectRequest": "Reject friend request",
+    "follow": "Follow",
+    "following": "Following",
+    "unfollow": "Unfollow",
+    "followers": "Followers",
+    "loading": "Loading..."
   },
   "leaderboards": {
     "title": "Leaderboards",

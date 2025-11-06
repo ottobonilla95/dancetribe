@@ -104,7 +104,9 @@ export async function POST(
 
     // Determine missing steps - use ACTUAL onboarding step keys
     // Match the mandatory steps from profile completion logic
-    const allSteps = [
+    const isProfessionalOnly = user.userType === "professional";
+    
+    const baseSteps = [
       { key: 'nameDetails', label: t.steps.name },
       { key: 'username', label: 'Username' },
       { key: 'profilePic', label: t.steps.profilePicture },
@@ -112,9 +114,15 @@ export async function POST(
       { key: 'gender', label: 'Gender' },
       { key: 'nationality', label: 'Nationality' },
       { key: 'currentLocation', label: t.steps.city },
-      { key: 'danceRole', label: 'Dance Role' },
       { key: 'teacherInfo', label: 'Professional Info' },
     ];
+    
+    const danceSteps = [
+      { key: 'danceRole', label: 'Dance Role' },
+    ];
+    
+    // Combine based on user type
+    const allSteps = isProfessionalOnly ? baseSteps : [...baseSteps, ...danceSteps];
 
     const missingSteps = allSteps.filter(step => {
       return !user.onboardingSteps?.[step.key];
@@ -232,4 +240,5 @@ export async function POST(
     );
   }
 }
+
 

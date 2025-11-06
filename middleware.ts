@@ -29,6 +29,7 @@ const authRoutes = [
   '/onboarding',
   '/api/user/profile',
   '/api/user/check-username',
+  '/api/user/delete-account',
   '/api/upload-profile-pic',
   '/api/dance-styles',
   '/api/cities',

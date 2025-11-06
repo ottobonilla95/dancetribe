@@ -91,6 +91,7 @@ export default function Onboarding() {
   const [isDJ, setIsDJ] = useState(false);
   const [isPhotographer, setIsPhotographer] = useState(false);
   const [isEventOrganizer, setIsEventOrganizer] = useState(false);
+  const [isProducer, setIsProducer] = useState(false);
   const [teacherBio, setTeacherBio] = useState("");
   const [yearsOfExperience, setYearsOfExperience] = useState("");
   const [djName, setDjName] = useState("");
@@ -102,13 +103,23 @@ export default function Onboarding() {
   const [eventOrganizerName, setEventOrganizerName] = useState("");
   const [eventTypes, setEventTypes] = useState("");
   const [eventOrganizerBio, setEventOrganizerBio] = useState("");
+  const [producerName, setProducerName] = useState("");
+  const [producerGenres, setProducerGenres] = useState("");
+  const [producerBio, setProducerBio] = useState("");
   const [professionalContact, setProfessionalContact] = useState({
     whatsapp: "",
     email: "",
   });
+  const [userType, setUserType] = useState<"dancer" | "professional" | "">("");
   const [skipDanceSections, setSkipDanceSections] = useState(false);
 
   const steps: OnboardingStep[] = [
+    {
+      id: "userType",
+      title: t("onboarding.userTypeTitle"),
+      description: t("onboarding.userTypeDesc"),
+      completed: user?.userType ? true : false,
+    },
     {
       id: "nameDetails",
       title: t("onboarding.nameTitle"),
@@ -207,6 +218,17 @@ export default function Onboarding() {
     },
   ];
 
+  // Filter out dance-specific steps if user is not a dancer
+  const filteredSteps = skipDanceSections
+    ? steps.filter(
+        (step) =>
+          step.id !== "dancingStartYear" &&
+          step.id !== "danceStyles" &&
+          step.id !== "danceRole" &&
+          step.id !== "citiesVisited"
+      )
+    : steps;
+
   // Username validation and checking
 
   const checkUsernameAvailability = async (value: string) => {
@@ -302,10 +324,21 @@ export default function Onboarding() {
         setDanceStyles(normalizedDanceStyles);
       } else if (
         userData.danceStyles?.length === 0 &&
-        (userData.isDJ || userData.isPhotographer || userData.isEventOrganizer)
+        (userData.isDJ ||
+          userData.isPhotographer ||
+          userData.isEventOrganizer ||
+          userData.isProducer)
       ) {
         // User has explicitly chosen to skip dance sections
         setSkipDanceSections(true);
+      }
+
+      // Load userType
+      if (userData.userType) {
+        setUserType(userData.userType);
+        if (userData.userType === "professional") {
+          setSkipDanceSections(true);
+        }
       }
       if (userData.username) {
         setUsername(userData.username);
@@ -422,6 +455,14 @@ export default function Onboarding() {
           setEventOrganizerBio(userData.eventOrganizerProfile.bio || "");
         }
       }
+      if (userData.isProducer) {
+        setIsProducer(userData.isProducer);
+        if (userData.producerProfile) {
+          setProducerName(userData.producerProfile.producerName || "");
+          setProducerGenres(userData.producerProfile.genres || "");
+          setProducerBio(userData.producerProfile.bio || "");
+        }
+      }
       if (userData.professionalContact) {
         setProfessionalContact({
           whatsapp: userData.professionalContact.whatsapp || "",
@@ -443,7 +484,9 @@ export default function Onboarding() {
               ]
           );
           setCurrentStep(
-            incompleteStepIndex !== -1 ? incompleteStepIndex : steps.length - 1
+            incompleteStepIndex !== -1
+              ? incompleteStepIndex
+              : filteredSteps.length - 1
           );
         } catch (stepError) {
           console.error("Error finding current step:", stepError);
@@ -471,34 +514,22 @@ export default function Onboarding() {
   };
 
   const handleNext = async () => {
-    const step = steps[currentStep];
+    const step = filteredSteps[currentStep];
 
-    // Skip all dance-related steps at once if user is not a dancer
-    if (skipDanceSections && step.id === "dancingStartYear") {
-      // Jump directly to the first non-dance step after danceRole
-      const danceRoleIndex = steps.findIndex((s) => s.id === "danceRole");
-      if (danceRoleIndex !== -1 && danceRoleIndex + 1 < steps.length) {
-        setCurrentStep(danceRoleIndex + 1);
-      }
-      return;
-    }
-
-    // Also skip dance-related steps if skipDanceSections is enabled
-    if (
-      skipDanceSections &&
-      (step.id === "danceStyles" ||
-        step.id === "danceRole" ||
-        step.id === "citiesVisited")
-    ) {
-      if (currentStep < steps.length - 1) {
-        setCurrentStep(currentStep + 1);
-      }
-      return;
-    }
+    // Note: Dance-related steps are now filtered out when skipDanceSections is true
 
     let stepData: any = {};
 
     switch (step.id) {
+      case "userType":
+        if (!userType) {
+          alert("Please select an option");
+          return;
+        }
+        // Set skipDanceSections based on userType
+        setSkipDanceSections(userType === "professional");
+        stepData = { userType };
+        break;
       case "nameDetails":
         if (!firstName.trim()) {
           alert("Please enter your first name");
@@ -630,7 +661,8 @@ export default function Onboarding() {
         break;
       case "teacherInfo": {
         // Validate at least one contact method if any professional role is selected
-        const hasAnyProfessionalRole = isTeacher || isDJ || isPhotographer || isEventOrganizer;
+        const hasAnyProfessionalRole =
+          isTeacher || isDJ || isPhotographer || isEventOrganizer || isProducer;
         if (
           hasAnyProfessionalRole &&
           !professionalContact.whatsapp &&
@@ -646,6 +678,7 @@ export default function Onboarding() {
           isDJ,
           isPhotographer,
           isEventOrganizer,
+          isProducer,
           teacherProfile: isTeacher
             ? {
                 bio: teacherBio,
@@ -675,6 +708,13 @@ export default function Onboarding() {
                 bio: eventOrganizerBio,
               }
             : undefined,
+          producerProfile: isProducer
+            ? {
+                producerName: producerName,
+                genres: producerGenres,
+                bio: producerBio,
+              }
+            : undefined,
           professionalContact: hasAnyProfessionalRole
             ? {
                 whatsapp: professionalContact.whatsapp || undefined,
@@ -694,7 +734,7 @@ export default function Onboarding() {
       setSavingStep(true);
 
       // Set completing state if this is the last step
-      if (currentStep === steps.length - 1) {
+      if (currentStep === filteredSteps.length - 1) {
         setCompleting(true);
       }
 
@@ -732,7 +772,7 @@ export default function Onboarding() {
       }
 
       // Move to next step or complete onboarding
-      if (currentStep < steps.length - 1) {
+      if (currentStep < filteredSteps.length - 1) {
         console.log("📍 Moving to next step:", currentStep + 1);
         setCurrentStep(currentStep + 1);
       } else {
@@ -853,7 +893,7 @@ export default function Onboarding() {
 
   // Auto-add current location to visited cities when they reach that step
   useEffect(() => {
-    const currentStepId = steps[currentStep]?.id;
+    const currentStepId = filteredSteps[currentStep]?.id;
 
     if (currentStepId === "citiesVisited" && currentLocation) {
       // Check if current location is already in visited cities
@@ -890,13 +930,13 @@ export default function Onboarding() {
                 : t("onboarding.completeProfile")}
             </h1>
             <span className="text-sm text-base-content/70">
-              {currentStep + 1} {t("onboarding.of")} {steps.length}
+              {currentStep + 1} {t("onboarding.of")} {filteredSteps.length}
             </span>
           </div>
           <progress
             className="progress progress-primary w-full"
             value={currentStep + 1}
-            max={steps.length}
+            max={filteredSteps.length}
           ></progress>
         </div>
 
@@ -904,14 +944,67 @@ export default function Onboarding() {
         <div className="card bg-base-200 shadow-xl">
           <div className="card-body">
             <h2 className="card-title text-xl mb-2">
-              {steps[currentStep].title}
+              {filteredSteps[currentStep].title}
             </h2>
             <p className="text-base-content/70 mb-6">
-              {steps[currentStep].description}
+              {filteredSteps[currentStep].description}
             </p>
 
+            {/* User Type Selection */}
+            {filteredSteps[currentStep].id === "userType" && (
+              <div className="space-y-4">
+                <div className="grid grid-cols-1 gap-4">
+                  {/* Option 1: I'm a Dancer */}
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setUserType("dancer");
+                      setSkipDanceSections(false);
+                    }}
+                    className={`btn btn-lg h-auto py-6 flex-col items-start text-left ${
+                      userType === "dancer" ? "btn-primary" : "btn-outline"
+                    }`}
+                  >
+                    <div className="flex items-center gap-3 mb-2">
+                      <span className="text-3xl">💃</span>
+                      <span className="text-xl font-bold">
+                        {t("onboarding.userTypeDancer")}
+                      </span>
+                    </div>
+                    <span className="text-sm opacity-80 normal-case">
+                      {t("onboarding.userTypeDancerDesc")}
+                    </span>
+                  </button>
+
+                  {/* Option 2: Professional Only */}
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setUserType("professional");
+                      setSkipDanceSections(true);
+                    }}
+                    className={`btn btn-lg h-auto py-6 flex-col items-start text-left ${
+                      userType === "professional"
+                        ? "btn-primary"
+                        : "btn-outline"
+                    }`}
+                  >
+                    <div className="flex items-center gap-3 mb-2">
+                      <span className="text-3xl">🎵</span>
+                      <span className="text-xl font-bold">
+                        {t("onboarding.userTypeProfessional")}
+                      </span>
+                    </div>
+                    <span className="text-sm opacity-80 normal-case">
+                      {t("onboarding.userTypeProfessionalDesc")}
+                    </span>
+                  </button>
+                </div>
+              </div>
+            )}
+
             {/* Name Details */}
-            {steps[currentStep].id === "nameDetails" && (
+            {filteredSteps[currentStep].id === "nameDetails" && (
               <div className="form-control space-y-4">
                 <div className="form-control">
                   <label className="label">
@@ -945,7 +1038,7 @@ export default function Onboarding() {
             )}
 
             {/* Dance Styles */}
-            {steps[currentStep].id === "danceStyles" && (
+            {filteredSteps[currentStep].id === "danceStyles" && (
               <div className="form-control space-y-6">
                 {/* Show dance styles only if not skipping */}
                 {!skipDanceSections && (
@@ -1084,7 +1177,7 @@ export default function Onboarding() {
             )}
 
             {/* Username */}
-            {steps[currentStep].id === "username" && (
+            {filteredSteps[currentStep].id === "username" && (
               <div className="form-control">
                 <label className="label">
                   <span className="label-text">
@@ -1171,7 +1264,7 @@ export default function Onboarding() {
             )}
 
             {/* Profile Picture */}
-            {steps[currentStep].id === "profilePic" && (
+            {filteredSteps[currentStep].id === "profilePic" && (
               <ImageCropPicker
                 onImageSelect={setProfilePic}
                 currentImage={user?.image}
@@ -1179,7 +1272,7 @@ export default function Onboarding() {
               />
             )}
 
-            {steps[currentStep].id === "dateOfBirth" && (
+            {filteredSteps[currentStep].id === "dateOfBirth" && (
               <div className="form-control space-y-4">
                 <div>
                   <label className="label">
@@ -1217,7 +1310,7 @@ export default function Onboarding() {
             )}
 
             {/* Bio */}
-            {steps[currentStep].id === "bio" && (
+            {filteredSteps[currentStep].id === "bio" && (
               <div className="form-control">
                 <label className="label">
                   <span className="label-text">{t("onboarding.bioLabel")}</span>
@@ -1239,31 +1332,8 @@ export default function Onboarding() {
               </div>
             )}
 
-            {steps[currentStep].id === "dancingStartYear" && (
+            {filteredSteps[currentStep].id === "dancingStartYear" && (
               <div className="form-control space-y-6">
-                {/* Skip Dance Sections Option - Compact */}
-                <div className="form-control">
-                  <label className="label cursor-pointer justify-start gap-3 py-3">
-                    <input
-                      type="checkbox"
-                      className="checkbox checkbox-sm"
-                      checked={skipDanceSections}
-                      onChange={(e) => {
-                        setSkipDanceSections(e.target.checked);
-                        // Clear dance data if they're skipping
-                        if (e.target.checked) {
-                          setDanceStyles([]);
-                          setDancingStartYear("");
-                          setDanceRole("both");
-                        }
-                      }}
-                    />
-                    <span className="label-text text-sm opacity-70">
-                      🎧 📸 {t("onboarding.skipDanceSections")}
-                    </span>
-                  </label>
-                </div>
-
                 {/* Show form only if not skipping */}
                 {!skipDanceSections && (
                   <>
@@ -1300,7 +1370,7 @@ export default function Onboarding() {
               </div>
             )}
 
-            {steps[currentStep].id === "currentLocation" && (
+            {filteredSteps[currentStep].id === "currentLocation" && (
               <CurrentLocationPicker
                 selectedCity={currentLocation}
                 onCitySelect={setCurrentLocation}
@@ -1310,7 +1380,7 @@ export default function Onboarding() {
             )}
 
             {!skipDanceSections &&
-              steps[currentStep].id === "citiesVisited" && (
+              filteredSteps[currentStep].id === "citiesVisited" && (
                 <div className="space-y-3">
                   {currentLocation &&
                     citiesVisited.some(
@@ -1356,70 +1426,70 @@ export default function Onboarding() {
             {/* Rest of the existing form steps remain the same... */}
             {/* I'll continue with the rest but keeping it shorter for readability */}
 
-            {!skipDanceSections && steps[currentStep].id === "anthem" && (
-              <div className="space-y-4">
-                <div className="form-control">
-                  <label className="label">
-                    <span className="label-text">
-                      {t("onboarding.spotifySongUrl")}
-                    </span>
-                  </label>
-                  <input
-                    type="url"
-                    className="input input-bordered"
-                    placeholder={t("onboarding.pasteSpotifyLink")}
-                    value={anthem.url}
-                    onChange={(e) => {
-                      const url = e.target.value;
-                      const parsedInfo = parseMediaUrl(url);
-
-                      setAnthem((prev) => ({
-                        ...prev,
-                        url,
-                        platform: "spotify",
-                        title: prev.title,
-                        artist: prev.artist,
-                      }));
-                    }}
-                  />
-                  <label className="label">
-                    <span className="label-text-alt text-base-content/60">
-                      {t("onboarding.spotifyExample")}
-                    </span>
-                  </label>
-                </div>
-
-                {!mediaInfo && anthem.url && (
-                  <div className="alert alert-warning">
-                    <span>{t("onboarding.validSpotifyUrl")}</span>
-                  </div>
-                )}
-
-                {mediaInfo && (
-                  <div className="space-y-2">
-                    <div className="flex items-center gap-2">
-                      <span className="badge badge-primary">Spotify</span>
-                      <span className="text-sm text-base-content/70">
-                        {t("onboarding.previewSong")}
+            {filteredSteps[currentStep].id === "anthem" && (
+                <div className="space-y-4">
+                  <div className="form-control">
+                    <label className="label">
+                      <span className="label-text">
+                        {t("onboarding.spotifySongUrl")}
                       </span>
-                    </div>
-                    <div className="flex justify-center mt-4">
-                      <iframe
-                        src={mediaInfo.embedUrl}
-                        width="100%"
-                        height="152"
-                        frameBorder="0"
-                        className="rounded-2xl"
-                        allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture"
-                        loading="lazy"
-                      ></iframe>
-                    </div>
-                  </div>
-                )}
-              </div>
-            )}
+                    </label>
+                    <input
+                      type="url"
+                      className="input input-bordered"
+                      placeholder={t("onboarding.pasteSpotifyLink")}
+                      value={anthem.url}
+                      onChange={(e) => {
+                        const url = e.target.value;
+                        const parsedInfo = parseMediaUrl(url);
 
-            {steps[currentStep].id === "socialMedia" && (
+                        setAnthem((prev) => ({
+                          ...prev,
+                          url,
+                          platform: "spotify",
+                          title: prev.title,
+                          artist: prev.artist,
+                        }));
+                      }}
+                    />
+                    <label className="label">
+                      <span className="label-text-alt text-base-content/60">
+                        {t("onboarding.spotifyExample")}
+                      </span>
+                    </label>
+                  </div>
+
+                  {!mediaInfo && anthem.url && (
+                    <div className="alert alert-warning">
+                      <span>{t("onboarding.validSpotifyUrl")}</span>
+                    </div>
+                  )}
+
+                  {mediaInfo && (
+                    <div className="space-y-2">
+                      <div className="flex items-center gap-2">
+                        <span className="badge badge-primary">Spotify</span>
+                        <span className="text-sm text-base-content/70">
+                          {t("onboarding.previewSong")}
+                        </span>
+                      </div>
+                      <div className="flex justify-center mt-4">
+                        <iframe
+                          src={mediaInfo.embedUrl}
+                          width="100%"
+                          height="152"
+                          frameBorder="0"
+                          className="rounded-2xl"
+                          allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture"
+                          loading="lazy"
+                        ></iframe>
+                      </div>
+                    </div>
+                  )}
+                </div>
+              )}
+
+            {filteredSteps[currentStep].id === "socialMedia" && (
               <div className="space-y-4">
                 <div className="form-control">
                   <label className="label">
@@ -1477,7 +1547,7 @@ export default function Onboarding() {
               </div>
             )}
 
-            {steps[currentStep].id === "danceRole" && (
+            {filteredSteps[currentStep].id === "danceRole" && (
               <div className="form-control">
                 {!skipDanceSections && (
                   <>
@@ -1517,7 +1587,7 @@ export default function Onboarding() {
             )}
 
             {/* Gender */}
-            {steps[currentStep].id === "gender" && (
+            {filteredSteps[currentStep].id === "gender" && (
               <div className="form-control">
                 <label className="label">
                   <span className="label-text">
@@ -1548,7 +1618,7 @@ export default function Onboarding() {
             )}
 
             {/* Nationality */}
-            {steps[currentStep].id === "nationality" && (
+            {filteredSteps[currentStep].id === "nationality" && (
               <div className="form-control">
                 <label className="label">
                   <span className="label-text">
@@ -1571,7 +1641,7 @@ export default function Onboarding() {
             )}
 
             {/* Relationship Status */}
-            {steps[currentStep].id === "relationshipStatus" && (
+            {filteredSteps[currentStep].id === "relationshipStatus" && (
               <div className="form-control">
                 <label className="label">
                   <span className="label-text">
@@ -1612,7 +1682,7 @@ export default function Onboarding() {
             )}
 
             {/* Professional Roles (Teacher/DJ/Photographer) */}
-            {steps[currentStep].id === "teacherInfo" && (
+            {filteredSteps[currentStep].id === "teacherInfo" && (
               <div className="space-y-6">
                 <div className="text-sm text-base-content/70 mb-4">
                   {t("onboarding.selectAllThatApply")}
@@ -1821,7 +1891,8 @@ export default function Onboarding() {
                         🎪 Event Organizer
                       </span>
                       <p className="text-sm text-base-content/60">
-                        I organize dance events, socials, workshops, or festivals
+                        I organize dance events, socials, workshops, or
+                        festivals
                       </p>
                     </div>
                   </label>
@@ -1873,10 +1944,83 @@ export default function Onboarding() {
                   </div>
                 )}
 
+                {/* Producer */}
+                <div className="form-control">
+                  <label className="label cursor-pointer justify-start gap-4">
+                    <input
+                      type="checkbox"
+                      className="toggle toggle-primary"
+                      checked={isProducer}
+                      onChange={(e) => setIsProducer(e.target.checked)}
+                    />
+                    <div>
+                      <span className="label-text font-semibold">
+                        🎹 Music Producer
+                      </span>
+                      <p className="text-sm text-base-content/60">
+                        I produce music for dance events, social dancing, or
+                        competitions
+                      </p>
+                    </div>
+                  </label>
+                </div>
+
+                {isProducer && (
+                  <div className="space-y-4 border-l-4 border-primary pl-4 ml-2">
+                    <div className="form-control">
+                      <label className="label">
+                        <span className="label-text">
+                          Producer/Artist Name (optional)
+                        </span>
+                      </label>
+                      <input
+                        type="text"
+                        className="input input-bordered"
+                        placeholder="e.g., DJ Producer, Artist Name"
+                        value={producerName}
+                        onChange={(e) => setProducerName(e.target.value)}
+                      />
+                    </div>
+
+                    <div className="form-control">
+                      <label className="label">
+                        <span className="label-text">
+                          Music Genres (optional)
+                        </span>
+                      </label>
+                      <input
+                        type="text"
+                        className="input input-bordered"
+                        placeholder="e.g., Bachata, Salsa, Kizomba"
+                        value={producerGenres}
+                        onChange={(e) => setProducerGenres(e.target.value)}
+                      />
+                    </div>
+
+                    <div className="form-control">
+                      <label className="label">
+                        <span className="label-text">
+                          Producer Bio (optional)
+                        </span>
+                      </label>
+                      <textarea
+                        className="textarea textarea-bordered h-20"
+                        placeholder="Tell us about your music production style, releases, and what inspires your work..."
+                        value={producerBio}
+                        onChange={(e) => setProducerBio(e.target.value)}
+                      />
+                    </div>
+                  </div>
+                )}
+
                 {/* Shared Professional Contact */}
-                {(isTeacher || isDJ || isPhotographer || isEventOrganizer) && (
+                {(isTeacher ||
+                  isDJ ||
+                  isPhotographer ||
+                  isEventOrganizer ||
+                  isProducer) && (
                   <div className="space-y-4 border-t pt-4">
-                    <div className="divider">
+                    <div className="text-center text-sm font-medium text-base-content/70 py-2">
                       Professional Contact (at least one required)
                     </div>
 
@@ -1959,35 +2103,35 @@ export default function Onboarding() {
                     uploadingProfilePic ||
                     completing ||
                     savingStep ||
-                    (steps[currentStep].id === "username" &&
+                    (filteredSteps[currentStep].id === "username" &&
                       usernameStatus.checking)
                   }
                 >
-                {uploadingProfilePic ? (
-                  <>
-                    <span className="loading loading-spinner loading-sm"></span>
-                    {t("onboarding.uploading")}
-                  </>
-                ) : savingStep ? (
-                  <>
-                    <span className="loading loading-spinner loading-sm"></span>
-                    {t("onboarding.saving")}
-                  </>
-                ) : completing ? (
-                  <>
-                    <span className="loading loading-spinner loading-sm"></span>
-                    {t("onboarding.completing")}
-                  </>
-                ) : currentStep === steps.length - 1 ? (
-                  isEditMode ? (
-                    t("onboarding.saveChanges")
+                  {uploadingProfilePic ? (
+                    <>
+                      <span className="loading loading-spinner loading-sm"></span>
+                      {t("onboarding.uploading")}
+                    </>
+                  ) : savingStep ? (
+                    <>
+                      <span className="loading loading-spinner loading-sm"></span>
+                      {t("onboarding.saving")}
+                    </>
+                  ) : completing ? (
+                    <>
+                      <span className="loading loading-spinner loading-sm"></span>
+                      {t("onboarding.completing")}
+                    </>
+                  ) : currentStep === filteredSteps.length - 1 ? (
+                    isEditMode ? (
+                      t("onboarding.saveChanges")
+                    ) : (
+                      t("onboarding.complete")
+                    )
                   ) : (
-                    t("onboarding.complete")
-                  )
-                ) : (
-                  t("onboarding.next")
-                )}
-              </button>
+                    t("onboarding.next")
+                  )}
+                </button>
               </div>
             </div>
           </div>

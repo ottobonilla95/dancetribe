@@ -199,6 +199,32 @@ export async function GET() {
       }
     ]);
 
+    // 6. Most Liked Producers
+    const mostLikedProducers = await User.aggregate([
+      { 
+        $match: { 
+          isProfileComplete: true,
+          isProducer: true
+        } 
+      },
+      {
+        $addFields: {
+          likesCount: { $size: { $ifNull: ["$likedBy", []] } }
+        }
+      },
+      { $match: { likesCount: { $gt: 0 } } },
+      { $sort: { likesCount: -1 } },
+      { $limit: 50 },
+      {
+        $project: {
+          name: 1,
+          username: 1,
+          image: 1,
+          likesCount: 1
+        }
+      }
+    ]);
+
     return NextResponse.json({
       mostLiked: mostLikedDancers,
       jjChampions,
@@ -207,6 +233,7 @@ export async function GET() {
       mostLikedTeachers,
       mostLikedDJs,
       mostLikedPhotographers,
+      mostLikedProducers,
     });
   } catch (error) {
     console.error('Error fetching leaderboards:', error);

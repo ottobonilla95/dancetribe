@@ -26,6 +26,7 @@ type LeaderboardData = {
   mostLikedTeachers: LeaderboardUser[];
   mostLikedDJs: LeaderboardUser[];
   mostLikedPhotographers: LeaderboardUser[];
+  mostLikedProducers: LeaderboardUser[];
 };
 
 export default function LeaderboardsPage() {
@@ -33,21 +34,21 @@ export default function LeaderboardsPage() {
   const { t } = useTranslation();
   const searchParams = useSearchParams();
   const router = useRouter();
-  const categoryParam = searchParams.get('category') as 'mostLiked' | 'jjChampions' | 'jjPodium' | 'jjParticipation' | 'mostLikedTeachers' | 'mostLikedDJs' | 'mostLikedPhotographers' | null;
+  const categoryParam = searchParams.get('category') as 'mostLiked' | 'jjChampions' | 'jjPodium' | 'jjParticipation' | 'mostLikedTeachers' | 'mostLikedDJs' | 'mostLikedPhotographers' | 'mostLikedProducers' | null;
   
-  const [activeTab, setActiveTab] = useState<'mostLiked' | 'jjChampions' | 'jjPodium' | 'jjParticipation' | 'mostLikedTeachers' | 'mostLikedDJs' | 'mostLikedPhotographers'>(categoryParam || 'mostLiked');
+  const [activeTab, setActiveTab] = useState<'mostLiked' | 'jjChampions' | 'jjPodium' | 'jjParticipation' | 'mostLikedTeachers' | 'mostLikedDJs' | 'mostLikedPhotographers' | 'mostLikedProducers'>(categoryParam || 'mostLiked');
   const [data, setData] = useState<LeaderboardData | null>(null);
   const [loading, setLoading] = useState(true);
   const currentUserId = session?.user?.id;
 
-  const handleTabChange = (tabId: 'mostLiked' | 'jjChampions' | 'jjPodium' | 'jjParticipation' | 'mostLikedTeachers' | 'mostLikedDJs' | 'mostLikedPhotographers') => {
+  const handleTabChange = (tabId: 'mostLiked' | 'jjChampions' | 'jjPodium' | 'jjParticipation' | 'mostLikedTeachers' | 'mostLikedDJs' | 'mostLikedPhotographers' | 'mostLikedProducers') => {
     setActiveTab(tabId);
     router.push(`/leaderboards?category=${tabId}`);
   };
 
   // Update active tab when URL parameter changes
   useEffect(() => {
-    if (categoryParam && ['mostLiked', 'jjChampions', 'jjPodium', 'jjParticipation', 'mostLikedTeachers', 'mostLikedDJs', 'mostLikedPhotographers'].includes(categoryParam)) {
+    if (categoryParam && ['mostLiked', 'jjChampions', 'jjPodium', 'jjParticipation', 'mostLikedTeachers', 'mostLikedDJs', 'mostLikedPhotographers', 'mostLikedProducers'].includes(categoryParam)) {
       setActiveTab(categoryParam);
     }
   }, [categoryParam]);
@@ -75,6 +76,7 @@ export default function LeaderboardsPage() {
     { id: 'mostLikedTeachers', label: 'Most Liked Teachers', icon: <FaChalkboardTeacher className="text-info" /> },
     { id: 'mostLikedDJs', label: 'Most Liked DJs', icon: <FaMusic className="text-secondary" /> },
     { id: 'mostLikedPhotographers', label: 'Most Liked Photographers', icon: <FaCamera className="text-accent" /> },
+    { id: 'mostLikedProducers', label: 'Most Liked Producers', icon: <span className="text-success">🎹</span> },
   ];
 
   const getCurrentUsers = () => {
@@ -94,6 +96,8 @@ export default function LeaderboardsPage() {
         return data.mostLikedDJs;
       case 'mostLikedPhotographers':
         return data.mostLikedPhotographers;
+      case 'mostLikedProducers':
+        return data.mostLikedProducers;
       default:
         return [];
     }
@@ -114,6 +118,8 @@ export default function LeaderboardsPage() {
       case 'mostLikedDJs':
         return { metric: 'likesCount', label: t('leaderboards.likes') };
       case 'mostLikedPhotographers':
+        return { metric: 'likesCount', label: t('leaderboards.likes') };
+      case 'mostLikedProducers':
         return { metric: 'likesCount', label: t('leaderboards.likes') };
       default:
         return { metric: 'likesCount', label: '' };

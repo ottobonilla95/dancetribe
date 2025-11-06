@@ -21,7 +21,7 @@ export async function GET() {
 
     const user = await User.findById(session.user.id)
       .select(
-        "name firstName lastName username email image dateOfBirth hideAge bio dancingStartYear city activeCity citiesVisited danceStyles anthem socialMedia danceRole gender nationality relationshipStatus onboardingSteps isProfileComplete isTeacher isDJ isPhotographer isEventOrganizer teacherProfile djProfile photographerProfile eventOrganizerProfile professionalContact openToMeetTravelers lookingForPracticePartners jackAndJillCompetitions createdAt"
+        "name firstName lastName username email image dateOfBirth hideAge bio dancingStartYear city activeCity citiesVisited danceStyles anthem socialMedia danceRole gender nationality relationshipStatus onboardingSteps isProfileComplete isTeacher isDJ isPhotographer isEventOrganizer isProducer teacherProfile djProfile photographerProfile eventOrganizerProfile producerProfile professionalContact openToMeetTravelers lookingForPracticePartners jackAndJillCompetitions userType createdAt"
       )
       .populate({
         path: "city",
@@ -119,6 +119,11 @@ export async function PUT(req: NextRequest) {
 
     // Update specific onboarding step
     switch (step) {
+      case "userType":
+        user.userType = data.userType;
+        user.onboardingSteps.userType = true;
+        break;
+
       case "nameDetails":
         user.firstName = data.firstName;
         user.lastName = data.lastName;
@@ -255,6 +260,7 @@ export async function PUT(req: NextRequest) {
         user.isDJ = data.isDJ || false;
         user.isPhotographer = data.isPhotographer || false;
         user.isEventOrganizer = data.isEventOrganizer || false;
+        user.isProducer = data.isProducer || false;
         
         // Update teacher profile
         if (data.isTeacher && data.teacherProfile) {
@@ -299,8 +305,19 @@ export async function PUT(req: NextRequest) {
           user.eventOrganizerProfile = undefined;
         }
         
+        // Update producer profile
+        if (data.isProducer && data.producerProfile) {
+          user.producerProfile = {
+            producerName: data.producerProfile.producerName,
+            genres: data.producerProfile.genres,
+            bio: data.producerProfile.bio,
+          };
+        } else {
+          user.producerProfile = undefined;
+        }
+        
         // Update shared professional contact
-        if (data.professionalContact && (data.isTeacher || data.isDJ || data.isPhotographer || data.isEventOrganizer)) {
+        if (data.professionalContact && (data.isTeacher || data.isDJ || data.isPhotographer || data.isEventOrganizer || data.isProducer)) {
           user.professionalContact = {
             whatsapp: data.professionalContact.whatsapp || "",
             email: data.professionalContact.email || "",
@@ -320,10 +337,8 @@ export async function PUT(req: NextRequest) {
     // Only require mandatory steps - optional ones like bio, anthem, socialMedia shouldn't block completion
     const steps = user.onboardingSteps;
     
-    // Check if user is ONLY a professional (not a dancer/teacher)
-    const isProfessionalOnly = (user.isDJ || user.isPhotographer || user.isEventOrganizer) 
-      && !user.isTeacher 
-      && (!user.danceStyles || user.danceStyles.length === 0);
+    // Check if user is ONLY a professional (not a dancer)
+    const isProfessionalOnly = user.userType === "professional";
     
     // Base mandatory steps for everyone
     const baseMandatorySteps = [
@@ -337,11 +352,12 @@ export async function PUT(req: NextRequest) {
       'teacherInfo'      // Need to declare professional roles
     ];
     
-    // Dance-related mandatory steps (only for dancers/teachers)
+    // Dance-related mandatory steps (only for dancers)
     const danceMandatorySteps = [
       'danceRole',
       // 'danceStyles' - optional even for dancers in case they want to skip
       // 'dancingStartYear' - optional
+      // 'citiesVisited' - optional
     ];
     
     // Combine based on user type

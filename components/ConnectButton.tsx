@@ -12,6 +12,9 @@ interface ConnectButtonProps {
   isFriend: boolean;
   hasSentRequest: boolean;
   hasReceivedRequest: boolean;
+  isFeaturedProfessional?: boolean;
+  isFollowing?: boolean;
+  isCurrentUserFeatured?: boolean;
   className?: string;
 }
 
@@ -20,6 +23,9 @@ export default function ConnectButton({
   isFriend, 
   hasSentRequest, 
   hasReceivedRequest,
+  isFeaturedProfessional = false,
+  isFollowing = false,
+  isCurrentUserFeatured = false,
   className = ""
 }: ConnectButtonProps) {
   const { t } = useTranslation();
@@ -29,8 +35,52 @@ export default function ConnectButton({
   const [status, setStatus] = useState({
     isFriend,
     hasSentRequest,
-    hasReceivedRequest
+    hasReceivedRequest,
+    isFollowing
   });
+
+  const handleFollow = async () => {
+    if (!session) {
+      window.location.href = '/api/auth/signin';
+      return;
+    }
+
+    setLoading(true);
+    try {
+      if (status.isFollowing) {
+        // Unfollow
+        const response = await fetch(`/api/user/follow?userId=${targetUserId}`, {
+          method: 'DELETE',
+        });
+        const data = await response.json();
+        if (data.success) {
+          setStatus(prev => ({ ...prev, isFollowing: false }));
+        } else {
+          alert(data.error || 'Something went wrong');
+        }
+      } else {
+        // Follow
+        const response = await fetch('/api/user/follow', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({ userId: targetUserId }),
+        });
+        const data = await response.json();
+        if (data.success) {
+          setStatus(prev => ({ ...prev, isFollowing: true }));
+        } else {
+          alert(data.error || 'Something went wrong');
+        }
+      }
+    } catch (error) {
+      console.error('Error handling follow:', error);
+      alert('Network error. Please try again.');
+    } finally {
+      setLoading(false);
+    }
+  };
 
   const handleFriendRequest = async (action: string) => {
     if (!session) {
@@ -90,6 +140,69 @@ export default function ConnectButton({
     );
   }
 
+  // Featured Professional: Show BOTH Follow + Friend buttons (LinkedIn-style)
+  if (isFeaturedProfessional) {
+    return (
+      <div className="flex gap-2 flex-wrap">
+        {/* Primary: Follow Button */}
+        <button
+          onClick={handleFollow}
+          disabled={loading}
+          className={`btn ${status.isFollowing ? 'btn-outline' : 'btn-primary'} btn-sm gap-2`}
+        >
+          <FaUserCheck className="text-sm" />
+          {loading ? t('connect.loading') : (status.isFollowing ? t('connect.following') : t('connect.follow'))}
+        </button>
+
+        {/* Secondary: Friend Button */}
+        {status.isFriend ? (
+          <button className="btn btn-success btn-sm gap-2" disabled>
+            <FaUserCheck className="text-sm" />
+            {t('connect.friends')}
+          </button>
+        ) : status.hasReceivedRequest ? (
+          <div className="flex gap-1">
+            <button
+              onClick={() => handleFriendRequest('accept')}
+              disabled={loading}
+              className="btn btn-success btn-sm"
+              title={t('connect.acceptRequest')}
+            >
+              <FaCheck className="text-sm" />
+            </button>
+            <button
+              onClick={() => handleFriendRequest('reject')}
+              disabled={loading}
+              className="btn btn-error btn-sm"
+              title={t('connect.rejectRequest')}
+            >
+              <FaTimes className="text-sm" />
+            </button>
+          </div>
+        ) : status.hasSentRequest ? (
+          <button
+            onClick={() => handleFriendRequest('cancel')}
+            disabled={loading}
+            className="btn btn-outline btn-sm gap-2"
+          >
+            <FaUserClock className="text-sm" />
+            {t('connect.pending')}
+          </button>
+        ) : (
+          <button
+            onClick={() => handleFriendRequest('send')}
+            disabled={loading}
+            className="btn btn-outline btn-sm gap-2"
+          >
+            <FaUserPlus className="text-sm" />
+            {t('connect.addFriend')}
+          </button>
+        )}
+      </div>
+    );
+  }
+
+  // FRIEND REQUEST SYSTEM: Normal users (no follow system)
   // Already friends
   if (status.isFriend) {
     return (

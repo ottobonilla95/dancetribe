@@ -47,7 +47,7 @@ export async function GET(req: NextRequest) {
     };
 
     const users = await User.find(userSearchConditions)
-      .select("name username image city")
+      .select("name username image city isFeaturedProfessional")
       .populate({
         path: "city",
         model: City,

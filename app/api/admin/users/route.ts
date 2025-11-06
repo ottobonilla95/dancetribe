@@ -1,4 +1,4 @@
-import { NextResponse } from "next/server";
+import { NextRequest, NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/libs/next-auth";
 import connectMongo from "@/libs/mongoose";
@@ -7,15 +7,17 @@ import City from "@/models/City";
 import Country from "@/models/Country";
 import config from "@/config";
 
+export const dynamic = 'force-dynamic';
+
 // GET: Fetch all users with pagination
-export async function GET(req: Request) {
+export async function GET(req: NextRequest) {
   try {
     const session = await getServerSession(authOptions);
     
     // Check if user is admin
     if (!session?.user?.email || session.user.email !== config.admin.email) {
       return NextResponse.json(
-        { error: "Unauthorized" },
+        { error: "Unauthorized - Admin access required" },
         { status: 401 }
       );
     }
@@ -30,6 +32,7 @@ export async function GET(req: Request) {
     const filterShared = searchParams.get("filterShared"); // "true", "false", or null (all)
     const filterProfileComplete = searchParams.get("filterProfileComplete"); // "true", "false", or null (all)
     const filterCity = searchParams.get("filterCity"); // City ID or null (all)
+    const isFeaturedProfessional = searchParams.get("isFeaturedProfessional"); // "true" or null
 
     // Build search query
     const query: any = {};
@@ -61,9 +64,14 @@ export async function GET(req: Request) {
       query.city = filterCity;
     }
 
+    // Filter by featured professional status (superstar users)
+    if (isFeaturedProfessional === "true") {
+      query.isFeaturedProfessional = true;
+    }
+
     const [users, total] = await Promise.all([
       User.find(query)
-        .select("_id name username image sharedOnSocialMedia isProfileComplete createdAt city onboardingSteps reminderSent reminderSentAt")
+        .select("_id name username email image sharedOnSocialMedia isProfileComplete createdAt city onboardingSteps reminderSent reminderSentAt isFeaturedProfessional isTeacher isDJ isPhotographer isEventOrganizer isProducer followers")
         .populate({
           path: "city",
           select: "name country",
@@ -79,8 +87,15 @@ export async function GET(req: Request) {
       User.countDocuments(query),
     ]);
 
+    // Add follower counts
+    const usersWithCounts = users.map((user: any) => ({
+      ...user,
+      followersCount: user.followers?.length || 0,
+    }));
+
     return NextResponse.json({
-      users,
+      success: true,
+      users: usersWithCounts,
       pagination: {
         page,
         limit,
@@ -96,4 +111,3 @@ export async function GET(req: Request) {
     );
   }
 }
-

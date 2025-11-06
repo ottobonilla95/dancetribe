@@ -133,6 +133,22 @@ export function generateWeeklyDigestHTML(data: WeeklyDigestData): string {
       `);
     }
 
+    if (leaderboardChanges.mostLikedProducers?.improved || leaderboardChanges.mostLikedProducers?.isNew) {
+      const change = leaderboardChanges.mostLikedProducers;
+      const emoji = change.isNew ? '🆕' : '🎹';
+      const text = change.isNew 
+        ? `You're now on the Most Liked Producers leaderboard! (#${change.current})`
+        : `Most Liked Producers: #${change.current} (↑${Math.abs(change.change)})`;
+      leaderboardItems.push(`
+        <div style="padding: 15px; background: linear-gradient(135deg, #84fab0 0%, #8fd3f4 100%); border-radius: 8px; margin-bottom: 10px;">
+          <div style="color: #333; font-size: 18px; font-weight: bold; margin-bottom: 10px;">${emoji} ${text}</div>
+          <a href="https://${config.domainName}/leaderboards?category=mostLikedProducers" style="display: inline-block; background: #84fab0; color: #333; padding: 8px 16px; text-decoration: none; border-radius: 4px; font-weight: bold; font-size: 13px;">
+            View Leaderboard →
+          </a>
+        </div>
+      `);
+    }
+
     if (leaderboardItems.length > 0) {
       leaderboardHTML = `
         <div style="margin-bottom: 30px;">
@@ -156,6 +172,11 @@ export function generateWeeklyDigestHTML(data: WeeklyDigestData): string {
     
     if (profileActivity.newLikes > 0) {
       activityItems.push(`<div style="font-size: 16px;">• <strong>${profileActivity.newLikes}</strong> new like${profileActivity.newLikes > 1 ? 's' : ''} ❤️</div>`);
+    }
+
+    // Show follower count for featured professionals
+    if (profileActivity.isFeaturedProfessional && profileActivity.followersCount > 0) {
+      activityItems.push(`<div style="font-size: 16px; margin-top: 10px;">• <strong>${profileActivity.followersCount}</strong> follower${profileActivity.followersCount > 1 ? 's' : ''} ⭐</div>`);
     }
 
     if (activityItems.length > 0) {
@@ -316,7 +337,8 @@ export function generateWeeklyDigestText(data: WeeklyDigestData): string {
   }
 
   // Profile activity
-  const hasAnyProfileActivity = profileActivity.views > 0 || profileActivity.newLikes > 0;
+  const hasAnyProfileActivity = profileActivity.views > 0 || profileActivity.newLikes > 0 || 
+    (profileActivity.isFeaturedProfessional && profileActivity.followersCount > 0);
   if (hasAnyProfileActivity) {
     text += `PROFILE ACTIVITY\n`;
     text += `----------------\n`;
@@ -325,6 +347,9 @@ export function generateWeeklyDigestText(data: WeeklyDigestData): string {
     }
     if (profileActivity.newLikes > 0) {
       text += `• ${profileActivity.newLikes} new like${profileActivity.newLikes > 1 ? 's' : ''}\n`;
+    }
+    if (profileActivity.isFeaturedProfessional && profileActivity.followersCount > 0) {
+      text += `• ${profileActivity.followersCount} follower${profileActivity.followersCount > 1 ? 's' : ''} ⭐\n`;
     }
     text += '\n';
   }

@@ -15,7 +15,8 @@ const LeaderboardSnapshotSchema = new mongoose.Schema({
       'jjParticipation',
       'mostLikedTeachers',
       'mostLikedDJs',
-      'mostLikedPhotographers'
+      'mostLikedPhotographers',
+      'mostLikedProducers'
     ],
     required: true,
     index: true

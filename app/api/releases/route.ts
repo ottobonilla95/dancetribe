@@ -1,0 +1,166 @@
+import { NextRequest, NextResponse } from "next/server";
+import { getServerSession } from "next-auth";
+import { authOptions } from "@/libs/next-auth";
+import connectMongo from "@/libs/mongoose";
+import Release from "@/models/Release";
+import User from "@/models/User";
+import { notifyNewMusic } from "@/utils/notifications";
+
+export const dynamic = "force-dynamic";
+
+// Helper to detect platform and extract IDs
+function parseUrl(url: string): { platform: "spotify" | "youtube"; id: string } | null {
+  // Spotify patterns
+  const spotifyPatterns = [
+    /spotify\.com\/track\/([a-zA-Z0-9]+)/,
+    /open\.spotify\.com\/track\/([a-zA-Z0-9]+)/,
+  ];
+  
+  for (const pattern of spotifyPatterns) {
+    const match = url.match(pattern);
+    if (match) {
+      return { platform: "spotify", id: match[1] };
+    }
+  }
+
+  // YouTube patterns
+  const youtubePatterns = [
+    /youtube\.com\/watch\?v=([a-zA-Z0-9_-]+)/,
+    /youtu\.be\/([a-zA-Z0-9_-]+)/,
+    /youtube\.com\/embed\/([a-zA-Z0-9_-]+)/,
+  ];
+  
+  for (const pattern of youtubePatterns) {
+    const match = url.match(pattern);
+    if (match) {
+      return { platform: "youtube", id: match[1] };
+    }
+  }
+
+  return null;
+}
+
+// POST /api/releases - Create new release
+export async function POST(req: NextRequest) {
+  try {
+    const session = await getServerSession(authOptions);
+
+    if (!session?.user?.id) {
+      return NextResponse.json(
+        { error: "Unauthorized" },
+        { status: 401 }
+      );
+    }
+
+    await connectMongo();
+
+    // Check if user is a producer
+    const user = await User.findById(session.user.id).select("isProducer").lean() as any;
+    if (!user || !user.isProducer) {
+      return NextResponse.json(
+        { error: "Only producers can create releases" },
+        { status: 403 }
+      );
+    }
+
+    const { title, description, url } = await req.json();
+
+    // Validate required fields
+    if (!title || !url) {
+      return NextResponse.json(
+        { error: "Title and URL are required" },
+        { status: 400 }
+      );
+    }
+
+    // Parse URL to determine platform and extract ID
+    const parsed = parseUrl(url);
+    if (!parsed) {
+      return NextResponse.json(
+        { error: "Invalid URL. Please provide a Spotify or YouTube link." },
+        { status: 400 }
+      );
+    }
+
+    // Create release
+    const release = await Release.create({
+      producer: session.user.id,
+      title,
+      description: description || "",
+      url,
+      platform: parsed.platform,
+      spotifyTrackId: parsed.platform === "spotify" ? parsed.id : undefined,
+      youtubeVideoId: parsed.platform === "youtube" ? parsed.id : undefined,
+    });
+
+    // Send notifications to followers AND friends with action URL to release detail page
+    await notifyNewMusic(
+      session.user.id,
+      title,
+      `/release/${release._id.toString()}`
+    );
+
+    return NextResponse.json({
+      success: true,
+      message: "Release created successfully",
+      release: {
+        _id: release._id.toString(),
+        title: release.title,
+        description: release.description,
+        url: release.url,
+        platform: release.platform,
+        createdAt: release.createdAt,
+      },
+    });
+  } catch (error) {
+    console.error("Error creating release:", error);
+    return NextResponse.json(
+      { error: "Failed to create release" },
+      { status: 500 }
+    );
+  }
+}
+
+// GET /api/releases?producerId=xxx - Get releases by producer
+export async function GET(req: NextRequest) {
+  try {
+    const { searchParams } = new URL(req.url);
+    const producerId = searchParams.get("producerId");
+
+    if (!producerId) {
+      return NextResponse.json(
+        { error: "Producer ID is required" },
+        { status: 400 }
+      );
+    }
+
+    await connectMongo();
+
+    const releases = await Release.find({ producer: producerId })
+      .sort({ createdAt: -1 })
+      .lean();
+
+    const releasesFormatted = releases.map((release: any) => ({
+      _id: release._id.toString(),
+      title: release.title,
+      description: release.description,
+      url: release.url,
+      platform: release.platform,
+      spotifyTrackId: release.spotifyTrackId,
+      youtubeVideoId: release.youtubeVideoId,
+      createdAt: release.createdAt,
+    }));
+
+    return NextResponse.json({
+      success: true,
+      releases: releasesFormatted,
+    });
+  } catch (error) {
+    console.error("Error fetching releases:", error);
+    return NextResponse.json(
+      { error: "Failed to fetch releases" },
+      { status: 500 }
+    );
+  }
+}
+

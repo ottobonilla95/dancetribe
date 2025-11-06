@@ -21,6 +21,7 @@ import { useTranslation } from "./I18nProvider";
 import DeleteAccountButton from "./DeleteAccountButton";
 import ActiveUsersCounter from "./ActiveUsersCounter";
 import AdminModeToggle from "./AdminModeToggle";
+import NotificationBell from "./NotificationBell";
 
 const links: {
   href: string;
@@ -110,8 +111,8 @@ const Header = () => {
             </div>
           )}
         </div>
-        {/* Search and Burger buttons on mobile */}
-        <div className="flex lg:hidden gap-2">
+        {/* Search, Notifications and Burger buttons on mobile */}
+        <div className="flex lg:hidden gap-2 items-center">
           {/* Search button on mobile */}
           {session && (
             <button
@@ -122,6 +123,13 @@ const Header = () => {
               <span className="sr-only">{t('nav.openSearch')}</span>
               <FaSearch className="w-5 h-5 text-base-content" />
             </button>
+          )}
+
+          {/* Notification Bell on mobile */}
+          {session && (
+            <div className="-m-1">
+              <NotificationBell />
+            </div>
           )}
           
           {/* Burger button to open menu on mobile */}
@@ -194,6 +202,9 @@ const Header = () => {
 
               {/* Language Switcher */}
               <LanguageSwitcher />
+
+              {/* Notification Bell */}
+              <NotificationBell />
 
               {/* Friend Requests Badge */}
               {pendingRequests > 0 && (

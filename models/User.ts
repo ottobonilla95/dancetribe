@@ -172,8 +172,14 @@ const userSchema = new mongoose.Schema(
       enum: ['en', 'es'],
       default: 'en',
     },
+    // User type (dancer vs professional-only)
+    userType: {
+      type: String,
+      enum: ['dancer', 'professional'],
+    },
     // Onboarding completion tracking
     onboardingSteps: {
+      userType: { type: Boolean, default: false },
       nameDetails: { type: Boolean, default: false },
       danceStyles: { type: Boolean, default: false },
       username: { type: Boolean, default: false },
@@ -208,6 +214,10 @@ const userSchema = new mongoose.Schema(
       type: Boolean,
       default: false,
     },
+    isProducer: {
+      type: Boolean,
+      default: false,
+    },
     // Teacher profile
     teacherProfile: {
       bio: String,
@@ -235,14 +245,35 @@ const userSchema = new mongoose.Schema(
       eventTypes: String, // e.g., "Socials, Workshops, Festivals"
       bio: String,
     },
+    // Producer profile
+    producerProfile: {
+      producerName: String, // Artist/producer name
+      genres: String, // Music genres
+      bio: String,
+    },
     // Shared professional contact (for all professional roles)
     professionalContact: {
       whatsapp: String,
       email: String,
     },
+    // Featured professional status (for follow system)
+    isFeaturedProfessional: {
+      type: Boolean,
+      default: false,
+    },
     // Social features
     // Users who liked this profile
     likedBy: [{
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "User",
+    }],
+    // Followers (one-way relationship for featured professionals)
+    followers: [{
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "User",
+    }],
+    // Following (users this user follows)
+    following: [{
       type: mongoose.Schema.Types.ObjectId,
       ref: "User",
     }],

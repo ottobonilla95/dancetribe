@@ -13,6 +13,7 @@ interface User {
   createdAt: string;
   reminderSent?: boolean;
   reminderSentAt?: string;
+  userType?: "dancer" | "professional" | "both";
   city?: {
     _id: string;
     name: string;
@@ -190,39 +191,62 @@ export default function AdminUsersPage() {
   };
 
   const getMissingSteps = (user: User) => {
-    const stepLabels: Record<string, string> = {
+    // Check if user is professional-only
+    const isProfessionalOnly = user.userType === "professional";
+    
+    // Base steps for everyone
+    const baseStepLabels: Record<string, string> = {
       nameDetails: "Name & Details",
-      danceStyles: "Dance Styles",
       username: "Username",
       profilePic: "Profile Picture",
       dateOfBirth: "Date of Birth",
-      bio: "Bio",
-      dancingStartYear: "Dancing Start Year",
+      gender: "Gender",
+      nationality: "Nationality",
       currentLocation: "Current Location",
+      teacherInfo: "Professional Info",
+    };
+    
+    // Dance-related mandatory steps (only for dancers)
+    const danceStepLabels: Record<string, string> = {
+      danceRole: "Dance Role",
+    };
+    
+    // Optional steps (shown but not required for completion)
+    const optionalStepLabels: Record<string, string> = {
+      bio: "Bio",
+      danceStyles: "Dance Styles",
+      dancingStartYear: "Dancing Start Year",
       citiesVisited: "Cities Visited",
       anthem: "Dance Anthem",
       socialMedia: "Social Media",
-      danceRole: "Dance Role",
-      gender: "Gender",
-      nationality: "Nationality",
       relationshipStatus: "Relationship Status",
-      teacherInfo: "Teacher Info",
     };
+    
+    // Combine based on user type
+    const mandatoryStepLabels = isProfessionalOnly
+      ? baseStepLabels
+      : { ...baseStepLabels, ...danceStepLabels };
+    
+    // All steps (mandatory + optional)
+    const allStepLabels = { ...mandatoryStepLabels, ...optionalStepLabels };
 
     const missing: string[] = [];
     const completed: string[] = [];
 
     if (user.onboardingSteps) {
-      Object.entries(stepLabels).forEach(([key, label]) => {
+      Object.entries(allStepLabels).forEach(([key, label]) => {
         if (user.onboardingSteps?.[key as keyof typeof user.onboardingSteps]) {
           completed.push(label);
         } else {
-          missing.push(label);
+          // Only show as missing if it's a mandatory step for this user type
+          if (key in mandatoryStepLabels) {
+            missing.push(label);
+          }
         }
       });
     } else {
-      // If no onboarding steps data, consider all as missing
-      return { missing: Object.values(stepLabels), completed: [] };
+      // If no onboarding steps data, consider all mandatory steps as missing
+      return { missing: Object.values(mandatoryStepLabels), completed: [] };
     }
 
     return { missing, completed };
