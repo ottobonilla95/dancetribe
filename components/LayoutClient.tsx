@@ -62,6 +62,7 @@ const ClientLayout = ({ children, initialLocale }: { children: ReactNode; initia
   const pathname = usePathname();
   const isDancerProfilePage = pathname?.startsWith('/dancer/');
   const isOnboardingPage = pathname?.startsWith('/onboarding');
+  const isDashboardPage = pathname === '/dashboard';
   
   return (
     <>
@@ -99,8 +100,8 @@ const ClientLayout = ({ children, initialLocale }: { children: ReactNode; initia
             {/* Track user presence (online/offline) */}
             <PresenceTracker />
             
-            {/* Suggestion Box - Floating button for user feedback (hidden on dancer profile pages and onboarding) */}
-            {!isDancerProfilePage && !isOnboardingPage && <SuggestionBox />}
+            {/* Suggestion Box - Floating button for user feedback (only visible on dashboard) */}
+            {isDashboardPage && <SuggestionBox />}
             
             {/* Facebook Pixel - Track page views */}
             <Suspense fallback={null}>
