@@ -19,6 +19,7 @@ const notificationSchema = new mongoose.Schema(
         "friend_accepted",     // Friend request accepted
         "profile_liked",       // Someone liked profile
         "new_follower",        // Someone followed you
+        "message",             // New direct message
       ],
       required: true,
       index: true,

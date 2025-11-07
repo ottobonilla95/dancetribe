@@ -10,7 +10,7 @@ import ButtonSignin from "./ButtonSignin";
 import SearchBar from "./SearchBar";
 import logo from "@/app/icon.png";
 import config from "@/config";
-import { FaUser, FaUserFriends, FaCog, FaSignOutAlt, FaHome, FaUserPlus, FaMusic, FaSearch, FaPlane, FaShieldAlt, FaTrophy } from "react-icons/fa";
+import { FaUser, FaUserFriends, FaCog, FaSignOutAlt, FaHome, FaUserPlus, FaMusic, FaSearch, FaPlane, FaShieldAlt, FaTrophy, FaComment } from "react-icons/fa";
 import { signOut } from "next-auth/react";
 import { CONTACT } from "@/constants/contact";
 import InstallAppButton from "./InstallAppButton";
@@ -43,12 +43,39 @@ const Header = () => {
   const [isOpen, setIsOpen] = useState<boolean>(false);
   const [isSearchOpen, setIsSearchOpen] = useState<boolean>(false);
   const [isSupportModalOpen, setIsSupportModalOpen] = useState<boolean>(false);
+  const [unreadMessagesCount, setUnreadMessagesCount] = useState<number>(0);
+  const [notifications, setNotifications] = useState<any[]>([]);
+  const [unreadNotificationsCount, setUnreadNotificationsCount] = useState<number>(0);
 
   // setIsOpen(false) when the route changes (i.e: when the user clicks on a link on mobile)
   useEffect(() => {
     setIsOpen(false);
     setIsSearchOpen(false);
   }, [searchParams]);
+
+  // Fetch user status (notifications + unread messages) in ONE call
+  useEffect(() => {
+    if (session?.user) {
+      const fetchUserStatus = async () => {
+        try {
+          const res = await fetch("/api/user/status");
+          const data = await res.json();
+          if (res.ok) {
+            setNotifications(data.notifications);
+            setUnreadNotificationsCount(data.unreadNotificationsCount);
+            setUnreadMessagesCount(data.unreadMessagesCount);
+          }
+        } catch (error) {
+          console.error("Error fetching user status:", error);
+        }
+      };
+
+      fetchUserStatus();
+      // Poll every 30 seconds
+      const interval = setInterval(fetchUserStatus, 30000);
+      return () => clearInterval(interval);
+    }
+  }, [session]);
 
 
 
@@ -58,6 +85,7 @@ const Header = () => {
   const loggedInNavItems = [
     { href: "/dashboard", label: t('nav.dashboard'), icon: FaHome },
     { href: "/discover", label: t('nav.discoverDancers'), icon: FaUserPlus },
+    { href: "/messages", label: t('nav.messages'), icon: FaComment },
     { href: "/leaderboards", label: t('nav.leaderboards'), icon: FaTrophy },
     { href: "/profile", label: t('nav.myProfile'), icon: FaUser },
     { href: "/friends", label: t('nav.friends'), icon: FaUserFriends },
@@ -121,7 +149,10 @@ const Header = () => {
           {/* Notification Bell on mobile */}
           {session && (
             <div className="-m-1">
-              <NotificationBell />
+              <NotificationBell 
+                notifications={notifications} 
+                unreadCount={unreadNotificationsCount} 
+              />
             </div>
           )}
           
@@ -145,7 +176,16 @@ const Header = () => {
                 strokeLinejoin="round"
               d="M3.75 6.75h16.5M3.75 12h16.5m-16.5 5.25h16.5"
             />
-          </svg>
+            </svg>
+            {/* Badge for unread messages on hamburger */}
+            {(unreadMessagesCount > 0) && (
+              <span className="absolute -top-1 -right-1 flex h-5 w-5 items-center justify-center">
+                <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-primary opacity-75"></span>
+                <span className="relative inline-flex items-center justify-center rounded-full h-5 w-5 bg-primary text-primary-content text-xs font-bold">
+                  {unreadMessagesCount}
+                </span>
+              </span>
+            )}
         </button>
         </div>
 
@@ -191,7 +231,10 @@ const Header = () => {
               <LanguageSwitcher />
 
               {/* Notification Bell */}
-              <NotificationBell />
+              <NotificationBell 
+                notifications={notifications}
+                unreadCount={unreadNotificationsCount}
+              />
               
               {/* User Avatar/Menu */}
               <div className="dropdown dropdown-end">
@@ -221,6 +264,11 @@ const Header = () => {
                       <Link href={item.href} className="flex items-center gap-2">
                         <item.icon />
                         {item.label}
+                        {item.href === "/messages" && unreadMessagesCount > 0 && (
+                          <span className="badge badge-primary badge-sm">
+                            {unreadMessagesCount}
+                          </span>
+                        )}
                       </Link>
                     </li>
                   ))}
@@ -369,6 +417,11 @@ const Header = () => {
                       >
                         <item.icon className="text-lg" />
                         <span className="font-medium">{item.label}</span>
+                        {item.href === "/messages" && unreadMessagesCount > 0 && (
+                          <span className="badge badge-primary badge-sm ml-auto">
+                            {unreadMessagesCount}
+                          </span>
+                        )}
                       </Link>
                     ))}
                   </div>

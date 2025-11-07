@@ -665,7 +665,7 @@ export default async function PublicProfile({ params }: Props) {
 
                       {/* Connect Button - show for all users except own profile */}
                       {!isOwnProfile && (
-                        <div className="mt-4">
+                        <div className="mt-4 space-y-2">
                           <ConnectButton
                             targetUserId={params.userId}
                             isFriend={isFriend}
@@ -677,6 +677,14 @@ export default async function PublicProfile({ params }: Props) {
                             isFollowing={isFollowing}
                             isCurrentUserFeatured={isCurrentUserFeatured}
                           />
+                          {isLoggedIn && (
+                            <Link
+                              href={`/messages?to=${params.userId}`}
+                              className="btn btn-outline btn-sm w-full"
+                            >
+                              💬 Send Message
+                            </Link>
+                          )}
                         </div>
                       )}
                     </div>

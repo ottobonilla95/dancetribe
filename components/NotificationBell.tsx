@@ -3,7 +3,7 @@
 import { useState, useEffect, useRef } from "react";
 import { useSession } from "next-auth/react";
 import Link from "next/link";
-import { FaBell, FaMusic, FaUserFriends, FaHeart, FaUserPlus, FaCheck } from "react-icons/fa";
+import { FaBell, FaMusic, FaUserFriends, FaHeart, FaUserPlus, FaCheck, FaComment } from "react-icons/fa";
 import { useTranslation } from "./I18nProvider";
 
 interface Notification {
@@ -21,41 +21,16 @@ interface Notification {
   createdAt: string;
 }
 
-export default function NotificationBell() {
+interface NotificationBellProps {
+  notifications: Notification[];
+  unreadCount: number;
+}
+
+export default function NotificationBell({ notifications = [], unreadCount = 0 }: NotificationBellProps) {
   const { data: session } = useSession();
   const { t } = useTranslation();
-  const [notifications, setNotifications] = useState<Notification[]>([]);
-  const [unreadCount, setUnreadCount] = useState(0);
   const [isOpen, setIsOpen] = useState(false);
-  const [loading, setLoading] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
-
-  // Fetch notifications
-  const fetchNotifications = async () => {
-    if (!session?.user) return;
-
-    try {
-      // Fetch only the most recent 30 notifications
-      const response = await fetch("/api/notifications?limit=30");
-      const data = await response.json();
-
-      if (data.success) {
-        setNotifications(data.notifications);
-        setUnreadCount(data.unreadCount);
-      }
-    } catch (error) {
-      console.error("Error fetching notifications:", error);
-    }
-  };
-
-  // Initial fetch and poll every 30 seconds
-  useEffect(() => {
-    if (session?.user) {
-      fetchNotifications();
-      const interval = setInterval(fetchNotifications, 30000); // Poll every 30s
-      return () => clearInterval(interval);
-    }
-  }, [session]);
 
   // Close dropdown when clicking outside
   useEffect(() => {
@@ -79,14 +54,7 @@ export default function NotificationBell() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ notificationId }),
       });
-
-      // Update local state
-      setNotifications((prev) =>
-        prev.map((n) =>
-          n._id === notificationId ? { ...n, isRead: true } : n
-        )
-      );
-      setUnreadCount((prev) => Math.max(0, prev - 1));
+      // Note: State will be updated on next poll (30s)
     } catch (error) {
       console.error("Error marking notification as read:", error);
     }
@@ -94,20 +62,15 @@ export default function NotificationBell() {
 
   // Mark all as read
   const markAllAsRead = async () => {
-    setLoading(true);
     try {
       await fetch("/api/notifications", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ markAllRead: true }),
       });
-
-      setNotifications((prev) => prev.map((n) => ({ ...n, isRead: true })));
-      setUnreadCount(0);
+      // Note: State will be updated on next poll (30s)
     } catch (error) {
       console.error("Error marking all as read:", error);
-    } finally {
-      setLoading(false);
     }
   };
 
@@ -124,6 +87,8 @@ export default function NotificationBell() {
         return <FaHeart className="text-error" />;
       case "new_follower":
         return <FaUserPlus className="text-info" />;
+      case "message":
+        return <FaComment className="text-primary" />;
       default:
         return <FaBell />;
     }
@@ -171,6 +136,11 @@ export default function NotificationBell() {
           text: t("notifications.newFollower").replace("{name}", senderName),
           link: getActionUrl(),
         };
+      case "message":
+        return {
+          text: t("notifications.message").replace("{name}", senderName),
+          link: `/messages/${notification.data.conversationId}`,
+        };
       default:
         return {
           text: "New notification",
@@ -216,7 +186,6 @@ export default function NotificationBell() {
             {unreadCount > 0 && (
               <button
                 onClick={markAllAsRead}
-                disabled={loading}
                 className="btn btn-ghost btn-xs"
               >
                 {t("notifications.markAllRead")}

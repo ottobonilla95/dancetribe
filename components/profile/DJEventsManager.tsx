@@ -71,10 +71,12 @@ export default function DJEventsManager() {
       const data = await res.json();
       
       if (res.ok) {
-        setCities(data);
+        // Handle both array response and object with cities array
+        setCities(Array.isArray(data) ? data : (data.cities || []));
       }
     } catch (error) {
       console.error("Error fetching cities:", error);
+      setCities([]);
     }
   };
 

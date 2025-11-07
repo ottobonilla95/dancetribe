@@ -13,6 +13,7 @@
     "friendAccepted": "{name} aceptó tu solicitud de amistad",
     "profileLiked": "{name} le gustó tu perfil",
     "newFollower": "{name} comenzó a seguirte",
+    "message": "{name} te envió un mensaje",
     "justNow": "Justo ahora",
     "minutesAgo": "hace {count}m",
     "hoursAgo": "hace {count}h",
@@ -489,6 +490,7 @@
   "nav": {
     "dashboard": "Inicio",
     "discoverDancers": "Descubrir Personas",
+    "messages": "Mensajes",
     "leaderboards": "Clasificaciones",
     "myProfile": "Mi Perfil",
     "friends": "Amigos",
