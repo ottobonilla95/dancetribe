@@ -281,16 +281,16 @@ export default function DJEventsManager() {
               {/* Venue */}
               <div className="form-control">
                 <label className="label">
-                  <span className="label-text">Venue *</span>
+                  <span className="label-text">Venue (optional)</span>
                 </label>
                 <input
                   type="text"
                   className="input input-bordered"
+                  placeholder="Club, venue, or location name"
                   value={formData.venue}
                   onChange={(e) =>
                     setFormData({ ...formData, venue: e.target.value })
                   }
-                  required
                   maxLength={100}
                 />
               </div>
@@ -302,26 +302,15 @@ export default function DJEventsManager() {
                 </label>
                 <input
                   type="text"
-                  className="input input-bordered mb-2"
-                  placeholder="Search city..."
-                  value={citySearch}
-                  onChange={(e) => setCitySearch(e.target.value)}
-                />
-                <select
-                  className="select select-bordered"
+                  className="input input-bordered"
+                  placeholder="e.g., Barcelona, New York, Tokyo"
                   value={formData.city}
                   onChange={(e) =>
                     setFormData({ ...formData, city: e.target.value })
                   }
                   required
-                >
-                  <option value="">Select a city</option>
-                  {filteredCities.slice(0, 50).map((city) => (
-                    <option key={city._id} value={city._id}>
-                      {city.name}, {city.country.name}
-                    </option>
-                  ))}
-                </select>
+                  maxLength={100}
+                />
               </div>
 
               {/* Date */}
@@ -343,10 +332,11 @@ export default function DJEventsManager() {
               {/* Description */}
               <div className="form-control">
                 <label className="label">
-                  <span className="label-text">Description</span>
+                  <span className="label-text">Description (optional)</span>
                 </label>
                 <textarea
                   className="textarea textarea-bordered h-24"
+                  placeholder="Tell people about this event..."
                   value={formData.description}
                   onChange={(e) =>
                     setFormData({ ...formData, description: e.target.value })
@@ -358,11 +348,12 @@ export default function DJEventsManager() {
               {/* Image URL */}
               <div className="form-control">
                 <label className="label">
-                  <span className="label-text">Image URL</span>
+                  <span className="label-text">Image URL (optional)</span>
                 </label>
                 <input
                   type="url"
                   className="input input-bordered"
+                  placeholder="https://example.com/event-photo.jpg"
                   value={formData.imageUrl}
                   onChange={(e) =>
                     setFormData({ ...formData, imageUrl: e.target.value })

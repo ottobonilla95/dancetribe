@@ -238,7 +238,7 @@ const Header = () => {
               
               {/* User Avatar/Menu */}
               <div className="dropdown dropdown-end">
-                <div tabIndex={0} role="button" className="btn btn-ghost btn-circle avatar">
+                <div tabIndex={0} role="button" className="btn btn-ghost btn-circle avatar relative">
                   <div className="w-8 rounded-full">
                     {session.user?.image ? (
                       <Image
@@ -257,6 +257,15 @@ const Header = () => {
                       </div>
                     )}
                   </div>
+                  {/* Badge for unread messages on desktop */}
+                  {unreadMessagesCount > 0 && (
+                    <span className="absolute -top-1 -right-1 flex h-5 w-5 items-center justify-center">
+                      <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-primary opacity-75"></span>
+                      <span className="relative inline-flex items-center justify-center rounded-full h-5 w-5 bg-primary text-primary-content text-xs font-bold">
+                        {unreadMessagesCount}
+                      </span>
+                    </span>
+                  )}
                 </div>
                 <ul tabIndex={0} className="mt-3 z-[1] p-2 shadow menu menu-sm dropdown-content bg-base-100 rounded-box w-52">
                   {loggedInNavItems.map((item) => (

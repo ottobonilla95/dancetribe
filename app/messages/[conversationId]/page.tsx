@@ -169,7 +169,7 @@ export default function ChatPage() {
         </div>
         <div className="flex-1">
           {otherUser && (
-            <div className="flex items-center gap-3">
+            <Link href={`/dancer/${otherUser._id}`} className="flex items-center gap-3 hover:opacity-80 transition-opacity">
               <div className="avatar">
                 <div className="w-10 h-10 rounded-full">
                   {otherUser.image ? (
@@ -184,7 +184,7 @@ export default function ChatPage() {
               <div>
                 <h2 className="font-semibold">{otherUser.name}</h2>
               </div>
-            </div>
+            </Link>
           )}
         </div>
       </div>

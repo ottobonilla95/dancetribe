@@ -15,13 +15,12 @@ const DJEventSchema = new Schema(
     },
     venue: {
       type: String,
-      required: true,
       maxlength: 100,
     },
     city: {
-      type: Schema.Types.ObjectId,
-      ref: "City",
+      type: String,
       required: true,
+      maxlength: 100,
     },
     eventDate: {
       type: Date,

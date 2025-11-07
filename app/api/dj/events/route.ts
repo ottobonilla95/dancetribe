@@ -24,7 +24,6 @@ export async function GET(req: NextRequest) {
 
     const skip = (page - 1) * limit;
     const events = await DJEvent.find({ djId })
-      .populate("city", "name country")
       .sort({ eventDate: -1 })
       .skip(skip)
       .limit(limit);
@@ -60,9 +59,9 @@ export async function POST(req: NextRequest) {
       body;
 
     // Validate required fields
-    if (!eventName || !venue || !city || !eventDate) {
+    if (!eventName || !city || !eventDate) {
       return NextResponse.json(
-        { error: "Missing required fields" },
+        { error: "Missing required fields: eventName, city, eventDate" },
         { status: 400 }
       );
     }
@@ -81,15 +80,13 @@ export async function POST(req: NextRequest) {
     const newEvent = await DJEvent.create({
       djId: session.user.id,
       eventName,
-      venue,
+      venue: venue || "",
       city,
       eventDate: new Date(eventDate),
-      description,
-      imageUrl,
+      description: description || "",
+      imageUrl: imageUrl || "",
       genres: genres || [],
     });
-
-    await newEvent.populate("city", "name country");
 
     return NextResponse.json({
       success: true,
