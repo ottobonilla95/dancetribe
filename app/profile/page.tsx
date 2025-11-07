@@ -26,6 +26,7 @@ import BioSection from "@/components/profile/BioSection";
 import DanceStylesSection from "@/components/profile/DanceStylesSection";
 import SocialMediaSection from "@/components/profile/SocialMediaSection";
 import AnthemSection from "@/components/profile/AnthemSection";
+import DJEventsManager from "@/components/profile/DJEventsManager";
 import DanceRoleSection from "@/components/profile/DanceRoleSection";
 import RelationshipStatusSection from "@/components/profile/RelationshipStatusSection";
 import DancingExperienceSection from "@/components/profile/DancingExperienceSection";
@@ -776,6 +777,15 @@ export default async function Profile({ searchParams }: ProfileProps) {
                 <AnthemSection initialAnthem={userData.anthem} />
               </div>
             </div>
+
+            {/* DJ Events Manager - Only for DJs */}
+            {userData.isDJ && (
+              <div className="card bg-base-200 shadow-xl">
+                <div className="card-body">
+                  <DJEventsManager />
+                </div>
+              </div>
+            )}
           </div>
         </div>
 

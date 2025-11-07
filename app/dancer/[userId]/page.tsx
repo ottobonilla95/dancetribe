@@ -3,6 +3,7 @@ import connectMongo from "@/libs/mongoose";
 import User from "@/models/User";
 import City from "@/models/City";
 import DanceStyle from "@/models/DanceStyle";
+import DJEvent from "@/models/DJEvent";
 import Country from "@/models/Country";
 import Continent from "@/models/Continent";
 import Link from "next/link";
@@ -255,6 +256,16 @@ export default async function PublicProfile({ params }: Props) {
   }
 
   const danceStyles = await DanceStyle.find({}).lean();
+
+  // Fetch DJ events if user is a DJ
+  let djEvents: any[] = [];
+  if ((user as any).isDJ) {
+    djEvents = await DJEvent.find({ djId: params.userId })
+      .populate("city", "name country")
+      .sort({ eventDate: -1 })
+      .limit(10)
+      .lean();
+  }
 
   // Calculate age from date of birth
   const getAge = (dateOfBirth: Date | string) => {
@@ -1417,6 +1428,76 @@ export default async function PublicProfile({ params }: Props) {
                           </a>
                         );
                       })()}
+                    </div>
+                  </div>
+                </div>
+              )}
+
+              {/* DJ Events */}
+              {userData.isDJ && djEvents.length > 0 && (
+                <div className="card bg-base-200 shadow-xl">
+                  <div className="card-body">
+                    <div className="flex items-center justify-between mb-4">
+                      <h2 className="card-title text-xl">
+                        🎧 DJ Events
+                      </h2>
+                      {djEvents.length >= 10 && (
+                        <Link
+                          href={`/dj/${params.userId}/events`}
+                          className="btn btn-sm btn-ghost"
+                        >
+                          See All
+                        </Link>
+                      )}
+                    </div>
+                    <div className="grid gap-3">
+                      {djEvents.map((event: any) => (
+                        <Link
+                          key={event._id}
+                          href={`/events/${event._id}`}
+                          className="card bg-base-100 hover:bg-base-300 transition-all cursor-pointer"
+                        >
+                          <div className="card-body p-4">
+                            <div className="flex items-start justify-between gap-4">
+                              <div className="flex-1">
+                                <h3 className="font-semibold text-lg">
+                                  {event.eventName}
+                                </h3>
+                                <p className="text-sm text-base-content/70">
+                                  📍 {event.venue}
+                                  {event.city && ` • ${event.city.name}`}
+                                </p>
+                                <p className="text-sm text-base-content/60 mt-1">
+                                  📅 {new Date(event.eventDate).toLocaleDateString("en-US", {
+                                    month: "short",
+                                    day: "numeric",
+                                    year: "numeric",
+                                  })}
+                                </p>
+                                {event.totalComments > 0 && (
+                                  <div className="flex items-center gap-3 mt-2">
+                                    <span className="text-sm">
+                                      ⭐ {event.averageRating.toFixed(1)}
+                                    </span>
+                                    <span className="text-sm text-base-content/60">
+                                      💬 {event.totalComments} {event.totalComments === 1 ? "review" : "reviews"}
+                                    </span>
+                                  </div>
+                                )}
+                              </div>
+                              {event.imageUrl && (
+                                <div className="w-20 h-20 rounded-lg overflow-hidden flex-shrink-0">
+                                  <img
+                                    src={event.imageUrl}
+                                    alt={event.eventName}
+                                    className="w-full h-full object-cover"
+                                  />
+                                </div>
+                              )}
+                            </div>
+                          </div>
+                        </Link>
+                      ))}
                     </div>
                   </div>
                 </div>
