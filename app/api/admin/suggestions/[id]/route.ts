@@ -94,7 +94,7 @@ export async function PATCH(
               ` : ''}
 
               <div style="text-align: center; margin: 20px 0;">
-                <a href="${config.domainWithHttps || config.domain}" style="display: inline-block; background: #10b981; color: white; padding: 12px 30px; text-decoration: none; border-radius: 6px; font-weight: bold;">
+                <a href="https://dancecircle.ai" style="display: inline-block; background: #10b981; color: white; padding: 12px 30px; text-decoration: none; border-radius: 6px; font-weight: bold;">
                   Check it out! →
                 </a>
               </div>
@@ -115,6 +115,7 @@ export async function PATCH(
         await sendEmail({
           to: suggestion.userEmail,
           subject: emailSubject,
+          text: `Your suggestion has been completed!\n\n${suggestion.suggestion}\n\n${adminNotes ? `Note: ${adminNotes}\n\n` : ''}Check it out at https://dancecircle.ai`,
           html: emailHtml,
         });
 
