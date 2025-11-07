@@ -26,7 +26,8 @@ export async function GET(req: NextRequest) {
     const events = await DJEvent.find({ djId })
       .sort({ eventDate: -1 })
       .skip(skip)
-      .limit(limit);
+      .limit(limit)
+      .lean();
 
     const total = await DJEvent.countDocuments({ djId });
 

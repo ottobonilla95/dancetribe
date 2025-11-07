@@ -8,8 +8,8 @@ import { FaPlus, FaEdit, FaTrash, FaCalendar, FaMapMarkerAlt } from "react-icons
 interface DJEvent {
   _id: string;
   eventName: string;
-  venue: string;
-  city: any;
+  venue?: string;
+  city: string;
   eventDate: string;
   description?: string;
   imageUrl?: string;
@@ -18,16 +18,9 @@ interface DJEvent {
   totalComments: number;
 }
 
-interface City {
-  _id: string;
-  name: string;
-  country: { name: string };
-}
-
 export default function DJEventsManager() {
   const { data: session } = useSession();
   const [events, setEvents] = useState<DJEvent[]>([]);
-  const [cities, setCities] = useState<City[]>([]);
   const [loading, setLoading] = useState(true);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingEvent, setEditingEvent] = useState<DJEvent | null>(null);
@@ -41,11 +34,9 @@ export default function DJEventsManager() {
     genres: [] as string[],
   });
   const [submitting, setSubmitting] = useState(false);
-  const [citySearch, setCitySearch] = useState("");
 
   useEffect(() => {
     fetchEvents();
-    fetchCities();
   }, []);
 
   const fetchEvents = async () => {
@@ -65,28 +56,13 @@ export default function DJEventsManager() {
     }
   };
 
-  const fetchCities = async () => {
-    try {
-      const res = await fetch("/api/cities");
-      const data = await res.json();
-      
-      if (res.ok) {
-        // Handle both array response and object with cities array
-        setCities(Array.isArray(data) ? data : (data.cities || []));
-      }
-    } catch (error) {
-      console.error("Error fetching cities:", error);
-      setCities([]);
-    }
-  };
-
   const handleOpenModal = (event?: DJEvent) => {
     if (event) {
       setEditingEvent(event);
       setFormData({
         eventName: event.eventName,
-        venue: event.venue,
-        city: typeof event.city === "object" ? event.city._id : event.city,
+        venue: event.venue || "",
+        city: event.city,
         eventDate: new Date(event.eventDate).toISOString().split("T")[0],
         description: event.description || "",
         imageUrl: event.imageUrl || "",
@@ -164,10 +140,6 @@ export default function DJEventsManager() {
     }
   };
 
-  const filteredCities = cities.filter((city) =>
-    city.name.toLowerCase().includes(citySearch.toLowerCase())
-  );
-
   if (loading) {
     return (
       <div className="flex justify-center py-8">
@@ -214,7 +186,8 @@ export default function DJEventsManager() {
                     </Link>
                     <p className="text-sm text-base-content/70 flex items-center gap-2 mt-1">
                       <FaMapMarkerAlt className="flex-shrink-0" />
-                      {event.venue} • {event.city?.name}
+                      {event.venue && `${event.venue} • `}
+                      {event.city}
                     </p>
                     <p className="text-sm text-base-content/60 flex items-center gap-2 mt-1">
                       <FaCalendar className="flex-shrink-0" />

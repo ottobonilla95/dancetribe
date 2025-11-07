@@ -43,7 +43,6 @@ export async function PUT(
     if (genres !== undefined) event.genres = genres;
 
     await event.save();
-    await event.populate("city", "name country");
 
     return NextResponse.json({
       success: true,

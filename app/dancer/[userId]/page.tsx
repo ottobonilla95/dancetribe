@@ -261,7 +261,6 @@ export default async function PublicProfile({ params }: Props) {
   let djEvents: any[] = [];
   if ((user as any).isDJ) {
     djEvents = await DJEvent.find({ djId: params.userId })
-      .populate("city", "name country")
       .sort({ eventDate: -1 })
       .limit(10)
       .lean();
@@ -1290,10 +1289,13 @@ export default async function PublicProfile({ params }: Props) {
               {/* Upcoming Trips */}
               {(() => {
                 const now = new Date();
-                const upcomingTrips =
+                const upcomingTrips = (
                   userData.trips?.filter(
                     (trip: any) => new Date(trip.endDate) >= now
-                  ) || [];
+                  ) || []
+                ).sort((a: any, b: any) => 
+                  new Date(a.startDate).getTime() - new Date(b.startDate).getTime()
+                ); // Sort by start date (ascending - soonest first)
 
                 if (upcomingTrips.length === 0) return null;
 
@@ -1472,8 +1474,8 @@ export default async function PublicProfile({ params }: Props) {
                                   {event.eventName}
                                 </h3>
                                 <p className="text-sm text-base-content/70">
-                                  📍 {event.venue}
-                                  {event.city && ` • ${event.city.name}`}
+                                  📍 {event.venue && `${event.venue} • `}
+                                  {event.city}
                                 </p>
                                 <p className="text-sm text-base-content/60 mt-1">
                                   📅 {new Date(event.eventDate).toLocaleDateString("en-US", {

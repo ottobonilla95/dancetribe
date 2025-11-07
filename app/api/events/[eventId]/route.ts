@@ -13,7 +13,6 @@ export async function GET(
     await connectMongo();
 
     const event = await DJEvent.findById(params.eventId)
-      .populate("city", "name country")
       .populate({
         path: "djId",
         model: User,
@@ -23,7 +22,8 @@ export async function GET(
           model: City,
           select: "name",
         },
-      });
+      })
+      .lean();
 
     if (!event) {
       return NextResponse.json({ error: "Event not found" }, { status: 404 });

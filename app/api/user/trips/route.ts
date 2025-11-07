@@ -33,12 +33,16 @@ export async function GET(req: NextRequest) {
 
     // Separate upcoming and past trips
     const now = new Date();
-    const upcoming = user.trips?.filter((trip: any) => new Date(trip.endDate) >= now) || [];
-    const past = user.trips?.filter((trip: any) => new Date(trip.endDate) < now) || [];
+    const upcoming = (user.trips?.filter((trip: any) => new Date(trip.endDate) >= now) || [])
+      .sort((a: any, b: any) => new Date(a.startDate).getTime() - new Date(b.startDate).getTime()); // Sort by start date (ascending)
+    
+    const past = (user.trips?.filter((trip: any) => new Date(trip.endDate) < now) || [])
+      .sort((a: any, b: any) => new Date(b.startDate).getTime() - new Date(a.startDate).getTime()) // Sort by start date (descending - most recent first)
+      .slice(0, 10); // Return only last 10 past trips
 
     return NextResponse.json({
       upcoming,
-      past: past.slice(0, 10) // Return only last 10 past trips
+      past
     });
   } catch (error) {
     console.error("Error fetching trips:", error);

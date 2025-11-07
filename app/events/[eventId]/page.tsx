@@ -9,8 +9,8 @@ import { FaArrowLeft, FaCalendar, FaMapMarkerAlt, FaStar } from "react-icons/fa"
 interface EventData {
   _id: string;
   eventName: string;
-  venue: string;
-  city: { name: string; country: { name: string } };
+  venue?: string;
+  city: string;
   eventDate: string;
   description?: string;
   imageUrl?: string;
@@ -179,7 +179,10 @@ export default function EventDetailPage() {
             <div className="space-y-2 text-base-content/70 mb-4">
               <p className="flex items-center gap-2">
                 <FaMapMarkerAlt />
-                <span>{event.venue} • {event.city.name}, {event.city.country.name}</span>
+                <span>
+                  {event.venue && `${event.venue} • `}
+                  {event.city}
+                </span>
               </p>
               <p className="flex items-center gap-2">
                 <FaCalendar />

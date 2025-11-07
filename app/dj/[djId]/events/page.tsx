@@ -8,8 +8,8 @@ import { FaArrowLeft, FaCalendar, FaMapMarkerAlt } from "react-icons/fa";
 interface DJEvent {
   _id: string;
   eventName: string;
-  venue: string;
-  city: { name: string; country: { name: string } };
+  venue?: string;
+  city: string;
   eventDate: string;
   description?: string;
   imageUrl?: string;
@@ -92,8 +92,8 @@ export default function DJEventsPage() {
                       <div className="space-y-1 text-sm text-base-content/70">
                         <p className="flex items-center gap-2">
                           <FaMapMarkerAlt className="flex-shrink-0" />
-                          {event.venue}
-                          {event.city && ` • ${event.city.name}`}
+                          {event.venue && `${event.venue} • `}
+                          {event.city}
                         </p>
                         <p className="flex items-center gap-2">
                           <FaCalendar className="flex-shrink-0" />
