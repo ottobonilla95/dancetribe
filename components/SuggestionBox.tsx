@@ -126,10 +126,11 @@ export default function SuggestionBox() {
                       <label className="label">
                         <span className="label-text font-medium">{t('suggestions.category')}</span>
                       </label>
-                      <div className="grid grid-cols-3 gap-2">
+                      <div className="grid grid-cols-2 gap-2">
                         {[
                           { value: "feature", label: `✨ ${t('suggestions.categoryFeature')}`, color: "btn-primary" },
                           { value: "improvement", label: `🚀 ${t('suggestions.categoryImprovement')}`, color: "btn-accent" },
+                          { value: "bug", label: `🐛 Bug`, color: "btn-error" },
                           { value: "other", label: `💭 ${t('suggestions.categoryOther')}`, color: "btn-secondary" },
                         ].map((cat) => (
                           <button

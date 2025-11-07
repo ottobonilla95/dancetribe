@@ -33,6 +33,7 @@ import MutualFriends from "@/components/MutualFriends";
 import { getMessages, getTranslation } from "@/lib/i18n";
 import ProfilePictureModal from "@/components/ProfilePictureModal";
 import AdminSharedCheckbox from "@/components/AdminSharedCheckbox";
+import AdminFeaturedCheckbox from "@/components/AdminFeaturedCheckbox";
 import AdminSocialMediaEdit from "@/components/AdminSocialMediaEdit";
 import ProfileViewTracker from "@/components/ProfileViewTracker";
 import { cookies } from "next/headers";
@@ -923,6 +924,11 @@ export default async function PublicProfile({ params }: Props) {
                     userId={params.userId}
                     initialSharedStatus={userData.sharedOnSocialMedia || false}
                     instagramHandle={userData.socialMedia?.instagram}
+                  />
+
+                  <AdminFeaturedCheckbox
+                    userId={params.userId}
+                    initialFeaturedStatus={userData.isFeaturedProfessional || false}
                   />
 
                   {/* Hero Sequence Control */}
