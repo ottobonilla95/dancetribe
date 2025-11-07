@@ -1354,36 +1354,50 @@ export default async function PublicProfile({ params }: Props) {
                       🎵 {t("profile.danceAnthem")}
                     </h2>
                     <div className="rounded-lg">
-                      {/* Iframe for Spotify/YouTube */}
+                      {/* Iframe for Spotify */}
                       {(() => {
                         const url = userData.anthem.url;
                         let embedUrl = "";
+                        let embedHeight = "152";
 
                         if (userData.anthem.platform === "spotify") {
-                          const spotifyMatch = url.match(
+                          // Check for track
+                          const trackMatch = url.match(
                             /(?:spotify\.com\/track\/|spotify:track:)([a-zA-Z0-9]+)/
                           );
-                          if (spotifyMatch) {
-                            embedUrl = `https://open.spotify.com/embed/track/${spotifyMatch[1]}`;
+                          if (trackMatch) {
+                            embedUrl = `https://open.spotify.com/embed/track/${trackMatch[1]}`;
+                            embedHeight = "152"; // Compact for single track
                           }
-                        } else if (userData.anthem.platform === "youtube") {
-                          const youtubeMatch = url.match(
-                            /(?:youtube\.com\/watch\?v=|youtu\.be\/)([a-zA-Z0-9_-]+)/
+
+                          // Check for playlist
+                          const playlistMatch = url.match(
+                            /(?:spotify\.com\/playlist\/|spotify:playlist:)([a-zA-Z0-9]+)/
                           );
-                          if (youtubeMatch) {
-                            embedUrl = `https://www.youtube.com/embed/${youtubeMatch[1]}`;
+                          if (playlistMatch) {
+                            embedUrl = `https://open.spotify.com/embed/playlist/${playlistMatch[1]}`;
+                            embedHeight = "380"; // Full player for playlist
+                          }
+
+                          // Check for album
+                          const albumMatch = url.match(
+                            /(?:spotify\.com\/album\/|spotify:album:)([a-zA-Z0-9]+)/
+                          );
+                          if (albumMatch) {
+                            embedUrl = `https://open.spotify.com/embed/album/${albumMatch[1]}`;
+                            embedHeight = "380"; // Full player for album
                           }
                         }
 
                         return embedUrl ? (
                           <div
                             className="rounded-lg overflow-hidden"
-                            style={{ height: "152px" }}
+                            style={{ height: `${embedHeight}px` }}
                           >
                             <iframe
                               src={embedUrl}
                               width="100%"
-                              height="152"
+                              height={embedHeight}
                               frameBorder="0"
                               scrolling="no"
                               className="rounded-2xl"

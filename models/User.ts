@@ -140,6 +140,7 @@ const userSchema = new mongoose.Schema(
       instagram: String,
       tiktok: String,
       youtube: String,
+      spotify: String,
     },
     // Dance role preference
     danceRole: {

@@ -96,7 +96,7 @@ export interface OnboardingSteps {
 
 export interface Anthem {
   url: string;
-  platform: "spotify" | "youtube";
+  platform: "spotify";
   title: string;
   artist: string;
 }
@@ -105,6 +105,7 @@ export interface SocialMedia {
   instagram?: string;
   tiktok?: string;
   youtube?: string;
+  spotify?: string;
 }
 
 export interface TeacherProfile {

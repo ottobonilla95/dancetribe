@@ -69,6 +69,7 @@ export default function Onboarding() {
     instagram: "",
     tiktok: "",
     youtube: "",
+    spotify: "",
   });
   const [danceRole, setDanceRole] = useState<"follower" | "leader" | "both">(
     "both"
@@ -396,6 +397,7 @@ export default function Onboarding() {
           instagram: userData.socialMedia.instagram || "",
           tiktok: userData.socialMedia.tiktok || "",
           youtube: userData.socialMedia.youtube || "",
+          spotify: userData.socialMedia.spotify || "",
         });
       }
       if (userData.danceRole) {
@@ -855,15 +857,39 @@ export default function Onboarding() {
   const parseMediaUrl = (url: string) => {
     if (!url) return null;
 
-    // Spotify URL patterns
-    const spotifyMatch = url.match(
+    // Spotify track URL pattern
+    const trackMatch = url.match(
       /(?:spotify\.com\/track\/|spotify:track:)([a-zA-Z0-9]+)/
     );
-    if (spotifyMatch) {
+    if (trackMatch) {
       return {
         platform: "spotify" as const,
-        id: spotifyMatch[1],
-        embedUrl: `https://open.spotify.com/embed/track/${spotifyMatch[1]}`,
+        id: trackMatch[1],
+        embedUrl: `https://open.spotify.com/embed/track/${trackMatch[1]}`,
+      };
+    }
+
+    // Spotify playlist URL pattern
+    const playlistMatch = url.match(
+      /(?:spotify\.com\/playlist\/|spotify:playlist:)([a-zA-Z0-9]+)/
+    );
+    if (playlistMatch) {
+      return {
+        platform: "spotify" as const,
+        id: playlistMatch[1],
+        embedUrl: `https://open.spotify.com/embed/playlist/${playlistMatch[1]}`,
+      };
+    }
+
+    // Spotify album URL pattern
+    const albumMatch = url.match(
+      /(?:spotify\.com\/album\/|spotify:album:)([a-zA-Z0-9]+)/
+    );
+    if (albumMatch) {
+      return {
+        platform: "spotify" as const,
+        id: albumMatch[1],
+        embedUrl: `https://open.spotify.com/embed/album/${albumMatch[1]}`,
       };
     }
 
@@ -1477,7 +1503,7 @@ export default function Onboarding() {
                         <iframe
                           src={mediaInfo.embedUrl}
                           width="100%"
-                          height="152"
+                          height={mediaInfo.embedUrl.includes('/playlist/') || mediaInfo.embedUrl.includes('/album/') ? "380" : "152"}
                           frameBorder="0"
                           className="rounded-2xl"
                           allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture"
@@ -1540,6 +1566,24 @@ export default function Onboarding() {
                       setSocialMedia((prev) => ({
                         ...prev,
                         youtube: e.target.value,
+                      }))
+                    }
+                  />
+                </div>
+
+                <div className="form-control">
+                  <label className="label">
+                    <span className="label-text">Spotify (optional)</span>
+                  </label>
+                  <input
+                    type="text"
+                    className="input input-bordered"
+                    placeholder="Profile URL"
+                    value={socialMedia.spotify}
+                    onChange={(e) =>
+                      setSocialMedia((prev) => ({
+                        ...prev,
+                        spotify: e.target.value,
                       }))
                     }
                   />

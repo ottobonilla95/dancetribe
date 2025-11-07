@@ -29,11 +29,8 @@ export default function AnthemSection({ initialAnthem }: AnthemSectionProps) {
   const handleSave = async () => {
     setSaving(true);
     try {
-      // Auto-detect platform from URL
-      let platform = "spotify";
-      if (anthem.url.includes("youtube.com") || anthem.url.includes("youtu.be")) {
-        platform = "youtube";
-      }
+      // Only Spotify is supported
+      const platform = "spotify";
       
       const response = await fetch("/api/user/profile", {
         method: "PUT",
@@ -72,15 +69,18 @@ export default function AnthemSection({ initialAnthem }: AnthemSectionProps) {
         <div className="space-y-3 mb-3">
           <div className="form-control">
             <label className="label">
-              <span className="label-text">Song URL (Spotify or YouTube)</span>
+              <span className="label-text">Spotify URL</span>
             </label>
             <input
               type="url"
               value={anthem.url}
               onChange={(e) => setAnthem({ ...anthem, url: e.target.value })}
               className="input input-bordered input-sm"
-              placeholder="Paste Spotify or YouTube link"
+              placeholder="Paste Spotify track, playlist, or album link"
             />
+            <label className="label">
+              <span className="label-text-alt">💡 Works with tracks, playlists, and albums!</span>
+            </label>
           </div>
         </div>
         <div className="flex gap-2">
@@ -113,7 +113,7 @@ export default function AnthemSection({ initialAnthem }: AnthemSectionProps) {
   return (
     <div className="relative">
       <div className="flex items-center gap-2 mb-4">
-        <h3 className="card-title text-xl">🎵 Dance Anthem</h3>
+        <h3 className="card-title text-xl">🎵 Favorite Music</h3>
         <button
           onClick={() => setIsEditing(true)}
           className="btn btn-ghost btn-xs gap-1"
@@ -126,32 +126,33 @@ export default function AnthemSection({ initialAnthem }: AnthemSectionProps) {
           {(() => {
             const url = anthem.url;
             let embedUrl = "";
+            let embedHeight = "152"; // Default for tracks
 
-            if (anthem.platform === "spotify") {
-              const spotifyMatch = url.match(
-                /(?:spotify\.com\/track\/|spotify:track:)([a-zA-Z0-9]+)/
-              );
-              if (spotifyMatch) {
-                embedUrl = `https://open.spotify.com/embed/track/${spotifyMatch[1]}`;
-              }
-            } else if (anthem.platform === "youtube") {
-              const youtubeMatch = url.match(
-                /(?:youtube\.com\/watch\?v=|youtu\.be\/)([a-zA-Z0-9_-]+)/
-              );
-              if (youtubeMatch) {
-                embedUrl = `https://www.youtube.com/embed/${youtubeMatch[1]}`;
-              }
+            // Detect Spotify type (track, playlist, album)
+            const trackMatch = url.match(/(?:spotify\.com\/track\/|spotify:track:)([a-zA-Z0-9]+)/);
+            const playlistMatch = url.match(/(?:spotify\.com\/playlist\/|spotify:playlist:)([a-zA-Z0-9]+)/);
+            const albumMatch = url.match(/(?:spotify\.com\/album\/|spotify:album:)([a-zA-Z0-9]+)/);
+            
+            if (trackMatch) {
+              embedUrl = `https://open.spotify.com/embed/track/${trackMatch[1]}`;
+              embedHeight = "152"; // Compact for single track
+            } else if (playlistMatch) {
+              embedUrl = `https://open.spotify.com/embed/playlist/${playlistMatch[1]}`;
+              embedHeight = "380"; // Full player for playlist
+            } else if (albumMatch) {
+              embedUrl = `https://open.spotify.com/embed/album/${albumMatch[1]}`;
+              embedHeight = "380"; // Full player for album
             }
 
             return embedUrl ? (
               <div
                 className="rounded-lg overflow-hidden"
-                style={{ height: "152px" }}
+                style={{ height: `${embedHeight}px` }}
               >
                 <iframe
                   src={embedUrl}
                   width="100%"
-                  height="152"
+                  height={embedHeight}
                   frameBorder="0"
                   scrolling="no"
                   className="rounded-2xl"
@@ -173,7 +174,7 @@ export default function AnthemSection({ initialAnthem }: AnthemSectionProps) {
           })()}
         </div>
       ) : (
-        <p className="text-base-content/50 italic">No anthem added yet. Click edit to add your favorite dance song.</p>
+        <p className="text-base-content/50 italic">No music added yet. Click edit to add your favorite Spotify track, playlist, or album.</p>
       )}
     </div>
   );
