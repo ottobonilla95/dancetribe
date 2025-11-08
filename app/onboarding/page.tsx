@@ -783,6 +783,11 @@ export default function Onboarding() {
           window.location.href = "/profile";
         } else {
           console.log("🎉 Onboarding complete! Showing welcome modal...");
+          // Track successful registration completion with Facebook Pixel
+          fbEvent("CompleteRegistration", {
+            content_name: "Onboarding Complete",
+            status: "completed",
+          });
           window.location.href = "/profile?welcome=true";
         }
       }

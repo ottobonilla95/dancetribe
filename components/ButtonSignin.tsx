@@ -5,6 +5,7 @@ import { useSession, signIn } from "next-auth/react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import config from "@/config";
+import { event as fbEvent } from "./FacebookPixel";
 
 // A simple button to sign in with our providers (Google & Magic Links).
 // It automatically redirects user to callbackUrl (config.auth.callbackUrl) after login, which is normally a private page for users to manage their accounts.
@@ -23,6 +24,11 @@ const ButtonSignin = ({
     if (status === "authenticated") {
       router.push(config.auth.callbackUrl);
     } else {
+      // Track Lead event when user clicks to sign in
+      fbEvent("Lead", {
+        content_name: text,
+        content_category: "signup",
+      });
       signIn(undefined, { callbackUrl: config.auth.callbackUrl });
     }
   };
