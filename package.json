@@ -17,6 +17,7 @@
     "@next/mdx": "^13.5.6",
     "@types/js-cookie": "^3.0.6",
     "@types/qrcode": "^1.5.5",
+    "@vercel/analytics": "^1.5.0",
     "axios": "^1.6.8",
     "cloudinary": "^2.7.0",
     "crisp-sdk-web": "^1.0.22",
