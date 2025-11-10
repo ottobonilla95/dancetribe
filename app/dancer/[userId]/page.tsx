@@ -195,7 +195,7 @@ export default async function PublicProfile({ params }: Props) {
         path: "friends",
         model: User,
         select: "name username image city",
-        options: { limit: 50 }, // Limit to 50 friends for display
+        options: { limit: 100 }, // Limit to 100 friends for display (good balance of UX vs performance)
         populate: {
           path: "city",
           model: City,
@@ -618,12 +618,6 @@ export default async function PublicProfile({ params }: Props) {
                             {t("connect.followers").toLowerCase()}
                           </span>
                         )}
-                        {!userData.isFeaturedProfessional &&
-                          followingCount > 0 && (
-                            <span className="whitespace-nowrap">
-                              ⭐ {followingCount} following
-                            </span>
-                          )}
                       </div>
                       {/* Current Location */}
                       {userData.city && typeof userData.city === "object" && (
