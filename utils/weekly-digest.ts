@@ -1,7 +1,9 @@
 import connectMongo from "@/libs/mongoose";
 import User from "@/models/User";
+import City from "@/models/City";
 import { getWeeklyViewStats } from "./profile-views";
 import { getAllRankChanges } from "./leaderboard-snapshot";
+import { getAllRankChangesFromCache } from "./leaderboard-snapshot-optimized";
 import mongoose from "mongoose";
 import config from "@/config";
 
@@ -103,8 +105,10 @@ export interface WeeklyDigestData {
 
 /**
  * Get all weekly digest data for a user
+ * @param userId - User ID
+ * @param useCache - Use cached leaderboard snapshots (MUCH faster for bulk operations)
  */
-export async function getWeeklyDigestData(userId: string): Promise<WeeklyDigestData | null> {
+export async function getWeeklyDigestData(userId: string, useCache: boolean = false): Promise<WeeklyDigestData | null> {
   try {
     await connectMongo();
 
@@ -130,7 +134,10 @@ export async function getWeeklyDigestData(userId: string): Promise<WeeklyDigestD
     }).length || 0;
 
     // 2. Leaderboard Changes
-    const leaderboardChanges = await getAllRankChanges(userId);
+    // Use cached version if available (MUCH faster for bulk operations)
+    const leaderboardChanges = useCache 
+      ? getAllRankChangesFromCache(userId)
+      : await getAllRankChanges(userId);
 
     // 3. Friend Activity
     // Get friends with upcoming trips

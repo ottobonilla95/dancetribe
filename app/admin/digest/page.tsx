@@ -6,6 +6,7 @@ import { FaCheckCircle, FaSpinner, FaCamera, FaEnvelope, FaFlask } from "react-i
 interface DigestResult {
   success: boolean;
   message?: string;
+  status?: string;
   snapshots?: number;
   totalUsers?: number;
   emailsSent?: number;
@@ -14,6 +15,7 @@ interface DigestResult {
   timestamp?: string;
   recipient?: string;
   digestData?: any;
+  note?: string;
 }
 
 export default function AdminDigestPage() {
@@ -50,7 +52,7 @@ export default function AdminDigestPage() {
   };
 
   const sendWeeklyDigest = async () => {
-    if (!confirm("Send weekly digest emails to all active users? This may take a few minutes.")) {
+    if (!confirm("Send weekly digest emails to all active users? Emails will be sent in the background.")) {
       return;
     }
 
@@ -62,7 +64,6 @@ export default function AdminDigestPage() {
         method: "POST",
         headers: { 
           "Content-Type": "application/json",
-          "Authorization": `Bearer ${process.env.NEXT_PUBLIC_CRON_SECRET || 'dev'}`,
         },
       });
 
@@ -70,6 +71,8 @@ export default function AdminDigestPage() {
 
       if (response.ok) {
         setResults(data);
+        // Show success message with instructions
+        alert(`✅ Weekly digest job started!\n\n${data.totalUsers} users will be processed.\n\nEmails are being sent in the background. Check Vercel logs to monitor progress.`);
       } else {
         alert(`Error: ${data.error}`);
       }
@@ -141,6 +144,12 @@ export default function AdminDigestPage() {
                     <div>Trip overlaps: {results.digestData.tripOverlaps?.length || 0}</div>
                   </div>
                 )}
+              </div>
+            ) : results.status === 'processing' ? (
+              <div className="text-sm mt-2">
+                <div>🚀 <strong>Weekly digest job started!</strong></div>
+                <div className="mt-1">{results.totalUsers} users will be processed in the background</div>
+                {results.note && <div className="mt-1 text-xs opacity-70">{results.note}</div>}
               </div>
             ) : results.emailsSent !== undefined ? (
               <div className="text-sm mt-2">
