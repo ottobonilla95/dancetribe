@@ -40,6 +40,9 @@ interface Props {
 // Hardcoded most popular dance styles for SEO
 const SEO_DANCE_STYLES = ["Bachata", "Salsa", "Kizomba", "Zouk", "Urban Kiz", "Bachazouk"];
 
+// Cache this page for 1 hour (3600 seconds)
+export const revalidate = 3600;
+
 // Generate dynamic SEO metadata
 export async function generateMetadata({ params }: Props) {
   await connectMongo();

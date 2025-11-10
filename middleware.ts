@@ -2,7 +2,7 @@ import { NextResponse } from 'next/server'
 import type { NextRequest } from 'next/server'
 import { getToken } from 'next-auth/jwt'
 
-// Routes that don't require onboarding
+// Routes that don't require onboarding (public pages that anyone can view)
 const publicRoutes = [
   '/',
   '/api/auth',
@@ -18,10 +18,22 @@ const publicRoutes = [
   '/api/auth/session',
   '/api/auth/providers',
   '/api/auth/csrf',
-  '/dancer',
-  '/dance-style',
-  '/city',
-  '/cities'
+  '/dancer',       // Public dancer profiles
+  '/dance-style',  // Public dance style pages
+  '/city',         // Public city pages
+  '/cities',       // Public cities list
+  '/country',      // Public country pages
+  '/countries',    // Public countries list
+  '/continent',    // Public continent pages
+  '/dj',           // Public DJ pages
+  '/release',      // Public music releases
+  '/releases',     // Public releases list
+  '/events',       // Public events
+  '/leaderboards', // Public leaderboards
+  '/music',        // Public music pages
+  '/stats',        // Public stats
+  '/discover',     // Public discover page
+  '/invite'        // Public invite page
 ]
 
 // Routes that require authentication but allow incomplete profiles
@@ -40,38 +52,7 @@ const authRoutes = [
 export async function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl
 
-  // ========================================
-  // Language Detection (for i18n)
-  // ========================================
-  
-  // Get user's token to check their preferred language
-  const token = await getToken({ 
-    req: request, 
-    secret: process.env.NEXTAUTH_SECRET 
-  });
-  
-  const cookieLang = request.cookies.get('NEXT_LOCALE')?.value;
-  const headerLang = request.headers.get('accept-language');
-  
-  // Determine language (priority: user DB preference > cookie > header > default 'en')
-  let locale = 'en';
-  if (token?.preferredLanguage && ['en', 'es'].includes(token.preferredLanguage as string)) {
-    locale = token.preferredLanguage as string;
-  } else if (cookieLang && ['en', 'es'].includes(cookieLang)) {
-    locale = cookieLang;
-  } else if (headerLang?.includes('es')) {
-    locale = 'es';
-  }
-
-  // Add locale to request headers for server components
-  const requestHeaders = new Headers(request.headers);
-  requestHeaders.set('x-locale', locale);
-
-  // ========================================
-  // Authentication & Onboarding Logic
-  // ========================================
-
-  // Skip middleware for static files and Next.js internals
+  // Skip middleware for static files and Next.js internals FIRST (before any auth checks)
   if (
     pathname.startsWith('/_next') ||
     pathname.startsWith('/static') ||
@@ -82,27 +63,60 @@ export async function middleware(request: NextRequest) {
     pathname.startsWith('/opengraph-image.png') ||
     pathname.startsWith('/twitter-image.png')
   ) {
-    return NextResponse.next({
-      request: {
-        headers: requestHeaders,
-      },
-    })
+    return NextResponse.next()
   }
 
-  // Allow public routes
-  if (publicRoutes.some(route => pathname === route || pathname.startsWith(route + '/'))) {
-    return NextResponse.next({
-      request: {
-        headers: requestHeaders,
-      },
-    })
-  }
-
+  // Check if this is a public route BEFORE calling getToken (expensive!)
+  const isPublicRoute = publicRoutes.some(route => pathname === route || pathname.startsWith(route + '/'));
+  
   // Allow username routes (/{username} pattern - single segment, no slashes)
-  // This allows users to share their profile via dancecircle.co/username
-  const pathSegments = pathname.split('/').filter(Boolean)
-  if (pathSegments.length === 1) {
-    // Single segment path - likely a username
+  const pathSegments = pathname.split('/').filter(Boolean);
+  const isUsernameRoute = pathSegments.length === 1;
+
+  // ========================================
+  // Language Detection (for i18n)
+  // ========================================
+  
+  const cookieLang = request.cookies.get('NEXT_LOCALE')?.value;
+  const headerLang = request.headers.get('accept-language');
+  
+  let locale = 'en';
+  let token = null;
+  
+  // Only get token if NOT a public or username route (saves expensive DB calls!)
+  if (!isPublicRoute && !isUsernameRoute) {
+    token = await getToken({ 
+      req: request, 
+      secret: process.env.NEXTAUTH_SECRET 
+    });
+    
+    // Determine language (priority: user DB preference > cookie > header > default 'en')
+    if (token?.preferredLanguage && ['en', 'es'].includes(token.preferredLanguage as string)) {
+      locale = token.preferredLanguage as string;
+    } else if (cookieLang && ['en', 'es'].includes(cookieLang)) {
+      locale = cookieLang;
+    } else if (headerLang?.includes('es')) {
+      locale = 'es';
+    }
+  } else {
+    // For public routes, just use cookie or header
+    if (cookieLang && ['en', 'es'].includes(cookieLang)) {
+      locale = cookieLang;
+    } else if (headerLang?.includes('es')) {
+      locale = 'es';
+    }
+  }
+
+  // Add locale to request headers for server components
+  const requestHeaders = new Headers(request.headers);
+  requestHeaders.set('x-locale', locale);
+
+  // ========================================
+  // Authentication & Onboarding Logic
+  // ========================================
+
+  // Allow public routes (already checked above)
+  if (isPublicRoute) {
     return NextResponse.next({
       request: {
         headers: requestHeaders,
@@ -110,7 +124,15 @@ export async function middleware(request: NextRequest) {
     })
   }
 
-  // Token was already fetched above for language detection
+  // Allow username routes (already checked above)
+  if (isUsernameRoute) {
+    return NextResponse.next({
+      request: {
+        headers: requestHeaders,
+      },
+    })
+  }
+
   // If not authenticated, allow normal auth flow (will be handled by individual layouts)
   if (!token) {
     return NextResponse.next({

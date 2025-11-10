@@ -85,7 +85,7 @@ const getHotDanceStyles = unstable_cache(
   }
 },
 ["hot-dance-styles"],
-{ revalidate: 300, tags: ["hot-dance-styles"] } // 5 minutes - shared with dashboard
+{ revalidate: 600, tags: ["hot-dance-styles"] } // 10 minutes - dance style popularity doesn't change rapidly
 );
 
 // Cached: Cities for landing page
@@ -115,7 +115,7 @@ const getCities = unstable_cache(
   }
 },
 ["hot-cities"],
-{ revalidate: 60, tags: ["hot-cities"] } // 1 minute - shared with dashboard
+{ revalidate: 300, tags: ["hot-cities"] } // 5 minutes - cities don't change that fast
 );
 
 // Extract Spotify track ID from URL
@@ -208,7 +208,7 @@ const getTrendingSongs = unstable_cache(
   }
 },
 ["landing-trending-songs"],
-{ revalidate: 900, tags: ["trending-songs"] } // 15 minutes - same tag as dashboard/music for unified cache invalidation
+{ revalidate: 1800, tags: ["trending-songs"] } // 30 minutes - trending songs don't need to update so frequently
 );
 
 // Cached: Featured users for hero section - prioritizes heroSequence, then random

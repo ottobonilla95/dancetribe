@@ -50,6 +50,9 @@ interface Props {
   };
 }
 
+// Cache dancer profile pages for 30 minutes (profiles don't change that often)
+export const revalidate = 1800;
+
 // Generate dynamic SEO metadata for dancer profiles
 export async function generateMetadata({ params }: Props) {
   await connectMongo();
