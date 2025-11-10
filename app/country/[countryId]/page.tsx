@@ -37,6 +37,9 @@ interface Props {
   };
 }
 
+// Hardcoded most popular dance styles for SEO
+const SEO_DANCE_STYLES = ["Bachata", "Salsa", "Kizomba", "Zouk", "Urban Kiz", "Bachazouk"];
+
 // Generate dynamic SEO metadata
 export async function generateMetadata({ params }: Props) {
   await connectMongo();
@@ -62,12 +65,6 @@ export async function generateMetadata({ params }: Props) {
       };
     }
 
-    // Get ALL dance styles from database for SEO (fast, no aggregation)
-    const allDanceStyles = await DanceStyle.find({ isActive: true })
-      .select('name')
-      .sort({ name: 1 })
-      .lean();
-
     // Get all cities in this country
     const countryObjectId = new mongoose.Types.ObjectId(params.countryId);
     const citiesInCountry = await City.find({
@@ -84,12 +81,12 @@ export async function generateMetadata({ params }: Props) {
       isProfileComplete: true,
     });
 
-    // Build dance styles string for SEO (all styles, not just ones in this country)
-    const danceStylesText = allDanceStyles.map((ds: any) => ds.name).join(", ");
-    const topStyles = allDanceStyles.slice(0, 3).map((ds: any) => ds.name).join(", ");
+    // Use hardcoded popular dance styles for SEO
+    const danceStylesText = SEO_DANCE_STYLES.join(", ");
+    const topStyles = SEO_DANCE_STYLES.slice(0, 3).join(", ");
 
-    const title = `${country.name} Dance Community | ${topStyles || "Dancers"} in ${country.name}`;
-    const description = `Discover ${totalDancers} dancers across ${country.name}. Connect with ${danceStylesText || "dance"} communities, find partners, teachers, and events throughout ${country.name}.`;
+    const title = `${country.name} Dance Community | ${topStyles} in ${country.name}`;
+    const description = `Discover ${totalDancers} dancers across ${country.name}. Connect with ${danceStylesText} communities, find partners, teachers, and events throughout ${country.name}.`;
     
     return {
       title,
