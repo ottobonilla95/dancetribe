@@ -21,6 +21,13 @@ const ConversationSchema = new Schema(
       type: Schema.Types.ObjectId,
       ref: "User",
     },
+    // Track last email notification sent to each participant
+    // This prevents spam during active conversations
+    lastEmailNotificationSent: {
+      type: Map,
+      of: Date,
+      default: new Map(),
+    },
   },
   { timestamps: true }
 );

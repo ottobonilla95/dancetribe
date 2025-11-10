@@ -517,6 +517,8 @@
     "friendRequestsDesc": "Get notified when someone sends you a friend request or accepts yours",
     "profileLikes": "Profile Likes",
     "profileLikesDesc": "Get notified when someone likes your profile",
+    "messages": "Direct Messages",
+    "messagesDesc": "Get notified when someone sends you a direct message",
     "weeklyDigest": "Weekly Digest",
     "weeklyDigestDesc": "Receive a weekly summary of your activity, leaderboard changes, and friend updates",
     "saved": "Settings saved successfully!",

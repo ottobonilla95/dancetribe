@@ -19,6 +19,7 @@ export default function SettingsPage() {
   const [emailNotifications, setEmailNotifications] = useState(true);
   const [friendRequestNotifications, setFriendRequestNotifications] = useState(true);
   const [profileLikedNotifications, setProfileLikedNotifications] = useState(true);
+  const [messageNotifications, setMessageNotifications] = useState(true);
   const [weeklyDigest, setWeeklyDigest] = useState(true);
 
   useEffect(() => {
@@ -36,6 +37,7 @@ export default function SettingsPage() {
           emailNotifications: boolean;
           friendRequestNotifications: boolean;
           profileLikedNotifications: boolean;
+          messageNotifications: boolean;
           weeklyDigest: boolean;
         };
       };
@@ -44,6 +46,7 @@ export default function SettingsPage() {
       setEmailNotifications(data.notificationSettings?.emailNotifications ?? true);
       setFriendRequestNotifications(data.notificationSettings?.friendRequestNotifications ?? true);
       setProfileLikedNotifications(data.notificationSettings?.profileLikedNotifications ?? true);
+      setMessageNotifications(data.notificationSettings?.messageNotifications ?? true);
       setWeeklyDigest(data.notificationSettings?.weeklyDigest ?? true);
       
       setLoading(false);
@@ -62,6 +65,7 @@ export default function SettingsPage() {
         emailNotifications,
         friendRequestNotifications,
         profileLikedNotifications,
+        messageNotifications,
         weeklyDigest,
       });
       
@@ -170,6 +174,26 @@ export default function SettingsPage() {
                     className="toggle toggle-error"
                     checked={profileLikedNotifications}
                     onChange={(e) => setProfileLikedNotifications(e.target.checked)}
+                    disabled={!emailNotifications}
+                  />
+                </label>
+              </div>
+
+              {/* Message Notifications */}
+              <div className="form-control">
+                <label className="label cursor-pointer justify-between p-4 bg-base-200 rounded-lg">
+                  <div className="flex items-center gap-3">
+                    <FaEnvelope className="text-lg text-warning" />
+                    <div>
+                      <span className="label-text font-semibold">{t('settings.messages')}</span>
+                      <p className="text-xs text-base-content/60 mt-1">{t('settings.messagesDesc')}</p>
+                    </div>
+                  </div>
+                  <input
+                    type="checkbox"
+                    className="toggle toggle-warning"
+                    checked={messageNotifications}
+                    onChange={(e) => setMessageNotifications(e.target.checked)}
                     disabled={!emailNotifications}
                   />
                 </label>

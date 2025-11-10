@@ -5,6 +5,8 @@ import connectMongo from "@/libs/mongoose";
 import Conversation from "@/models/Conversation";
 import Message from "@/models/Message";
 import User from "@/models/User";
+import { sendEmail } from "@/libs/resend";
+import { messageReceivedEmail } from "@/libs/email-templates";
 
 // GET /api/conversations/[conversationId]/messages - Get all messages in a conversation
 export async function GET(
@@ -54,6 +56,10 @@ export async function GET(
       },
       { isRead: true }
     );
+
+    // Note: We DON'T reset the cooldown here on purpose
+    // This prevents email spam during active conversations
+    // The 1-hour cooldown will naturally expire if they stop chatting
 
     return NextResponse.json({ messages });
   } catch (error) {
@@ -108,7 +114,7 @@ export async function POST(
     }
 
     // Get sender info
-    const sender = await User.findById(session.user.id).select("name image");
+    const sender = await User.findById(session.user.id).select("name username image preferredLanguage");
 
     // Create message
     const message = await Message.create({
@@ -125,8 +131,64 @@ export async function POST(
     conversation.lastMessageBy = session.user.id;
     await conversation.save();
 
-    // Note: We don't create notifications for messages anymore
-    // Messages are tracked via unread count on the Messages link instead
+    // Get recipient(s) - exclude the sender
+    const recipientIds = conversation.participants.filter(
+      (p: any) => p.toString() !== session.user.id
+    );
+
+    // Send email notification to each recipient (non-blocking) with cooldown
+    recipientIds.forEach(async (recipientId: any) => {
+      try {
+        const recipient = await User.findById(recipientId).select(
+          "email name notificationSettings preferredLanguage"
+        );
+
+        // Check if email notifications are enabled
+        if (
+          recipient?.email &&
+          recipient.notificationSettings?.emailNotifications !== false &&
+          recipient.notificationSettings?.messageNotifications !== false
+        ) {
+          // Cooldown mechanism: Only send email if it's been more than 1 hour since last email
+          // This prevents spam during active conversations (like LinkedIn does)
+          const lastEmailSent = conversation.lastEmailNotificationSent?.get(recipientId.toString());
+          const cooldownPeriod = 60 * 60 * 1000; // 1 hour in milliseconds
+          const now = new Date();
+
+          if (!lastEmailSent || (now.getTime() - new Date(lastEmailSent).getTime() > cooldownPeriod)) {
+            // Send the email
+            const emailTemplate = messageReceivedEmail(
+              {
+                name: sender?.name,
+                username: sender?.username,
+                image: sender?.image,
+              },
+              {
+                name: recipient.name,
+                email: recipient.email,
+              },
+              text.trim(),
+              params.conversationId,
+              recipient.preferredLanguage || 'en'
+            );
+
+            sendEmail({
+              to: recipient.email,
+              ...emailTemplate,
+            }).catch(err => console.error('Failed to send message notification email:', err));
+
+            // Update the last email sent timestamp for this recipient
+            conversation.lastEmailNotificationSent = conversation.lastEmailNotificationSent || new Map();
+            conversation.lastEmailNotificationSent.set(recipientId.toString(), now);
+            await conversation.save();
+          } else {
+            console.log(`Skipping email to ${recipientId} - cooldown active (last sent: ${lastEmailSent})`);
+          }
+        }
+      } catch (err) {
+        console.error('Error processing message notification:', err);
+      }
+    });
 
     return NextResponse.json({
       success: true,

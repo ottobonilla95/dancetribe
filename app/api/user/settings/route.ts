@@ -23,6 +23,7 @@ export async function GET(req: NextRequest) {
     return NextResponse.json({
       notificationSettings: user.notificationSettings || {
         emailNotifications: true,
+        messageNotifications: true,
         friendRequestNotifications: true,
         profileLikedNotifications: true,
       }

@@ -380,6 +380,10 @@ const userSchema = new mongoose.Schema(
         type: Boolean,
         default: true, // Enabled by default
       },
+      messageNotifications: {
+        type: Boolean,
+        default: true, // Enabled by default
+      },
       weeklyDigest: {
         type: Boolean,
         default: true, // Enabled by default

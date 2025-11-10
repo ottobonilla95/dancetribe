@@ -517,6 +517,8 @@
     "friendRequestsDesc": "Recibe notificaciones cuando alguien te envíe una solicitud de amistad o acepte la tuya",
     "profileLikes": "Me Gusta en el Perfil",
     "profileLikesDesc": "Recibe notificaciones cuando alguien le dé me gusta a tu perfil",
+    "messages": "Mensajes Directos",
+    "messagesDesc": "Recibe notificaciones cuando alguien te envíe un mensaje directo",
     "weeklyDigest": "Resumen Semanal",
     "weeklyDigestDesc": "Recibe un resumen semanal de tu actividad, cambios en clasificaciones y actualizaciones de amigos",
     "saved": "¡Configuración guardada exitosamente!",

@@ -48,6 +48,16 @@ const emailTranslations = {
       footer1: "Maybe it's time to connect? Send them a friend request! 💃🕺",
       footer2: (appName: string) => `You're receiving this because someone liked your profile on ${appName}.`,
       managePrefs: 'Manage notification preferences'
+    },
+    messageReceived: {
+      subject: (name: string) => `${name} sent you a message! 💬`,
+      header: 'New Message!',
+      greeting: (name: string) => `Hi ${name}!`,
+      sentMessage: 'sent you a message:',
+      viewButton: 'View Message',
+      footer1: "Reply to continue the conversation! 💬",
+      footer2: (appName: string) => `You're receiving this because someone sent you a message on ${appName}.`,
+      managePrefs: 'Manage notification preferences'
     }
   },
   es: {
@@ -80,6 +90,16 @@ const emailTranslations = {
       viewButton: 'Ver su Perfil',
       footer1: '¿Quizás es momento de conectar? ¡Envíale una solicitud de amistad! 💃🕺',
       footer2: (appName: string) => `Recibes esto porque a alguien le gustó tu perfil en ${appName}.`,
+      managePrefs: 'Gestionar preferencias de notificaciones'
+    },
+    messageReceived: {
+      subject: (name: string) => `¡${name} te envió un mensaje! 💬`,
+      header: '¡Nuevo Mensaje!',
+      greeting: (name: string) => `¡Hola ${name}!`,
+      sentMessage: 'te envió un mensaje:',
+      viewButton: 'Ver Mensaje',
+      footer1: '¡Responde para continuar la conversación! 💬',
+      footer2: (appName: string) => `Recibes esto porque alguien te envió un mensaje en ${appName}.`,
       managePrefs: 'Gestionar preferencias de notificaciones'
     }
   }
@@ -189,6 +209,77 @@ export function friendRequestAcceptedEmail(accepter: UserData, sender: UserData,
               </div>
               <div style="text-align: center;">
                 <a href="https://dancecircle.co/${accepter.username || `dancer/${accepter._id}`}" class="button">${t.viewButton}</a>
+              </div>
+              <p style="margin-top: 30px; color: #666; font-size: 14px;">
+                ${t.footer1}
+              </p>
+            </div>
+            <div class="footer">
+              <p>${t.footer2(config.appName)}</p>
+              <p><a href="https://${config.domainName}/profile?settings=notifications" style="color: #667eea;">${t.managePrefs}</a></p>
+            </div>
+          </div>
+        </body>
+      </html>
+    `
+  };
+}
+
+/**
+ * Message Received Email
+ */
+export function messageReceivedEmail(
+  sender: UserData, 
+  recipient: UserData, 
+  messagePreview: string, 
+  conversationId: string,
+  locale: Locale = 'en'
+) {
+  const t = emailTranslations[locale].messageReceived;
+  const messageSnippet = messagePreview.length > 100 ? messagePreview.substring(0, 100) + '...' : messagePreview;
+  
+  return {
+    subject: t.subject(sender.name || 'Someone'),
+    text: `${t.greeting(recipient.name || 'there')} ${sender.name || 'A dancer'} ${t.sentMessage} "${messageSnippet}"`,
+    html: `
+      <!DOCTYPE html>
+      <html>
+        <head>
+          <meta charset="utf-8">
+          <style>
+            body { font-family: Arial, sans-serif; line-height: 1.6; color: #333; margin: 0; padding: 0; }
+            .container { max-width: 600px; margin: 0 auto; }
+            .header { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 40px 30px; text-align: center; }
+            .content { background: #f9f9f9; padding: 40px 30px; }
+            .profile-card { background: white; padding: 20px; margin: 20px 0; border-radius: 10px; text-align: center; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
+            .profile-image { width: 80px; height: 80px; border-radius: 50%; margin: 0 auto 15px; object-fit: cover; }
+            .message-preview { background: #f0f0f0; padding: 15px; border-radius: 8px; margin: 20px 0; font-style: italic; color: #555; }
+            .button { display: inline-block; background: #667eea; color: white !important; padding: 14px 30px; text-decoration: none; border-radius: 6px; margin-top: 20px; font-weight: bold; }
+            .button:hover { background: #5568d3; }
+            .footer { text-align: center; padding: 20px; color: #666; font-size: 12px; }
+          </style>
+        </head>
+        <body>
+          <div class="container">
+            <div class="header">
+              <h1 style="margin: 0; font-size: 28px;">💬 ${t.header}</h1>
+            </div>
+            <div class="content">
+              <p style="font-size: 16px; margin-bottom: 20px;">${t.greeting(recipient.name || 'there')}</p>
+              <div class="profile-card">
+                ${sender.image 
+                  ? `<img src="${sender.image}" alt="${sender.name}" class="profile-image" />` 
+                  : `<div style="width: 80px; height: 80px; border-radius: 50%; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); margin: 0 auto 15px; display: flex; align-items: center; justify-content: center; color: white; font-size: 32px; font-weight: bold;">${sender.name?.[0] || 'D'}</div>`
+                }
+                <h2 style="margin: 10px 0; color: #333;">${sender.name || 'A dancer'}</h2>
+                ${sender.username ? `<p style="color: #666; margin: 5px 0;">@${sender.username}</p>` : ''}
+                <p style="color: #666; margin: 10px 0;">${t.sentMessage}</p>
+                <div class="message-preview">
+                  "${messageSnippet}"
+                </div>
+              </div>
+              <div style="text-align: center;">
+                <a href="https://dancecircle.co/messages/${conversationId}" class="button">${t.viewButton}</a>
               </div>
               <p style="margin-top: 30px; color: #666; font-size: 14px;">
                 ${t.footer1}
