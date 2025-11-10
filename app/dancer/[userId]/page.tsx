@@ -194,13 +194,8 @@ export default async function PublicProfile({ params }: Props) {
       .populate({
         path: "friends",
         model: User,
-        select: "name username image city",
-        options: { limit: 100 }, // Limit to 100 friends for display (good balance of UX vs performance)
-        populate: {
-          path: "city",
-          model: City,
-          select: "name", // Only need city name for display
-        },
+        select: "name username image", // Only fetch what's displayed: name, image, and username for alt text fallback
+        options: { limit: 200 }, // Show up to 200 friends (optimized - no city queries means we can show more!)
       })
       .populate({
         path: "city",
