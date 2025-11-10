@@ -251,20 +251,16 @@ export function shouldSendDigest(data: WeeklyDigestData): boolean {
 }
 
 /**
- * Get all active users for weekly digest
- * (users who have completed profiles and logged in within last 30 days)
+ * Get all users eligible for weekly digest
+ * (all users with completed profiles - shouldSendDigest() will check if they have activity)
  */
 export async function getActiveUsersForDigest(): Promise<string[]> {
   try {
     await connectMongo();
 
-    const thirtyDaysAgo = new Date();
-    thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
-
     const users = await User.find({
       isProfileComplete: true,
-      email: { $exists: true, $nin: [null, config.admin.email] }, // Exclude admin
-      lastLogin: { $gte: thirtyDaysAgo },
+      email: { $exists: true, $ne: null },
     })
       .select('_id')
       .lean();
