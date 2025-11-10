@@ -1,4 +1,6 @@
 import { NextResponse } from "next/server";
+import { getServerSession } from "next-auth";
+import { authOptions } from "@/libs/next-auth";
 import { getActiveUsersForDigest, getWeeklyDigestData, shouldSendDigest } from "@/utils/weekly-digest";
 import { generateWeeklyDigestHTML, generateWeeklyDigestText } from "@/utils/email-templates/weekly-digest";
 import { sendEmail } from "@/libs/resend";
@@ -14,18 +16,18 @@ import config from "@/config";
  */
 export async function POST(req: Request) {
   try {
-    // Check authorization
+    // Check authorization - allow either cron secret OR admin user
     const authHeader = req.headers.get('authorization');
     const cronSecret = process.env.CRON_SECRET;
-
-    // Allow either cron secret or admin session
     const isAuthorizedCron = cronSecret && authHeader === `Bearer ${cronSecret}`;
     
-    if (!isAuthorizedCron) {
-      // Alternative: check if admin (for manual testing)
-      // You could add session check here if needed
+    // Check if user is admin (for manual testing)
+    const session = await getServerSession(authOptions);
+    const isAdmin = session?.user?.email === config.admin.email;
+    
+    if (!isAuthorizedCron && !isAdmin) {
       return NextResponse.json(
-        { error: "Unauthorized" },
+        { error: "Unauthorized - Admin access or cron secret required" },
         { status: 401 }
       );
     }
