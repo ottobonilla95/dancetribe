@@ -80,9 +80,13 @@ export async function generateMetadata({ params }: Props) {
       title,
       description,
       keywords: `${city.name} dance, ${city.name} dancers, ${danceStylesText}, dance community ${city.name}, ${city.name} ${city.country?.name} dance, dance partners ${city.name}, dance classes ${city.name}`,
+      alternates: {
+        canonical: `/city/${params.cityId}`,
+      },
       openGraph: {
         title,
         description,
+        url: `https://dancecircle.co/city/${params.cityId}`,
         images: city.image ? [city.image] : [],
       },
       twitter: {

@@ -92,9 +92,13 @@ export async function generateMetadata({ params }: Props) {
       title,
       description,
       keywords: `${country.name} dance, ${country.name} dancers, ${danceStylesText}, dance community ${country.name}, dance partners ${country.name}, ${country.name} dance scene, dance classes ${country.name}`,
+      alternates: {
+        canonical: `/country/${params.countryId}`,
+      },
       openGraph: {
         title,
         description,
+        url: `https://dancecircle.co/country/${params.countryId}`,
       },
       twitter: {
         card: "summary_large_image",
