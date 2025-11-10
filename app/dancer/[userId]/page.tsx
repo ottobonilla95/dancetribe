@@ -50,9 +50,6 @@ interface Props {
   };
 }
 
-// Cache dancer profile pages for 30 minutes (profiles don't change that often)
-export const revalidate = 1800;
-
 // Generate dynamic SEO metadata for dancer profiles
 export async function generateMetadata({ params }: Props) {
   await connectMongo();
@@ -391,8 +388,10 @@ export default async function PublicProfile({ params }: Props) {
 
   // Social status calculations
   const likesCount = userData.likedBy?.length || 0;
+  // Convert ObjectIds to strings once for performance
+  const likedByIds = userData.likedBy?.map((id: any) => id.toString()) || [];
   const isLikedByCurrentUser = isLoggedIn
-    ? userData.likedBy?.includes(session?.user?.id)
+    ? likedByIds.includes(session?.user?.id)
     : false;
 
   // Separate populated friends from IDs

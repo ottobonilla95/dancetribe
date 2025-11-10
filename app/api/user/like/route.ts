@@ -51,8 +51,9 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    // Check if already liked
-    const isAlreadyLiked = targetUser.likedBy.includes(currentUserId);
+    // Check if already liked (convert ObjectIds to strings once for performance)
+    const likedByIds = targetUser.likedBy.map((id: any) => id.toString());
+    const isAlreadyLiked = likedByIds.includes(currentUserId);
 
     if (isAlreadyLiked) {
       // Unlike - remove from likedBy array
