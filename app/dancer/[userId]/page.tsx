@@ -43,12 +43,23 @@ import LeaderboardBadges from "@/components/LeaderboardBadges";
 import { getUserLeaderboardBadges } from "@/utils/leaderboard-badges";
 import ProducerReleases from "@/components/ProducerReleases";
 import VerifiedBadge from "@/components/VerifiedBadge";
+import { unstable_cache } from "next/cache";
 
 interface Props {
   params: {
     userId: string;
   };
 }
+
+// Cache dance styles for 1 hour - they rarely change
+const getCachedDanceStyles = unstable_cache(
+  async () => {
+    await connectMongo();
+    return await DanceStyle.find({}).lean();
+  },
+  ['all-dance-styles'],
+  { revalidate: 3600, tags: ['dance-styles'] }
+);
 
 // Generate dynamic SEO metadata for dancer profiles
 export async function generateMetadata({ params }: Props) {
@@ -250,7 +261,8 @@ export default async function PublicProfile({ params }: Props) {
     notFound();
   }
 
-  const danceStyles = await DanceStyle.find({}).lean();
+  // Use cached dance styles - reduces DB queries significantly
+  const danceStyles = await getCachedDanceStyles();
 
   // Fetch DJ events if user is a DJ
   let djEvents: any[] = [];

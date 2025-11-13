@@ -20,6 +20,7 @@ import TripOverlaps from "@/components/TripOverlaps";
 import DiscoverySettings from "@/components/DiscoverySettings";
 import YourCityPreview from "@/components/YourCityPreview";
 import InviteFriendsBanner from "@/components/InviteFriendsBanner";
+import InstallAppDashboardBanner from "@/components/InstallAppDashboardBanner";
 import Link from "next/link";
 import { getMessages, getTranslation } from "@/lib/i18n";
 import { unstable_cache } from "next/cache";
@@ -1040,6 +1041,9 @@ export default async function Dashboard() {
   return (
     <main className="min-h-screen pb-24 py-8">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        {/* Install App Banner - Only shows if NOT installed as PWA */}
+        <InstallAppDashboardBanner />
+
         {/* Invite Friends Banner */}
         <InviteFriendsBanner friendsCount={friendsCount} />
 

@@ -41,10 +41,14 @@ const connectMongo = async () => {
   if (!cached.promise) {
     const opts = {
       bufferCommands: false,
-      maxPoolSize: 10, // Limit connection pool size
-      minPoolSize: 2,
+      maxPoolSize: 5, // REDUCED: In serverless, each instance creates a pool. Keep it small!
+      minPoolSize: 1,
+      maxIdleTimeMS: 10000, // Close idle connections after 10s
       serverSelectionTimeoutMS: 5000,
       socketTimeoutMS: 45000,
+      // Force connection reuse
+      retryWrites: true,
+      retryReads: true,
     };
 
     console.log("🔌 Creating new MongoDB connection...");

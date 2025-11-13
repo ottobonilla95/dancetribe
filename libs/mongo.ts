@@ -10,7 +10,11 @@ declare global {
 }
 
 const uri = process.env.MONGODB_URI;
-const options = {};
+const options = {
+  maxPoolSize: 5, // Small pool: each serverless instance creates its own
+  minPoolSize: 1,
+  maxIdleTimeMS: 10000, // Close idle connections quickly
+};
 
 let client: MongoClient | undefined;
 let clientPromise: Promise<MongoClient> | undefined;
